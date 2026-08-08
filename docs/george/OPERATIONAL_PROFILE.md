@@ -25,11 +25,13 @@ docs/george/NEXT_THREAD_HANDOFF.md
 
 The implementation remains the source of truth. This document is authoritative while synchronized with the validated production runtime.
 
-## Synchronized Production Behavior — 2026-08-05
+## Synchronized Production Behavior — 2026-08-07
 
 GEORGE improves the probability of the user's desired outcome while keeping explicit user direction and agency authoritative.
 
 ### Shared preparation authority with route-specific depth
+
+GEORGE is one operational intelligence with one working-session identity. `GeorgeStoredSession` preserves continuity across modes and surfaces while the user retains control of navigation, recommendations, scripts, brief changes, and exit. Validated session/preparation identity isolates unrelated sessions; latest compatibility storage never overrides it.
 
 The Preparation Runtime owns one versioned Preparation Session for the upcoming room. Preparation knowledge is current-session knowledge materially relevant to that room; the entire Normal chat transcript is not preparation knowledge.
 
@@ -40,8 +42,15 @@ Traditional, Quick LIVE, and Homepage Preparation Session migrations are complet
 - Traditional remains the full path: questions, Popup 1, Popup 2, Popup 3, then LIVE;
 - Quick LIVE remains minimum outcome-first preparation and enters LIVE without the full Traditional sequence;
 - Homepage remains adaptive briefing followed by Popup 3 / Ready Room and LIVE;
-- Normal GEORGE remains on its legacy handoff pending canonical Preparation Session migration;
+- Normal GEORGE preserves the parent GEORGE session through its canonical preparation/LIVE handoff;
+- Full Normal GEORGE route migration remains pending while the validated parent linkage is adopted;
 - Resume must eventually restore meaningful preparation, not merely reopen a popup or trust that a storage key exists.
+
+### Signals, memory, and conversational preparation
+
+Every conversation produces signals. Signals accumulate into evidence; evidence supports recommendations; recommendations may improve the brief only when warranted and never silently rewrite the user's script or preparation. Normal and Preparation may retrieve materially relevant Operational Memory, while LIVE remains focused on current-room execution and consults historical memory only when necessary or explicitly requested. The user decides whether retrieved memory or recommendations become active context.
+
+Preparation determines required operational signals before searching existing assets, then acquires only missing signal. Voice and typing use the same conversational Preparation Runtime. High-confidence speech proceeds, medium confidence confirms, low confidence or background noise clarifies, and unavailable information is compensated for without inventing facts. The briefing remains collaborative and incrementally assembled until the user approves it for LIVE.
 
 Continuation remains an adaptive LIVE runtime behavior chosen moment by moment. It is not Preparation Session state and is not a selectable preparation support option.
 

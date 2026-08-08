@@ -30,7 +30,7 @@ The implementation remains the source of truth. This document is authoritative o
 Current phase:
 
 ```text
-Production Completion — canonical Preparation Runtime route migration
+Production Completion — conversational preparation and session continuity
 ```
 
 The runtime architecture is frozen unless current implementation evidence proves a genuine architectural defect.
@@ -80,6 +80,18 @@ A Preparation Session may carry:
 - confirmations and runtime preferences relevant to the prepared room;
 - semantic workflow checkpoint, checkpoint history, and return target;
 - valid related Normal and LIVE session identities.
+
+### GEORGE working-session continuity
+
+`lib/george/session/store.ts` owns `GeorgeStoredSession`, the parent working-session identity and linkage boundary. It records the stable GEORGE session ID, validated `preparationSessionId` when present, operating mode, and current surface. It points to canonical Preparation, LIVE, Conversation Package, Conversation Record, Formula, Script, and authentication identities; it does not absorb their payloads.
+
+Mode or surface changes across Normal, Library/Marketplace, Preparation, LIVE, Post-LIVE, Ask GEORGE, and Next Call preserve the parent session identity while leaving navigation and adoption decisions to the user. Validated session/preparation linkage takes precedence over compatibility/latest storage, which remains recovery material only. Unrelated sessions cannot inherit active briefing, Formula, Script, LIVE setup, signals, or Conversation Records.
+
+Normal GEORGE's parent linkage is implemented, while full Normal route migration remains pending.
+
+Operational Memory is materially retrievable in Normal and Preparation and resumes full analysis after LIVE. LIVE prioritizes current room, approved preparation, objective, script/formula, and uploaded material; historical memory is consulted only when materially necessary or explicitly requested. Retrieved memory informs work but does not become current-session authority without user adoption.
+
+The production preparation flow is objective → required operational signals → relevant existing assets → missing signal → conversational briefing. Voice and typing share the same Preparation Runtime; speech confidence and non-fabricating compensation remain preparation behaviors. Preparation resolves assessment → operational action → communication behavior → voice/visual expression. LIVE execution composition remains mode-specific and is not replaced by a universal composer.
 
 Readiness, missing evidence, confidence, and recommended next step are derived selectors recomputed by the preparation controller. They are not persisted as canonical Preparation Session truth. `LivePrepSetup` and runtime-support payloads are outputs derived for existing consumers; they are not canonical preparation state, and their external contracts remain unchanged.
 

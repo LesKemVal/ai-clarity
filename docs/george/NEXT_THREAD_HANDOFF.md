@@ -20,17 +20,17 @@ Inspect the local implementation before changing anything. This handoff records 
 ## Current Repository State
 
 - Current branch: `conversation-summary-runtime`
-- Current HEAD: `2fe3cbdac8b07ee28eccb91e1c10850a0026478b` (`2fe3cbda Unify homepage preparation session`)
+- Current HEAD: `00ba538b Complete conversational preparation and session continuity`
 - Ahead/behind `origin/conversation-summary-runtime`: ahead 17, behind 0 at synchronization start
 - Production build status: PASS after the required validation for this synchronization
-- Worktree status: clean at synchronization start; dirty at handoff only for the approved documentation authorities and documentation qualification, with no production implementation changes
+- Worktree status: implementation checkpoint committed; documentation and approved front-page UI remain the next scoped changes
 - Commit status: stopped before commit
 
 No recovery tag is declared for this handoff.
 
 ## Current Validated Phase
 
-GEORGE is in **Production Completion — canonical Preparation Runtime route migration**.
+GEORGE is in **Production Completion — conversational preparation and session continuity**.
 
 The Preparation Runtime is the canonical lifecycle authority. `PreparationSessionV1` is the versioned state for one preparation. Routes seed or restore the session while preserving distinct user experiences; they do not create separate runtimes or reasoning authorities.
 
@@ -60,21 +60,18 @@ Canonical route adapters:
 | Traditional | Complete | Questions → Popup 1 → Popup 2 → Popup 3 → LIVE |
 | Quick LIVE | Complete | Minimum outcome-first setup → LIVE |
 | Homepage | Complete | Adaptive briefing → Popup 3 / Ready Room → LIVE |
-| Normal GEORGE | Pending | Existing legacy handoff remains active |
+| Normal GEORGE | Linked / pending full migration | Parent GEORGE session identity is preserved; full route migration remains pending |
 | Resume | Pending | Meaningful eligibility and canonical restoration are not implemented |
 
 Legacy preparation contracts remain read-compatible until all route migrations are complete. Strategy must wait until Normal and Resume share the canonical lifecycle.
 
-## Normal-to-LIVE Inspection Findings
+## Session Continuity and Operational Doctrine
 
-- A source-less Normal LIVE entry currently routes to LIVE Entry and begins briefing questions.
-- `source=signal` and `source=message` use the legacy Normal prepared handoff and enter Popup 2 mechanics.
-- Normal currently writes legacy preparation keys and does not create or identify a canonical Preparation Session.
-- A stored canonical session is not sufficient proof of identity and may belong to Traditional, Quick LIVE, Homepage, or an unrelated LIVE preparation.
-- A deliberate Normal-to-LIVE handoff must carry both `preparationSessionId` and `normalSessionId` so LIVE Entry can validate and hydrate the intended session.
-- The explicit objective remains authoritative. Inferred direction may become context or a proposed outcome, but must not replace an established objective without confirmation.
-- Normal documents, Formula, Script, and support recommendations are not yet safely represented in the handoff; the entire Normal chat transcript must not be copied into preparation state.
-- The current user destination must be preserved: source-less entry begins briefing, while prepared signal/message entry reaches Popup 2 mechanics. The eventual semantic checkpoint must represent that existing destination rather than redesign it.
+`GeorgeStoredSession` is the parent working-session identity/linkage boundary. It preserves session ID, validated preparation linkage, mode, and surface across Normal, Library/Marketplace, Preparation, LIVE, Post-LIVE, Ask GEORGE, and Next Call without forcing user navigation. Preparation, LIVE, Conversation Package, Conversation Record, Formula, Script, and authentication remain separate canonical owners.
+
+Validated identity isolates unrelated sessions; compatibility/latest storage is recovery material only. Normal and Preparation retrieve materially relevant Operational Memory, while LIVE prioritizes current execution context and consults historical memory only when necessary or explicitly requested. Signals accumulate into evidence, evidence supports recommendations, and the user decides whether to adopt them.
+
+Preparation is objective-first and conversational: required operational signals are identified before relevant assets are searched; voice and typing share the same runtime; missing information is acquired without fabrication; assessment resolves operational action and then communication behavior. LIVE behavior composition remains execution-specific.
 
 ## Current Next Work
 

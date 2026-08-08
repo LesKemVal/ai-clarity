@@ -19,11 +19,11 @@ Read in this order:
 
 Continuation packets provide operational context only. They do not override implementation or these synchronized authorities.
 
-## Synchronized Current Status — 2026-08-05
+## Synchronized Current Status — 2026-08-07
 
 Current branch: `conversation-summary-runtime`
 
-Current validated phase: **Production Completion — canonical Preparation Runtime route migration**.
+Current validated phase: **Production Completion — conversational preparation and session continuity**.
 
 The local implementation has one GEORGE intelligence, one runtime, and one reasoning authority. The current branch preserves that architecture while completing these production behaviors:
 
@@ -35,7 +35,14 @@ The local implementation has one GEORGE intelligence, one runtime, and one reaso
 - preparation recommendations and explicit user overrides remain distinct; Formula, Script, customized Script, documents, confirmations, workflow checkpoints, and valid related-session identities may travel with the session;
 - preparation readiness, missing evidence, confidence, and recommended next step are recomputed controller results rather than persisted canonical truth;
 - existing `LivePrepSetup` and runtime-support payloads remain output contracts rather than Preparation Session state;
-- the Normal GEORGE handoff is still legacy and is the next route migration; meaningful Resume restoration, legacy cleanup, and Strategy integration remain pending;
+- `GeorgeStoredSession` is the parent GEORGE working-session identity/linkage boundary. Mode and surface changes preserve it; Preparation, LIVE, Conversation Package, Conversation Record, Formula, Script, and authentication retain their own canonical ownership;
+- Normal, Library/Marketplace, Preparation, LIVE, Post-LIVE, Ask GEORGE, and Next Call preserve validated session/preparation linkage without forcing navigation or user choices;
+- unrelated sessions remain isolated by validated session/preparation identity; compatibility/latest storage is recovery material only and cannot override a conflicting validated identity;
+- Normal and Preparation may retrieve materially relevant Operational Memory. LIVE prioritizes current room, preparation, objective, script/formula, and approved material; historical memory is suppressed unless materially necessary or explicitly requested. Retrieved memory remains advisory until the user adopts it;
+- every conversation yields signals; accumulated signals support evidence, evidence supports recommendations, and recommendations do not automatically rewrite the brief or script;
+- Preparation determines required operational signals before searching relevant existing assets. Conversational voice and typing share the same Preparation Runtime, incrementally assemble the briefing, and never fabricate unavailable facts;
+- preparation communication resolves assessment → operational action → behavior → voice/visual expression. This preparation-specific composition is not a universalized LIVE Behavior Composer;
+- meaningful Resume restoration, legacy cleanup, and Strategy integration remain pending;
 - Homepage and LIVE Entry construct canonical `priorInteractions` from accumulated answers, skipped questions, and original question text;
 - `app/api/george/live/signal-question/route.ts` normalizes canonical briefing history while retaining `priorAnswers` and `skippedQuestions` compatibility;
 - Homepage returns control after each optional question and requests another question only through **NEXT QUESTION**;
@@ -56,7 +63,7 @@ Current qualification status: **PASS** at `2fe3cbda` after `git diff --check`, `
 | Traditional | Migrated | Full questions → Popup 1 → Popup 2 → Popup 3 → LIVE |
 | Quick LIVE | Migrated | Minimum outcome-first setup → LIVE |
 | Homepage | Migrated | Adaptive briefing → Popup 3 / Ready Room → LIVE |
-| Normal GEORGE | Pending | Existing legacy handoff remains active until explicit session identity and hydration are implemented |
+| Normal GEORGE | Linked / pending full migration | Existing GEORGE session identity is preserved through deliberate preparation/LIVE handoff; full route migration remains pending |
 | Resume | Pending | Must restore meaningful preparation, not infer eligibility from a storage key |
 
 Strategy remains future workflow over the same Preparation Session. It must not introduce another preparation runtime or semantic layer.
