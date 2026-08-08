@@ -71,6 +71,7 @@ export type PreparationSessionV1 = {
   updatedAt: number
   knowledge: {
     objective: string
+    baselineAssumptions: string[]
     name?: string
     role?: string
     participants: string[]
@@ -345,6 +346,7 @@ export function createPreparationSession(
     updatedAt,
     knowledge: {
       objective: cleanString(knowledge.objective),
+      baselineAssumptions: uniqueStrings(knowledge.baselineAssumptions),
       ...(cleanOptionalString(knowledge.name)
         ? { name: cleanOptionalString(knowledge.name) }
         : {}),

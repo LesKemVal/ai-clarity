@@ -738,3 +738,98 @@ export function getConversationType(id: string | null | undefined) {
     null
   );
 }
+
+/**
+ * GEORGE's starting operational understanding for a conversation type.
+ * These are working assumptions, not user-selected objectives; Preparation
+ * carries them forward so the user can correct or refine them.
+ */
+export function getConversationTypeBaselineAssumptions(
+  id: string | null | undefined,
+): readonly string[] {
+  const conversationId = String(id || "").trim().toLowerCase();
+
+  if (
+    /sale|sales|appointment|discovery|objection|client|customer|product-demo|renewal|price-increase|collections|referral/.test(
+      conversationId,
+    )
+  ) {
+    return [
+      "Trust matters.",
+      "Discovery matters.",
+      "Resistance is expected.",
+      "Value must become clear.",
+      "The conversation should move toward a concrete next step.",
+    ];
+  }
+
+  if (/interview|promotion|salary|performance-review|feedback/.test(conversationId)) {
+    return [
+      "Evidence matters.",
+      "Credibility matters.",
+      "Difficult questions are expected.",
+      "Confidence and recovery matter.",
+    ];
+  }
+
+  if (/investor|fundrais|financing|loan/.test(conversationId)) {
+    return [
+      "Evidence and financial clarity matter.",
+      "Risk questions are expected.",
+      "Confidence matters.",
+      "The conversation should earn a clear next commitment.",
+    ];
+  }
+
+  if (/negotiat|contract|housing|vendor|budget|partnership|real-estate/.test(conversationId)) {
+    return [
+      "Interests may differ.",
+      "Resistance is expected.",
+      "Leverage and boundaries matter.",
+      "Tradeoffs should be made explicit.",
+    ];
+  }
+
+  if (/meeting|executive|kickoff|status|crisis|manage-up|delegate|align/.test(conversationId)) {
+    return [
+      "Alignment matters.",
+      "Important decisions should become explicit.",
+      "Stakeholders and risks need to stay visible.",
+      "The conversation should end with clear actions.",
+    ];
+  }
+
+  if (/teach|workshop|keynote|broadcast|podcast|explain|debate|presentation|panel|media|press|comment/.test(conversationId)) {
+    return [
+      "The audience's understanding matters.",
+      "Clarity and pacing matter.",
+      "Questions and shifts in attention are expected.",
+      "The intended takeaway should remain clear.",
+    ];
+  }
+
+  if (/case|legal|criminal|civil|appeal|deposition/.test(conversationId)) {
+    return [
+      "Facts and evidence matter.",
+      "Scrutiny is expected.",
+      "The argument must remain clear and bounded.",
+      "The requested outcome should stay explicit.",
+    ];
+  }
+
+  if (/conflict|difficult|boundary|relationship|family|therapy|apologize|repair|co-parenting|estate/.test(conversationId)) {
+    return [
+      "Trust and clarity matter.",
+      "Emotion or resistance may shape the exchange.",
+      "Boundaries should remain clear.",
+      "The conversation should move toward a workable resolution.",
+    ];
+  }
+
+  return [
+    "The people and context matter.",
+    "Relevant evidence should stay close at hand.",
+    "Questions or resistance are possible.",
+    "The conversation should move toward a clear next step.",
+  ];
+}
