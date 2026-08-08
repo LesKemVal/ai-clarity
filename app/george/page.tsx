@@ -1974,7 +1974,21 @@ export default function Page({
   const [showSidebar, setShowSidebar] = useState(false);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia("(min-width: 1280px)");
+    const syncDesktopSidebar = () => {
+      setShowSidebar(media.matches && !forceLive && !liveMode);
+    };
+    syncDesktopSidebar();
+    media.addEventListener?.("change", syncDesktopSidebar);
+    return () => media.removeEventListener?.("change", syncDesktopSidebar);
+  }, [forceLive, liveMode]);
+
+  useEffect(() => {
     if (typeof window === "undefined" || !showSidebar) return;
+
+    const mobileOverlay = window.matchMedia("(max-width: 1279px)").matches;
+    if (!mobileOverlay) return;
 
     const scrollY = window.scrollY;
     const body = document.body;
@@ -6783,7 +6797,7 @@ I’ll stay with you.`,
               type="button"
               aria-label="Close GEORGE sidebar"
               onClick={() => setShowSidebar(false)}
-              className="fixed inset-0 z-[220] cursor-default bg-black george-motion-fade-soft/[0.18] backdrop-blur-[7px] transition-[opacity,background-color,backdrop-filter] duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)]"
+              className="fixed inset-0 z-[220] cursor-default bg-black george-motion-fade-soft/[0.18] backdrop-blur-[7px] transition-[opacity,background-color,backdrop-filter] duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)] xl:hidden"
             />
           )}
 

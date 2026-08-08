@@ -449,7 +449,7 @@ return (
 
           <section>
             <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/30">
-              GEORGE
+              WORKSPACE
             </div>
 
             <div className="mt-2 space-y-0.5">
@@ -517,8 +517,17 @@ return (
           )}
 
           <section className="border-t border-white/[0.035] pt-4">
+            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/26">
+              Workspace
+            </div>
+            <a href="/george/library" onClick={() => setShowSidebar?.(false)} className="mt-2 block rounded-[0.55rem] px-3 py-2 text-[13px] text-white/52 transition hover:bg-white/[0.016] hover:text-white/78">
+              Library
+            </a>
+          </section>
+
+          <section className="border-t border-white/[0.035] pt-4">
             <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/22">
-              Governance
+              Support
             </div>
 
             <div className="mt-2 space-y-0.5">

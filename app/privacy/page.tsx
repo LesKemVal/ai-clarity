@@ -25,7 +25,7 @@ export default function PrivacyPage() {
           <div className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5">
             <h2 className="text-white text-xl font-semibold">Your Documents</h2>
             <p className="mt-3 text-neutral-400 leading-7">
-              Features such as saved responses, folders, and recent items may store data locally in your browser or device environment.
+              Saved sessions, preparation state, and recent items may store data locally in your browser or device environment.
             </p>
           </div>
 

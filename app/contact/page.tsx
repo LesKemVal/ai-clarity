@@ -23,6 +23,10 @@ export default function ContactPage() {
             <p className="mt-2 text-sm text-neutral-400">We respond as soon as possible.</p>
           </div>
         </section>
+
+        <a href="/help" className="inline-flex text-sm text-[#AEB6FF]/78 transition hover:text-white">
+          Read Using GEORGE →
+        </a>
       </div>
     </PageShell>
   )

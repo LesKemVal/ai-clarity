@@ -3,9 +3,9 @@ import BxPageHeader from '@/components/BxPageHeader'
 const steps = [
   {
     index: '01',
-    label: 'START',
-    title: 'Begin with the result you want.',
-    body: 'Tell GEORGE what you are trying to accomplish. You can be specific or begin with a rough idea. GEORGE may ask for the smallest piece of information needed to make the next move useful.',
+    label: 'GET STARTED',
+    title: 'Start with the outcome.',
+    body: 'Tell GEORGE what you are trying to accomplish. Your role, audience, constraints, and desired result give the conversation a useful direction.',
     examples: [
       'Help me prepare for an investor meeting.',
       'Review this contract before I sign it.',
@@ -15,62 +15,62 @@ const steps = [
   },
   {
     index: '02',
-    label: 'PREPARE',
-    title: 'Think, plan, practice, and build.',
-    body: 'Use GEORGE before an important moment to organize your thinking, understand the situation, identify risks, prepare your message, and create the work you need.',
+    label: 'PREPARATION',
+    title: 'Brief GEORGE conversationally.',
+    body: 'Preparation is collaborative. Type or speak naturally while GEORGE identifies the objective, required signals, useful existing assets, and any missing information before assembling a briefing.',
     examples: [
-      'Plans and strategies',
-      'Interview and meeting preparation',
-      'Presentations, proposals, and pitch decks',
-      'Decisions, research, and next steps',
+      'Voice and typing use the same preparation flow',
+      'Existing resumes, proposals, decks, scripts, and briefings can be reviewed',
+      'Uploads, screenshots, photos, paste, and voice can supply missing signal',
+      'You review and approve the briefing before LIVE',
     ],
   },
   {
     index: '03',
-    label: 'FILES',
-    title: 'Bring GEORGE the information that matters.',
-    body: 'Upload a document, image, résumé, contract, report, presentation, or other relevant file. Tell GEORGE what you need from it instead of only asking for a summary.',
+    label: 'WORKSPACE',
+    title: 'Reuse work you already have.',
+    body: 'GEORGE looks for relevant operational assets before asking you to recreate them. Library and saved sessions can provide documents, formulas, scripts, and prior preparation for your confirmation.',
     examples: [
-      'Find the risks in this agreement.',
-      'Use my résumé to prepare stronger interview answers.',
-      'Turn this information into a presentation.',
-      'Tell me what matters for the decision I need to make.',
+      'Choose an existing asset or version',
+      'Update it, replace it, keep both, or start fresh',
+      'Library presents accessible operational strategies and saved work',
+      'Marketplace access and publication status remain explicit',
     ],
   },
   {
     index: '04',
     label: 'LIVE',
-    title: 'Take GEORGE into the conversation.',
-    body: 'LIVE is the real-time operating mode for interviews, meetings, negotiations, presentations, sales calls, reviews, and other conversations where support is useful while the outcome can still change.',
+    title: 'Execute the approved preparation.',
+    body: 'LIVE is the real-time operating mode for interviews, meetings, negotiations, presentations, sales calls, reviews, and other conversations where support can still change the outcome.',
     examples: [
-      'Choose how you will receive support.',
-      'Brief GEORGE on the room and desired outcome.',
-      'Talk naturally and remain present.',
-      'Use, change, or ignore any guidance.',
+      'Current room signals and approved preparation come first',
+      'Audio and visual support stay concise and referenceable',
+      'Historical memory is not surfaced just because it exists',
+      'Use, change, or ignore any guidance',
     ],
   },
   {
     index: '05',
-    label: 'SUPPORT',
-    title: 'Choose the support that fits the moment.',
-    body: 'GEORGE can provide a small cue, help continue your thought, form a complete response, or recommend the next move. Audio support is designed to be easy to hear and use. Visual support can remain available to read and reference.',
+    label: 'AFTER LIVE',
+    title: 'Review signals and decide what comes next.',
+    body: 'A completed conversation can produce signals, records, review, and recommendations. Signals accumulate into evidence; nothing silently rewrites your brief or script.',
     examples: [
-      'Cue — a short nudge',
-      'Continuation — help finishing your thought',
-      'Response — a complete answer to adapt or repeat',
-      'Advice — a practical next move',
+      'Review the conversation and transcript evidence',
+      'Reuse the briefing for a next call',
+      'Consider script or brief improvements when evidence warrants them',
+      'Keep final authority over every recommendation',
     ],
   },
   {
     index: '06',
-    label: 'CONTINUE',
-    title: 'Keep useful work available.',
-    body: 'Saved conversations help you return to plans, documents, decisions, and preparation. GEORGE may use relevant prior work when it improves the current objective, but a new conversation remains a new conversation.',
+    label: 'MEMORY',
+    title: 'Keep context without losing control.',
+    body: 'GEORGE maintains continuity inside a validated session while keeping unrelated sessions isolated. Relevant prior information may inform current work, but it becomes active context only when you adopt it.',
     examples: [
-      'Open a saved conversation from the sidebar.',
-      'Start a new workspace when the objective changes.',
-      'Tell GEORGE what changed since the last session.',
-      'Decide what should be remembered or reused.',
+      'Open recent sessions from the sidebar',
+      'Use one approved briefing for repeated conversations',
+      'Relevant memory can inform Normal and Preparation',
+      'You decide what should be remembered, reused, or ignored',
     ],
   },
 ]
@@ -98,17 +98,15 @@ export default function HelpPage() {
 
         <section className="border-b border-white/[0.08] pb-10 pt-4 sm:pb-14 sm:pt-8">
           <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/34">
-            How to use GEORGE
+            USING GEORGE
           </div>
 
           <h1 className="mt-5 max-w-4xl font-mono text-[40px] font-black uppercase leading-[0.92] tracking-[-0.07em] text-white sm:text-[68px]">
-            Move from the situation you have to the outcome you want.
+            A practical guide to the GEORGE workspace.
           </h1>
 
           <p className="mt-7 max-w-3xl text-[17px] leading-8 text-white/68 sm:text-[20px] sm:leading-9">
-            GEORGE helps you understand what is happening, decide what matters,
-            prepare the next move, create useful work, and communicate effectively
-            before, during, and after important moments.
+            One GEORGE supports Normal work, collaborative Preparation, focused LIVE execution, and the review that follows. You remain in control of what is adopted, reused, or changed.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
@@ -172,8 +170,8 @@ export default function HelpPage() {
         </section>
 
         <section className="border-t border-white/[0.08] py-10 sm:py-14">
-          <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/30">
-            Keep in mind
+            <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/30">
+            Your control
           </div>
 
           <div className="mt-6 grid gap-4 md:grid-cols-3">

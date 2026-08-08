@@ -25,6 +25,11 @@ export default function BxPageHeader({
       return
     }
 
+    if (backLabel === 'GEORGE') {
+      router.push(backHref || '/george')
+      return
+    }
+
     if (typeof window !== 'undefined' && window.history.length > 1) {
       router.back()
       return
@@ -44,7 +49,8 @@ export default function BxPageHeader({
 
         {showBack ? (
           <button type="button" onClick={handleBack} className={backClass}>
-            {backLabel}
+            <span aria-hidden="true">←</span>
+            <span>{backLabel === 'GEORGE' ? 'Back to GEORGE' : backLabel}</span>
           </button>
         ) : null}
       </div>
