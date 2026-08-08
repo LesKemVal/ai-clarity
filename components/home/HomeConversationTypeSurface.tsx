@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import BxPageHeader from "@/components/BxPageHeader";
+import { ContextualGeorgeInput } from "@/components/george/ContextualGeorgeInput";
 import {
   CONVERSATION_TYPES,
+  getConversationTypeBaselineAssumptions,
   type ConversationType,
 } from "@/lib/george/live-entry/conversation-types";
 import {
@@ -77,9 +79,6 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
     relevantGoalIds: [
       "close-sale",
       "set-appointment",
-      "handle-objection",
-      "negotiate",
-      "present-offer",
       "protect-margin",
       "advance-buyer",
     ],
@@ -121,11 +120,10 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
     ],
     relevantGoalIds: [
       "win-interview",
-      "explain-experience",
-      "answer-difficult-questions",
-      "present-qualifications",
       "negotiate-compensation",
-      "recover-train-thought",
+      "receive-offer",
+      "pass-technical-interview",
+      "build-confidence",
     ],
   },
   {
@@ -149,12 +147,8 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
     capabilities: ["Explanation", "Examples", "Pacing", "Adaptation"],
     relevantGoalIds: [
       "teach-lesson",
-      "explain-difficult-concept",
-      "keep-learners-engaged",
       "present-research",
-      "answer-questions",
-      "adapt-explanation",
-      "manage-difficult-discussion",
+      "secure-curriculum-support",
     ],
   },
   {
@@ -439,24 +433,16 @@ type HomepageGoal = { id: string; label: string };
 const HOMEPAGE_GOALS: readonly HomepageGoal[] = [
   { id: "close-sale", label: "Close a sale" },
   { id: "set-appointment", label: "Set an appointment" },
-  { id: "handle-objection", label: "Handle an objection" },
-  { id: "negotiate", label: "Negotiate" },
-  { id: "present-offer", label: "Present an offer" },
   { id: "protect-margin", label: "Protect margin" },
   { id: "advance-buyer", label: "Advance the buyer to the next step" },
   { id: "win-interview", label: "Win the interview" },
-  { id: "explain-experience", label: "Explain my experience" },
-  { id: "answer-difficult-questions", label: "Answer difficult questions" },
-  { id: "present-qualifications", label: "Present my qualifications" },
   { id: "negotiate-compensation", label: "Negotiate compensation" },
-  { id: "recover-train-thought", label: "Recover when I lose my train of thought" },
   { id: "teach-lesson", label: "Teach a lesson" },
-  { id: "explain-difficult-concept", label: "Explain a difficult concept" },
-  { id: "keep-learners-engaged", label: "Keep learners engaged" },
   { id: "present-research", label: "Present research" },
-  { id: "answer-questions", label: "Answer questions" },
-  { id: "adapt-explanation", label: "Adapt the explanation" },
-  { id: "manage-difficult-discussion", label: "Manage a difficult discussion" },
+  { id: "secure-curriculum-support", label: "Secure curriculum support" },
+  { id: "receive-offer", label: "Receive an offer" },
+  { id: "pass-technical-interview", label: "Pass the technical interview" },
+  { id: "build-confidence", label: "Build confidence" },
   { id: "deliver-presentation", label: "Deliver a presentation" },
   { id: "keep-audience-engaged", label: "Keep the audience engaged" },
   { id: "stay-on-message", label: "Stay on message" },
@@ -504,12 +490,30 @@ const UNIVERSAL_GOAL_IDS = [
   "other",
 ] as const;
 
+const BASELINE_GOAL_IDS = new Set([
+  "handle-objection",
+  "answer-difficult-questions",
+  "explain-experience",
+  "present-qualifications",
+  "recover-train-thought",
+  "keep-audience-engaged",
+  "stay-on-message",
+  "conduct-interview",
+  "respond-audience-reactions",
+  "answer-questions",
+  "adapt-explanation",
+  "manage-difficult-discussion",
+]);
+
 function goalsForHomepageRole(role: HomepageRole | null) {
   const ids = role?.relevantGoalIds?.length
     ? role.relevantGoalIds
     : UNIVERSAL_GOAL_IDS;
   const goalsById = new Map(HOMEPAGE_GOALS.map((goal) => [goal.id, goal]));
-  return ids.map((id) => goalsById.get(id)).filter(Boolean) as HomepageGoal[];
+  return ids
+    .filter((id) => !BASELINE_GOAL_IDS.has(id))
+    .map((id) => goalsById.get(id))
+    .filter(Boolean) as HomepageGoal[];
 }
 
 
@@ -851,13 +855,13 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [selectedMissions, setSelectedMissions] = useState<string[]>([]);
   const [missionTier, setMissionTier] = useState<HomepageMissionTier>("smart");
   const [customMissionOpen, setCustomMissionOpen] = useState(false);
+  const [assumptionCorrectionOpen, setAssumptionCorrectionOpen] = useState(false);
+  const [assumptionCorrection, setAssumptionCorrection] = useState("");
   const [missionCollapsing, setMissionCollapsing] = useState(false);
 
   const [showAllRoles, setShowAllRoles] = useState(false);
   const [phase, setPhase] = useState<SurfacePhase>("selection");
   const [introStage, setIntroStage] = useState(0);
-  const [showInitialBriefingDecisionMessage, setShowInitialBriefingDecisionMessage] =
-    useState(false);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [briefingSufficient, setBriefingSufficient] = useState(false);
   const [optionalQuestion, setOptionalQuestion] =
@@ -887,28 +891,6 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       setMissionTier(storedTier);
     }
   }, []);
-
-  useEffect(() => {
-    if (
-      !selectedType ||
-      (phase !== "goal" && phase !== "introduction") ||
-      typeof window === "undefined"
-    ) return;
-
-    const media = window.matchMedia("(max-width: 767px)");
-    const previousOverflow = document.body.style.overflow;
-    const syncScrollLock = () => {
-      document.body.style.overflow = media.matches ? "hidden" : previousOverflow;
-    };
-
-    syncScrollLock();
-    media.addEventListener?.("change", syncScrollLock);
-
-    return () => {
-      media.removeEventListener?.("change", syncScrollLock);
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [phase, selectedType]);
 
   const activeFormula = useMemo(() => {
     if (!selectedType || accessibleFormulas.length === 0) return null;
@@ -1146,6 +1128,119 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     selectedRole,
     selectedGoal,
   );
+  const currentOperationalUnderstanding = answers.conversationContext?.trim()
+    ? `Based on what you've told me, ${answers.conversationContext.trim()}`
+    : currentOperationalPromise;
+
+  const baselineAssumptions = useMemo(
+    () =>
+      getConversationTypeBaselineAssumptions(selectedType?.id),
+    [selectedType?.id],
+  );
+
+  const preparationUnderstandingChecklist = useMemo(() => {
+    const objective = String(
+      answers.desiredOutcome || selectedGoal || "",
+    ).trim();
+    const context = String(answers.conversationContext || "").trim();
+    const audience = String(
+      answers.audience ||
+        answers.participants ||
+        answers.who ||
+        "",
+    ).trim();
+
+    const learnedSignals = Object.entries({
+      ...answers,
+      ...optionalAnswers,
+    }).filter(([, value]) => Boolean(String(value || "").trim()));
+
+    const items = [
+      {
+        key: "conversation",
+        label: selectedType?.title
+          ? `Conversation: ${selectedType.title}`
+          : "Conversation type",
+        complete: Boolean(selectedType),
+      },
+      {
+        key: "objective",
+        label: objective
+          ? `Outcome: ${objective}`
+          : "Outcome still being clarified",
+        complete: Boolean(objective),
+      },
+      {
+        key: "context",
+        label: context
+          ? "Conversation-specific context understood"
+          : "Conversation-specific context still developing",
+        complete: Boolean(context),
+      },
+      {
+        key: "people",
+        label: audience
+          ? "People / decision environment understood"
+          : "People / decision environment still developing",
+        complete: Boolean(audience),
+      },
+    ];
+
+    if (learnedSignals.length > 0) {
+      items.push({
+        key: "signals",
+        label: "Additional operational details understood",
+        complete: true,
+      });
+    }
+
+    return items;
+  }, [
+    answers,
+    optionalAnswers,
+    selectedGoal,
+    selectedType,
+  ]);
+
+  const preparationUnderstandingSummary = useMemo(() => {
+    const conversation =
+      selectedType?.title?.trim() ||
+      selectedRole?.label?.trim() ||
+      "conversation";
+
+    const objective = String(
+      answers.desiredOutcome || selectedGoal || "",
+    ).trim();
+
+    const context = String(answers.conversationContext || "").trim();
+
+    if (briefingSufficient) {
+      const parts = [
+        `We're preparing for a ${conversation.toLowerCase()}.`,
+        objective ? `Our intended outcome is ${objective}.` : "",
+        context ? `Based on your briefing, ${context}` : "",
+      ].filter(Boolean);
+
+      return parts.join(" ");
+    }
+
+    if (context) {
+      return `You're preparing for a ${conversation.toLowerCase()}. Based on what you've told me, ${context} I'll keep refining this understanding as we brief.`;
+    }
+
+    if (objective) {
+      return `You're preparing for a ${conversation.toLowerCase()} with the outcome ${objective}. I'm using what is generally important in this type of conversation as a starting point, and I'll replace those expectations with what is specifically true here as we brief.`;
+    }
+
+    return `You're preparing for a ${conversation.toLowerCase()}. I'm starting with what is generally important in this type of conversation and will refine that understanding as you brief me.`;
+  }, [
+    answers.conversationContext,
+    answers.desiredOutcome,
+    briefingSufficient,
+    selectedGoal,
+    selectedRole,
+    selectedType,
+  ]);
   const isMissionTransition = Boolean(
     selectedType && (phase === "goal" || phase === "introduction"),
   );
@@ -1175,7 +1270,6 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setMissionCollapsing(false);
     setPhase("goal");
     setIntroStage(0);
-    setShowInitialBriefingDecisionMessage(false);
     setAnswers({});
     setOptionalQuestion(null);
     setOptionalAnswer("");
@@ -1200,7 +1294,6 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setMissionCollapsing(false);
     setPhase("selection");
     setIntroStage(0);
-    setShowInitialBriefingDecisionMessage(false);
     setAnswers({});
     setOptionalQuestion(null);
     setOptionalAnswer("");
@@ -1267,6 +1360,18 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setCustomMissionOpen(false);
   }
 
+  function submitAssumptionCorrection() {
+    const correction = assumptionCorrection.trim();
+    if (!correction) return;
+    setAnswers((current) => ({
+      ...current,
+      conversationContext: correction,
+    }));
+    setAssumptionCorrection("");
+    setAssumptionCorrectionOpen(false);
+    setIntroStage(2);
+  }
+
   function beginPreparation() {
     setPhase("introduction");
   }
@@ -1315,7 +1420,6 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setAnswers(freshAnswers);
     saveLivePreparationSignals(freshAnswers);
     setBriefingSufficient(false);
-    setShowInitialBriefingDecisionMessage(false);
     setOptionalQuestion(null);
     setOptionalAnswer("");
     setPhase("optional");
@@ -1449,30 +1553,23 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       return;
     }
 
-    const isFirstCompletedInteraction =
-      Object.keys(optionalAnswers).length === 0 &&
-      skippedOptionalQuestions.length === 0;
-
-    setShowInitialBriefingDecisionMessage(isFirstCompletedInteraction);
-    setBriefingSufficient(true);
-    setPhase("decision");
+    setBriefingSufficient(false);
+    setPhase("optional");
+    void requestHomepageOptionalQuestion(nextAnswers, skippedOptionalQuestions);
   }
 
   function skipHomepageOptionalQuestion() {
     if (!optionalQuestion) return;
 
-    const isFirstCompletedInteraction =
-      Object.keys(optionalAnswers).length === 0 &&
-      skippedOptionalQuestions.length === 0;
     const nextSkipped = [...skippedOptionalQuestions, optionalQuestion.key];
 
     setSkippedOptionalQuestions(nextSkipped);
     setOptionalQuestion(null);
     setOptionalAnswer("");
 
-    setShowInitialBriefingDecisionMessage(isFirstCompletedInteraction);
-    setBriefingSufficient(true);
-    setPhase("decision");
+    setBriefingSufficient(false);
+    setPhase("optional");
+    void requestHomepageOptionalQuestion(optionalAnswers, nextSkipped);
   }
 
   function continueHomepageBriefing() {
@@ -1480,7 +1577,6 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setOptionalQuestion(null);
     setOptionalAnswer("");
     setBriefingSufficient(false);
-    setShowInitialBriefingDecisionMessage(false);
     setPhase("optional");
     void requestHomepageOptionalQuestion(
       optionalAnswers,
@@ -1567,6 +1663,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       knowledge: {
         objective:
           answers.desiredOutcome || selectedGoal || seed.knowledge.objective,
+        baselineAssumptions: [...baselineAssumptions],
         name: answers.name || seed.knowledge.name,
         role: answers.role || selectedRole?.label || seed.knowledge.role,
         participants: audience ? [audience] : seed.knowledge.participants,
@@ -1611,6 +1708,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     selectedGoal,
     selectedRole,
     selectedType,
+    baselineAssumptions,
     skippedOptionalQuestions,
   ]);
 
@@ -1727,11 +1825,11 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       ref={surfaceRef}
       className={`relative min-h-[100dvh] scroll-mt-4 border-t border-white/10 px-5 py-14 transition-colors duration-700 sm:px-8 sm:py-20 ${
         isMissionTransition
-          ? "bg-[#020304] max-sm:h-[100dvh] max-sm:overflow-hidden max-sm:px-3 max-sm:py-3"
+          ? "bg-[#020304] max-sm:px-3 max-sm:py-3"
           : "bg-black"
       }`}
     >
-      <div className={`mx-auto w-full max-w-[1700px] ${isMissionTransition ? "max-sm:h-full" : ""}`}>
+      <div className="mx-auto w-full max-w-[1700px]">
         {phase === "selection" ? (
           <div className="animate-[fadeIn_420ms_ease-out]">
             <div className="max-w-6xl">
@@ -1818,8 +1916,90 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
             </div>
           </div>
         ) : (
-          <div className={`mx-auto w-full max-w-4xl animate-[fadeIn_420ms_ease-out] ${isMissionTransition ? "max-sm:h-full" : ""}`}>
-            <div ref={preparationScrollRef} className={`rounded-[18px] border border-white/[0.08] bg-[#050607] p-3 shadow-[0_18px_70px_rgba(0,0,0,0.42)] sm:p-5 sm:p-7 ${isMissionTransition ? "max-sm:flex max-sm:h-full max-sm:min-h-0 max-sm:overflow-y-auto max-sm:overscroll-contain" : ""}`}>
+          <div className="mx-auto grid w-full max-w-6xl gap-6 animate-[fadeIn_420ms_ease-out] lg:grid-cols-[minmax(220px,0.78fr)_minmax(0,1.7fr)]">
+            <aside
+              aria-live="polite"
+              className="rounded-[18px] border border-white/[0.07] bg-white/[0.018] p-5 lg:sticky lg:top-6 lg:self-start"
+            >
+              <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/58">
+                GEORGE understands
+              </div>
+              <h2 className="mt-3 font-mono text-[20px] font-semibold uppercase tracking-[-0.03em] text-white">
+                {selectedType?.title || selectedRole?.label || "Conversation"}
+              </h2>
+              <p className="mt-2 text-[13px] leading-6 text-white/52">
+                I’ll keep this understanding current as we brief.
+              </p>
+              <div className="mt-5 border-t border-white/[0.08] pt-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-white/34">
+                    {briefingSufficient ? "Final understanding" : "What I understand"}
+                  </div>
+                  <div className="font-mono text-[8px] uppercase tracking-[0.15em] text-white/28">
+                    {briefingSufficient ? "Ready" : "Updating"}
+                  </div>
+                </div>
+
+                <ul className="mt-3 space-y-2 text-[12px] leading-5">
+                  {preparationUnderstandingChecklist.map((item) => (
+                    <li
+                      key={item.key}
+                      className={`flex gap-2 ${
+                        item.complete ? "text-white/66" : "text-white/34"
+                      }`}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={
+                          item.complete
+                            ? "text-[#AEB6FF]"
+                            : "text-white/24"
+                        }
+                      >
+                        {item.complete ? "✓" : "○"}
+                      </span>
+                      <span>{item.label}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <p className="mt-4 text-[12px] leading-5 text-white/62">
+                  {preparationUnderstandingSummary}
+                </p>
+
+                {assumptionCorrectionOpen ? (
+                  <ContextualGeorgeInput
+                    id="homepage-assumption-correction"
+                    value={assumptionCorrection}
+                    label="What should GEORGE understand instead?"
+                    placeholder="Tell GEORGE what is different or important about this conversation."
+                    submitLabel="Update understanding"
+                    onChange={setAssumptionCorrection}
+                    onSubmit={submitAssumptionCorrection}
+                    onCancel={() => setAssumptionCorrectionOpen(false)}
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setAssumptionCorrectionOpen(true)}
+                    className="mt-4 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[#AEB6FF]/72 transition hover:text-white"
+                  >
+                    That’s not quite right →
+                  </button>
+                )}
+
+                <div className="mt-5 border-t border-white/[0.08] pt-4">
+                  <p className="text-[12px] leading-5 text-white/48">
+                    {briefingSufficient
+                      ? "I've assembled a briefing that I believe prepares us well."
+                      : optionalQuestion
+                        ? "I'm still refining the briefing."
+                        : "The briefing is taking shape."}
+                  </p>
+                </div>
+              </div>
+            </aside>
+            <div ref={preparationScrollRef} className="rounded-[18px] border border-white/[0.08] bg-[#050607] p-3 shadow-[0_18px_70px_rgba(0,0,0,0.42)] sm:p-5 sm:p-7">
               <BxPageHeader
                 onBack={goBack}
                 rightSlot={
@@ -1828,12 +2008,12 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                     onClick={resetSelection}
                     className="inline-flex h-7 items-center justify-center rounded-[9px] border border-[#7EA1FF]/42 bg-[#11182A] px-3 font-mono text-[8px] font-semibold uppercase tracking-[0.14em] text-white transition hover:border-[#AEB6FF]/70 hover:bg-[#18213A]"
                   >
-                    Re-select
+                    Change role
                   </button>
                 }
               />
               <div
-                className={`border-b border-white/[0.07] pb-5 transition-all duration-500 ${isMissionTransition ? "max-sm:sticky max-sm:top-0 max-sm:z-10 max-sm:bg-[#050607]" : ""} ${
+                className={`border-b border-white/[0.07] pb-5 transition-all duration-500 ${
                   phase === "optional" ? "border-transparent pb-3" : ""
                 }`}
               >
@@ -1884,7 +2064,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                           onClick={resetSelection}
                           className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-white bg-white px-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[#111318] transition hover:border-[#4E7CFF] hover:bg-[#4E7CFF] hover:text-white"
                         >
-                          Re-select
+                          Change role
                         </button>
                       </div>
                     </div>
@@ -1968,9 +2148,15 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                       Mission
                     </div>
                     <h3 className="mt-3 font-mono text-[22px] font-semibold leading-8 tracking-[-0.035em] text-white sm:text-[28px] sm:leading-9">
-                      What would make this conversation successful?
+                      What outcome matters most?
                     </h3>
-                    <p className="mt-2 text-[13px] leading-6 text-white/42">
+                    <p className="mt-2 text-[13px] leading-6 text-white/52">
+                      I’m preparing for a {selectedType?.title?.toLowerCase() || "conversation"}.
+                      I already understand the usual pressure, evidence, and
+                      decision points. Tell me what makes this conversation
+                      unique.
+                    </p>
+                    <p className="mt-3 text-[13px] leading-6 text-white/42">
                       {missionTier === "smart"
                         ? "Select one objective."
                         : missionTier === "intelligent"
@@ -2151,7 +2337,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                         placeholder={optionalQuestion.example}
                         className="mt-4 min-h-[118px] w-full resize-none rounded-[11px] border border-white/[0.09] bg-black/20 px-4 py-3 text-[14px] leading-6 text-white outline-none transition placeholder:text-white/22 focus:border-[#7EA1FF]/45 focus:bg-black/30"
                       />
-                      <div className="mt-4 flex flex-wrap items-center justify-end gap-3 max-sm:sticky max-sm:bottom-0 max-sm:z-10 max-sm:bg-[#050607] max-sm:py-3">
+                      <div className="mt-4 flex flex-wrap items-center justify-end gap-3">
                         <div className="flex gap-2">
                           <button
                             type="button"
@@ -2186,17 +2372,17 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
               {phase === "decision" && (
                 <div className="pt-7 animate-[fadeIn_420ms_ease-out]">
-                  {showInitialBriefingDecisionMessage && (
+                  {briefingSufficient && (
                     <div>
                       <h3 className="max-w-4xl font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px] sm:leading-9">
-                        Continue Briefing?
+                        I've assembled a briefing that I believe prepares us well.
                       </h3>
                       <p className="mt-3 max-w-3xl text-[13px] leading-6 text-white/52">
-                        Additional briefing can improve timing, context, and execution.
+                        You can continue briefing if you want to add context, or approve this preparation when it feels right.
                       </p>
                     </div>
                   )}
-                  <div className={`${showInitialBriefingDecisionMessage ? "mt-7" : "mt-1"} flex flex-wrap justify-center gap-3`}>
+                  <div className={`${briefingSufficient ? "mt-7" : "mt-1"} flex flex-wrap justify-center gap-3`}>
                     <button
                       type="button"
                       onClick={approveAndContinueToLive}
@@ -2284,7 +2470,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                     </div>
                   )}
 
-                  <div className="mt-7 flex justify-center gap-3 max-sm:sticky max-sm:bottom-0 max-sm:z-10 max-sm:bg-[#050607] max-sm:py-3">
+                  <div className="mt-7 flex justify-center gap-3">
                     <button
                       type="button"
                       onClick={approveAndContinueToLive}
