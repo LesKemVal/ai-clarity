@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import BxPageHeader from "@/components/BxPageHeader";
 import {
   CONVERSATION_TYPES,
   type ConversationType,
@@ -43,6 +44,7 @@ type HomepageRole = {
   featured?: boolean;
   summary: string;
   capabilities: readonly string[];
+  relevantGoalIds?: readonly string[];
 };
 
 type HomepagePriorInteraction = {
@@ -70,8 +72,17 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
     conversationTypeId: "discovery-call",
     featured: true,
     summary:
-      "Keep the buyer focused while I help surface the strongest proof, response, and next move.",
+      "Navigating aggressive pricing pushback, defending contract profit margins, or closing high-value software and service agreements with corporate buyers.",
     capabilities: ["Discovery", "Value framing", "Objection handling", "Next steps"],
+    relevantGoalIds: [
+      "close-sale",
+      "set-appointment",
+      "handle-objection",
+      "negotiate",
+      "present-offer",
+      "protect-margin",
+      "advance-buyer",
+    ],
   },
   {
     id: "executive",
@@ -80,8 +91,17 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
     conversationTypeId: "executive-presentation",
     featured: true,
     summary:
-      "Keep the room focused while I help surface the decision, evidence, risks, and concise framing that matter.",
+      "Aligning divided board members behind a single strategy, managing corporate reputation under pressure, or delivering critical structural feedback without breaking team morale.",
     capabilities: ["Decision framing", "Evidence", "Risk", "Executive clarity"],
+    relevantGoalIds: [
+      "make-decision",
+      "present-strategy",
+      "negotiate",
+      "lead-difficult-meeting",
+      "align-stakeholders",
+      "defend-recommendation",
+      "deliver-feedback",
+    ],
   },
   {
     id: "job-seeker",
@@ -90,17 +110,32 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
     conversationTypeId: "prep-my-interview",
     featured: true,
     summary:
-      "Stay focused on the interviewer while I help surface the accomplishment, metric, or example that fits the moment.",
-    capabilities: ["Accomplishments", "Metrics", "Examples", "Recovery"],
+      "Navigating intense panels and technical Q&A sessions, pulling up specific portfolio metrics instantly, or confidently defending salary requirements during an offer discussion.",
+    capabilities: [
+      "Accomplishments",
+      "Metrics",
+      "STAR examples",
+      "Company research",
+      "Difficult questions",
+      "Recovery",
+    ],
+    relevantGoalIds: [
+      "win-interview",
+      "explain-experience",
+      "answer-difficult-questions",
+      "present-qualifications",
+      "negotiate-compensation",
+      "recover-train-thought",
+    ],
   },
   {
-    id: "healthcare",
-    label: "Healthcare",
+    id: "scientist",
+    label: "Scientist",
     category: "Conversation starters",
     conversationTypeId: "other-work",
     featured: true,
     summary:
-      "Stay focused on the conversation while I help you recall the relevant facts, questions, and next step.",
+      "Defending complex experimental data to a non-technical board of directors, translating dense engineering metrics for commercial investors, or cleanly passing an intense academic panel review.",
     capabilities: ["Relevant facts", "Questions", "Clarity", "Next steps"],
   },
   {
@@ -110,8 +145,17 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
     conversationTypeId: "teach-a-lesson",
     featured: true,
     summary:
-      "Keep learners with you while I help surface the clearest explanation, example, or transition for the moment.",
+      "Translating dense academic material into effortless clarity, managing sudden classroom behavioral shifts, or defending curriculum decisions directly to a school board.",
     capabilities: ["Explanation", "Examples", "Pacing", "Adaptation"],
+    relevantGoalIds: [
+      "teach-lesson",
+      "explain-difficult-concept",
+      "keep-learners-engaged",
+      "present-research",
+      "answer-questions",
+      "adapt-explanation",
+      "manage-difficult-discussion",
+    ],
   },
   {
     id: "other",
@@ -120,7 +164,7 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
     conversationTypeId: "other-work",
     featured: true,
     summary:
-      "Stay focused on the conversation while I help surface the fact, response, or next move that supports your objective.",
+      "Recovering cleanly when a spontaneous client conversation changes direction, pulling up forgotten project details instantly, or keeping any unexpected discussion moving toward your target objective.",
     capabilities: ["Clarity", "Recall", "Adaptation", "Next steps"],
   },
   {
@@ -130,7 +174,7 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
     conversationTypeId: "set-appointment",
     featured: true,
     summary:
-      "Make repeated calls with a consistent opening, recover quickly, handle objections, and adapt as the session produces evidence.",
+      "Breaking through initial cold call resistance, maintaining absolute energy across hundreds of dials, or instantly pivoting to a fresh angle the moment a prospect tries to hang up.",
     capabilities: [
       "Openings and first impressions",
       "Pacing and conversational control",
@@ -149,7 +193,7 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
     conversationTypeId: "discovery-call",
     featured: true,
     summary:
-      "Move a prospect toward the next decision with stronger discovery, explanation, objection handling, and closing language.",
+      "Uncovering hidden buyer pain points through structured discovery, handling unexpected competitive threats smoothly, or locking down immediate purchase commitments before ending a call.",
     capabilities: [
       "Discovery and qualification",
       "Rhetorical flow",
@@ -168,7 +212,7 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
     conversationTypeId: "create-a-broadcast-script",
     featured: true,
     summary:
-      "Present from a teleprompter, laptop, camera, microphone, livestream, or interview with greater control and audience awareness.",
+      "Hitting every required sponsor brand message naturally, maintaining high-energy charismatic pacing on a live stream, or conducting seamless, unscripted interviews with guest creators.",
     capabilities: [
       "Rhetorical flow",
       "Pacing",
@@ -176,8 +220,18 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
       "Transitions",
       "Recovery",
       "Audience engagement",
+      "Sponsor messages",
       "Clarity and confidence",
       "Adapting to audience reaction",
+    ],
+    relevantGoalIds: [
+      "deliver-presentation",
+      "keep-audience-engaged",
+      "stay-on-message",
+      "conduct-interview",
+      "present-sponsor-messages",
+      "recover-train-thought",
+      "respond-audience-reactions",
     ],
   },
   {
@@ -187,7 +241,7 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
     conversationTypeId: "investor-pitch",
     featured: true,
     summary:
-      "Lead consequential conversations with investors, partners, customers, teams, and the public while staying anchored to the goal.",
+      "Securing vital capital during high-stakes venture investor pitches, defending company valuations, or winning over key early hires on the ultimate company vision.",
     capabilities: [
       "Pitch structure",
       "Executive presence",
@@ -198,6 +252,15 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
       "Recovery",
       "Maintaining the objective",
     ],
+    relevantGoalIds: [
+      "raise-capital",
+      "pitch-business",
+      "defend-valuation",
+      "explain-strategy",
+      "negotiate",
+      "recruit-key-person",
+      "secure-partnership",
+    ],
   },
   {
     id: "attorney",
@@ -206,7 +269,7 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
     conversationTypeId: "make-my-case",
     featured: true,
     summary:
-      "Organize arguments, question effectively, respond under pressure, and present a position with precision.",
+      "Protecting sensitive case strategy under intense cross-examination, exposing critical logical flaws in an opponent's witness testimony, or delivering airtight legal arguments in a deposition.",
     capabilities: [
       "Argument structure",
       "Question sequencing",
@@ -217,6 +280,15 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
       "Clarity",
       "Adapting to the listener or forum",
     ],
+    relevantGoalIds: [
+      "make-case",
+      "prepare-questioning",
+      "answer-difficult-questions",
+      "protect-key-facts",
+      "negotiate",
+      "present-argument",
+      "maintain-legal-boundaries",
+    ],
   },
   {
     id: "recruiter",
@@ -225,7 +297,7 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
     conversationTypeId: "networking-conversation",
     featured: true,
     summary:
-      "Attract, evaluate, and move candidates through conversations while adapting to motivation, hesitation, and fit.",
+      "Screening passive executive-level candidates, uncovering resume discrepancies during phone screens, or selling top-tier talent on company culture to close a competitive hire.",
     capabilities: [
       "Candidate engagement",
       "Discovery",
@@ -235,6 +307,15 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
       "Follow-up",
       "Recovery",
       "Adapting to candidate reaction",
+    ],
+    relevantGoalIds: [
+      "evaluate-candidate",
+      "conduct-interview",
+      "sell-opportunity",
+      "uncover-inconsistencies",
+      "negotiate-compensation",
+      "deliver-feedback",
+      "resolve-employee-issue",
     ],
   },
   {
@@ -353,20 +434,83 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
 
 const FEATURED_HOMEPAGE_ROLES = HOMEPAGE_ROLES.filter((role) => role.featured);
 
-const HOMEPAGE_GOALS = [
-  "Close a sale",
-  "Set an appointment",
-  "Negotiate",
-  "Present an idea",
-  "Win an interview",
-  "Resolve a conflict",
-  "Educate",
-  "Persuade",
-  "Defend a position",
-  "Build trust",
-  "Explain something",
-  "Other...",
+type HomepageGoal = { id: string; label: string };
+
+const HOMEPAGE_GOALS: readonly HomepageGoal[] = [
+  { id: "close-sale", label: "Close a sale" },
+  { id: "set-appointment", label: "Set an appointment" },
+  { id: "handle-objection", label: "Handle an objection" },
+  { id: "negotiate", label: "Negotiate" },
+  { id: "present-offer", label: "Present an offer" },
+  { id: "protect-margin", label: "Protect margin" },
+  { id: "advance-buyer", label: "Advance the buyer to the next step" },
+  { id: "win-interview", label: "Win the interview" },
+  { id: "explain-experience", label: "Explain my experience" },
+  { id: "answer-difficult-questions", label: "Answer difficult questions" },
+  { id: "present-qualifications", label: "Present my qualifications" },
+  { id: "negotiate-compensation", label: "Negotiate compensation" },
+  { id: "recover-train-thought", label: "Recover when I lose my train of thought" },
+  { id: "teach-lesson", label: "Teach a lesson" },
+  { id: "explain-difficult-concept", label: "Explain a difficult concept" },
+  { id: "keep-learners-engaged", label: "Keep learners engaged" },
+  { id: "present-research", label: "Present research" },
+  { id: "answer-questions", label: "Answer questions" },
+  { id: "adapt-explanation", label: "Adapt the explanation" },
+  { id: "manage-difficult-discussion", label: "Manage a difficult discussion" },
+  { id: "deliver-presentation", label: "Deliver a presentation" },
+  { id: "keep-audience-engaged", label: "Keep the audience engaged" },
+  { id: "stay-on-message", label: "Stay on message" },
+  { id: "conduct-interview", label: "Conduct an interview" },
+  { id: "present-sponsor-messages", label: "Present sponsor messages" },
+  { id: "respond-audience-reactions", label: "Respond to audience reactions" },
+  { id: "make-decision", label: "Make a decision" },
+  { id: "present-strategy", label: "Present a strategy" },
+  { id: "lead-difficult-meeting", label: "Lead a difficult meeting" },
+  { id: "align-stakeholders", label: "Align stakeholders" },
+  { id: "defend-recommendation", label: "Defend a recommendation" },
+  { id: "deliver-feedback", label: "Deliver performance feedback" },
+  { id: "make-case", label: "Make my case" },
+  { id: "prepare-questioning", label: "Prepare for questioning" },
+  { id: "protect-key-facts", label: "Protect key facts" },
+  { id: "present-argument", label: "Present an argument" },
+  { id: "maintain-legal-boundaries", label: "Maintain legal boundaries" },
+  { id: "raise-capital", label: "Raise capital" },
+  { id: "pitch-business", label: "Pitch the business" },
+  { id: "defend-valuation", label: "Defend the valuation" },
+  { id: "explain-strategy", label: "Explain the strategy" },
+  { id: "recruit-key-person", label: "Recruit a key person" },
+  { id: "secure-partnership", label: "Secure a partnership" },
+  { id: "evaluate-candidate", label: "Evaluate a candidate" },
+  { id: "sell-opportunity", label: "Sell the opportunity" },
+  { id: "uncover-inconsistencies", label: "Uncover inconsistencies" },
+  { id: "resolve-employee-issue", label: "Resolve an employee issue" },
+  { id: "present-idea", label: "Present an idea" },
+  { id: "persuade", label: "Persuade" },
+  { id: "resolve-conflict", label: "Resolve a conflict" },
+  { id: "explain-something", label: "Explain something clearly" },
+  { id: "lead-meeting", label: "Lead a meeting" },
+  { id: "handle-difficult-questions", label: "Handle difficult questions" },
+  { id: "other", label: "Other..." },
+];
+
+const UNIVERSAL_GOAL_IDS = [
+  "present-idea",
+  "persuade",
+  "negotiate",
+  "resolve-conflict",
+  "explain-something",
+  "lead-meeting",
+  "handle-difficult-questions",
+  "other",
 ] as const;
+
+function goalsForHomepageRole(role: HomepageRole | null) {
+  const ids = role?.relevantGoalIds?.length
+    ? role.relevantGoalIds
+    : UNIVERSAL_GOAL_IDS;
+  const goalsById = new Map(HOMEPAGE_GOALS.map((goal) => [goal.id, goal]));
+  return ids.map((id) => goalsById.get(id)).filter(Boolean) as HomepageGoal[];
+}
 
 
 
@@ -586,10 +730,10 @@ function HomepageRoleCard({
     <button
       type="button"
       onClick={() => onSelect(role)}
-      className={`group flex items-center justify-between gap-3 rounded-[14px] border text-left transition-[border-color,background-color,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7EA1FF]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-[0.99] ${
+      className={`bx-command-shimmer group flex items-center justify-between gap-3 rounded-[14px] border text-left transition-[border-color,background-color,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7EA1FF]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-[0.99] ${
         featured
-          ? "min-h-[88px] border-[#7EA1FF]/28 bg-[#10172A] px-5 py-4 hover:border-[#AEB6FF]/55 hover:bg-[#151F39]"
-          : "min-h-[64px] border-white/[0.08] bg-[#08090A] px-4 py-3 hover:border-white/[0.16] hover:bg-[#0D0F12]"
+          ? "min-h-[88px] border-white/[0.28] bg-[#050505] px-5 py-4 hover:border-white/[0.58] hover:bg-[#0B0B0C]"
+          : "min-h-[64px] border-white/[0.12] bg-[#08090A] px-4 py-3 hover:border-white/[0.24] hover:bg-[#0D0F12]"
       }`}
     >
       <div>
@@ -612,12 +756,13 @@ function HomepageRoleCard({
 function homepageOperationalPromise(
   role: HomepageRole | null,
   goal: string | null,
-  fallback: string,
 ) {
-  const summary = String(role?.summary || fallback).trim();
-  const sentence = /^I['’]ll\b/i.test(summary)
-    ? summary
-    : `I’ll help you ${summary.charAt(0).toLowerCase()}${summary.slice(1)}`;
+  const capabilities = role?.capabilities.slice(0, 3) || [
+    "the relevant facts",
+    "strong responses",
+    "the next move",
+  ];
+  const sentence = `I’ll help you prepare ${capabilities.join(", ")} while you keep the conversation moving.`;
   const objective = String(goal || "").trim();
 
   return objective
@@ -625,8 +770,77 @@ function homepageOperationalPromise(
     : sentence;
 }
 
+type HomepageMissionTier = "smart" | "intelligent" | "brilliant";
+
+function homepageMissionLimit(tier: HomepageMissionTier) {
+  if (tier === "smart") return 1;
+  if (tier === "intelligent") return 2;
+  return Number.POSITIVE_INFINITY;
+}
+
+function homepageOperationalUnderstanding(
+  role: HomepageRole | null,
+  missions: readonly string[],
+) {
+  const roleLabel = role?.label || "professional";
+  const missionParts = missions
+    .map((mission) => {
+      const [verb, ...rest] = mission.split(" ");
+      const gerunds: Record<string, string> = {
+        Answer: "answering",
+        Close: "closing",
+        Conduct: "conducting",
+        Defend: "defending",
+        Deliver: "delivering",
+        Explain: "explaining",
+        Handle: "handling",
+        Keep: "keeping",
+        Lead: "leading",
+        Make: "making",
+        Negotiate: "negotiating",
+        Persuade: "persuading",
+        Pitch: "pitching",
+        Present: "presenting",
+        Prepare: "preparing",
+        Protect: "protecting",
+        Raise: "raising",
+        Recruit: "recruiting",
+        Recover: "recovering",
+        Resolve: "resolving",
+        Respond: "responding",
+        Secure: "securing",
+        Sell: "selling",
+        Set: "setting",
+        Stay: "staying",
+        Teach: "teaching",
+        Uncover: "uncovering",
+        Win: "winning",
+      };
+      return [gerunds[verb] || verb.toLowerCase(), ...rest].join(" ");
+    });
+  const missionText =
+    missionParts.length <= 1
+      ? missionParts[0] || "moving toward your objective"
+      : missionParts.length === 2
+        ? missionParts.join(" and ")
+        : `${missionParts.slice(0, -1).join(", ")}, and ${missionParts.at(-1)}`;
+
+  return `You're preparing for a ${roleLabel.toLowerCase()} conversation where success depends on ${missionText}.`;
+}
+
+function homepageOperationalSupport(role: HomepageRole | null) {
+  const capabilities = role?.capabilities.slice(0, 3) || [
+    "the strongest evidence",
+    "likely resistance",
+    "next moves",
+  ];
+
+  return `I'll help you prepare ${capabilities.join(", ")} before the conversation begins.`;
+}
+
 export function HomeConversationTypeSurface() {
   const surfaceRef = useRef<HTMLElement | null>(null);
+  const preparationScrollRef = useRef<HTMLDivElement | null>(null);
   const homepagePreparationSeedRef = useRef<PreparationSessionV1 | null>(null);
   const [selectedType, setSelectedType] = useState<ConversationType | null>(
     null,
@@ -634,6 +848,10 @@ export function HomeConversationTypeSurface() {
   const [selectedRole, setSelectedRole] = useState<HomepageRole | null>(null);
 
 const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
+  const [selectedMissions, setSelectedMissions] = useState<string[]>([]);
+  const [missionTier, setMissionTier] = useState<HomepageMissionTier>("smart");
+  const [customMissionOpen, setCustomMissionOpen] = useState(false);
+  const [missionCollapsing, setMissionCollapsing] = useState(false);
 
   const [showAllRoles, setShowAllRoles] = useState(false);
   const [phase, setPhase] = useState<SurfacePhase>("selection");
@@ -663,7 +881,19 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [formulaError, setFormulaError] = useState("");
 
   useEffect(() => {
-    if (!selectedType || typeof window === "undefined") return;
+    if (typeof window === "undefined") return;
+    const storedTier = window.localStorage.getItem("george_tier");
+    if (storedTier === "smart" || storedTier === "intelligent" || storedTier === "brilliant") {
+      setMissionTier(storedTier);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (
+      !selectedType ||
+      (phase !== "goal" && phase !== "introduction") ||
+      typeof window === "undefined"
+    ) return;
 
     const media = window.matchMedia("(max-width: 767px)");
     const previousOverflow = document.body.style.overflow;
@@ -678,7 +908,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       media.removeEventListener?.("change", syncScrollLock);
       document.body.style.overflow = previousOverflow;
     };
-  }, [selectedType]);
+  }, [phase, selectedType]);
 
   const activeFormula = useMemo(() => {
     if (!selectedType || accessibleFormulas.length === 0) return null;
@@ -886,7 +1116,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
     const introductionText =
       selectedRole?.summary ||
-      "GEORGE will carry the selected role and goal into preparation.";
+      "GEORGE will carry the selected role and objective into preparation.";
     const typewriterDuration = introductionText.length * 24;
 
     const typewriterTimer = window.setTimeout(() => setIntroStage(1), 180);
@@ -906,11 +1136,6 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     };
   }, [phase]);
 
-  const structureText = useTypewriter(
-    "The structure is ready. GEORGE will help sequence the facts, impact, explanation, empathy, and next steps.",
-    phase === "introduction" && introStage >= 1,
-    24,
-  );
   const optionalQuestionText = useTypewriter(
     optionalQuestion?.question || "",
     phase === "optional" && Boolean(optionalQuestion),
@@ -920,8 +1145,15 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const currentOperationalPromise = homepageOperationalPromise(
     selectedRole,
     selectedGoal,
-    selectedType?.description || "move the conversation toward your objective.",
   );
+  const isMissionTransition = Boolean(
+    selectedType && (phase === "goal" || phase === "introduction"),
+  );
+
+  useEffect(() => {
+    if (!isMissionTransition) return;
+    preparationScrollRef.current?.scrollTo({ top: 0, behavior: "auto" });
+  }, [isMissionTransition, phase, selectedRole]);
 
   function selectRole(role: HomepageRole) {
     const conversationType = CONVERSATION_TYPES.find(
@@ -938,7 +1170,10 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setSelectedRole(role);
     setSelectedType(conversationType);
     setSelectedGoal(null);
-    setPhase("selected");
+    setSelectedMissions([]);
+    setCustomMissionOpen(false);
+    setMissionCollapsing(false);
+    setPhase("goal");
     setIntroStage(0);
     setShowInitialBriefingDecisionMessage(false);
     setAnswers({});
@@ -960,6 +1195,9 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setSelectedType(null);
     setSelectedRole(null);
     setSelectedGoal(null);
+    setSelectedMissions([]);
+    setCustomMissionOpen(false);
+    setMissionCollapsing(false);
     setPhase("selection");
     setIntroStage(0);
     setShowInitialBriefingDecisionMessage(false);
@@ -972,10 +1210,26 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setOptionalQuestionLoading(false);
   }
 
-  function selectGoal(goal: string) {
-    const normalizedGoal = goal.trim();
-    if (!normalizedGoal || normalizedGoal === "Other...") return;
+  function toggleMission(mission: string) {
+    const normalizedMission = mission.trim();
+    if (!normalizedMission) return;
 
+    setSelectedMissions((current) => {
+      if (current.includes(normalizedMission)) {
+        return current.filter((value) => value !== normalizedMission);
+      }
+
+      const limit = homepageMissionLimit(missionTier);
+      if (current.length >= limit) return current;
+      return [...current, normalizedMission];
+    });
+  }
+
+  function continueWithMissions() {
+    const missions = selectedMissions.map((mission) => mission.trim()).filter(Boolean);
+    if (missions.length === 0) return;
+
+    const normalizedGoal = missions.join("; ");
     const nextSignals = {
       ...answers,
       role: selectedRole?.label || answers.role || "",
@@ -993,7 +1247,24 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setSelectedGoal(normalizedGoal);
     setAnswers(nextSignals);
     saveLivePreparationSignals(nextSignals);
-    setPhase("introduction");
+    setMissionCollapsing(true);
+    window.setTimeout(() => {
+      setMissionCollapsing(false);
+      setPhase("introduction");
+      setIntroStage(0);
+    }, 520);
+  }
+
+  function selectCustomMission(mission: string) {
+    const normalizedMission = mission.trim();
+    if (!normalizedMission) return;
+    setSelectedMissions((current) => {
+      if (current.includes(normalizedMission)) return current;
+      const limit = homepageMissionLimit(missionTier);
+      if (current.length >= limit) return current;
+      return [...current, normalizedMission];
+    });
+    setCustomMissionOpen(false);
   }
 
   function beginPreparation() {
@@ -1007,12 +1278,12 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     }
 
     if (phase === "goal") {
-      setPhase("selected");
+      resetSelection();
       return;
     }
 
     if (phase === "introduction") {
-      setPhase("selected");
+      setPhase("goal");
       return;
     }
 
@@ -1455,12 +1726,12 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     <section
       ref={surfaceRef}
       className={`relative min-h-[100dvh] scroll-mt-4 border-t border-white/10 px-5 py-14 transition-colors duration-700 sm:px-8 sm:py-20 ${
-        selectedType
+        isMissionTransition
           ? "bg-[#020304] max-sm:h-[100dvh] max-sm:overflow-hidden max-sm:px-3 max-sm:py-3"
           : "bg-black"
       }`}
     >
-      <div className={`mx-auto w-full max-w-[1700px] ${selectedType ? "max-sm:h-full" : ""}`}>
+      <div className={`mx-auto w-full max-w-[1700px] ${isMissionTransition ? "max-sm:h-full" : ""}`}>
         {phase === "selection" ? (
           <div className="animate-[fadeIn_420ms_ease-out]">
             <div className="max-w-6xl">
@@ -1471,7 +1742,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                 If success depends on what you say, how you say it, or how you adapt while saying it, GEORGE can help.
               </h1>
               <p className="mt-6 max-w-3xl text-[16px] leading-8 text-white/68">
-                Choose the starting point that feels closest to your conversation. I’ll show how I can help before asking what you are trying to accomplish.
+                Start from your role in the conversation, then define your objective. Intelligent communication can mean the difference between success and failure.
               </p>
 
               <div className="mt-10">
@@ -1547,51 +1818,32 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
             </div>
           </div>
         ) : (
-          <div className="mx-auto w-full max-w-4xl animate-[fadeIn_420ms_ease-out] max-sm:h-full">
-            <div className="rounded-[18px] border border-white/[0.08] bg-[#050607] p-3 shadow-[0_18px_70px_rgba(0,0,0,0.42)] sm:p-5 sm:p-7 max-sm:flex max-sm:h-full max-sm:min-h-0 max-sm:flex-col max-sm:overflow-y-auto max-sm:overscroll-contain">
+          <div className={`mx-auto w-full max-w-4xl animate-[fadeIn_420ms_ease-out] ${isMissionTransition ? "max-sm:h-full" : ""}`}>
+            <div ref={preparationScrollRef} className={`rounded-[18px] border border-white/[0.08] bg-[#050607] p-3 shadow-[0_18px_70px_rgba(0,0,0,0.42)] sm:p-5 sm:p-7 ${isMissionTransition ? "max-sm:flex max-sm:h-full max-sm:min-h-0 max-sm:overflow-y-auto max-sm:overscroll-contain" : ""}`}>
+              <BxPageHeader
+                onBack={goBack}
+                rightSlot={
+                  <button
+                    type="button"
+                    onClick={resetSelection}
+                    className="inline-flex h-7 items-center justify-center rounded-[9px] border border-[#7EA1FF]/42 bg-[#11182A] px-3 font-mono text-[8px] font-semibold uppercase tracking-[0.14em] text-white transition hover:border-[#AEB6FF]/70 hover:bg-[#18213A]"
+                  >
+                    Re-select
+                  </button>
+                }
+              />
               <div
-                className={`border-b border-white/[0.07] pb-5 transition-all duration-500 max-sm:sticky max-sm:top-0 max-sm:z-10 max-sm:bg-[#050607] ${
+                className={`border-b border-white/[0.07] pb-5 transition-all duration-500 ${isMissionTransition ? "max-sm:sticky max-sm:top-0 max-sm:z-10 max-sm:bg-[#050607]" : ""} ${
                   phase === "optional" ? "border-transparent pb-3" : ""
                 }`}
               >
                 <div className="flex items-start justify-between gap-2 sm:gap-3">
                   <div className="min-w-0 flex-1">
-                    <div className="whitespace-nowrap font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-white">
-                      How GEORGE Can Help
-                    </div>
-
                     <SelectionAcknowledgement
                       label={selectedRole?.label || selectedType?.title || "Selected role"}
                     />
                   </div>
 
-                  <div
-                    className={`shrink-0 transition-all duration-500 ${
-                      phase === "optional"
-                        ? "pointer-events-none -translate-y-1 opacity-0"
-                        : "translate-y-0 opacity-100"
-                    }`}
-                  >
-                    {phase !== "selected" && phase !== "optional" && (
-                      <div className="flex gap-2 flex-col items-stretch shrink-0 w-[116px] sm:w-[132px]">
-                        <button
-                          type="button"
-                          onClick={goBack}
-                          className="rounded-[9px] border border-white/[0.12] bg-transparent font-mono font-semibold uppercase tracking-[0.12em] text-white/52 transition hover:border-white/25 hover:text-white w-full h-8 min-w-0 px-2 text-[7px] sm:text-[8px] whitespace-nowrap"
-                        >
-                          ← Back
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={resetSelection}
-                          className="rounded-[9px] border border-white/[0.12] bg-transparent font-mono font-semibold uppercase tracking-[0.12em] text-white/52 transition hover:border-white/25 hover:text-white w-full h-8 min-w-0 px-2 text-[7px] sm:text-[8px] whitespace-nowrap order-last"
-                        >
-                          Re-select
-                        </button>
-                      </div>
-                    )}
-                  </div>
                 </div>
               </div>
 
@@ -1713,114 +1965,154 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                 <div className="pt-6 animate-[fadeIn_360ms_ease-out]">
                   <div className="max-w-3xl">
                     <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/58">
-                      Goal
+                      Mission
                     </div>
-
                     <h3 className="mt-3 font-mono text-[22px] font-semibold leading-8 tracking-[-0.035em] text-white sm:text-[28px] sm:leading-9">
-                      What is your goal?
+                      What would make this conversation successful?
                     </h3>
-
                     <p className="mt-2 text-[13px] leading-6 text-white/42">
-                      Choose the outcome that best describes what you need this
-                      conversation or presentation to accomplish.
+                      {missionTier === "smart"
+                        ? "Select one objective."
+                        : missionTier === "intelligent"
+                          ? "Select up to two objectives."
+                          : "Select all that apply."}
                     </p>
                   </div>
 
-                  <div className="mt-6 grid gap-2 sm:grid-cols-2">
-                    {HOMEPAGE_GOALS.filter((goal) => goal !== "Other...").map(
-                      (goal) => (
-                        <button
-                          key={goal}
-                          type="button"
-                          onClick={() => selectGoal(goal)}
-                          className="min-h-[48px] rounded-[11px] border border-white/[0.08] bg-white/[0.018] px-4 py-3 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-white/72 transition hover:border-[#7EA1FF]/45 hover:bg-[#11182A] hover:text-white"
+                  <div className={missionCollapsing ? "mt-6 grid gap-2 sm:grid-cols-2 opacity-0 transition-all duration-500" : "mt-6 grid gap-2 sm:grid-cols-2 opacity-100 transition-all duration-500"}>
+                    {goalsForHomepageRole(selectedRole)
+                      .filter((goal) => goal.id !== "other")
+                      .map((mission) => {
+                        const selected = selectedMissions.includes(mission.label);
+                        const limitReached =
+                          !selected &&
+                          selectedMissions.length >= homepageMissionLimit(missionTier);
+                        return (
+                          <button
+                            key={mission.id}
+                            type="button"
+                            aria-pressed={selected}
+                            disabled={limitReached}
+                            onClick={() => toggleMission(mission.label)}
+                            className={selected
+                              ? "min-h-[48px] rounded-[11px] border border-[#AEB6FF]/70 bg-[#172347] px-4 py-3 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-white transition"
+                              : "min-h-[48px] rounded-[11px] border border-white/[0.08] bg-white/[0.018] px-4 py-3 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-white/72 transition hover:border-[#7EA1FF]/45 hover:bg-[#11182A] hover:text-white disabled:cursor-not-allowed disabled:opacity-30"}
+                          >
+                            <span className="mr-2 inline-block w-4 text-[#AEB6FF]">
+                              {selected ? "✓" : ""}
+                            </span>
+                            {mission.label}
+                          </button>
+                        );
+                      })}
+                  </div>
+
+                  <div className="mt-4">
+                    {!customMissionOpen ? (
+                      <button
+                        type="button"
+                        onClick={() => setCustomMissionOpen(true)}
+                        className="rounded-[10px] border border-dashed border-white/[0.16] px-4 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white/58 transition hover:border-white/30 hover:text-white"
+                      >
+                        Something else…
+                      </button>
+                    ) : (
+                      <div className="rounded-[12px] border border-white/[0.08] bg-white/[0.015] p-3">
+                        <label
+                          htmlFor="homepage-custom-mission"
+                          className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42"
                         >
-                          {goal}
-                        </button>
-                      ),
+                          What are you trying to accomplish?
+                        </label>
+                        <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+                          <input
+                            id="homepage-custom-mission"
+                            value={selectedGoal || ""}
+                            onChange={(event) => setSelectedGoal(event.target.value)}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter") {
+                                event.preventDefault();
+                                selectCustomMission(selectedGoal || "");
+                              }
+                            }}
+                            placeholder="Describe the outcome you want"
+                            className="h-11 min-w-0 flex-1 rounded-[9px] border border-white/[0.09] bg-black/40 px-3 text-[14px] text-white outline-none placeholder:text-white/24 focus:border-[#7EA1FF]/55"
+                          />
+                          <button
+                            type="button"
+                            disabled={!String(selectedGoal || "").trim()}
+                            onClick={() => selectCustomMission(selectedGoal || "")}
+                            className="h-11 rounded-[9px] border border-[#7EA1FF]/42 bg-[#11182A] px-5 font-mono text-[9px] font-semibold uppercase tracking-[0.15em] text-white transition hover:border-white disabled:cursor-not-allowed disabled:opacity-35"
+                          >
+                            Add objective
+                          </button>
+                        </div>
+                      </div>
                     )}
                   </div>
 
-                  <div className="mt-5 rounded-[12px] border border-white/[0.08] bg-white/[0.015] p-3">
-                    <label
-                      htmlFor="homepage-custom-goal"
-                      className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42"
-                    >
-                      Or describe your goal
-                    </label>
-
-                    <div className="mt-2 flex flex-col gap-2 sm:flex-row">
-                      <input
-                        id="homepage-custom-goal"
-                        value={selectedGoal || ""}
-                        onChange={(event) => setSelectedGoal(event.target.value)}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter") {
-                            event.preventDefault();
-                            selectGoal(selectedGoal || "");
-                          }
-                        }}
-                        placeholder="What needs to happen?"
-                        className="h-11 min-w-0 flex-1 rounded-[9px] border border-white/[0.09] bg-black/40 px-3 text-[14px] text-white outline-none placeholder:text-white/24 focus:border-[#7EA1FF]/55"
-                      />
-
-                      <button
-                        type="button"
-                        disabled={!String(selectedGoal || "").trim()}
-                        onClick={() => selectGoal(selectedGoal || "")}
-                        className="h-11 rounded-[9px] border border-[#7EA1FF]/42 bg-[#11182A] px-5 font-mono text-[9px] font-semibold uppercase tracking-[0.15em] text-white transition hover:border-white disabled:cursor-not-allowed disabled:opacity-35"
-                      >
-                        Continue →
-                      </button>
+                  {missionCollapsing && selectedMissions.length > 0 && (
+                    <div className={missionCollapsing ? "mt-5 flex flex-wrap gap-2 -translate-y-3 transition-all duration-500" : "mt-5 flex flex-wrap gap-2 translate-y-0 transition-all duration-500"}>
+                      {selectedMissions.map((mission) => (
+                        <span
+                          key={mission}
+                          className="rounded-full border border-[#AEB6FF]/45 bg-[#172347] px-3 py-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-white"
+                        >
+                          ✓ {mission}
+                        </span>
+                      ))}
                     </div>
-                  </div>
+                  )}
 
-                  <button
-                    type="button"
-                    onClick={goBack}
-                    className="mt-5 h-9 rounded-[9px] border border-white/[0.10] px-4 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/52 transition hover:border-white/25 hover:text-white"
-                  >
-                    ← Back
-                  </button>
+                  <div className="mt-6 flex items-center gap-3">
+                    <button
+                      type="button"
+                      disabled={selectedMissions.length === 0}
+                      onClick={continueWithMissions}
+                      className="h-11 rounded-[9px] border border-[#7EA1FF]/42 bg-[#11182A] px-5 font-mono text-[9px] font-semibold uppercase tracking-[0.15em] text-white transition hover:border-white disabled:cursor-not-allowed disabled:opacity-35"
+                    >
+                      Continue →
+                    </button>
+                    <button
+                      type="button"
+                      onClick={goBack}
+                      className="h-9 rounded-[9px] border border-white/[0.10] px-4 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/52 transition hover:border-white/25 hover:text-white"
+                    >
+                      ← Back
+                    </button>
+                  </div>
                 </div>
               )}
 
               {phase === "introduction" && (
-                <div className="pt-6">
-                  <div className="min-h-[96px] max-w-4xl font-mono text-[20px] leading-8 tracking-[-0.03em] text-white sm:text-[24px] sm:leading-9">
-                    {structureText}
-                  </div>
-
-                  <div
-                    className={`mt-6 transition-all duration-700 ${
-                      introStage >= 2
-                        ? "translate-y-0 opacity-100"
-                        : "pointer-events-none translate-y-2 opacity-0"
-                    }`}
-                  >
-                    <h3 className="font-mono text-[17px] font-semibold tracking-[-0.02em] text-white">
-                      With you in the conversation.
-                    </h3>
-
-                    <p className="mt-3 max-w-3xl text-[14px] leading-7 text-white/52">
-                      {currentOperationalPromise}
-                    </p>
-                  </div>
-
-                  <div
-                    className={`mt-5 transition-all duration-500 ${
-                      introStage >= 3
-                        ? "translate-y-0 opacity-100"
-                        : "pointer-events-none translate-y-2 opacity-0"
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      onClick={beginQuestions}
-                      className="h-10 rounded-[10px] border border-[#7EA1FF]/42 bg-[#11182A] px-4 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white transition hover:border-[#AEB6FF]/70 hover:bg-[#18213A]"
+                <div className="flex min-h-0 flex-1 flex-col">
+                  <div className="px-1 pt-4 pb-3 sm:pt-6">
+                    <div
+                      className={`mt-5 transition-all duration-700 ${
+                        introStage >= 2
+                          ? "translate-y-0 opacity-100"
+                          : "pointer-events-none translate-y-2 opacity-0"
+                      }`}
                     >
-                      Start →
-                    </button>
+                      <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/58">
+                        My understanding
+                      </div>
+                      <p className="mt-3 max-w-4xl font-mono text-[18px] font-medium leading-[1.5] tracking-[-0.02em] text-white sm:text-[24px] sm:leading-[1.45]">
+                        {homepageOperationalUnderstanding(selectedRole, selectedMissions)}
+                      </p>
+                      <p className="mt-4 max-w-3xl text-[14px] leading-[1.6] text-white/52 sm:text-[16px] sm:leading-[1.6]">
+                        {homepageOperationalSupport(selectedRole)}
+                      </p>
+                      <div className="mt-7">
+                        <button
+                          type="button"
+                          onClick={beginQuestions}
+                          className="h-11 rounded-[9px] border border-[#7EA1FF]/42 bg-[#11182A] px-5 font-mono text-[9px] font-semibold uppercase tracking-[0.15em] text-white transition hover:border-[#AEB6FF]/70 hover:bg-[#18213A] sm:h-10"
+                        >
+                          Start Briefing →
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1938,7 +2230,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                       },
                       {
                         key: "broadGoal",
-                        label: "Goal",
+                        label: "Objectives",
                         value: answers.broadGoal || selectedGoal || "",
                       },
                     ]

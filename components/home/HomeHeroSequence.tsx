@@ -3,19 +3,68 @@
 import { useEffect, useState } from "react";
 import { requestFreshNormalBrowserSession } from "@/lib/george/session/store";
 
-const MESSAGES = [
-  "GEORGE quietly delivers the right facts, answers, and strategies to your screen, audio glasses, or earbuds while you confidently drive the conversation to completion.",
-  "Use GEORGE during meetings, interviews, negotiations, sales calls, presentations, or any situation where conversation determines the outcome.",
-  "Use GEORGE on Zoom, over the phone, face-to-face, by desktop or mobile device.",
+const OPERATIONAL_SECTIONS = [
+  {
+    heading: "Relentless objective focus",
+    paragraph:
+      "Every recommendation GEORGE delivers to your screen, audio glasses, or earbuds is designed to move the conversation one step closer to your objective. Every cue, every response, and every strategy serves a purpose.",
+  },
+  {
+    heading: "Continuous tracking",
+    paragraph:
+      "You don't need to pause the conversation or press buttons. While you're speaking with a client, investor, interviewer, or candidate, GEORGE continuously follows the conversation in the background and identifies the exact moment to assist.",
+  },
+  {
+    heading: "Instant adaptation",
+    paragraph:
+      "If an unexpected question comes up, GEORGE doesn't simply search your uploaded notes. He combines your pitch decks, documents, case files, instructions, and conversation context with his own operational knowledge to generate the strongest response strategy for that moment.",
+  },
+  {
+    heading: "Asymmetrical advantage",
+    paragraph:
+      "Whether you prefer a visual cue on your laptop, a line on your audio glasses, or a quiet phrase in your earbud, the person across from you experiences only a confident, uninterrupted professional conversation.",
+  },
+  {
+    heading: "Dynamic redirection",
+    paragraph:
+      "If a negotiation stalls, a prospect raises an unexpected objection, or an interviewer suddenly changes direction, GEORGE immediately abandons the previous strategy, reassesses the conversation, and delivers new guidance to keep you moving toward your objective.",
+  },
 ] as const;
 
 export function HomeHeroSequence() {
-  const [messageIndex, setMessageIndex] = useState(0);
+  const [sectionIndex, setSectionIndex] = useState(0);
+  const [typedParagraph, setTypedParagraph] = useState("");
   const [messageVisible, setMessageVisible] = useState(true);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReducedMotion(media.matches);
+    update();
+    media.addEventListener?.("change", update);
+    return () => media.removeEventListener?.("change", update);
+  }, []);
 
   useEffect(() => {
     let active = true;
     const timers = new Set<number>();
+    const section = OPERATIONAL_SECTIONS[sectionIndex];
+    setMessageVisible(true);
+
+    if (reducedMotion) {
+      setTypedParagraph(section.paragraph);
+    } else {
+      setTypedParagraph("");
+      let characterIndex = 0;
+      const typingTimer = window.setInterval(() => {
+        characterIndex += 1;
+        setTypedParagraph(section.paragraph.slice(0, characterIndex));
+        if (characterIndex >= section.paragraph.length) {
+          window.clearInterval(typingTimer);
+        }
+      }, 28);
+      timers.add(typingTimer);
+    }
 
     const schedule = (callback: () => void, delay: number) => {
       const timer = window.setTimeout(() => {
@@ -25,26 +74,22 @@ export function HomeHeroSequence() {
       timers.add(timer);
     };
 
-    const cycle = (index: number) => {
+    schedule(() => {
+      setMessageVisible(false);
       schedule(() => {
-        setMessageVisible(false);
-        schedule(() => {
-          const nextIndex = (index + 1) % MESSAGES.length;
-          setMessageIndex(nextIndex);
-          setMessageVisible(true);
-          cycle(nextIndex);
-        }, 700);
-      }, 6500);
-    };
-
-    cycle(0);
+        if (!active) return;
+        setSectionIndex((current) =>
+          (current + 1) % OPERATIONAL_SECTIONS.length,
+        );
+      }, reducedMotion ? 180 : 600);
+    }, reducedMotion ? 8000 : section.paragraph.length * 28 + 8500);
 
     return () => {
       active = false;
       timers.forEach((timer) => window.clearTimeout(timer));
       timers.clear();
     };
-  }, []);
+  }, [reducedMotion, sectionIndex]);
 
   const startNormal = () => {
     requestFreshNormalBrowserSession();
@@ -73,18 +118,25 @@ export function HomeHeroSequence() {
 
       <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[1500px] flex-col px-5 pb-6 pt-[14vh] sm:px-10 sm:pb-8 sm:pt-[18vh]">
         <div className="max-w-4xl">
-          <h1 className="font-mono text-[42px] font-black uppercase leading-[0.94] tracking-[-0.07em] text-white sm:text-[68px] md:text-[88px]">
-            Ask GEORGE.
+          <h1 className="font-mono text-[42px] font-black uppercase leading-[0.94] tracking-[-0.045em] text-white sm:text-[68px] md:text-[88px]">
+            GEORGE
           </h1>
-
+          <div className="bx-command-shimmer mt-3 inline-flex overflow-hidden rounded-[7px] bg-[#C7CBD1] px-3 py-1.5 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-black sm:mt-4 sm:px-4 sm:py-2 sm:text-[15px]">
+            Intelligent Communication
+          </div>
           <div className="mt-8 min-h-[12rem] max-w-4xl sm:mt-10 sm:min-h-[14rem]">
             <div
               aria-live="polite"
-              className={`flex min-h-[12rem] items-center rounded-[16px] border border-white/[0.12] bg-white/[0.025] px-5 py-6 text-[20px] font-medium leading-[1.5] text-white/80 transition-opacity duration-700 sm:min-h-[14rem] sm:px-8 sm:py-8 sm:text-[28px] sm:leading-[1.45] ${
+              className={`george-motion-fade-soft min-h-[12rem] rounded-[16px] border border-white/[0.12] bg-white/[0.025] px-5 py-6 text-white/80 transition-opacity duration-700 motion-reduce:transition-none sm:min-h-[14rem] sm:px-8 sm:py-8 ${
                 messageVisible ? "opacity-100" : "opacity-0"
               }`}
             >
-              {MESSAGES[messageIndex]}
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#AEB6FF]/72">
+                {OPERATIONAL_SECTIONS[sectionIndex].heading}
+              </p>
+              <p className="mt-4 max-w-3xl text-[20px] font-medium leading-[1.55] sm:text-[28px] sm:leading-[1.45]">
+                {typedParagraph}
+              </p>
             </div>
           </div>
         </div>
