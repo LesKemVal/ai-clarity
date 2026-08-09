@@ -1895,3 +1895,22 @@ Working-hypothesis creation occurs only after recommendation retrieval fails to 
 Post-execution derivation remains separate. If execution evidence indicates a materially different operational strategy, the canonical derivation path may propose a derived Formula Candidate with preserved lineage. Existing retention and approval rules continue to govern that candidate.
 
 The hypothesis materializer does not own derivation. The derivation service does not own recommendation-miss hypothesis creation.
+
+### Recommendation strategy status
+
+Operational Memory owns recommendation status semantics.
+
+Status is derived from Formula state:
+
+initial
+= no established recommended Formula is currently available
+
+confirmed
+= an actual Formula is selected and no prior Formula was replaced, including the case where the same prior Formula remains selected
+
+refined
+= a prior Formula existed and a different Formula is now recommended
+
+A completed briefing does not itself establish confirmed status.
+
+If canonical retrieval misses and governed synthesis returns no usable strategy, the recommendation remains unresolved and strategy status remains initial.

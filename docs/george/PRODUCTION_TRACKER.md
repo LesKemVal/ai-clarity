@@ -1786,3 +1786,21 @@ working hypothesis = pre-execution strategy needed to operate
 derived Formula Candidate = post-execution proposed strategy discovered through evidence
 
 The working-hypothesis path does not replace or weaken the existing derived-Formula Candidate approval doctrine.
+
+### Recommendation strategy status semantics
+
+Recommendation strategy status now reflects Formula state rather than briefing completion alone.
+
+Canonical meaning:
+
+- initial = no established recommended Formula is currently available;
+- confirmed = the current recommendation is an actual Formula and the prior Formula remains selected, or an actual Formula is selected without a prior Formula;
+- refined = a prior Formula existed and a different Formula is now recommended.
+
+A completed briefing with no recommended Formula remains initial.
+
+Briefing completion may trigger strategy synthesis, but completion by itself does not confirm a strategy.
+
+Validated implementation commit:
+
+f447b69b Correct recommendation strategy status

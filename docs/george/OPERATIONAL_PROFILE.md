@@ -1449,3 +1449,15 @@ The first enables execution.
 The second captures operational discovery.
 
 Neither is treated as proven merely because it exists.
+
+### Recommendation status meaning
+
+GEORGE does not describe a strategy as confirmed merely because preparation is complete.
+
+Initial means GEORGE does not yet have an established recommended Formula for the current work.
+
+Confirmed means GEORGE has an actual recommended Formula that remains the current operational strategy.
+
+Refined means GEORGE has moved from a prior Formula to a different recommended Formula because the current briefing or signal supports a different approach.
+
+If a completed briefing still does not support a usable Formula, the strategy remains initial rather than being treated as confirmed.

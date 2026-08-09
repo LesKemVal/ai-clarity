@@ -164,3 +164,21 @@ The working hypothesis is created pre-execution when no existing Formula qualifi
 A derived Formula Candidate remains a post-execution learning artifact produced through the canonical derivation path and remains subject to existing lineage and user-retention approval rules.
 
 These are complementary paths, not competing Formula owners.
+
+## Recommendation Status Semantics — Completed
+
+Validated production refinement corrected recommendation status semantics.
+
+Current meaning:
+
+- initial: no recommended Formula is currently established;
+- confirmed: an actual Formula is selected without replacing the prior strategy, including preservation of the same prior Formula;
+- refined: a prior Formula existed and a different Formula is now recommended.
+
+Completed briefing alone no longer produces confirmed status when no Formula exists.
+
+Null strategy synthesis remains a valid degradation state and leaves recommendation status initial.
+
+Validated commit:
+
+f447b69b Correct recommendation strategy status
