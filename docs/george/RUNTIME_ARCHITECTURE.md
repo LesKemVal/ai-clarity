@@ -1914,3 +1914,17 @@ refined
 A completed briefing does not itself establish confirmed status.
 
 If canonical retrieval misses and governed synthesis returns no usable strategy, the recommendation remains unresolved and strategy status remains initial.
+
+### Working Formula recommendation summary
+
+Operational Memory remains the canonical owner of recommendation summary semantics.
+
+When the selected recommendation is a newly synthesized working Formula hypothesis, the summary is:
+
+"Here's how I'd approach this conversation based on what I know now."
+
+This communicates that the Formula is GEORGE's current operational approach rather than proven truth.
+
+The summary is derived from the recommendation result already owned by Operational Memory. No separate presentation authority or reasoning owner is introduced.
+
+Refined, confirmed, incomplete-briefing, and synthesis-degradation summaries remain separate existing branches.

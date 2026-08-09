@@ -1804,3 +1804,26 @@ Briefing completion may trigger strategy synthesis, but completion by itself doe
 Validated implementation commit:
 
 f447b69b Correct recommendation strategy status
+
+### Working Formula recommendation language
+
+A newly synthesized working Formula hypothesis is presented as GEORGE's current operational approach, not as a confirmed or proven strategy.
+
+Canonical user-facing summary:
+
+"Here's how I'd approach this conversation based on what I know now."
+
+This language applies when the recommended Formula is the newly created working hypothesis.
+
+Existing summary semantics remain:
+
+- refined Formula: GEORGE recommends the refined strategy;
+- confirmed Formula: the briefing supports the current strategy;
+- no usable Formula after completed briefing: GEORGE remains in the strategy-preparation degradation state;
+- incomplete briefing with no Formula: GEORGE remains in the initial-strategy preparation state.
+
+The working-hypothesis summary does not change Formula status, verification, evidence, publication, or Script ownership.
+
+Validated implementation commit:
+
+3edd3454 Clarify working formula recommendation summary

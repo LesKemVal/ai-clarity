@@ -182,3 +182,21 @@ Null strategy synthesis remains a valid degradation state and leaves recommendat
 Validated commit:
 
 f447b69b Correct recommendation strategy status
+
+## Working Formula Recommendation Summary — Completed
+
+Validated production refinement now gives newly synthesized working Formula hypotheses distinct conversational framing.
+
+Current behavior:
+
+- working hypothesis: "Here's how I'd approach this conversation based on what I know now.";
+- confirmed Formula: retains current-strategy support language;
+- refined Formula: retains refined-strategy recommendation language;
+- completed briefing with no usable Formula: retains degradation language;
+- incomplete briefing with no Formula: retains initial-strategy preparation language.
+
+No new recommendation status, presentation owner, Formula lifecycle state, or Script behavior was introduced.
+
+Validated commit:
+
+3edd3454 Clarify working formula recommendation summary

@@ -1461,3 +1461,19 @@ Confirmed means GEORGE has an actual recommended Formula that remains the curren
 Refined means GEORGE has moved from a prior Formula to a different recommended Formula because the current briefing or signal supports a different approach.
 
 If a completed briefing still does not support a usable Formula, the strategy remains initial rather than being treated as confirmed.
+
+### Working Formula conversational framing
+
+A working Formula hypothesis should sound like a current approach, not a verdict.
+
+The canonical framing is:
+
+"Here's how I'd approach this conversation based on what I know now."
+
+This preserves three things at once:
+
+- the user's desired outcome remains the authority;
+- GEORGE provides a concrete operational strategy;
+- the strategy remains adaptable and unproven until evidence supports it.
+
+Working-hypothesis language must not imply that the Formula is confirmed, validated, verified, or proven merely because GEORGE synthesized it.
