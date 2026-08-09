@@ -318,12 +318,75 @@ const existingFormula = {
   )
 }
 
+{
+  const store = makeFormulaLibrary([])
+
+  let synthesisCount = 0
+
+  const memory = createOperationalMemory({
+    formulaLibrary: store.library,
+    strategySynthesizer: async () => {
+      synthesisCount += 1
+      return null
+    },
+  })
+
+  const result = await memory.recommend({
+    userId: 'user@example.com',
+    roomType: 'job_interview',
+    objectiveType: 'secure_offer',
+    observedSignalTypes: [],
+    briefingComplete: true,
+    preparationContext: {
+      desiredOutcome: 'Secure the stocking position',
+    },
+  })
+
+  assert.equal(
+    synthesisCount,
+    1,
+    'A completed briefing with no qualifying Formula must attempt strategy synthesis.',
+  )
+
+  assert.equal(
+    store.saved.length,
+    0,
+    'Null strategy synthesis must not persist a Formula hypothesis.',
+  )
+
+  assert.equal(
+    result.recommendedFormula,
+    null,
+    'Null strategy synthesis must preserve the no-recommendation degradation state.',
+  )
+
+  assert.equal(
+    result.recommendedScript,
+    null,
+    'Null strategy synthesis must not create or select a Script.',
+  )
+
+  assert.equal(
+    result.recommendationSummary,
+    'GEORGE is preparing the strongest strategy from the briefing.',
+    'Null strategy synthesis must preserve the completed-briefing degradation message.',
+  )
+
+  assert.equal(
+    result.reviewRequired,
+    false,
+    'Null strategy synthesis must not require Formula review when no Formula exists.',
+  )
+}
+
+
 console.log('GEORGE working Formula hypothesis qualification passed', {
   existingRelevantFormulaSuppressesSynthesis: true,
   incompleteBriefingSuppressesSynthesis: true,
   belowThresholdTriggersSynthesis: true,
   privateCandidatePersisted: true,
   scriptCreationSuppressed: true,
+  synthesisNullDegradesWithoutPersistence: true,
 })
 
 `
