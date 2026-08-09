@@ -3857,30 +3857,6 @@ export default function LiveEntryClient() {
     }
   };
 
-  const acceptOperationalRecommendation = () => {
-    const recommendedFormula =
-      operationalRecommendation?.recommendedFormula ?? null;
-
-    if (!recommendedFormula) return;
-
-    setSelectedFormula(recommendedFormula);
-    setSelectedFormulaSource("george");
-  };
-
-  const beginFormulaEdit = () => {
-    const formula =
-      selectedFormula ||
-      operationalRecommendation?.recommendedFormula ||
-      null;
-
-    if (!formula) return;
-
-    console.info("[GEORGE][LIVE_ENTRY][FORMULA_EDIT_REQUESTED]", {
-      formulaId: formula.id,
-      formulaVersion: formula.version,
-    });
-  };
-
   const beginFormulaSelection = () => {
     console.info("[GEORGE][LIVE_ENTRY][FORMULA_SELECTION_REQUESTED]");
 
@@ -3945,47 +3921,6 @@ export default function LiveEntryClient() {
     }
 
     window.location.href = "/george/library?asset=formulas&source=live-prep";
-  };
-
-  const browseFormulaScripts = async (formula: OperationalFormula) => {
-    setScriptBrowserFormula(formula);
-    setScriptBrowserOpen(true);
-    setScriptBrowserLoading(true);
-    setScriptBrowserError("");
-
-    try {
-      const params = new URLSearchParams({ formulaId: formula.id });
-      const response = await fetch(
-        `/api/george/operational-memory/scripts?${params.toString()}`,
-        { cache: "no-store" },
-      );
-      const payload = (await response.json().catch(() => null)) as
-        | { ok?: boolean; scripts?: OperationalScript[]; error?: string }
-        | null;
-
-      if (!response.ok || payload?.ok !== true) {
-        throw new Error(payload?.error || "Script retrieval failed");
-      }
-
-      const scripts = Array.isArray(payload.scripts) ? payload.scripts : [];
-      setFormulaScripts(scripts);
-
-      const recommendedScript =
-        operationalRecommendation?.recommendedScript ?? null;
-      if (
-        recommendedScript &&
-        scripts.some((script) => script.id === recommendedScript.id)
-      ) {
-        setSelectedScript((current) => current || recommendedScript);
-      }
-    } catch (error) {
-      setFormulaScripts([]);
-      setScriptBrowserError(
-        error instanceof Error ? error.message : "Script retrieval failed",
-      );
-    } finally {
-      setScriptBrowserLoading(false);
-    }
   };
 
   const selectFormulaScript = (script: OperationalScript) => {
