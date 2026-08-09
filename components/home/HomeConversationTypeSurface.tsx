@@ -1114,7 +1114,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
     const introductionText =
       selectedRole?.summary ||
-      "GEORGE will carry the selected role and objective into preparation.";
+      "I’ll carry your selected role and objective into preparation.";
     const typewriterDuration = introductionText.length * 24;
 
     const typewriterTimer = window.setTimeout(() => setIntroStage(1), 180);
@@ -1461,7 +1461,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
             })),
             {
               key: "assumptionCorrection",
-              question: "What should GEORGE understand instead?",
+              question: "What should I understand instead?",
               answer: correction,
               status: "answered" as const,
             },
@@ -1659,8 +1659,8 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       const fallbackQuestion: HomepageOptionalQuestion = {
         key: `fallback_${Date.now()}`,
         label: "Additional signal",
-        question: "What should GEORGE be especially ready for in this room?",
-        why: "This answer may materially improve GEORGE's preparation.",
+        question: "What should I be especially ready for in this room?",
+        why: "This may materially improve my preparation.",
         example: "Answer if useful, or skip.",
       };
 
@@ -2214,9 +2214,9 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                       <ContextualGeorgeInput
                         id="homepage-assumption-correction"
                         value={assumptionCorrection}
-                        label="What should GEORGE understand instead?"
-                        placeholder="Tell GEORGE what is different or important about this conversation."
-                        submitLabel="Update understanding"
+                        label="What should I understand instead?"
+                        placeholder="Tell me what is different or important about this conversation."
+                        submitLabel="Update my understanding"
                         onChange={setAssumptionCorrection}
                         onSubmit={submitAssumptionCorrection}
                         onCancel={() => setAssumptionCorrectionOpen(false)}

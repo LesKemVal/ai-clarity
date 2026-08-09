@@ -1297,11 +1297,11 @@ export default function LiveEntryClient() {
           : "Your completed mechanics carry forward into this room."
         : livePrepOpenSection === "formula"
           ? preparationResumeMessage ||
-            "The formula gives GEORGE an operational path for this room. Choose the one you want to use."
+            "The formula gives me an operational path for this room. Choose the one you want me to use."
           : livePrepOpenSection === "ready"
             ? activeFormula
-              ? `GEORGE will use ${formulaName} as the operational reference for this room.`
-              : "No formula is required. GEORGE will adapt from the briefing and the room as the conversation unfolds."
+              ? `I will use ${formulaName} as the operational reference for this room.`
+              : "No formula is required. I will adapt from the briefing and the room as the conversation unfolds."
             : "";
 
     setReadyRoomTypedPrompt("");
@@ -1476,7 +1476,7 @@ export default function LiveEntryClient() {
         why: String(
           data.why ||
             data.helper ||
-            "This may improve GEORGE’s context, timing, and support.",
+            "This may improve my context, timing, and support.",
         ),
         example: String(data.example || "Answer if useful, or skip."),
       };
@@ -1491,8 +1491,8 @@ export default function LiveEntryClient() {
       const fallbackQuestion = {
         key: `fallback_${Date.now()}`,
         label: "Additional signal",
-        question: "What should GEORGE be especially ready for in this room?",
-        why: "This may improve GEORGE’s context, timing, and support.",
+        question: "What should I be especially ready for in this room?",
+        why: "This may improve my context, timing, and support.",
         example: "Answer if useful, or skip.",
       };
 
@@ -5006,8 +5006,8 @@ export default function LiveEntryClient() {
               kicker: "ADDITIONAL SIGNAL",
               label: currentOptionalSignalQuestion.label || "Optional signal",
               headline: canonicalPreparationReadiness.thresholdMet
-                ? "GEORGE has enough signal."
-                : "Bring GEORGE up to speed.",
+                ? "I have enough signal."
+                : "Bring me up to speed.",
               question: typedOptionalSignalQuestion,
               helper:
                 optionalSignalInteractionMode === "ask_george"
@@ -5032,13 +5032,13 @@ export default function LiveEntryClient() {
           : showOpenAISignalSurface && optionalSignalLoading
             ? {
                 kicker: "ADDITIONAL SIGNAL",
-                label: "GEORGE is determining the next useful signal",
+                label: "I’m determining the next useful signal",
                 headline: canonicalPreparationReadiness.thresholdMet
-                  ? "GEORGE has enough signal."
-                  : "Bring GEORGE up to speed.",
+                  ? "I have enough signal."
+                  : "Bring me up to speed.",
                 question: "One moment.",
                 helper:
-                  "OpenAI is reasoning over the room signal to sharpen GEORGE's support.",
+                  "I’m reasoning over the room signal to sharpen my support.",
                 example: "",
                 inputValue: "",
                 setInputValue: () => {},
@@ -5878,7 +5878,7 @@ export default function LiveEntryClient() {
               briefingPreparation?.risks?.[0]) && (
               <div className="mt-3 rounded-[1rem] border border-white/[0.055] bg-white/[0.014] px-3.5 py-3">
                 <div className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/28">
-                  What GEORGE will carry into LIVE
+                  What I will carry into LIVE
                 </div>
 
                 {briefingUnderstandingSignals.length > 0 && (
@@ -6980,7 +6980,7 @@ export default function LiveEntryClient() {
                 Start LIVE with minimal preparation.
               </span>
               <span className="mt-2 block text-[11px] leading-5 text-white/32">
-                GEORGE will learn from the room as the conversation unfolds.
+                I’ll learn from the room as the conversation unfolds.
               </span>
             </button>
 
