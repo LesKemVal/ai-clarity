@@ -832,7 +832,16 @@ function homepageOperationalUnderstanding(
   return `You're preparing for a ${roleLabel.toLowerCase()} conversation where success depends on ${missionText}.`;
 }
 
-function homepageOperationalSupport(role: HomepageRole | null) {
+function homepageOperationalSupport(
+  role: HomepageRole | null,
+  outcome: string,
+) {
+  const resolvedOutcome = String(outcome || "").trim();
+
+  if (resolvedOutcome) {
+    return `I'll help you prepare to ${resolvedOutcome.toLowerCase()} before the conversation begins.`;
+  }
+
   const capabilities = role?.capabilities.slice(0, 3) || [
     "the strongest evidence",
     "likely resistance",
@@ -857,6 +866,10 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [customMissionOpen, setCustomMissionOpen] = useState(false);
   const [assumptionCorrectionOpen, setAssumptionCorrectionOpen] = useState(false);
   const [assumptionCorrection, setAssumptionCorrection] = useState("");
+  const [adaptiveUnderstanding, setAdaptiveUnderstanding] = useState("");
+  const [adaptiveUnderstandingOutcome, setAdaptiveUnderstandingOutcome] = useState("");
+  const [adaptiveDirections, setAdaptiveDirections] = useState<string[]>([]);
+  const [understandingUpdatePending, setUnderstandingUpdatePending] = useState(false);
   const [missionCollapsing, setMissionCollapsing] = useState(false);
 
   const [showAllRoles, setShowAllRoles] = useState(false);
@@ -1157,10 +1170,17 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
     const items = [
       {
+        key: "role",
+        label: selectedRole?.label
+          ? `Role: ${selectedRole.label}`
+          : "Role still being clarified",
+        complete: Boolean(selectedRole),
+      },
+      {
         key: "conversation",
         label: selectedType?.title
           ? `Conversation: ${selectedType.title}`
-          : "Conversation type",
+          : "Conversation still being clarified",
         complete: Boolean(selectedType),
       },
       {
@@ -1199,41 +1219,54 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     answers,
     optionalAnswers,
     selectedGoal,
+    selectedRole,
     selectedType,
   ]);
 
   const preparationUnderstandingSummary = useMemo(() => {
-    const conversation =
-      selectedType?.title?.trim() ||
-      selectedRole?.label?.trim() ||
-      "conversation";
-
-    const objective = String(
-      answers.desiredOutcome || selectedGoal || "",
+    const role = selectedRole?.label?.trim() || "";
+    const conversation = selectedType?.title?.trim() || "";
+    const direction = String(
+      selectedGoal || answers.broadGoal || "",
     ).trim();
-
+    const outcome = String(answers.desiredOutcome || "").trim();
     const context = String(answers.conversationContext || "").trim();
 
-    if (briefingSufficient) {
-      const parts = [
-        `We're preparing for a ${conversation.toLowerCase()}.`,
-        objective ? `Our intended outcome is ${objective}.` : "",
-        context ? `Based on your briefing, ${context}` : "",
-      ].filter(Boolean);
+    const frame = conversation
+      ? `You're preparing for a ${conversation.toLowerCase()}.`
+      : role
+        ? `You're preparing for a ${role.toLowerCase()} conversation.`
+        : "You're preparing for a conversation.";
 
-      return parts.join(" ");
+    if (briefingSufficient) {
+      return [
+        frame.replace("You're", "We're"),
+        outcome
+          ? `The intended outcome is ${outcome}.`
+          : direction
+            ? `The current direction is ${direction}.`
+            : "",
+        context ? `What I understand about this conversation: ${context}.` : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
     }
 
     if (context) {
-      return `You're preparing for a ${conversation.toLowerCase()}. Based on what you've told me, ${context} I'll keep refining this understanding as we brief.`;
+      return `${frame} I understand this is ${context}. I'll use that to refine what matters next.`;
     }
 
-    if (objective) {
-      return `You're preparing for a ${conversation.toLowerCase()} with the outcome ${objective}. I'm using what is generally important in this type of conversation as a starting point, and I'll replace those expectations with what is specifically true here as we brief.`;
+    if (outcome) {
+      return `${frame} The intended outcome is ${outcome}. I'll keep refining what matters as you brief me.`;
     }
 
-    return `You're preparing for a ${conversation.toLowerCase()}. I'm starting with what is generally important in this type of conversation and will refine that understanding as you brief me.`;
+    if (direction) {
+      return `${frame} The current direction is ${direction}. I'll use that as a working signal while we clarify the specific outcome.`;
+    }
+
+    return `${frame} I understand the role, but not yet the specific situation or what you need this conversation to accomplish.`;
   }, [
+    answers.broadGoal,
     answers.conversationContext,
     answers.desiredOutcome,
     briefingSufficient,
@@ -1241,8 +1274,39 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     selectedRole,
     selectedType,
   ]);
+  const currentUnderstandingOutcome = String(
+    answers.desiredOutcome || "",
+  ).trim();
+
+  const adaptiveUnderstandingIsCurrent =
+    Boolean(adaptiveUnderstanding) &&
+    adaptiveUnderstandingOutcome === currentUnderstandingOutcome;
+
+  const resolvedPreparationUnderstanding =
+    adaptiveUnderstandingIsCurrent
+      ? adaptiveUnderstanding
+      : preparationUnderstandingSummary;
+
+  const understandingBeforeUpdateRef = useRef(resolvedPreparationUnderstanding);
+
+  useEffect(() => {
+    if (!understandingUpdatePending) {
+      understandingBeforeUpdateRef.current = resolvedPreparationUnderstanding;
+    }
+  }, [resolvedPreparationUnderstanding, understandingUpdatePending]);
+
+  const typewriterUnderstanding = understandingUpdatePending
+    ? understandingBeforeUpdateRef.current
+    : resolvedPreparationUnderstanding;
+
+  const typedPreparationUnderstanding = useTypewriter(
+    typewriterUnderstanding,
+    phase !== "selection",
+    18,
+  );
+
   const isMissionTransition = Boolean(
-    selectedType && (phase === "goal" || phase === "introduction"),
+    selectedRole && (phase === "goal" || phase === "introduction"),
   );
 
   useEffect(() => {
@@ -1251,21 +1315,19 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   }, [isMissionTransition, phase, selectedRole]);
 
   function selectRole(role: HomepageRole) {
-    const conversationType = CONVERSATION_TYPES.find(
-      (option) => option.id === role.conversationTypeId,
-    );
-
-    if (!conversationType) return;
-
     if (loadPreparationSession()?.provenance.entrySource === "homepage") {
       clearPreparationSession();
     }
     homepagePreparationSeedRef.current = null;
 
     setSelectedRole(role);
-    setSelectedType(conversationType);
+    setSelectedType(null);
     setSelectedGoal(null);
     setSelectedMissions([]);
+    setAdaptiveUnderstanding("");
+    setAdaptiveUnderstandingOutcome("");
+    setAdaptiveDirections([]);
+    setUnderstandingUpdatePending(false);
     setCustomMissionOpen(false);
     setMissionCollapsing(false);
     setPhase("goal");
@@ -1290,6 +1352,10 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setSelectedRole(null);
     setSelectedGoal(null);
     setSelectedMissions([]);
+    setAdaptiveUnderstanding("");
+    setAdaptiveUnderstandingOutcome("");
+    setAdaptiveDirections([]);
+    setUnderstandingUpdatePending(false);
     setCustomMissionOpen(false);
     setMissionCollapsing(false);
     setPhase("selection");
@@ -1326,6 +1392,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     const nextSignals = {
       ...answers,
       role: selectedRole?.label || answers.role || "",
+      broadGoal: normalizedGoal,
       desiredOutcome: normalizedGoal,
     };
 
@@ -1339,6 +1406,8 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
     setSelectedGoal(normalizedGoal);
     setAnswers(nextSignals);
+    setAdaptiveUnderstanding("");
+    setAdaptiveUnderstandingOutcome("");
     saveLivePreparationSignals(nextSignals);
     setMissionCollapsing(true);
     window.setTimeout(() => {
@@ -1360,15 +1429,104 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setCustomMissionOpen(false);
   }
 
-  function submitAssumptionCorrection() {
+  async function submitAssumptionCorrection() {
     const correction = assumptionCorrection.trim();
     if (!correction) return;
-    setAnswers((current) => ({
-      ...current,
+
+    const nextAnswers: Record<string, string> = {
+      ...answers,
+      role: answers.role || selectedRole?.label || "",
       conversationContext: correction,
-    }));
+    };
+
     setAssumptionCorrection("");
     setAssumptionCorrectionOpen(false);
+    setUnderstandingUpdatePending(true);
+
+    try {
+      const response = await fetch("/api/george/live/signal-question", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          role: nextAnswers.role,
+          broadGoal: nextAnswers.broadGoal || selectedGoal || "",
+          desiredOutcome: nextAnswers.desiredOutcome || "",
+          acceptableOutcome: "",
+          audience:
+            nextAnswers.audience ||
+            nextAnswers.participants ||
+            nextAnswers.who ||
+            "",
+          room: selectedType?.title || "",
+          knownContext: correction,
+          documentSummary: "",
+          priorAnswers: optionalAnswers,
+          priorInteractions: [
+            ...Object.entries(optionalAnswers).map(([key, answer]) => ({
+              key,
+              question: optionalQuestionHistory[key] || "",
+              answer: String(answer || "").trim(),
+              status: "answered" as const,
+            })),
+            {
+              key: "assumptionCorrection",
+              question: "What should GEORGE understand instead?",
+              answer: correction,
+              status: "answered" as const,
+            },
+          ],
+          skippedQuestions: skippedOptionalQuestions,
+        }),
+      });
+
+      const payload = await response.json().catch(() => ({}));
+
+      const understanding =
+        typeof payload?.understanding === "string"
+          ? payload.understanding.trim()
+          : "";
+
+      const directions = Array.isArray(payload?.directions)
+        ? payload.directions
+            .map((value: unknown) =>
+              typeof value === "string" ? value.trim() : "",
+            )
+            .filter(Boolean)
+            .slice(0, 6)
+        : [];
+
+      setAnswers(nextAnswers);
+      saveLivePreparationSignals(nextAnswers);
+
+      if (understanding) {
+        setAdaptiveUnderstanding(understanding);
+        setAdaptiveUnderstandingOutcome(
+          String(nextAnswers.desiredOutcome || "").trim(),
+        );
+      } else {
+        // Clear stale adaptive text so the corrected deterministic
+        // understanding becomes the single fallback render.
+        setAdaptiveUnderstanding("");
+        setAdaptiveUnderstandingOutcome("");
+      }
+
+      if (directions.length > 0) {
+        setAdaptiveDirections(directions);
+        setSelectedMissions((current) =>
+          current.filter((mission) => directions.includes(mission)),
+        );
+      }
+    } catch {
+      // If adaptive reasoning fails, apply the correction once and let
+      // the deterministic understanding become the single revised render.
+      setAnswers(nextAnswers);
+      saveLivePreparationSignals(nextAnswers);
+      setAdaptiveUnderstanding("");
+      setAdaptiveUnderstandingOutcome("");
+    } finally {
+      setUnderstandingUpdatePending(false);
+    }
+
     setIntroStage(2);
   }
 
@@ -1430,7 +1588,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     priorAnswers = optionalAnswers,
     skippedQuestions = skippedOptionalQuestions,
   ) {
-    if (!selectedType) return;
+    if (!selectedRole) return;
 
     setOptionalQuestionLoading(true);
 
@@ -1462,7 +1620,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
           desiredOutcome: answers.desiredOutcome || "",
           acceptableOutcome: "",
           audience: "",
-          room: selectedType.title,
+          room: selectedType?.title || "",
           knownContext: answers.conversationContext || "",
           documentSummary: "",
           priorAnswers,
@@ -1634,7 +1792,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
   const homepagePreparationSession = useMemo(() => {
     const seed = homepagePreparationSeedRef.current;
-    if (!seed || !selectedType) return null;
+    if (!seed || !selectedRole) return null;
 
     const additionalSignals = Object.fromEntries(
       Object.entries({
@@ -1669,11 +1827,13 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
         participants: audience ? [audience] : seed.knowledge.participants,
         audience: audience || seed.knowledge.audience,
         perspectives: seed.knowledge.perspectives,
-        conversation: {
-          id: selectedType.id,
-          title: selectedType.title,
-          group: selectedType.group,
-        },
+        conversation: selectedType
+          ? {
+              id: selectedType.id,
+              title: selectedType.title,
+              group: selectedType.group,
+            }
+          : seed.knowledge.conversation,
         knownContext:
           answers.conversationContext || seed.knowledge.knownContext,
         communicationMedium: seed.knowledge.communicationMedium,
@@ -1916,89 +2076,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
             </div>
           </div>
         ) : (
-          <div className="mx-auto grid w-full max-w-6xl gap-6 animate-[fadeIn_420ms_ease-out] lg:grid-cols-[minmax(220px,0.78fr)_minmax(0,1.7fr)]">
-            <aside
-              aria-live="polite"
-              className="rounded-[18px] border border-white/[0.07] bg-white/[0.018] p-5 lg:sticky lg:top-6 lg:self-start"
-            >
-              <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/58">
-                GEORGE understands
-              </div>
-              <h2 className="mt-3 font-mono text-[20px] font-semibold uppercase tracking-[-0.03em] text-white">
-                {selectedType?.title || selectedRole?.label || "Conversation"}
-              </h2>
-              <p className="mt-2 text-[13px] leading-6 text-white/52">
-                I’ll keep this understanding current as we brief.
-              </p>
-              <div className="mt-5 border-t border-white/[0.08] pt-4">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-white/34">
-                    {briefingSufficient ? "Final understanding" : "What I understand"}
-                  </div>
-                  <div className="font-mono text-[8px] uppercase tracking-[0.15em] text-white/28">
-                    {briefingSufficient ? "Ready" : "Updating"}
-                  </div>
-                </div>
-
-                <ul className="mt-3 space-y-2 text-[12px] leading-5">
-                  {preparationUnderstandingChecklist.map((item) => (
-                    <li
-                      key={item.key}
-                      className={`flex gap-2 ${
-                        item.complete ? "text-white/66" : "text-white/34"
-                      }`}
-                    >
-                      <span
-                        aria-hidden="true"
-                        className={
-                          item.complete
-                            ? "text-[#AEB6FF]"
-                            : "text-white/24"
-                        }
-                      >
-                        {item.complete ? "✓" : "○"}
-                      </span>
-                      <span>{item.label}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <p className="mt-4 text-[12px] leading-5 text-white/62">
-                  {preparationUnderstandingSummary}
-                </p>
-
-                {assumptionCorrectionOpen ? (
-                  <ContextualGeorgeInput
-                    id="homepage-assumption-correction"
-                    value={assumptionCorrection}
-                    label="What should GEORGE understand instead?"
-                    placeholder="Tell GEORGE what is different or important about this conversation."
-                    submitLabel="Update understanding"
-                    onChange={setAssumptionCorrection}
-                    onSubmit={submitAssumptionCorrection}
-                    onCancel={() => setAssumptionCorrectionOpen(false)}
-                  />
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setAssumptionCorrectionOpen(true)}
-                    className="mt-4 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[#AEB6FF]/72 transition hover:text-white"
-                  >
-                    That’s not quite right →
-                  </button>
-                )}
-
-                <div className="mt-5 border-t border-white/[0.08] pt-4">
-                  <p className="text-[12px] leading-5 text-white/48">
-                    {briefingSufficient
-                      ? "I've assembled a briefing that I believe prepares us well."
-                      : optionalQuestion
-                        ? "I'm still refining the briefing."
-                        : "The briefing is taking shape."}
-                  </p>
-                </div>
-              </div>
-            </aside>
+          <div className="mx-auto w-full max-w-6xl animate-[fadeIn_420ms_ease-out]">
             <div ref={preparationScrollRef} className="rounded-[18px] border border-white/[0.08] bg-[#050607] p-3 shadow-[0_18px_70px_rgba(0,0,0,0.42)] sm:p-5 sm:p-7">
               <BxPageHeader
                 onBack={goBack}
@@ -2006,7 +2084,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                   <button
                     type="button"
                     onClick={resetSelection}
-                    className="inline-flex h-7 items-center justify-center rounded-[9px] border border-[#7EA1FF]/42 bg-[#11182A] px-3 font-mono text-[8px] font-semibold uppercase tracking-[0.14em] text-white transition hover:border-[#AEB6FF]/70 hover:bg-[#18213A]"
+                    className="inline-flex h-[23px] items-center justify-center rounded-[7px] border border-white bg-white px-2.5 font-mono !text-[8px] font-semibold uppercase leading-none tracking-[0.11em] text-black transition hover:bg-white/88"
                   >
                     Change role
                   </button>
@@ -2026,6 +2104,97 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
                 </div>
               </div>
+
+              <section
+                aria-live="polite"
+                className="border-b border-white/[0.07] py-5 transition-all duration-500 sm:py-6"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/58">
+                      GEORGE understands
+                    </div>
+                    <h2 className="mt-2 font-mono text-[18px] font-semibold uppercase tracking-[-0.03em] text-white sm:text-[20px]">
+                      {selectedRole?.label || selectedType?.title || "Conversation"}
+                    </h2>
+                  </div>
+
+                  <div className="font-mono text-[8px] uppercase tracking-[0.15em] text-white/30">
+                    {briefingSufficient ? "Briefing ready" : "Updating as we brief"}
+                  </div>
+                </div>
+
+                <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(220px,0.72fr)_minmax(0,1.45fr)] lg:items-start">
+                  <ul className="space-y-2 text-[12px] leading-5">
+                    {preparationUnderstandingChecklist.map((item) => (
+                      <li
+                        key={item.key}
+                        className={`flex gap-2 ${
+                          item.complete ? "text-white/68" : "text-white/34"
+                        }`}
+                      >
+                        <span
+                          aria-hidden="true"
+                          className={
+                            item.complete
+                              ? "text-[#AEB6FF]"
+                              : "text-white/24"
+                          }
+                        >
+                          {item.complete ? "✓" : "○"}
+                        </span>
+                        <span>{item.label}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="min-w-0">
+                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/32">
+                      {briefingSufficient
+                        ? "Final understanding"
+                        : "Current understanding"}
+                    </div>
+
+                    <p className="mt-2 max-w-3xl text-[13px] leading-6 text-white/64">
+                      {typedPreparationUnderstanding}
+                    </p>
+
+                    {baselineAssumptions.length > 0 && !answers.conversationContext?.trim() ? (
+                      <div className="mt-4">
+                        <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-white/28">
+                          Working assumptions
+                        </div>
+                        <ul className="mt-2 space-y-1 text-[11px] leading-5 text-white/42">
+                          {baselineAssumptions.map((assumption) => (
+                            <li key={assumption}>{assumption}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+
+                    {assumptionCorrectionOpen ? (
+                      <ContextualGeorgeInput
+                        id="homepage-assumption-correction"
+                        value={assumptionCorrection}
+                        label="What should GEORGE understand instead?"
+                        placeholder="Tell GEORGE what is different or important about this conversation."
+                        submitLabel="Update understanding"
+                        onChange={setAssumptionCorrection}
+                        onSubmit={submitAssumptionCorrection}
+                        onCancel={() => setAssumptionCorrectionOpen(false)}
+                      />
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setAssumptionCorrectionOpen(true)}
+                        className="mt-4 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[#AEB6FF]/72 transition hover:text-white"
+                      >
+                        That’s not quite right →
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </section>
 
               {phase === "selected" && (
                 <div className="pt-6">
@@ -2144,31 +2313,34 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
               {phase === "goal" && (
                 <div className="pt-6 animate-[fadeIn_360ms_ease-out]">
                   <div className="max-w-3xl">
-                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/58">
-                      Mission
+                    <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.24em] text-[#AEB6FF]/58 sm:text-[9px]">
+                      Direction
                     </div>
-                    <h3 className="mt-3 font-mono text-[22px] font-semibold leading-8 tracking-[-0.035em] text-white sm:text-[28px] sm:leading-9">
-                      What outcome matters most?
+                    <h3 className="mt-2.5 font-mono text-[17px] font-semibold leading-6 tracking-[-0.03em] text-white sm:text-[22px] sm:leading-7">
+                      What are you trying to accomplish?
                     </h3>
-                    <p className="mt-2 text-[13px] leading-6 text-white/52">
-                      I’m preparing for a {selectedType?.title?.toLowerCase() || "conversation"}.
-                      I already understand the usual pressure, evidence, and
-                      decision points. Tell me what makes this conversation
-                      unique.
+                    <p className="mt-2 max-w-2xl text-[11px] leading-[1.65] text-white/48 sm:text-[12px] sm:leading-5">
+                      Give GEORGE the direction first. I’ll use it with what I already understand about this conversation to refine the briefing.
                     </p>
-                    <p className="mt-3 text-[13px] leading-6 text-white/42">
+                    <p className="mt-2.5 font-mono text-[9px] uppercase tracking-[0.10em] text-white/34">
                       {missionTier === "smart"
-                        ? "Select one objective."
+                        ? "Choose the closest direction."
                         : missionTier === "intelligent"
-                          ? "Select up to two objectives."
-                          : "Select all that apply."}
+                          ? "Choose up to two."
+                          : "Choose what applies."}
                     </p>
                   </div>
 
-                  <div className={missionCollapsing ? "mt-6 grid gap-2 sm:grid-cols-2 opacity-0 transition-all duration-500" : "mt-6 grid gap-2 sm:grid-cols-2 opacity-100 transition-all duration-500"}>
-                    {goalsForHomepageRole(selectedRole)
-                      .filter((goal) => goal.id !== "other")
-                      .map((mission) => {
+                  <div className={missionCollapsing ? "mt-5 grid gap-2 sm:grid-cols-2 opacity-0 transition-all duration-500" : "mt-5 grid gap-2 sm:grid-cols-2 opacity-100 transition-all duration-500"}>
+                    {(adaptiveDirections.length > 0
+                      ? adaptiveDirections.map((label) => ({
+                          id: `adaptive-${label}`,
+                          label,
+                        }))
+                      : goalsForHomepageRole(selectedRole).filter(
+                          (goal) => goal.id !== "other",
+                        )
+                    ).map((mission) => {
                         const selected = selectedMissions.includes(mission.label);
                         const limitReached =
                           !selected &&
@@ -2181,8 +2353,8 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                             disabled={limitReached}
                             onClick={() => toggleMission(mission.label)}
                             className={selected
-                              ? "min-h-[48px] rounded-[11px] border border-[#AEB6FF]/70 bg-[#172347] px-4 py-3 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-white transition"
-                              : "min-h-[48px] rounded-[11px] border border-white/[0.08] bg-white/[0.018] px-4 py-3 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-white/72 transition hover:border-[#7EA1FF]/45 hover:bg-[#11182A] hover:text-white disabled:cursor-not-allowed disabled:opacity-30"}
+                              ? "min-h-[34px] rounded-[8px] border border-[#AEB6FF]/70 bg-[#172347] px-3 py-2 text-left font-mono !text-[11px] font-semibold uppercase leading-[1.4] tracking-[0.08em] text-white transition sm:min-h-[40px] sm:px-4 sm:py-2.5 sm:!text-[12px] sm:tracking-[0.10em]"
+                              : "min-h-[34px] rounded-[8px] border border-white/[0.08] bg-white/[0.018] px-3 py-2 text-left font-mono !text-[11px] font-semibold uppercase leading-[1.4] tracking-[0.08em] text-white/68 transition hover:border-[#7EA1FF]/45 hover:bg-[#11182A] hover:text-white disabled:cursor-not-allowed disabled:opacity-30 sm:min-h-[40px] sm:px-4 sm:py-2.5 sm:!text-[12px] sm:tracking-[0.10em]"}
                           >
                             <span className="mr-2 inline-block w-4 text-[#AEB6FF]">
                               {selected ? "✓" : ""}
@@ -2259,13 +2431,6 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                     >
                       Continue →
                     </button>
-                    <button
-                      type="button"
-                      onClick={goBack}
-                      className="h-9 rounded-[9px] border border-white/[0.10] px-4 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/52 transition hover:border-white/25 hover:text-white"
-                    >
-                      ← Back
-                    </button>
                   </div>
                 </div>
               )}
@@ -2280,14 +2445,11 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                           : "pointer-events-none translate-y-2 opacity-0"
                       }`}
                     >
-                      <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/58">
-                        My understanding
-                      </div>
-                      <p className="mt-3 max-w-4xl font-mono text-[18px] font-medium leading-[1.5] tracking-[-0.02em] text-white sm:text-[24px] sm:leading-[1.45]">
-                        {homepageOperationalUnderstanding(selectedRole, selectedMissions)}
-                      </p>
-                      <p className="mt-4 max-w-3xl text-[14px] leading-[1.6] text-white/52 sm:text-[16px] sm:leading-[1.6]">
-                        {homepageOperationalSupport(selectedRole)}
+                      <p className="max-w-3xl text-[14px] leading-[1.6] text-white/52 sm:text-[16px] sm:leading-[1.6]">
+                        {homepageOperationalSupport(
+                      selectedRole,
+                      answers.desiredOutcome || selectedGoal || "",
+                    )}
                       </p>
                       <div className="mt-7">
                         <button

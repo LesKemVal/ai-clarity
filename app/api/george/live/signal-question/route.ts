@@ -214,7 +214,47 @@ Reason from the entire briefing conversation and all available operational signa
 
 Treat priorInteractions as the canonical accumulated briefing conversation. Use priorAnswers and skippedQuestions only as backward-compatible supporting fields, and do not count equivalent history more than once.
 
-When another briefing interaction is appropriate, generate:
+For every response, also form GEORGE's current operational understanding from the accumulated evidence and identify concise direction candidates that best represent what the user may be trying to accomplish now.
+
+Keep these concepts distinct:
+
+- Role: the user's operating role, such as Sales.
+- Conversation context: what kind of situation this is, such as a second conversation with a prospect.
+- Direction / intended outcome: what the user wants this conversation to accomplish.
+- Preparation action: something GEORGE may later help prepare, such as an agenda, objection handling, evidence, talking points, or rapport strategy.
+
+Conversation context does not by itself establish the intended outcome.
+Preparation actions are not directions.
+
+Return:
+- understanding: one concise first-person GEORGE statement addressed directly to the user. Use "you" and "I" naturally. Never refer to the person as "the user." State only what the evidence supports. If the role or context is known but the intended outcome is not, say that plainly rather than inventing a generic successful outcome.
+- directions: an array of 3-6 concise labels that answer the interface question "What are you trying to accomplish?" Each label must describe an intended conversational result, movement, commitment, decision, clarification, or change in state. Do not return preparation tasks such as preparing an agenda, planning objection handling, developing rapport, gathering evidence, writing talking points, or rehearsing.
+
+Good direction examples when supported by context:
+- Advance the opportunity
+- Confirm fit and needs
+- Resolve a concern
+- Secure the next commitment
+- Reach a decision
+- Protect margin
+- Clarify expectations
+- Gain agreement
+
+Bad direction examples:
+- Prepare call agenda
+- Plan objection handling
+- Develop rapport strategies
+- Gather evidence
+- Draft talking points
+- Rehearse responses
+
+Do not invent a call, meeting, interview, discovery stage, audience, objective, or outcome merely from the role. A role such as Sales establishes domain context only.
+
+When knownContext changes the situation, update both understanding and directions from that evidence. Preserve uncertainty where evidence is incomplete.
+
+Treat understanding and directions as provisional operational synthesis, not new user facts.
+
+When another briefing interaction is appropriate, also generate:
 
 1. Question
 2. Why this is important
@@ -248,6 +288,13 @@ Return JSON matching the existing schema.
     const example = clean(parsed?.example) || (status === 'sufficient' ? '' : 'For example: Describe the key facts, the result that matters, and any constraint that changes the answer.')
     const helper = clean(parsed?.helper) || why
     const key = clean(parsed?.key) || `signal_${Date.now()}`
+    const understanding = clean(parsed?.understanding)
+    const directions = Array.isArray(parsed?.directions)
+      ? parsed.directions
+          .map((value: unknown) => clean(value))
+          .filter(Boolean)
+          .slice(0, 6)
+      : []
 
     if (status === 'sufficient' || !question) {
       return NextResponse.json({
@@ -258,6 +305,8 @@ Return JSON matching the existing schema.
         example,
         helper,
         key,
+        understanding,
+        directions,
       })
     }
 
@@ -269,6 +318,8 @@ Return JSON matching the existing schema.
       example,
       helper,
       key,
+      understanding,
+      directions,
     })
   } catch {
     return NextResponse.json({
