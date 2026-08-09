@@ -2149,7 +2149,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                   </ul>
 
                   <div className="min-w-0">
-                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/32">
+                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#AEB6FF]/58">
                       {briefingSufficient
                         ? "Final understanding"
                         : "Current understanding"}
@@ -2161,7 +2161,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
                     {baselineAssumptions.length > 0 && !answers.conversationContext?.trim() ? (
                       <div className="mt-4">
-                        <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-white/28">
+                        <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-[#AEB6FF]/58">
                           Working assumptions
                         </div>
                         <ul className="mt-2 space-y-1 text-[11px] leading-5 text-white/42">
@@ -2187,9 +2187,9 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                       <button
                         type="button"
                         onClick={() => setAssumptionCorrectionOpen(true)}
-                        className="mt-4 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[#AEB6FF]/72 transition hover:text-white"
+                        className="mt-4 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[#AEB6FF]/58 transition hover:text-white"
                       >
-                        That’s not quite right →
+                        Clarify something? →
                       </button>
                     )}
                   </div>
