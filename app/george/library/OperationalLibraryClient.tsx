@@ -1210,7 +1210,9 @@ export default function OperationalLibraryClient() {
               >
                 <div className="flex items-center justify-between gap-4">
                   <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white/38">
-                    Experimental baseline
+                    {formula.origin === "hypothesis"
+                      ? "Working strategy"
+                      : "Experimental baseline"}
                   </span>
                   <span className="text-[11px] text-white/32">
                     {Math.round(formula.confidence * 100)}% confidence
