@@ -10,6 +10,7 @@ import type {
 } from "@/lib/george/operational-memory/recommendation-api";
 import { createRedisOperationalFormulaLibrary } from "@/lib/george/operational-memory/redis-formula-library";
 import { createRedisOperationalScriptLibrary } from "@/lib/george/operational-memory/redis-script-library";
+import { runNormalTextCompletion } from "@/lib/george/runtime/provider/normal-provider";
 import { readGeorgeSession } from "@/lib/security/george-session";
 
 export const runtime = "nodejs";
@@ -114,6 +115,49 @@ export async function POST(req: NextRequest) {
     const operationalMemory = createOperationalMemory({
       formulaLibrary: createRedisOperationalFormulaLibrary(),
       scriptLibrary: createRedisOperationalScriptLibrary(),
+      strategySynthesizer: async (recommendationInput) => {
+        const preparation = recommendationInput.preparationContext;
+
+        const providerResult = await runNormalTextCompletion({
+          provider: "openai",
+          model:
+            process.env.OPENAI_MODEL_INTELLIGENT ||
+            process.env.OPENAI_MODEL ||
+            "gpt-4o",
+          systemContent:
+            "You are GEORGE. Reason from the supplied operational briefing and desired outcome.",
+          messages: [],
+          strategyRequest: {
+            enabled: true,
+            desiredOutcome:
+              preparation?.desiredOutcome ||
+              recommendationInput.objectiveType,
+            role: preparation?.role,
+            conversationContext: preparation?.conversationContext,
+            audience: preparation?.audience,
+            knownFacts: preparation?.knownFacts || [],
+          },
+        });
+
+        const strategy = providerResult?.operationalStrategy;
+
+        if (!strategy) {
+          return null;
+        }
+
+        return {
+          name: strategy.name || undefined,
+          bestUsedFor: strategy.bestUsedFor,
+          prerequisites: strategy.prerequisites,
+          steps: strategy.steps.map((step) => ({
+            signalType: step.signalType,
+            actionType: step.actionType || undefined,
+            expectedTransition:
+              step.expectedTransition || undefined,
+          })),
+          failureConditions: strategy.failureConditions,
+        };
+      },
     });
 
     const recommendation = await operationalMemory.recommend(input);

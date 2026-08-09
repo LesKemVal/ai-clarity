@@ -19,6 +19,10 @@ import {
   type OperationalFormulaExtractionOptions,
 } from './formula-extractor'
 import type { OperationalFormulaLibrary } from './formula-library'
+import {
+  materializeOperationalFormulaHypothesis,
+  type OperationalStrategyHypothesis,
+} from './formula-hypothesis'
 import type { OperationalLearningRecordRecorder } from './learning-record-recorder'
 import type {
   OperationalRecommendationPreparationContext,
@@ -32,6 +36,7 @@ import {
   type OperationalScriptGenerator,
 } from './script-generator'
 import type { OperationalScriptLibrary } from './script-library'
+import { applyOperationalMemoryRetrievalPolicy } from './retrieval-policy'
 import {
   validateOperationalFormula,
   type OperationalFormulaValidationPolicy,
@@ -73,6 +78,9 @@ export type OperationalMemoryDependencies = {
   formulaEvolutionEngine?: OperationalFormulaEvolutionEngine
   formulaDerivationService?: OperationalFormulaDerivationService
   learningRecordRecorder?: OperationalLearningRecordRecorder
+  strategySynthesizer?: (
+    input: OperationalRecommendationInput
+  ) => Promise<OperationalStrategyHypothesis | null>
 }
 
 export type OperationalMemoryLearnOptions = {
@@ -138,6 +146,7 @@ export function createOperationalMemory(
         learningRecordRecorder: dependencies.learningRecordRecorder,
       }),
     learningRecordRecorder,
+    strategySynthesizer,
   } = dependencies
 
   return {
@@ -155,7 +164,7 @@ export function createOperationalMemory(
         input.alternativeLimit ?? Math.max(0, formulaLimit - 1)
       )
 
-      const rankedFormulas = await formulaLibrary.retrieve({
+      const retrievedFormulas = await formulaLibrary.retrieve({
         userId: input.userId,
         organizationId: input.organizationId,
         roomType: input.roomType,
@@ -164,9 +173,45 @@ export function createOperationalMemory(
         limit: formulaLimit,
       })
 
-      const recommendedFormula = rankedFormulas[0] ?? null
+      const rankedFormulas =
+        applyOperationalMemoryRetrievalPolicy(retrievedFormulas)
+          .slice(0, formulaLimit)
+
+      let recommendedFormula = rankedFormulas[0] ?? null
       const alternativeFormulas = rankedFormulas
         .slice(1, alternativeLimit + 1)
+
+      const desiredOutcome = String(
+        input.preparationContext?.desiredOutcome ||
+          input.objectiveType ||
+          ''
+      ).trim()
+
+      if (
+        !recommendedFormula &&
+        strategySynthesizer &&
+        input.briefingComplete === true &&
+        desiredOutcome
+      ) {
+        const strategy = await strategySynthesizer(input)
+
+        if (strategy) {
+          const formula = materializeOperationalFormulaHypothesis({
+            userId: input.userId,
+            roomType: input.roomType,
+            objectiveType: input.objectiveType,
+            strategy,
+          })
+
+          await formulaLibrary.save(formula)
+
+          recommendedFormula = {
+            formula,
+            score: formula.confidence,
+            reasons: ['working_hypothesis'],
+          }
+        }
+      }
 
       let recommendedScript: OperationalScript | null = null
 

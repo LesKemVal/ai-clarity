@@ -1,7 +1,9 @@
 import type { OperationalFormula } from "./types";
 
 export type OperationalStrategyHypothesis = {
+  name?: string;
   summary?: string;
+  bestUsedFor?: string[];
   prerequisites?: string[];
   steps: Array<{
     signalType?: string;
@@ -47,14 +49,19 @@ export function materializeOperationalFormulaHypothesis(
   const now = input.now ?? Date.now();
   const roomType = normalized(input.roomType);
   const objectiveType = normalized(input.objectiveType);
-  const summary = normalized(input.strategy.summary);
+  const name =
+    normalized(input.strategy.name) ||
+    normalized(input.strategy.summary);
 
   return {
     id: crypto.randomUUID(),
     version: 1,
     scope: "personal",
     ownerId: userId,
-    ...(summary ? { name: summary } : {}),
+    ...(name ? { name } : {}),
+    bestUsedFor: (input.strategy.bestUsedFor ?? [])
+      .map(normalized)
+      .filter(Boolean),
     visibility: "private",
     status: "candidate",
     origin: "hypothesis",
