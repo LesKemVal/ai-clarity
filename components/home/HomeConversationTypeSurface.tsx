@@ -880,6 +880,9 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [optionalQuestion, setOptionalQuestion] =
     useState<HomepageOptionalQuestion | null>(null);
   const [optionalAnswer, setOptionalAnswer] = useState("");
+  const [optionalInteractionMode, setOptionalInteractionMode] =
+    useState<"briefing" | "ask_george">("briefing");
+  const [optionalGeorgeResponse, setOptionalGeorgeResponse] = useState("");
   const [editingOptionalQuestionKey, setEditingOptionalQuestionKey] =
     useState<string | null>(null);
   const [optionalAnswers, setOptionalAnswers] = useState<Record<string, string>>({});
@@ -1580,6 +1583,8 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setBriefingSufficient(false);
     setOptionalQuestion(null);
     setOptionalAnswer("");
+    setOptionalInteractionMode("briefing");
+    setOptionalGeorgeResponse("");
     setPhase("optional");
     void requestHomepageOptionalQuestion({}, []);
   }
@@ -1683,11 +1688,56 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     }
   }
 
-  function submitHomepageOptionalAnswer() {
+  async function submitHomepageOptionalAnswer() {
     if (!optionalQuestion) return;
 
     const answer = optionalAnswer.trim();
     if (!answer) return;
+
+    if (optionalInteractionMode === "ask_george") {
+      setOptionalQuestionLoading(true);
+      setOptionalGeorgeResponse("");
+
+      try {
+        const response = await fetch("/api/george/live/signal-question", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            interactionMode: "ask_george",
+            userTurn: answer,
+            role: answers.role || selectedRole?.label || "",
+            broadGoal: answers.broadGoal || selectedGoal || "",
+            desiredOutcome: answers.desiredOutcome || "",
+            acceptableOutcome: "",
+            audience: "",
+            room: selectedType?.title || "",
+            knownContext: answers.conversationContext || "",
+            documentSummary: "",
+            priorAnswers: optionalAnswers,
+            priorInteractions: buildHomepagePriorInteractions(),
+            skippedQuestions: skippedOptionalQuestions,
+          }),
+        });
+
+        const payload = await response.json().catch(() => ({}));
+        const georgeResponse = String(payload?.response || "").trim();
+
+        setOptionalGeorgeResponse(
+          georgeResponse ||
+            "I can answer that while preserving the current briefing question.",
+        );
+        setOptionalAnswer("");
+        setOptionalInteractionMode("briefing");
+      } catch {
+        setOptionalGeorgeResponse(
+          "I couldn't answer that just now. The briefing question is still here.",
+        );
+      } finally {
+        setOptionalQuestionLoading(false);
+      }
+
+      return;
+    }
 
     const nextAnswers = {
       ...optionalAnswers,
@@ -1697,6 +1747,8 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setOptionalAnswers(nextAnswers);
     setOptionalQuestion(null);
     setOptionalAnswer("");
+    setOptionalGeorgeResponse("");
+    setOptionalInteractionMode("briefing");
 
     try {
       window.localStorage.setItem(
@@ -2485,6 +2537,52 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                       <p className="mt-2 max-w-3xl text-[12px] leading-5 text-white/42">
                         {optionalQuestion.why}
                       </p>
+                      {optionalGeorgeResponse && (
+                        <div className="mt-4 rounded-[11px] border border-[#7EA1FF]/20 bg-[#11182A]/55 px-4 py-3">
+                          <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-[#AEB6FF]/64">
+                            GEORGE
+                          </div>
+                          <p className="mt-2 text-[13px] leading-6 text-white/70">
+                            {optionalGeorgeResponse}
+                          </p>
+                        </div>
+                      )}
+
+                      {!editingOptionalQuestionKey && (
+                        <div className="mt-4 flex items-center gap-2">
+                          <button
+                            type="button"
+                            aria-pressed={optionalInteractionMode === "briefing"}
+                            onClick={() => {
+                              setOptionalInteractionMode("briefing");
+                              setOptionalGeorgeResponse("");
+                            }}
+                            className={
+                              optionalInteractionMode === "briefing"
+                                ? "rounded-[9px] border border-[#7EA1FF]/48 bg-[#172347] px-3 py-2 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white"
+                                : "rounded-[9px] border border-white/[0.10] px-3 py-2 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/45 transition hover:border-white/25 hover:text-white/70"
+                            }
+                          >
+                            Answer
+                          </button>
+                          <button
+                            type="button"
+                            aria-pressed={optionalInteractionMode === "ask_george"}
+                            onClick={() => {
+                              setOptionalInteractionMode("ask_george");
+                              setOptionalGeorgeResponse("");
+                            }}
+                            className={
+                              optionalInteractionMode === "ask_george"
+                                ? "rounded-[9px] border border-[#7EA1FF]/48 bg-[#172347] px-3 py-2 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white"
+                                : "rounded-[9px] border border-white/[0.10] px-3 py-2 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/45 transition hover:border-white/25 hover:text-white/70"
+                            }
+                          >
+                            Ask GEORGE
+                          </button>
+                        </div>
+                      )}
+
                       <textarea
                         autoFocus
                         value={optionalAnswer}
@@ -2496,7 +2594,11 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                           }
                         }}
                         rows={3}
-                        placeholder={optionalQuestion.example}
+                        placeholder={
+                          optionalInteractionMode === "ask_george"
+                            ? "Ask GEORGE about this conversation or briefing."
+                            : optionalQuestion.example
+                        }
                         className="mt-4 min-h-[118px] w-full resize-none rounded-[11px] border border-white/[0.09] bg-black/20 px-4 py-3 text-[14px] leading-6 text-white outline-none transition placeholder:text-white/22 focus:border-[#7EA1FF]/45 focus:bg-black/30"
                       />
                       <div className="mt-4 flex flex-wrap items-center justify-end gap-3">
@@ -2515,7 +2617,9 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                             disabled={optionalQuestionLoading || !optionalAnswer.trim()}
                             className="rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.17em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-30"
                           >
-                            Continue
+                            {optionalInteractionMode === "ask_george"
+                              ? "Ask GEORGE"
+                              : "Continue"}
                           </button>
                         </div>
                       </div>
