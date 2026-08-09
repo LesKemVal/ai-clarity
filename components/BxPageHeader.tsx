@@ -38,7 +38,7 @@ export default function BxPageHeader({
     router.push(backHref || '/')
   }
   const backClass =
-    'inline-flex h-[30px] items-center justify-center rounded-[0.56rem] border border-[#7EA1FF]/35 bg-[#4E7CFF] px-4 font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.16em] text-white shadow-[0_8px_22px_rgba(20,61,168,0.2)] transition-colors hover:bg-[#5A84FF] active:bg-[#426FE8]'
+    'inline-flex h-[27px] items-center justify-center rounded-[7px] border border-[#7EA1FF]/35 bg-[#4E7CFF] px-3 font-mono !text-[9px] font-semibold uppercase leading-none tracking-[0.13em] text-white shadow-[0_8px_22px_rgba(20,61,168,0.2)] transition-colors hover:bg-[#5A84FF] active:bg-[#426FE8]'
 
   return (
     <header className="relative mb-6 flex items-center justify-between">
