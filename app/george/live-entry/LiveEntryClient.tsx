@@ -1366,8 +1366,6 @@ export default function LiveEntryClient() {
     }
   }, []);
 
-  const contextSignalsCollapsed = chairSectionCollapsed;
-
   const groundingSignalAvailable =
     knownContext.trim().length > 0 ||
     Boolean(prepDocument) ||
@@ -1514,30 +1512,6 @@ export default function LiveEntryClient() {
         "E.g. They may ask for proof, traction, or timing.",
       ];
 
-  const desiredOutcomeExamples = [
-    "E.g. Secure a second meeting.",
-    "E.g. Get agreement on next steps.",
-    "E.g. Leave with a clear decision.",
-  ];
-
-  const contextExamples = [
-    "E.g. Speaking with an investor. Desired outcome: secure follow-up. Concern: valuation.",
-    "E.g. The room may be tense. I need GEORGE to keep the language calm and useful.",
-    "E.g. They care about timeline, risk, and whether I can defend the ask.",
-  ];
-
-  const positionExamples = [
-    "E.g. CEO",
-    "E.g. Candidate",
-    "E.g. Patient advocate",
-  ];
-
-  const steeringExamples = [
-    "E.g. softer, sharper, line, pause, clarify, plain",
-    "E.g. diplomatic, concise, slow down, repeat line",
-    "E.g. push, soften, explain simply, buy time",
-  ];
-
   const currentOptionalAnswerExample =
     optionalAnswerExamples[exampleIndex % optionalAnswerExamples.length];
 
@@ -1567,11 +1541,7 @@ export default function LiveEntryClient() {
     optionalSignalInputFocused,
   ]);
 
-  const optionalSignalSurfaceComplete =
-    showOpenAISignalSurface && optionalSignalComplete;
-
   const hasGeorgeSurfaceSignals = Object.keys(preLiveSignals).length > 0;
-  const hideAcquiredMandatoryFields = hasGeorgeSurfaceSignals;
   useEffect(() => {
     const timer = window.setInterval(() => {
       setExampleIndex((index) => index + 1);
