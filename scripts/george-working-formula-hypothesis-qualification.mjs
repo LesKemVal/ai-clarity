@@ -312,6 +312,12 @@ const existingFormula = {
   )
 
   assert.equal(
+    result.recommendationSummary,
+    "Here's how I'd approach this conversation based on what I know now.",
+    "A working Formula hypothesis must be presented as GEORGE's current operational approach, not as a proven strategy.",
+  )
+
+  assert.equal(
     result.recommendedScript,
     null,
     'Pre-execution hypothesis creation must not generate a Script.',

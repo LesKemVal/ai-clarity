@@ -242,11 +242,13 @@ export function createOperationalMemory(
         ? input.briefingComplete
           ? 'GEORGE is preparing the strongest strategy from the briefing.'
           : 'GEORGE is preparing an initial strategy from the available context.'
-        : strategyStatus === 'refined'
-          ? 'Based on the briefing, GEORGE recommends a refined strategy.'
-          : strategyStatus === 'confirmed'
-            ? 'The briefing supports the current strategy.'
-            : 'This is the initial strategy based on the available conversation context.'
+        : recommendedFormula.reasons.includes('working_hypothesis')
+          ? "Here's how I'd approach this conversation based on what I know now."
+          : strategyStatus === 'refined'
+            ? 'Based on the briefing, GEORGE recommends a refined strategy.'
+            : strategyStatus === 'confirmed'
+              ? 'The briefing supports the current strategy.'
+              : 'This is the initial strategy based on the available conversation context.'
 
       return {
         recommendedFormula,
