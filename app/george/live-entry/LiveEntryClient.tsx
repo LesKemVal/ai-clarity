@@ -3377,7 +3377,6 @@ export default function LiveEntryClient() {
       ? toRuntimeSupportStyle(liveBriefingActiveSupportStyle)
       : selectedSupportStyle,
   );
-  const liveAssistMode = legacyAssistModeFromSupportStyle(supportStyle);
 
   const nextBriefingBenefit = buildNextBriefingBenefit(
     resolvedConversationType,
