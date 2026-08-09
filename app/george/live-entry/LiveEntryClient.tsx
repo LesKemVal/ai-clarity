@@ -1123,6 +1123,9 @@ export default function LiveEntryClient() {
     {},
   );
   const [optionalSignalInput, setOptionalSignalInput] = useState("");
+  const [optionalSignalInteractionMode, setOptionalSignalInteractionMode] =
+    useState<"briefing" | "ask_george">("briefing");
+  const [optionalGeorgeResponse, setOptionalGeorgeResponse] = useState("");
   const [typedOptionalAnswerExample, setTypedOptionalAnswerExample] =
     useState("");
   const [optionalSignalInputFocused, setOptionalSignalInputFocused] =
@@ -1400,6 +1403,8 @@ export default function LiveEntryClient() {
     setLiveEntryReadyMessageVisible(false);
     setCurrentOptionalSignalQuestion(null);
     setOptionalSignalInput("");
+    setOptionalSignalInteractionMode("briefing");
+    setOptionalGeorgeResponse("");
     setOptionalSignalLoading(false);
     setOptionalSignalComplete(false);
   };
@@ -1616,11 +1621,82 @@ export default function LiveEntryClient() {
     return () => window.clearInterval(timer);
   }, [currentOptionalSignalQuestion?.key]);
 
-  const submitOptionalSignalAnswer = () => {
+  const submitOptionalSignalAnswer = async () => {
     if (!currentOptionalSignalQuestion) return false;
 
     const answer = optionalSignalInput.trim();
     if (!answer) return false;
+
+    if (optionalSignalInteractionMode === "ask_george") {
+      const answeredQuestionKeys = new Set(
+        Object.keys(optionalSignalAnswers),
+      );
+      const priorInteractions = [
+        ...Object.entries(optionalSignalAnswers).map(([key, value]) => ({
+          key,
+          question: optionalSignalQuestionHistory[key] || "",
+          answer: String(value || "").trim(),
+          status: "answered" as const,
+        })),
+        ...Array.from(new Set(skippedOptionalSignalKeys))
+          .filter((key) => !answeredQuestionKeys.has(key))
+          .map((key) => ({
+            key,
+            question: optionalSignalQuestionHistory[key] || "",
+            answer: "",
+            status: "skipped" as const,
+          })),
+      ];
+
+      setOptionalSignalLoading(true);
+      setOptionalGeorgeResponse("");
+
+      try {
+        const response = await fetch("/api/george/live/signal-question", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            interactionMode: "ask_george",
+            userTurn: answer,
+            role:
+              preLiveSignals.role ||
+              chairs.join(", ") ||
+              customChair ||
+              userPosition,
+            broadGoal: preLiveSignals.broadGoal || "",
+            desiredOutcome: preLiveSignals.desiredOutcome || objective,
+            acceptableOutcome: preLiveSignals.acceptableOutcome || "",
+            audience: preLiveSignals.counterparty || audienceType,
+            room:
+              conversationType === "Other"
+                ? customConversationType
+                : conversationType,
+            knownContext,
+            documentSummary: prepDocument?.summary || "",
+            priorAnswers: optionalSignalAnswers,
+            priorInteractions,
+            skippedQuestions: skippedOptionalSignalKeys,
+          }),
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        setOptionalGeorgeResponse(
+          String(data?.response || "").trim() ||
+            "I can answer that while preserving the current briefing question.",
+        );
+        setOptionalSignalInput("");
+        setOptionalSignalInteractionMode("briefing");
+      } catch {
+        setOptionalGeorgeResponse(
+          "I couldn't answer that just now. The current briefing question is still here.",
+        );
+      } finally {
+        setOptionalSignalLoading(false);
+      }
+
+      return true;
+    }
 
     const nextAnswers = {
       ...optionalSignalAnswers,
@@ -1638,6 +1714,8 @@ export default function LiveEntryClient() {
     });
 
     setOptionalSignalInput("");
+    setOptionalSignalInteractionMode("briefing");
+    setOptionalGeorgeResponse("");
 
     try {
       window.localStorage.setItem(
@@ -1659,6 +1737,8 @@ export default function LiveEntryClient() {
     ];
     setSkippedOptionalSignalKeys(nextSkipped);
     setOptionalSignalInput("");
+    setOptionalSignalInteractionMode("briefing");
+    setOptionalGeorgeResponse("");
     returnToLiveEntryReadiness();
   };
 
@@ -4929,14 +5009,23 @@ export default function LiveEntryClient() {
                 ? "GEORGE has enough signal."
                 : "Bring GEORGE up to speed.",
               question: typedOptionalSignalQuestion,
-              helper: currentOptionalSignalQuestion.why,
-              example: currentOptionalSignalQuestion.example,
+              helper:
+                optionalSignalInteractionMode === "ask_george"
+                  ? "Ask GEORGE without changing or answering the current briefing question."
+                  : currentOptionalSignalQuestion.why,
+              example:
+                optionalSignalInteractionMode === "ask_george"
+                  ? ""
+                  : currentOptionalSignalQuestion.example,
               inputValue: optionalSignalInput,
               setInputValue: setOptionalSignalInput,
               submit: submitOptionalSignalAnswer,
               loading: false,
               step: "Optional",
-              primaryAction: "Continue preparing",
+              primaryAction:
+                optionalSignalInteractionMode === "ask_george"
+                  ? "Ask GEORGE"
+                  : "Continue preparing",
               liveAvailable: true,
               readinessMessage: false,
             }
@@ -5005,6 +5094,19 @@ export default function LiveEntryClient() {
                   {liveEntryQuestionSurface.helper}
                 </div>
 
+                {currentOptionalSignalQuestion &&
+                  optionalGeorgeResponse &&
+                  !liveEntryQuestionSurface.readinessMessage && (
+                    <div className="mt-5 rounded-[16px] border border-[#7EA1FF]/20 bg-[#11182A]/55 px-4 py-4">
+                      <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-[#AEB6FF]/64">
+                        GEORGE
+                      </div>
+                      <div className="mt-2.5 text-[13px] leading-6 text-white/72">
+                        {optionalGeorgeResponse}
+                      </div>
+                    </div>
+                  )}
+
                 {!liveEntryQuestionSurface.readinessMessage &&
                   liveEntryQuestionSurface.example && (
                     <div className="mt-5 rounded-[16px] border border-white/[0.08] bg-[#08090A] px-4 py-4">
@@ -5014,6 +5116,48 @@ export default function LiveEntryClient() {
                       <div className="mt-2.5 text-[12.5px] leading-6 text-white/44">
                         {liveEntryQuestionSurface.example}
                       </div>
+                    </div>
+                  )}
+
+                {!liveEntryQuestionSurface.loading &&
+                  !liveEntryQuestionSurface.readinessMessage &&
+                  currentOptionalSignalQuestion && (
+                    <div className="mt-5 flex items-center gap-2">
+                      <button
+                        type="button"
+                        aria-pressed={
+                          optionalSignalInteractionMode === "briefing"
+                        }
+                        onClick={() => {
+                          setOptionalSignalInteractionMode("briefing");
+                          setOptionalGeorgeResponse("");
+                        }}
+                        className={
+                          optionalSignalInteractionMode === "briefing"
+                            ? "rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-3 py-2 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white"
+                            : "rounded-[10px] border border-white/[0.10] px-3 py-2 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/45 transition hover:border-white/25 hover:text-white/70"
+                        }
+                      >
+                        Answer
+                      </button>
+
+                      <button
+                        type="button"
+                        aria-pressed={
+                          optionalSignalInteractionMode === "ask_george"
+                        }
+                        onClick={() => {
+                          setOptionalSignalInteractionMode("ask_george");
+                          setOptionalGeorgeResponse("");
+                        }}
+                        className={
+                          optionalSignalInteractionMode === "ask_george"
+                            ? "rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-3 py-2 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white"
+                            : "rounded-[10px] border border-white/[0.10] px-3 py-2 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/45 transition hover:border-white/25 hover:text-white/70"
+                        }
+                      >
+                        Ask GEORGE
+                      </button>
                     </div>
                   )}
 
@@ -5034,7 +5178,11 @@ export default function LiveEntryClient() {
                       }}
                       autoFocus
                       className="mt-6 w-full rounded-[16px] border border-white/[0.10] bg-[#08090A] px-5 py-4 text-[15px] leading-7 text-white outline-none transition placeholder:text-white/28 focus:border-[#7EA1FF]/55"
-                      placeholder="say it here..."
+                      placeholder={
+                        optionalSignalInteractionMode === "ask_george"
+                          ? "Ask GEORGE about this conversation or briefing..."
+                          : "say it here..."
+                      }
                     />
                   )}
 
