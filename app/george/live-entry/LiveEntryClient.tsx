@@ -4,12 +4,11 @@ import { RecommendedStrategyCard } from "@/components/george/live-entry/Recommen
 import { FormulaScriptBrowserPanel } from "@/components/george/live-entry/FormulaScriptBrowserPanel";
 import { ScriptCustomizationPanel } from "@/components/george/live-entry/ScriptCustomizationPanel";
 import type {
-  FormulaDecisionSource,
-} from "@/components/george/live-entry/FormulaDecisionPanel";
-import type {
   OperationalFormula,
   OperationalScript,
 } from "@/lib/george/operational-memory/types";
+
+type FormulaDecisionSource = "george" | "user";
 import type {
   OperationalRecommendationApiResponse,
   OperationalRecommendationDto,
@@ -6533,14 +6532,7 @@ export default function LiveEntryClient() {
                   recommendation={operationalRecommendation}
                   loading={recommendationLoading}
                   selectedFormula={selectedFormula}
-                  selectedSource={selectedFormulaSource}
-                  reviewRequired={
-                    operationalRecommendation?.reviewRequired ?? false
-                  }
-                  onAcceptRecommendation={acceptOperationalRecommendation}
-                  onEditFormula={beginFormulaEdit}
                   onChooseAnother={beginFormulaSelection}
-                  onBrowseScripts={browseFormulaScripts}
                   onContinue={() => setLivePrepOpenSection("ready")}
                 />
 
