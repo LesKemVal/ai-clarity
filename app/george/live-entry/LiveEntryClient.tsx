@@ -3745,11 +3745,72 @@ export default function LiveEntryClient() {
       ),
     );
 
+    const preparationSession =
+      showQuickLiveSetup
+        ? quickLivePreparationSession
+        : liveEntryRoute === "homepage"
+          ? homepagePreparationSession
+          : liveEntryRoute === "normal"
+            ? normalPreparationSession
+            : traditionalPreparationSession;
+
+    const preparationKnowledge = preparationSession?.knowledge;
+    const preparationInteractions =
+      preparationSession?.briefing.priorInteractions || [];
+
+    const knownFacts = Array.from(
+      new Set(
+        [
+          ...(preparationKnowledge?.baselineAssumptions || []),
+          ...Object.entries(
+            preparationKnowledge?.additionalSignals || {},
+          ).map(([key, value]) => {
+            const cleanValue = String(value || "").trim();
+            return cleanValue ? `${key}: ${cleanValue}` : "";
+          }),
+          ...preparationInteractions.map((interaction) => {
+            const question = String(interaction.question || "").trim();
+            const answer = String(interaction.answer || "").trim();
+
+            if (!answer) return "";
+            return question ? `${question}: ${answer}` : answer;
+          }),
+          ...(preparationKnowledge?.documents || []).map((document) => {
+            const summary = String(document.summary || "").trim();
+            return summary
+              ? `Document ${document.name}: ${summary}`
+              : `Document available: ${document.name}`;
+          }),
+        ].filter(Boolean),
+      ),
+    );
+
     const input: OperationalRecommendationRequest = {
-      roomType: resolvedConversationType,
-      objectiveType: objective,
+      roomType:
+        preparationKnowledge?.conversation.title ||
+        resolvedConversationType,
+      objectiveType:
+        preparationKnowledge?.objective ||
+        objective,
       observedSignalTypes,
       briefingComplete: liveBriefingToaAccepted,
+      preparationContext: {
+        role:
+          preparationKnowledge?.role ||
+          userPosition ||
+          chair,
+        desiredOutcome:
+          preparationKnowledge?.objective ||
+          objective,
+        conversationContext:
+          preparationKnowledge?.knownContext ||
+          knownContext,
+        audience:
+          preparationKnowledge?.audience ||
+          preparationKnowledge?.participants.join(", ") ||
+          audienceType,
+        knownFacts,
+      },
     };
 
     return input;

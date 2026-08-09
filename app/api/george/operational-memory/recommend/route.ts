@@ -86,6 +86,26 @@ export async function POST(req: NextRequest) {
     observedSignalTypes: normalizeStringArray(body.observedSignalTypes),
     priorFormulaId: normalizeOptionalString(body.priorFormulaId),
     briefingComplete: body.briefingComplete === true,
+    preparationContext:
+      body.preparationContext &&
+      typeof body.preparationContext === "object" &&
+      !Array.isArray(body.preparationContext)
+        ? {
+            role: normalizeOptionalString(body.preparationContext.role),
+            desiredOutcome: normalizeOptionalString(
+              body.preparationContext.desiredOutcome,
+            ),
+            conversationContext: normalizeOptionalString(
+              body.preparationContext.conversationContext,
+            ),
+            audience: normalizeOptionalString(
+              body.preparationContext.audience,
+            ),
+            knownFacts: normalizeStringArray(
+              body.preparationContext.knownFacts,
+            ),
+          }
+        : undefined,
     ...(formulaLimit === undefined ? {} : { formulaLimit }),
     ...(alternativeLimit === undefined ? {} : { alternativeLimit }),
   };

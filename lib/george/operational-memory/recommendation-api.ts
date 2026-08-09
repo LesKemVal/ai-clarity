@@ -8,6 +8,14 @@ export type OperationalRecommendationStrategyStatus =
   | "confirmed"
   | "refined";
 
+export type OperationalRecommendationPreparationContext = {
+  role?: string;
+  desiredOutcome?: string;
+  conversationContext?: string;
+  audience?: string;
+  knownFacts?: string[];
+};
+
 export type OperationalRecommendationRequest = {
   organizationId?: string;
   roomType?: string;
@@ -17,6 +25,7 @@ export type OperationalRecommendationRequest = {
   alternativeLimit?: number;
   priorFormulaId?: string;
   briefingComplete?: boolean;
+  preparationContext?: OperationalRecommendationPreparationContext;
 };
 
 export type OperationalRecommendationDto = {

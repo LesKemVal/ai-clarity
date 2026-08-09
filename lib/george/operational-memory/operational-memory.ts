@@ -21,6 +21,9 @@ import {
 import type { OperationalFormulaLibrary } from './formula-library'
 import type { OperationalLearningRecordRecorder } from './learning-record-recorder'
 import type {
+  OperationalRecommendationPreparationContext,
+} from './recommendation-api'
+import type {
   OperationalFormulaReassessmentEngine,
 } from './formula-reassessment-engine'
 import type { OperationalScriptExecutionRecorder } from './script-execution-recorder'
@@ -82,6 +85,7 @@ export type OperationalRecommendationInput = FormulaRetrievalContext & {
   alternativeLimit?: number
   priorFormulaId?: string
   briefingComplete?: boolean
+  preparationContext?: OperationalRecommendationPreparationContext
 }
 
 export type OperationalRecommendationStrategyStatus =
