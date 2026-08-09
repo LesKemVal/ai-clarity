@@ -3254,9 +3254,6 @@ export default function LiveEntryClient() {
          */
         livePreparationHistoryRef.current = ["brief_review"];
         setLiveBriefingStep(3);
-        window.setTimeout(() => {
-          void loadOperationalRecommendation();
-        }, 0);
         setLiveBriefingToaAccepted(true);
         setLiveBriefingSupportAccepted(false);
         setSupportAssessmentExplanationOpen(false);
