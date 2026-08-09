@@ -230,11 +230,11 @@ export function createOperationalMemory(
       const recommendedFormulaId = recommendedFormula?.formula.id || ''
 
       const strategyStatus: OperationalRecommendationStrategyStatus =
-        !input.briefingComplete
+        !input.briefingComplete || !recommendedFormulaId
           ? 'initial'
           : priorFormulaId && priorFormulaId === recommendedFormulaId
             ? 'confirmed'
-            : priorFormulaId && recommendedFormulaId
+            : priorFormulaId
               ? 'refined'
               : 'confirmed'
 

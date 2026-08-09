@@ -367,6 +367,12 @@ const existingFormula = {
   )
 
   assert.equal(
+    result.strategyStatus,
+    'initial',
+    'Completed briefing with no recommended Formula must remain initial.',
+  )
+
+  assert.equal(
     result.recommendationSummary,
     'GEORGE is preparing the strongest strategy from the briefing.',
     'Null strategy synthesis must preserve the completed-briefing degradation message.',
