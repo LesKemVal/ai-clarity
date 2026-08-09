@@ -53,6 +53,7 @@ type ConversationRecordProjection = {
 type PostLiveConversationRecordPanelProps = {
   record: ConversationRecordProjection
   onClose?: () => void
+  onAskGeorge?: () => void
   onNextCall?: () => void
 }
 
@@ -68,9 +69,11 @@ function list(value: unknown) {
 export function PostLiveConversationRecordPanel({
   record,
   onClose,
+  onAskGeorge,
   onNextCall,
 }: PostLiveConversationRecordPanelProps) {
   const [showWhy, setShowWhy] = useState(false)
+  const [showReviewConversation, setShowReviewConversation] = useState(false)
   const [showExecutionReview, setShowExecutionReview] = useState(false)
   const [showTranscriptEvidence, setShowTranscriptEvidence] = useState(false)
   const [retentionState, setRetentionState] = useState<
@@ -85,6 +88,7 @@ export function PostLiveConversationRecordPanel({
   const transcriptHighlights = Array.isArray(record.transcriptHighlights)
     ? record.transcriptHighlights
     : []
+  const signalCount = transcriptHighlights.length + debriefObservations.length
   const documentationCount = Array.isArray(record.relevantDocumentation)
     ? record.relevantDocumentation.length
     : 0
@@ -151,8 +155,8 @@ export function PostLiveConversationRecordPanel({
 
   const strategyAdjustmentSuggested = /\b(change|adjust|different|alternate|new opening|revise|switch|replace|modify|weaken)\b/.test(adjustmentText)
   const strategyStatus = strategyAdjustmentSuggested
-    ? 'GEORGE suggests an adjustment before the next conversation.'
-    : 'Current Formula and Script remain appropriate for the next conversation.'
+    ? 'Signals surfaced a possible adjustment. Accumulated signals must produce sufficient evidence before recommending a change to the brief.'
+    : 'The signals from this conversation have been retained. As signals accumulate, they strengthen the evidence supporting future recommendations.'
 
   async function retainExecutedAssets(
     disposition: "formula" | "script" | "both" | "neither",
@@ -220,8 +224,8 @@ export function PostLiveConversationRecordPanel({
       record.operationalDebrief?.summary ||
       record.summary,
     strategyAdjustmentSuggested
-      ? 'The available evidence suggests a different execution approach may improve the next conversation.'
-      : 'The available evidence does not justify changing the current operational strategy yet.',
+      ? 'We detected a possible execution or strategy signal. Accumulated signals must produce sufficient evidence before recommending a brief improvement.'
+      : 'The signals from this conversation have been retained. As signals accumulate, they strengthen the evidence supporting future recommendations.',
   )
 
   return (
@@ -231,6 +235,18 @@ export function PostLiveConversationRecordPanel({
           <p className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#8FB6C9]/72">
             Conversation Complete
           </p>
+          <p className="mt-2 text-[10px] uppercase tracking-[0.18em] text-white/38">
+            Active briefing · {label(record.desiredOutcome, 'Current objective')}
+          </p>
+          {onAskGeorge && (
+            <button
+              type="button"
+              onClick={onAskGeorge}
+              className="mt-2 text-[10px] uppercase tracking-[0.16em] text-[#BFD9FF]/68 transition hover:text-[#DCE9FF]"
+            >
+              Ask GEORGE
+            </button>
+          )}
           <h2 className="mt-1 text-[15px] font-medium text-[color:var(--steel-100)]/88">
             Decide what changes before the next conversation.
           </h2>
@@ -256,6 +272,64 @@ export function PostLiveConversationRecordPanel({
         <div className="rounded-[0.95rem] border border-[var(--border-subtle)] bg-[color:var(--surface-3)]/72 p-3">
           <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/42">Strategy status</p>
           <p className="mt-2 text-[13px] leading-5 text-[color:var(--steel-100)]/82">{strategyStatus}</p>
+          <p className="mt-2 text-[11px] leading-5 text-white/38">
+            Signals create evidence over time; one conversation is not a verdict.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-2 sm:grid-cols-2">
+        {onNextCall && (
+          <button
+            type="button"
+            onClick={onNextCall}
+            className="rounded-[0.75rem] border border-[#BFD9FF]/28 bg-[#BFD9FF]/[0.08] px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-[0.17em] text-white/90 transition hover:border-[#DCE9FF]/48 hover:bg-[#BFD9FF]/[0.13]"
+          >
+            Next Call
+            <span className="mt-1 block text-[10px] font-normal normal-case tracking-normal text-white/46">
+              Continue with the current preparation.
+            </span>
+          </button>
+        )}
+
+        <button
+          type="button"
+          onClick={() => setShowReviewConversation((current) => !current)}
+          className="rounded-[0.75rem] border border-white/[0.12] px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-[0.17em] text-white/72 transition hover:border-white/[0.24] hover:text-white"
+        >
+          {showReviewConversation ? 'Hide review' : 'Review conversation'}
+          <span className="mt-1 block text-[10px] font-normal normal-case tracking-normal text-white/42">
+            Summary, evidence, and executed assets.
+          </span>
+        </button>
+
+         {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-[0.75rem] border border-white/[0.12] px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-[0.17em] text-white/58 transition hover:border-white/[0.24] hover:text-white"
+          >
+            Finish
+            <span className="mt-1 block text-[10px] font-normal normal-case tracking-normal text-white/38">
+              Return to GEORGE.
+            </span>
+          </button>
+        )}
+      </div>
+
+       {showReviewConversation && (
+        <div className="george-motion-fade-soft mt-4 border-t border-white/[0.07] pt-4">
+          <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/48">
+            Review conversation
+          </p>
+
+          {showWhy && (
+            <div className="mt-3 rounded-[0.95rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.04] p-3">
+              <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/48">Why</p>
+              <p className="mt-2 text-[12px] leading-5 text-[color:var(--steel-200)]/76">{whyText}</p>
+            </div>
+          )}
+
           <button
             type="button"
             onClick={() => setShowWhy((current) => !current)}
@@ -263,44 +337,6 @@ export function PostLiveConversationRecordPanel({
           >
             {showWhy ? 'Hide why' : 'Why?'}
           </button>
-        </div>
-      </div>
-
-      {showWhy && (
-        <div className="mt-3 rounded-[0.95rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.04] p-3">
-          <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/48">Why</p>
-          <p className="mt-2 text-[12px] leading-5 text-[color:var(--steel-200)]/76">{whyText}</p>
-        </div>
-      )}
-
-      <div className="mt-3 flex flex-wrap gap-2">
-        {strategyAdjustmentSuggested ? (
-          <>
-            <button
-              type="button"
-              className="rounded-[0.75rem] border border-white/12 px-4 py-2.5 text-[10px] uppercase tracking-[0.16em] text-white/66 transition hover:border-white/24 hover:text-white"
-            >
-              Keep Current
-            </button>
-            <button
-              type="button"
-              className="rounded-[0.75rem] border border-[#8FB6C9]/25 bg-[#8FB6C9]/[0.07] px-4 py-2.5 text-[10px] uppercase tracking-[0.16em] text-[#D9ECF6]/82 transition hover:border-[#8FB6C9]/45 hover:bg-[#8FB6C9]/[0.11]"
-            >
-              Adopt Adjustment
-            </button>
-          </>
-        ) : null}
-
-        {onNextCall && (
-          <button
-            type="button"
-            onClick={onNextCall}
-            className="ml-auto rounded-[0.75rem] border border-[#BFD9FF]/28 bg-[#BFD9FF]/[0.08] px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.17em] text-white/90 transition hover:border-[#DCE9FF]/48 hover:bg-[#BFD9FF]/[0.13]"
-          >
-            Next Call
-          </button>
-        )}
-      </div>
 
       {(formulaExecutionAvailable || scriptExecutionAvailable) && (
         <div className="mt-5 rounded-[1rem] border border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.035] p-4">
@@ -427,13 +463,20 @@ export function PostLiveConversationRecordPanel({
             )}
 
             <div className="rounded-[0.95rem] border border-[var(--border-subtle)] bg-[color:var(--surface-3)]/70 p-3">
-              <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/36">GEORGE analysis</p>
+              <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/36">Signals detected</p>
               <p className="mt-1 text-[12px] leading-5 text-[color:var(--steel-200)]/72">{label(record.summary)}</p>
+              <p className="mt-2 text-[11px] leading-5 text-white/38">
+                {signalCount > 1
+                  ? `We detected ${signalCount} meaningful signals. As signals accumulate across future conversations, they strengthen the evidence supporting this briefing.`
+                  : signalCount === 1
+                    ? 'We detected one meaningful signal. As signals accumulate across future conversations, they strengthen the evidence supporting this briefing.'
+                    : 'No distinct signal was attached to this record. The conversation remains available for future context.'}
+              </p>
             </div>
 
             {debriefObservations.length > 0 && (
               <div className="rounded-[0.95rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.04] p-3">
-                <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/48">Operational observations</p>
+                <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/48">Signal details</p>
                 <ul className="mt-2 space-y-1 text-[11px] leading-5 text-[color:var(--steel-200)]/56">
                   {debriefObservations.map((item) => (
                     <li key={`${item.label}-${item.detail}`}>
@@ -492,6 +535,8 @@ export function PostLiveConversationRecordPanel({
           Evidence: {record.transcriptEvidenceAvailable ? 'Preserved' : 'Summary only'}
         </span>
       </div>
+        </div>
+      )}
     </section>
   )
 }
