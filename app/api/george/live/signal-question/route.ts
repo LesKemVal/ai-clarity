@@ -300,18 +300,42 @@ Identify what is already established semantically across desiredOutcome, broadGo
 2. UNRESOLVED
 Identify the operational facts that remain genuinely unresolved for this specific mission. Missing information is only a candidate; it does not automatically deserve a question.
 
-3. RANK
-Compare ALL unresolved candidates by expected operational value. Ask which unknown, if resolved now, would most materially change GEORGE's preparation, judgment, timing, support, or the user's likelihood of achieving the established outcome.
+3. INFORMATION AUTHORITY
+Before an unresolved candidate is eligible to become a question, determine who should supply the missing value.
 
-4. SELECT
-Ask only the single highest-value unresolved question. Foundational mission facts generally outrank deeper elaboration of a dimension GEORGE already understands. A follow-up to the latest answer must compete against every other unresolved candidate before it can be selected.
+Ask the user for information the user is the appropriate authority to supply, including facts, history, observations, constraints, preferences, actual capabilities, commitments, authority, decisions only they can make, and information uniquely available to them.
 
-5. STOP
-If no unresolved candidate has enough expected operational value to justify another briefing turn, return sufficient. Do not keep interviewing merely because another question is possible.
+Do NOT ask the user to perform reasoning that belongs to GEORGE. GEORGE owns professional technique, strategy, analysis, synthesis, positioning, prioritization, tactics, preparation methodology, and expert judgment that can be derived from established evidence.
+
+The user is not required to understand the professional discipline in order to use GEORGE effectively.
+
+For every candidate, ask internally:
+"Is this information the user should reasonably supply, or am I asking the user to perform reasoning that belongs to GEORGE?"
+
+If GEORGE can derive the needed value from established evidence using its own expertise, derive it rather than asking the user.
+
+If GEORGE cannot derive it because an underlying user-owned fact is missing, ask for that underlying fact rather than asking the user for the expert conclusion.
+
+Do not invent user-owned facts, permissions, capabilities, commitments, limits, preferences, or decisions.
+
+This doctrine is discipline-independent. Apply it equally in sales, interviews, negotiations, management, presentations, investor conversations, difficult conversations, planning, and every other preparation context.
+
+4. RANK
+Compare ALL eligible unresolved user-owned information by expected operational value. Ask which unknown, if resolved now, would most materially change GEORGE's preparation, judgment, timing, support, or the user's likelihood of achieving the established outcome.
+
+Do not rank GEORGE-owned reasoning as though it were missing user evidence. GEORGE should perform that reasoning itself.
+
+5. SELECT
+Ask only the single highest-value eligible unresolved question. Foundational mission facts generally outrank deeper elaboration of a dimension GEORGE already understands. A follow-up to the latest answer must compete against every other eligible unresolved candidate before it can be selected.
+
+6. STOP
+If no eligible unresolved user-owned information has enough expected operational value to justify another briefing turn, return sufficient. Do not keep interviewing merely because another question is possible or because GEORGE could ask the user to perform more analysis.
 
 A question is wrong when it:
 - recursively elaborates the newest answer while a more consequential foundational unknown remains;
 - asks for finer detail about an already-useful dimension without comparing other unresolved dimensions;
+- asks the user to supply strategy, technique, analysis, synthesis, positioning, tactics, or professional judgment GEORGE should produce;
+- asks for an expert conclusion when the actual missing information is an underlying fact the user can supply;
 - repeats information GEORGE already knows semantically;
 - is selected simply because its field is missing;
 - would not materially change preparation or LIVE support.
@@ -392,13 +416,13 @@ Return JSON matching the existing schema.
     const raw = completion.choices?.[0]?.message?.content || '{}'
     const parsed = JSON.parse(raw)
 
-    const status = parsed?.status === 'sufficient' ? 'sufficient' : 'question'
-    const question = clean(parsed?.question)
-    const label = clean(parsed?.label) || (status === 'sufficient' ? 'Signal sufficient' : 'Additional signal')
-    const why = clean(parsed?.why) || clean(parsed?.helper) || (status === 'sufficient' ? 'Additional signal is unlikely to materially improve context, timing, or support.' : 'This may improve GEORGE’s context, timing, and support.')
-    const example = clean(parsed?.example) || (status === 'sufficient' ? '' : 'For example: Describe the key facts, the result that matters, and any constraint that changes the answer.')
-    const helper = clean(parsed?.helper) || why
-    const key = clean(parsed?.key) || `signal_${Date.now()}`
+    let status = parsed?.status === 'sufficient' ? 'sufficient' : 'question'
+    let question = clean(parsed?.question)
+    let label = clean(parsed?.label) || (status === 'sufficient' ? 'Signal sufficient' : 'Additional signal')
+    let why = clean(parsed?.why) || clean(parsed?.helper) || (status === 'sufficient' ? 'Additional signal is unlikely to materially improve context, timing, or support.' : 'This may improve GEORGE’s context, timing, and support.')
+    let example = clean(parsed?.example) || (status === 'sufficient' ? '' : 'For example: Describe the key facts, the result that matters, and any constraint that changes the answer.')
+    let helper = clean(parsed?.helper) || why
+    let key = clean(parsed?.key) || `signal_${Date.now()}`
     const understanding = clean(parsed?.understanding)
     const directions = Array.isArray(parsed?.directions)
       ? parsed.directions
@@ -406,6 +430,161 @@ Return JSON matching the existing schema.
           .filter(Boolean)
           .slice(0, 6)
       : []
+
+    if (status === 'question' && question) {
+      const eligibilityCompletion = await openai.chat.completions.create({
+        model:
+          process.env.OPENAI_MODEL_INTELLIGENT ||
+          process.env.OPENAI_MODEL ||
+          'gpt-4o',
+        temperature: 0,
+        response_format: { type: 'json_object' },
+        messages: [
+          {
+            role: 'system',
+            content: `
+You are GEORGE's preparation question eligibility reviewer.
+
+You are NOT choosing a professional strategy for the user.
+You are reviewing whether GEORGE's proposed briefing question is legitimate to ask.
+
+Apply this discipline-independent authority rule:
+
+USER-OWNED INFORMATION
+The user is the appropriate authority for:
+- facts they know;
+- history and what happened;
+- observations;
+- people and relationships they know;
+- constraints;
+- actual capabilities;
+- authority and permissions;
+- commitments already made;
+- preferences;
+- limits;
+- decisions only they can make;
+- information uniquely available to them.
+
+GEORGE-OWNED REASONING
+GEORGE owns:
+- professional technique;
+- strategy;
+- analysis;
+- synthesis;
+- positioning;
+- prioritization;
+- tactics;
+- methodology;
+- expert judgment;
+- deciding how to address an obstacle;
+- constructing a value proposition;
+- determining an approach from established evidence.
+
+The user must not need professional mastery of the discipline in order to prepare with GEORGE.
+
+Examples of INELIGIBLE questions:
+- "What is your proposed solution to address their concerns?"
+- "What value proposition can you offer?"
+- "What negotiation strategy will you use?"
+- "How should you position yourself in the interview?"
+- "What management technique will you use?"
+
+Those ask the user to perform GEORGE-owned reasoning.
+
+When a proposed question is ineligible:
+
+1. Identify whether GEORGE actually lacks an underlying USER-OWNED FACT needed to perform the reasoning itself.
+2. If such a fact exists and would materially improve preparation, replace the proposed question with the single highest-value underlying fact question.
+3. If GEORGE has enough facts to do the professional reasoning itself, return sufficient instead of interrogating the user.
+
+Do not merely rephrase an ineligible expert question.
+
+A replacement must ask for raw information, not the user's strategy or professional conclusion.
+
+Return JSON only:
+
+If the proposed question is legitimate:
+{
+  "verdict": "user_owned_fact"
+}
+
+If it improperly delegates GEORGE-owned reasoning but an underlying fact is needed:
+{
+  "verdict": "george_owned_reasoning",
+  "replacement": {
+    "status": "question",
+    "question": "single user-owned fact question",
+    "label": "short label",
+    "why": "concise reason the fact materially changes preparation",
+    "example": "For example: Describe X, Y, and Z.",
+    "key": "semantic_key"
+  }
+}
+
+If it improperly delegates GEORGE-owned reasoning and GEORGE already has enough:
+{
+  "verdict": "george_owned_reasoning",
+  "replacement": {
+    "status": "sufficient"
+  }
+}
+            `.trim(),
+          },
+          {
+            role: 'user',
+            content: JSON.stringify({
+              knownSignal,
+              proposedQuestion: {
+                question,
+                label,
+                why,
+                example,
+              },
+            }),
+          },
+        ],
+      })
+
+      const eligibilityRaw =
+        eligibilityCompletion.choices?.[0]?.message?.content || '{}'
+      const eligibilityParsed = JSON.parse(eligibilityRaw)
+      const verdict = clean(eligibilityParsed?.verdict)
+      const replacement = eligibilityParsed?.replacement
+
+      if (verdict === 'george_owned_reasoning') {
+        const replacementStatus =
+          replacement?.status === 'question' ? 'question' : 'sufficient'
+        const replacementQuestion = clean(replacement?.question)
+
+        if (
+          replacementStatus === 'question' &&
+          replacementQuestion
+        ) {
+          status = 'question'
+          question = replacementQuestion
+          label = clean(replacement?.label) || 'Additional signal'
+          why =
+            clean(replacement?.why) ||
+            'This fact would materially improve GEORGE’s preparation.'
+          example =
+            clean(replacement?.example) ||
+            'For example: Describe the relevant facts, constraints, and what actually happened.'
+          helper = why
+          key =
+            clean(replacement?.key) ||
+            `signal_${Date.now()}`
+        } else {
+          status = 'sufficient'
+          question = ''
+          label = 'Signal sufficient'
+          why =
+            'GEORGE has enough user-owned information to perform the remaining professional reasoning.'
+          example = ''
+          helper = why
+          key = 'signal_sufficient'
+        }
+      }
+    }
 
     if (status === 'sufficient' || !question) {
       return NextResponse.json({
