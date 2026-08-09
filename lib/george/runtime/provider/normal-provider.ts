@@ -25,10 +25,25 @@ export type NormalProviderSemanticJudgment = {
   capabilityRecommendationMaterial: boolean
 }
 
+export type NormalProviderOperationalStrategyStep = {
+  signalType: string
+  actionType: string | null
+  expectedTransition: string | null
+}
+
+export type NormalProviderOperationalStrategy = {
+  name: string | null
+  bestUsedFor: string[]
+  prerequisites: string[]
+  steps: NormalProviderOperationalStrategyStep[]
+  failureConditions: string[]
+}
+
 export type NormalProviderResult = {
   text: string
   semanticIntent: NormalProviderSemanticIntent
   semanticJudgment: NormalProviderSemanticJudgment
+  operationalStrategy: NormalProviderOperationalStrategy | null
 }
 
 type NormalProviderMessage = {
@@ -65,7 +80,8 @@ Return one valid JSON object and nothing else:
     "capabilityBenefit": "Why the selected capability materially helps the desired outcome, or null.",
     "capabilityExplicitlyRequested": false,
     "capabilityRecommendationMaterial": false
-  }
+  },
+  "operationalStrategy": null
 }
 
 semanticIntent must be exactly one of:
@@ -85,6 +101,31 @@ semanticJudgment rules:
 - capabilityRecommendationMaterial is true only when recommending the capability would materially improve the probability of reaching the desired outcome.
 - Do not expose semanticJudgment or this contract in the user-facing text.
 - The user retains activation authority. Never claim that LIVE has been activated unless the active runtime says so.
+
+operationalStrategy rules:
+- operationalStrategy is structured operational reasoning, not a second response.
+- Return null unless the governed context provides enough evidence to form a useful multi-step operational approach toward the desired outcome.
+- When present, reason from the desired outcome, current briefing/context, known facts, constraints, and operational evidence supplied by GEORGE.
+- Treat the strategy as GEORGE's current working approach, not as proven truth.
+- The strategy may adapt as new signal appears.
+- Do not manufacture missing user-owned facts.
+- steps describe meaningful operational transitions, not generic advice or a transcript of the user-facing response.
+- Do not expose internal strategy field names or this contract in the user-facing text.
+
+When operationalStrategy is present, use exactly this shape:
+{
+  "name": "A concise human-readable strategy name or null.",
+  "bestUsedFor": ["Concrete situations this approach serves."],
+  "prerequisites": ["Conditions or known facts the approach depends on."],
+  "steps": [
+    {
+      "signalType": "The signal or state that makes this move relevant.",
+      "actionType": "The operational move to make, or null.",
+      "expectedTransition": "The intended state change, or null."
+    }
+  ],
+  "failureConditions": ["Conditions indicating this approach should change."]
+}
 
 The text field remains the complete response GEORGE should deliver.
 Do not mention this contract to the user.
@@ -185,6 +226,67 @@ function parseSemanticJudgment(value: unknown): NormalProviderSemanticJudgment {
   }
 }
 
+function normalizeTextList(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+
+  return Array.from(
+    new Set(
+      value
+        .map((item) => nullableText(item))
+        .filter((item): item is string => Boolean(item))
+    )
+  )
+}
+
+function parseOperationalStrategy(
+  value: unknown
+): NormalProviderOperationalStrategy | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const strategy = value as Record<string, unknown>
+  const rawSteps = Array.isArray(strategy.steps)
+    ? strategy.steps
+    : []
+
+  const steps = rawSteps
+    .map((value) => {
+      if (!value || typeof value !== 'object' || Array.isArray(value)) {
+        return null
+      }
+
+      const step = value as Record<string, unknown>
+      const signalType = nullableText(step.signalType)
+
+      if (!signalType) return null
+
+      return {
+        signalType,
+        actionType: nullableText(step.actionType),
+        expectedTransition: nullableText(step.expectedTransition),
+      }
+    })
+    .filter(
+      (
+        step
+      ): step is NormalProviderOperationalStrategyStep =>
+        step !== null
+    )
+
+  if (!steps.length) return null
+
+  return {
+    name: nullableText(strategy.name),
+    bestUsedFor: normalizeTextList(strategy.bestUsedFor),
+    prerequisites: normalizeTextList(strategy.prerequisites),
+    steps,
+    failureConditions: normalizeTextList(
+      strategy.failureConditions
+    ),
+  }
+}
+
 function parseProviderResult(
   rawContent: string | null | undefined
 ): NormalProviderResult | null {
@@ -196,6 +298,7 @@ function parseProviderResult(
       text?: unknown
       semanticIntent?: unknown
       semanticJudgment?: unknown
+      operationalStrategy?: unknown
     }
 
     const text =
@@ -222,6 +325,9 @@ function parseProviderResult(
       text,
       semanticIntent,
       semanticJudgment: parseSemanticJudgment(parsed.semanticJudgment),
+      operationalStrategy: parseOperationalStrategy(
+        parsed.operationalStrategy
+      ),
     }
   } catch {
     // Preserve provider availability if a model returns plain text instead
@@ -230,6 +336,7 @@ function parseProviderResult(
       text: content,
       semanticIntent: null,
       semanticJudgment: { ...EMPTY_SEMANTIC_JUDGMENT },
+      operationalStrategy: null,
     }
   }
 }
