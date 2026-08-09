@@ -1158,72 +1158,60 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     const objective = String(
       answers.desiredOutcome || selectedGoal || "",
     ).trim();
-    const context = String(answers.conversationContext || "").trim();
-    const audience = String(
-      answers.audience ||
-        answers.participants ||
-        answers.who ||
-        "",
-    ).trim();
 
     const learnedSignals = Object.entries({
       ...answers,
       ...optionalAnswers,
     }).filter(([, value]) => Boolean(String(value || "").trim()));
 
-    const items = [
+    const semanticUnderstanding =
+      adaptiveUnderstanding &&
+      adaptiveUnderstandingOutcome ===
+        String(answers.desiredOutcome || "").trim()
+        ? String(adaptiveUnderstanding).trim()
+        : "";
+
+    const hasAccumulatedBriefingEvidence =
+      learnedSignals.length > 0 || Boolean(semanticUnderstanding);
+
+    return [
       {
         key: "role",
         label: selectedRole?.label
-          ? `Role: ${selectedRole.label}`
-          : "Role still being clarified",
+          ? `I understand your role: ${selectedRole.label}.`
+          : "I still need to understand your role.",
         complete: Boolean(selectedRole),
-      },
-      {
-        key: "conversation",
-        label: selectedType?.title
-          ? `Conversation: ${selectedType.title}`
-          : "Conversation still being clarified",
-        complete: Boolean(selectedType),
       },
       {
         key: "objective",
         label: objective
-          ? `Outcome: ${objective}`
-          : "Outcome still being clarified",
+          ? `I understand the outcome: ${objective}.`
+          : "I still need to understand the outcome you want.",
         complete: Boolean(objective),
       },
       {
-        key: "context",
-        label: context
-          ? "Conversation-specific context understood"
-          : "Conversation-specific context still developing",
-        complete: Boolean(context),
+        key: "briefing",
+        label: hasAccumulatedBriefingEvidence
+          ? "I understand important facts about this conversation."
+          : "I'm still learning the situation.",
+        complete: hasAccumulatedBriefingEvidence,
       },
       {
-        key: "people",
-        label: audience
-          ? "People / decision environment understood"
-          : "People / decision environment still developing",
-        complete: Boolean(audience),
+        key: "readiness",
+        label: briefingSufficient
+          ? "I have enough context to support you LIVE."
+          : "I'm still gathering the context I need to support you LIVE.",
+        complete: briefingSufficient,
       },
     ];
-
-    if (learnedSignals.length > 0) {
-      items.push({
-        key: "signals",
-        label: "Additional operational details understood",
-        complete: true,
-      });
-    }
-
-    return items;
   }, [
+    adaptiveUnderstanding,
+    adaptiveUnderstandingOutcome,
     answers,
+    briefingSufficient,
     optionalAnswers,
     selectedGoal,
     selectedRole,
-    selectedType,
   ]);
 
   const preparationUnderstandingSummary = useMemo(() => {
@@ -2202,9 +2190,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
                   <div className="min-w-0">
                     <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#AEB6FF]/58">
-                      {briefingSufficient
-                        ? "Final understanding"
-                        : "Current understanding"}
+                      Current understanding
                     </div>
 
                     <p className="mt-2 max-w-3xl text-[13px] leading-6 text-white/64">
@@ -2641,10 +2627,10 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                   {briefingSufficient && (
                     <div>
                       <h3 className="max-w-4xl font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px] sm:leading-9">
-                        I've assembled a briefing that I believe prepares us well.
+                        I have enough context to support you LIVE.
                       </h3>
                       <p className="mt-3 max-w-3xl text-[13px] leading-6 text-white/52">
-                        You can continue briefing if you want to add context, or approve this preparation when it feels right.
+                        We can start now, or continue briefing to sharpen my support.
                       </p>
                     </div>
                   )}
