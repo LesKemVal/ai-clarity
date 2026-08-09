@@ -12,6 +12,7 @@ export type OperationalFormulaOrigin =
   | 'canonical'
   | 'observed'
   | 'derived'
+  | 'hypothesis'
 
 export type OperationalParticipantRole =
   | 'user'
