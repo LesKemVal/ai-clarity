@@ -16,6 +16,8 @@ type PriorInteraction = {
 }
 
 type SignalQuestionRequest = {
+  interactionMode?: 'briefing' | 'ask_george'
+  userTurn?: string
   role?: string
   broadGoal?: string
   desiredOutcome?: string
@@ -127,6 +129,10 @@ export async function POST(req: Request) {
       skippedQuestions
     )
 
+    const interactionMode =
+      body.interactionMode === 'ask_george' ? 'ask_george' : 'briefing'
+    const userTurn = clean(body.userTurn)
+
     const knownSignal = {
       role: clean(body.role),
       broadGoal: clean(body.broadGoal),
@@ -139,6 +145,76 @@ export async function POST(req: Request) {
       priorAnswers,
       priorInteractions,
       skippedQuestions,
+    }
+
+    if (interactionMode === 'ask_george' && userTurn) {
+      if (!process.env.OPENAI_API_KEY) {
+        return NextResponse.json({
+          status: 'response',
+          interactionMode: 'ask_george',
+          response:
+            'I can answer that while preserving the current briefing question. Continue when you are ready.',
+        })
+      }
+
+      const answerCompletion = await openai.chat.completions.create({
+        model:
+          process.env.OPENAI_MODEL_INTELLIGENT ||
+          process.env.OPENAI_MODEL ||
+          'gpt-4o',
+        temperature: 0.35,
+        response_format: { type: 'json_object' },
+        messages: [
+          {
+            role: 'system',
+            content: `
+You are GEORGE, operating inside an active conversation-preparation session.
+
+The user has explicitly chosen ASK GEORGE.
+
+Answer the user's question directly from the accumulated preparation evidence and current session context.
+
+This turn is conversational assistance, not an answer to GEORGE's current briefing question.
+
+Rules:
+- Do not promote the user's question into briefing evidence.
+- Do not mark the current briefing question answered.
+- Do not replace or consume the unresolved briefing question.
+- Do not invent facts that are not supported by the accumulated evidence.
+- If the user asks what GEORGE knows, summarize only established evidence.
+- If the user asks why a briefing question matters, explain its operational value concisely.
+- If the user asks for help answering, help them reason without fabricating their answer.
+- Preserve the same GEORGE intelligence, preparation context, and session continuity.
+- Be concise and operational.
+
+Return JSON:
+{
+  "response": "GEORGE's direct response to the user"
+}
+            `.trim(),
+          },
+          {
+            role: 'user',
+            content: JSON.stringify({
+              userTurn,
+              knownSignal,
+            }),
+          },
+        ],
+      })
+
+      const answerRaw =
+        answerCompletion.choices?.[0]?.message?.content || '{}'
+      const answerParsed = JSON.parse(answerRaw)
+      const response = clean(answerParsed?.response)
+
+      return NextResponse.json({
+        status: 'response',
+        interactionMode: 'ask_george',
+        response:
+          response ||
+          'I can answer that while preserving the current briefing question.',
+      })
     }
 
     if (!process.env.OPENAI_API_KEY) {
@@ -202,11 +278,15 @@ You are GEORGE's adaptive preparation reasoning authority.
 
 The desired outcome establishes the briefing mission.
 
-Outcome clarification is one of GEORGE's first reasoning responsibilities. GEORGE should normally clarify what successful achievement of the desired outcome looks like before optimizing execution.
+Treat an explicit desiredOutcome as established current-session operational evidence. Do not ask the user to restate, rename, validate, or generically clarify an outcome they have already selected or stated.
 
-Determine the user's present intent before collecting unrelated signals. Use explicit current-session statements first, then current-session conversation evidence, then relevant history as supporting context, and general inference last. The user may have already expressed the intent or a broad outcome in knownContext; do not ask for it again merely because desiredOutcome is blank.
+Determine the user's present intent before collecting unrelated signals. Use explicit current-session statements first, then current-session conversation evidence, then relevant history as supporting context, and general inference last. The user may have already expressed the intent or outcome in desiredOutcome, broadGoal, knownContext, or priorInteractions. Reason across all of them before deciding what remains unresolved.
 
-If intent is unclear, ask one direct intent question. If intent is clear but outcome is unclear, ask one current-session outcome question. If the outcome is explicit or strongly supported, qualify the most important condition of meaningful success instead of repeating the outcome. Treat inferred outcomes as provisional until the user confirms them naturally.
+If intent or outcome is genuinely unresolved, ask the minimum direct question needed to establish it. If the intended outcome is already explicit or strongly supported, move downstream: identify the highest-value unresolved condition, obstacle, decision factor, commitment, constraint, or situational fact that could materially affect the user's ability to achieve that outcome.
+
+The next question must add operational information. It must not merely produce a more detailed wording of evidence GEORGE already has.
+
+Treat inferred outcomes as provisional until the user confirms them naturally.
 
 GEORGE selects every question as though it is the final opportunity before LIVE to materially increase the user's likelihood of achieving the desired outcome.
 
@@ -260,11 +340,14 @@ When another briefing interaction is appropriate, also generate:
 2. Why this is important
 3. Example of how to construct a strong answer
 
-The example must be a concise response formula tailored to the question, not a completed answer for the user to copy. Prefer the form: "For example: Describe X, Y, and Z."
+The example must be a concise response formula tailored to the question and the established briefing evidence, not a completed answer for the user to copy. Prefer the form: "For example: Describe X, Y, and Z."
+
+The example must help answer the new question without restating the established outcome or suggesting a different outcome. If the user has already established an outcome such as closing a sale, do not offer examples such as finalizing the deal, setting an appointment, or choosing another objective. Instead illustrate the unresolved information the question is seeking.
 
 Do not use the example or helper as interface guidance. Do not write "Answer if useful, or skip," repeat the question, or explain that the answer may improve GEORGE's context, timing, or support.
 
 Never repeat a semantically answered question.
+Never ask for elaboration merely because an established answer is broad.
 Never ask solely because information is missing.
 Do not ask about participants, role, documents, objections, timing, audience, or background until the user's intent and outcome make that signal materially useful.
 
