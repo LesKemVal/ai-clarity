@@ -130,3 +130,37 @@ npm run george:live-entry:smoke
 ```
 
 After validation, inspect `git status --short` and the complete scoped diff. Stop before commit.
+
+## Working Formula Hypothesis — Completed
+
+Validated production implementation now supports creation of a working Formula hypothesis after a genuine recommendation miss.
+
+Current behavior:
+
+- canonical retrieval and retrieval policy run first;
+- an eligible existing Formula remains preferred;
+- hypothesis synthesis requires a completed briefing and desired outcome;
+- provider reasoning returns a structured operational strategy;
+- Operational Memory materializes and persists the private candidate Formula;
+- the new Formula becomes the current working recommendation;
+- incomplete briefing does not persist a hypothesis;
+- no Script is created by the hypothesis path;
+- provider reasoning owns no Formula asset or persistence lifecycle.
+
+Validated commit:
+
+fd05d1c5 Create working formula on recommendation miss
+
+Production build and behavioral/core qualifications passed.
+
+Continue production refinement from this implementation. Inspect nearby stale branches and dead code as affected owners are touched, but remove only code proven obsolete by current ownership and reference evidence.
+
+### Candidate lifecycle distinction
+
+Do not conflate the new recommendation-miss working hypothesis with post-execution Formula derivation.
+
+The working hypothesis is created pre-execution when no existing Formula qualifies and is persisted private/candidate so execution has an exact Formula identity.
+
+A derived Formula Candidate remains a post-execution learning artifact produced through the canonical derivation path and remains subject to existing lineage and user-retention approval rules.
+
+These are complementary paths, not competing Formula owners.

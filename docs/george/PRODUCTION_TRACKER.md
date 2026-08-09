@@ -1678,7 +1678,7 @@ If operational assessment determines that success resulted from a materially dif
 
 The originating Formula remains unchanged.
 
-The Formula Candidate preserves lineage by referencing its originating Formula.
+The post-execution derived Formula Candidate preserves lineage by referencing its originating Formula.
 
 --------------------------------------------------
 SCRIPT RETENTION
@@ -1701,7 +1701,7 @@ Script ownership belongs to the user.
 FORMULA CREATION
 --------------------------------------------------
 
-A Formula Candidate becomes a Formula only after user approval.
+A post-execution derived Formula Candidate becomes a retained Formula only after user approval.
 
 Creating a new Formula does not replace the originating Formula.
 
@@ -1730,3 +1730,59 @@ Additional Formulas
 This preserves operational lineage.
 
 GEORGE grows by expanding operational strategy rather than overwriting previous operational knowledge.
+--------------------------------------------------
+WORKING FORMULA HYPOTHESIS — VALIDATED
+--------------------------------------------------
+
+Operational Formula recommendation now supports a working-hypothesis path when retrieval finds no sufficiently relevant existing Formula.
+
+Canonical flow:
+
+completed semantic briefing
+→ desired outcome remains operational authority
+→ Operational Memory retrieves and applies canonical retrieval policy
+→ sufficiently relevant existing Formula: recommend existing Formula
+→ no sufficiently relevant Formula: request governed operational-strategy synthesis
+→ materialize a personal/private candidate Formula hypothesis
+→ persist through the canonical Formula Library
+→ use that Formula as the current working recommendation
+
+The working Formula is not proven truth.
+
+It begins with candidate status, hypothesis origin, private visibility, zero samples, zero successes, and no execution evidence.
+
+The Formula is GEORGE's current operational strategy for pursuing the desired outcome and may adapt as new signal appears.
+
+Hypothesis creation requires a completed briefing and a usable desired outcome. An incomplete briefing does not persist a Formula hypothesis.
+
+OpenAI/provider reasoning synthesizes structured operational strategy. It does not own Formula assets, persistence, publication, Marketplace state, learning, or Script creation.
+
+Operational Memory remains the canonical recommendation/orchestration owner.
+
+formula-hypothesis.ts owns conversion from structured strategy reasoning into the Formula asset shape.
+
+The Formula Library remains the persistence owner.
+
+No Script is created merely because a Formula hypothesis is created. Existing active Script lookup remains downstream of Formula selection.
+
+Validated implementation commit:
+
+fd05d1c5 Create working formula on recommendation miss
+
+### Candidate distinction
+
+A pre-execution working Formula hypothesis and a post-execution derived Formula Candidate are different lifecycle events.
+
+A working Formula hypothesis exists because the current conversation requires an operational strategy and canonical retrieval found no sufficiently relevant existing Formula. GEORGE may create and persist that Formula immediately as personal, private, candidate, and unproven so the exact strategy used for execution has durable identity and can accumulate evidence.
+
+This working-hypothesis persistence does not constitute verification, publication, Marketplace listing, proof, or post-execution derivation.
+
+A post-execution derived Formula Candidate is different. It arises when execution evidence indicates that success or material operational change came from a strategy materially different from the Formula that was executed. That path preserves lineage and remains governed by the canonical derivation and user-retention doctrine.
+
+Therefore:
+
+working hypothesis = pre-execution strategy needed to operate
+
+derived Formula Candidate = post-execution proposed strategy discovered through evidence
+
+The working-hypothesis path does not replace or weaken the existing derived-Formula Candidate approval doctrine.

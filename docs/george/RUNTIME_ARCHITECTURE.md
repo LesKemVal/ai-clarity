@@ -1854,3 +1854,44 @@ OpenAI's LIVE reasoning remains within conversational execution: what GEORGE and
 
 Normal and LIVE remain modes of one intelligence. No separate runtime or separate reasoning authority is introduced.
 <!-- FORMULA_SCRIPT_EXECUTION_LEARNING_END -->
+### Working Formula Hypothesis
+
+Operational Memory may create a working Formula hypothesis when canonical retrieval produces no sufficiently relevant Formula for a completed semantic briefing.
+
+This does not create another reasoning authority or Formula owner.
+
+Canonical flow:
+
+completed briefing + desired outcome
+→ canonical Formula retrieval
+→ canonical retrieval policy
+→ qualifying Formula exists: use existing Formula
+→ no qualifying Formula: governed provider strategy synthesis
+→ Formula hypothesis materializer
+→ personal/private candidate Formula
+→ canonical Formula Library persistence
+→ current working recommendation
+
+The desired outcome remains the authority. The Formula is the current operational strategy for achieving it.
+
+Provider reasoning returns structured operational strategy only when explicitly requested by the recommendation path. Provider reasoning does not create, persist, publish, verify, commercialize, reassess, evolve, or learn Formula assets.
+
+operational-memory.ts owns recommendation orchestration and the decision to materialize a hypothesis after a true retrieval miss.
+
+formula-hypothesis.ts owns only conversion of structured strategy reasoning into the candidate Formula shape.
+
+The resulting Formula is initially unproven and may adapt as execution produces new signal and evidence.
+
+Incomplete briefing does not create a persisted Formula hypothesis.
+
+Formula creation does not imply Script creation. Script selection remains a separate downstream concern.
+
+### Working hypothesis versus derived candidate
+
+The pre-execution working Formula hypothesis is not the same lifecycle event as a post-execution derived Formula Candidate, and only the derived-candidate path is governed by the existing user-retention approval rule.
+
+Working-hypothesis creation occurs only after recommendation retrieval fails to produce a sufficiently relevant Formula and a completed briefing provides enough operational context to synthesize a strategy. The private candidate Formula is persisted before execution so the exact strategy used in the room has canonical identity.
+
+Post-execution derivation remains separate. If execution evidence indicates a materially different operational strategy, the canonical derivation path may propose a derived Formula Candidate with preserved lineage. Existing retention and approval rules continue to govern that candidate.
+
+The hypothesis materializer does not own derivation. The derivation service does not own recommendation-miss hypothesis creation.

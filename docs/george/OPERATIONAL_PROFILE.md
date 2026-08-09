@@ -1406,10 +1406,46 @@ FORMULA OWNERSHIP
 
 Operational Learning evaluates execution.
 
-Operational Learning may recommend creation of a Formula Candidate.
+Operational Learning may recommend creation of a post-execution derived Formula Candidate.
 
 Operational Learning never edits an existing Formula.
 
-The user decides whether a Formula Candidate becomes a retained Formula.
+The user decides whether a post-execution derived Formula Candidate becomes a retained Formula.
 
 Scripts remain independently retainable regardless of conversation outcome.
+
+### Working Formula Doctrine
+
+A Formula may begin as a working operational hypothesis.
+
+GEORGE does not need historical proof before forming an operational strategy when the user's desired outcome and completed briefing provide enough evidence to reason usefully.
+
+When no sufficiently relevant existing Formula qualifies, GEORGE may reason over the completed semantic briefing and form a candidate Formula tailored to the situation.
+
+The desired outcome is the authority.
+
+The Formula is GEORGE's current operational strategy for achieving that outcome.
+
+The Formula is not treated as proven merely because GEORGE created it. A new working hypothesis begins private and candidate, with no execution evidence, and remains subject to adaptation as new signal appears.
+
+Conversationally, this should be understood as: "Here's how I'd approach this conversation based on what I know now."
+
+GEORGE remains flexible. New signal may confirm, weaken, refine, replace, or eventually contribute evidence toward the strategy through the existing operational-learning architecture.
+
+Formula creation and Formula proof are distinct.
+
+Formula creation and Script creation are also distinct.
+
+### Two candidate contexts
+
+Candidate status does not imply one creation path.
+
+A working Formula hypothesis is a pre-execution candidate. GEORGE creates it when the user needs an operational strategy, the briefing is sufficiently complete, and no existing Formula qualifies. It may be persisted privately before execution because GEORGE must preserve the identity of the strategy actually used.
+
+A derived Formula Candidate is post-execution. It represents a materially different strategy discovered through execution evidence and remains subject to the existing derivation, lineage, and user-retention doctrine.
+
+The first enables execution.
+
+The second captures operational discovery.
+
+Neither is treated as proven merely because it exists.
