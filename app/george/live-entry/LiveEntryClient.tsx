@@ -5562,38 +5562,6 @@ export default function LiveEntryClient() {
       setKnownContext(value);
     };
 
-    const previousLiveUserRecognized = Boolean(
-      cleanBriefingValue(sessionEmail) ||
-      cleanBriefingValue(
-        relatedSessionId && relatedSessionId !== "not_related"
-          ? relatedSessionId
-          : "",
-      ) ||
-      cleanBriefingValue(
-        typeof window !== "undefined"
-          ? window.localStorage.getItem("george_live_previous_user")
-          : "",
-      ),
-    );
-
-    const hasSeenLiveSteering = Boolean(
-      cleanBriefingValue(
-        typeof window !== "undefined"
-          ? window.localStorage.getItem("george_live_steering_seen")
-          : "",
-      ) ||
-      cleanBriefingValue(
-        typeof window !== "undefined"
-          ? window.localStorage.getItem("george_live_entry_steering_seen")
-          : "",
-      ) ||
-      cleanBriefingValue(
-        typeof window !== "undefined"
-          ? window.localStorage.getItem(GEORGE_LIVE_RECOVERY_STORAGE_KEY)
-          : "",
-      ),
-    );
-
     const briefingPreparation = buildBriefRoomPreparation();
     const briefingUnderstandingSignals = Array.from(
       new Set(
