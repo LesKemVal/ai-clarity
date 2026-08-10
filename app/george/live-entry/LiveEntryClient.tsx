@@ -952,10 +952,10 @@ export default function LiveEntryClient() {
   const [scriptBrowserFormula, setScriptBrowserFormula] =
     useState<OperationalFormula | null>(null);
   const [scriptBrowserOpen, setScriptBrowserOpen] = useState(false);
-  const [scriptBrowserLoading, setScriptBrowserLoading] = useState(false);
-  const [formulaScripts, setFormulaScripts] = useState<OperationalScript[]>([]);
-  const [scriptBrowserError, setScriptBrowserError] = useState("");
-  const [recommendationError, setRecommendationError] = useState("");
+  const [scriptBrowserLoading] = useState(false);
+  const [formulaScripts] = useState<OperationalScript[]>([]);
+  const [scriptBrowserError] = useState("");
+  const [, setRecommendationError] = useState("");
 
   const [optionalSignalAnswers, setOptionalSignalAnswers] = useState<
     Record<string, string>
