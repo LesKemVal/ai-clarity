@@ -8,8 +8,8 @@ assert.equal(
   isStandaloneAmbiguousKnowledgeQuestion(
     'What can you tell me about dilution?'
   ),
-  true,
-  'Dilution remains a standalone definitional question by itself'
+  false,
+  'A broad knowledge request must not be promoted into the compact definitional path'
 )
 
 assert.equal(
