@@ -957,6 +957,14 @@ export default function LiveEntryClient() {
   const [scriptBrowserError, setScriptBrowserError] = useState("");
   const [recommendationError, setRecommendationError] = useState("");
 
+  const [optionalSignalAnswers, setOptionalSignalAnswers] = useState<
+    Record<string, string>
+  >({});
+  const [optionalSignalQuestionHistory, setOptionalSignalQuestionHistory] =
+    useState<Record<string, string>>({});
+  const [skippedOptionalSignalKeys, setSkippedOptionalSignalKeys] = useState<
+    string[]
+  >([]);
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -1129,11 +1137,6 @@ export default function LiveEntryClient() {
     useState("");
   const [optionalSignalInputFocused, setOptionalSignalInputFocused] =
     useState(false);
-  const [optionalSignalAnswers, setOptionalSignalAnswers] = useState<
-    Record<string, string>
-  >({});
-  const [optionalSignalQuestionHistory, setOptionalSignalQuestionHistory] =
-    useState<Record<string, string>>({});
   const [showOpenAISignalSurface, setShowOpenAISignalSurface] = useState(false);
   const [typedOptionalSignalQuestion, setTypedOptionalSignalQuestion] =
     useState("");
@@ -1147,9 +1150,6 @@ export default function LiveEntryClient() {
     } | null>(null);
   const [optionalSignalLoading, setOptionalSignalLoading] = useState(false);
   const [optionalSignalComplete, setOptionalSignalComplete] = useState(false);
-  const [skippedOptionalSignalKeys, setSkippedOptionalSignalKeys] = useState<
-    string[]
-  >([]);
   const [exampleIndex, setExampleIndex] = useState(0);
   const [preLivePreviewReady, setPreLivePreviewReady] = useState(false);
   const [liveEntryReadyMessageVisible, setLiveEntryReadyMessageVisible] =
