@@ -1137,6 +1137,20 @@ export default function LiveEntryClient() {
     useState("");
   const [optionalSignalInputFocused, setOptionalSignalInputFocused] =
     useState(false);
+  const [traditionalBriefingRoleInput, setTraditionalBriefingRoleInput] =
+    useState("");
+  const [
+    traditionalBriefingCounterpartyInput,
+    setTraditionalBriefingCounterpartyInput,
+  ] = useState("");
+  const [
+    traditionalBriefingContextInput,
+    setTraditionalBriefingContextInput,
+  ] = useState("");
+  const [
+    traditionalBriefingOutcomeInput,
+    setTraditionalBriefingOutcomeInput,
+  ] = useState("");
   const [showOpenAISignalSurface, setShowOpenAISignalSurface] = useState(false);
   const [typedOptionalSignalQuestion, setTypedOptionalSignalQuestion] =
     useState("");
@@ -1406,6 +1420,53 @@ export default function LiveEntryClient() {
     setOptionalSignalComplete(false);
   };
 
+  const traditionalBriefingParagraphActive =
+    isFreshTraditionalPreparation &&
+    showOpenAISignalSurface &&
+    !String(preLiveSignals.role || "").trim() &&
+    !String(preLiveSignals.counterparty || "").trim() &&
+    !String(preLiveSignals.conversationContext || "").trim() &&
+    !String(preLiveSignals.desiredOutcome || "").trim();
+
+  const traditionalBriefingParagraphReady =
+    traditionalBriefingRoleInput.trim().length > 0 &&
+    traditionalBriefingCounterpartyInput.trim().length > 0 &&
+    traditionalBriefingContextInput.trim().length > 0 &&
+    traditionalBriefingOutcomeInput.trim().length > 0;
+
+  const submitTraditionalBriefingParagraph = () => {
+    if (!traditionalBriefingParagraphReady) return;
+
+    const role = traditionalBriefingRoleInput.trim();
+    const counterparty = traditionalBriefingCounterpartyInput.trim();
+    const conversationContext = traditionalBriefingContextInput.trim();
+    const desiredOutcome = traditionalBriefingOutcomeInput.trim();
+
+    setPreLiveSignals((current) => ({
+      ...current,
+      role,
+      counterparty,
+      conversationContext,
+      desiredOutcome,
+    }));
+
+    setObjective(desiredOutcome);
+    setKnownContext(conversationContext);
+
+    setTraditionalBriefingRoleInput("");
+    setTraditionalBriefingCounterpartyInput("");
+    setTraditionalBriefingContextInput("");
+    setTraditionalBriefingOutcomeInput("");
+
+    setCurrentOptionalSignalQuestion(null);
+    setOptionalSignalInput("");
+    setOptionalSignalInteractionMode("briefing");
+    setOptionalGeorgeResponse("");
+    setOptionalSignalLoading(false);
+    setOptionalSignalComplete(false);
+    setLiveEntryReadyMessageVisible(false);
+  };
+
   const requestNextOptionalSignalQuestion = async (
     answers = optionalSignalAnswers,
     skipped = skippedOptionalSignalKeys,
@@ -1553,6 +1614,7 @@ export default function LiveEntryClient() {
   useEffect(() => {
     if (
       !showOpenAISignalSurface ||
+      traditionalBriefingParagraphActive ||
       liveEntryReadyMessageVisible ||
       currentOptionalSignalQuestion ||
       optionalSignalLoading ||
@@ -1562,6 +1624,7 @@ export default function LiveEntryClient() {
     void requestNextOptionalSignalQuestion();
   }, [
     showOpenAISignalSurface,
+    traditionalBriefingParagraphActive,
     liveEntryReadyMessageVisible,
     currentOptionalSignalQuestion?.key,
     optionalSignalLoading,
@@ -2812,6 +2875,10 @@ export default function LiveEntryClient() {
         setSkippedOptionalSignalKeys([]);
         setCurrentOptionalSignalQuestion(null);
         setOptionalSignalInput("");
+        setTraditionalBriefingRoleInput("");
+        setTraditionalBriefingCounterpartyInput("");
+        setTraditionalBriefingContextInput("");
+        setTraditionalBriefingOutcomeInput("");
         setOptionalSignalComplete(false);
         setShowOpenAISignalSurface(false);
         setLiveEntryReadyMessageVisible(false);
@@ -5011,6 +5078,139 @@ export default function LiveEntryClient() {
                 readinessMessage: false,
               }
             : null;
+
+  if (traditionalBriefingParagraphActive) {
+    return (
+      <main className="relative min-h-[100dvh] overflow-y-auto bg-black px-5 py-14 text-white sm:px-8 sm:py-20">
+        <div className="relative z-10 mx-auto w-full max-w-5xl">
+          <div className="mb-6 flex items-center gap-4">
+            <BxPageHeader
+              backLabel="BACK"
+              onBack={goBackFromLiveEntryQuestionSurface}
+            />
+          </div>
+
+          <section className="relative w-full overflow-hidden rounded-[28px] border border-white/[0.08] bg-[#050505] px-5 py-7 sm:px-8 sm:py-9">
+            <div className="relative z-30 mx-auto max-w-[760px]">
+              <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-white/42">
+                PREPARE WITH GEORGE
+              </div>
+
+              <h1 className="mt-5 font-mono text-[28px] font-black uppercase leading-[0.98] tracking-[-0.055em] text-white sm:text-[36px]">
+                Brief me.
+              </h1>
+
+              <p className="mt-4 max-w-[620px] text-[13px] leading-6 text-white/48">
+                Give me the first pieces of the room. I&apos;ll decide what else
+                I need to know.
+              </p>
+
+              <div className="mt-8">
+                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-white/30">
+                  Example
+                </div>
+
+                <p className="mt-4 text-[17px] leading-[2] text-white/52 sm:text-[18px]">
+                  In this conversation my role is{" "}
+                  <span className="inline rounded-[0.7rem] bg-[#4E7CFF] px-2.5 py-1.5 font-medium text-white">
+                    CEO
+                  </span>
+                  . I am speaking with{" "}
+                  <span className="inline rounded-[0.7rem] bg-[#4E7CFF] px-2.5 py-1.5 font-medium text-white">
+                    a potential investor
+                  </span>{" "}
+                  concerning{" "}
+                  <span className="inline rounded-[0.7rem] bg-[#4E7CFF] px-2.5 py-1.5 font-medium text-white">
+                    our Series A financing
+                  </span>
+                  . My goal is to{" "}
+                  <span className="inline rounded-[0.7rem] bg-[#4E7CFF] px-2.5 py-1.5 font-medium text-white">
+                    secure a second meeting and move into diligence
+                  </span>
+                  .
+                </p>
+              </div>
+
+              <div className="mt-9 border-t border-white/[0.06] pt-8">
+                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-white/36">
+                  Your briefing
+                </div>
+
+                <div className="mt-5 text-[17px] leading-[2.45] text-white/84 sm:text-[19px]">
+                  <span>In this conversation my role is </span>
+                  <input
+                    value={traditionalBriefingRoleInput}
+                    onChange={(event) =>
+                      setTraditionalBriefingRoleInput(event.target.value)
+                    }
+                    placeholder="your role"
+                    aria-label="Your role in this conversation"
+                    className="mx-1 inline-block min-w-[130px] max-w-[220px] rounded-[0.7rem] border border-[#7EA1FF]/55 bg-[#4E7CFF] px-2.5 py-1.5 align-baseline font-medium text-white outline-none placeholder:text-white/55 focus:border-white/75"
+                  />
+
+                  <span>. I am speaking with </span>
+
+                  <input
+                    value={traditionalBriefingCounterpartyInput}
+                    onChange={(event) =>
+                      setTraditionalBriefingCounterpartyInput(
+                        event.target.value,
+                      )
+                    }
+                    placeholder="who"
+                    aria-label="Who you are speaking with"
+                    className="mx-1 inline-block min-w-[150px] max-w-[250px] rounded-[0.7rem] border border-[#7EA1FF]/55 bg-[#4E7CFF] px-2.5 py-1.5 align-baseline font-medium text-white outline-none placeholder:text-white/55 focus:border-white/75"
+                  />
+
+                  <span> concerning </span>
+
+                  <input
+                    value={traditionalBriefingContextInput}
+                    onChange={(event) =>
+                      setTraditionalBriefingContextInput(event.target.value)
+                    }
+                    placeholder="the subject"
+                    aria-label="What the conversation concerns"
+                    className="mx-1 inline-block min-w-[170px] max-w-[290px] rounded-[0.7rem] border border-[#7EA1FF]/55 bg-[#4E7CFF] px-2.5 py-1.5 align-baseline font-medium text-white outline-none placeholder:text-white/55 focus:border-white/75"
+                  />
+
+                  <span>. My goal is to </span>
+
+                  <input
+                    value={traditionalBriefingOutcomeInput}
+                    onChange={(event) =>
+                      setTraditionalBriefingOutcomeInput(event.target.value)
+                    }
+                    placeholder="your goal"
+                    aria-label="Your goal for this conversation"
+                    className="mx-1 inline-block min-w-[190px] max-w-[340px] rounded-[0.7rem] border border-[#7EA1FF]/55 bg-[#4E7CFF] px-2.5 py-1.5 align-baseline font-medium text-white outline-none placeholder:text-white/55 focus:border-white/75"
+                  />
+
+                  <span>.</span>
+                </div>
+
+                <button
+                  type="button"
+                  disabled={!traditionalBriefingParagraphReady}
+                  onClick={() => {
+                    unlockLiveEntryVoice();
+                    submitTraditionalBriefingParagraph();
+                  }}
+                  className={`mt-8 w-full rounded-[14px] border px-4 py-3.5 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.18em] transition active:scale-[0.99] ${
+                    traditionalBriefingParagraphReady
+                      ? "border-[#4E7CFF]/35 bg-[#4E7CFF] text-white hover:border-[#5A84FF] hover:bg-[#5A84FF]"
+                      : "cursor-default border-white/[0.06] bg-white/[0.02] text-white/20"
+                  }`}
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    );
+  }
 
   if (liveEntryQuestionSurface) {
     return (
