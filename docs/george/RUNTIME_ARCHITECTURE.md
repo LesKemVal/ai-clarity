@@ -30,12 +30,14 @@ The implementation remains the source of truth. This document is authoritative o
 Current phase:
 
 ```text
-Production Completion — conversational preparation and session continuity
+Production Completion — product refinement over the established production and portability baseline
 ```
 
 The runtime architecture is frozen unless current implementation evidence proves a genuine architectural defect.
 
-Preparation Session route migration is product-completion work over the existing runtime. Operational Formula Experience remains an established product layer over the operational-memory and formula-intelligence architecture. Neither may create another runtime, reasoning authority, retrieval path, learning owner, conversation-type registry, or page-level intelligence.
+Current work is product refinement over the established production runtime and portability boundary. Preparation Session lifecycle work and Operational Formula Experience remain product layers over the existing runtime and operational-memory/formula-intelligence architecture. Refinement must not create another runtime, reasoning authority, retrieval path, learning owner, conversation-type registry, or page-level intelligence.
+
+Known Normal GEORGE and Resume lifecycle work remains valid, but it does not redefine the current phase as a production/portability build-out.
 
 Canonical boundaries:
 

@@ -20,19 +20,19 @@ Inspect the local implementation before changing anything. This handoff records 
 ## Current Repository State
 
 - Current branch: `conversation-summary-runtime`
-- Current HEAD: `00ba538b Complete conversational preparation and session continuity`
-- Ahead/behind `origin/conversation-summary-runtime`: ahead 17, behind 0 at synchronization start
-- Production build status: PASS after the required validation for this synchronization
-- Worktree status: implementation checkpoint committed; documentation and approved front-page UI remain the next scoped changes
-- Commit status: stopped before commit
+- Current HEAD: `2df3d23d Correct live transcript packet qualification`
+- Ahead/behind `origin/conversation-summary-runtime`: ahead 65, behind 0 at synchronization start
+- Production build status: PASS at the current refinement checkpoint after the full post-synchronization production regression/build chain; focused behavior, ownership, portability, interface-freeze, resilience, and qualification regression guards also PASS
+- Worktree status: clean at synchronization start
+- Commit status: stopped before documentation synchronization commit
 
 No recovery tag is declared for this handoff.
 
 ## Current Validated Phase
 
-GEORGE is in **Production Completion — conversational preparation and session continuity**.
+GEORGE is in **Production Completion — product refinement over the established production and portability baseline**.
 
-The Preparation Runtime is the canonical lifecycle authority. `PreparationSessionV1` is the versioned state for one preparation. Routes seed or restore the session while preserving distinct user experiences; they do not create separate runtimes or reasoning authorities.
+The production runtime, portability boundary, canonical ownership model, Preparation Runtime, operational-learning path, and Formula execution identity are established. Current work refines the existing product and its qualification surface. It is not a new production/portability trek and must not reopen completed architecture without new implementation evidence.
 
 ## Completed Preparation Runtime Milestones
 
@@ -75,20 +75,33 @@ Preparation is objective-first and conversational: required operational signals 
 
 ## Current Next Work
 
-Next implementation milestone: implement an explicit Normal GEORGE handoff and LIVE Entry hydration for the canonical Preparation Session while preserving the current Normal user flow and legacy read compatibility.
+Continue **product refinement** from the established production runtime.
 
-Smallest ordered sequence:
+Recent validated refinement includes:
 
-1. Add deliberate Normal handoff session identity and current-session preparation knowledge at the existing Normal browser-host integration boundary.
-2. Validate both `preparationSessionId` and `normalSessionId` in LIVE Entry before restoring the session; never trust storage-key existence alone.
-3. Hydrate the session and derive the existing destination and runtime outputs without changing popup flow.
-4. Add focused Normal-to-LIVE qualification.
-5. Migrate meaningful Resume eligibility and restoration.
-6. Remove legacy preparation paths only after every route migration is qualified.
-7. Introduce future Strategy transitions only through the shared Preparation Session workflow.
-8. Synchronize all four production authorities whenever these statuses change.
+- explicit working Formula synthesis after a genuine recommendation miss;
+- preservation of the distinction between pre-execution working Formula hypotheses and post-execution derived Formula Candidates;
+- recommendation status semantics distinguishing initial, confirmed, and refined;
+- distinct conversational framing for newly synthesized working Formula hypotheses;
+- removal of obsolete LIVE Entry Formula decision wiring, unused recognition/presentation state, and a redundant legacy assist calculation;
+- removal of the premature Homepage recommendation trigger while preserving the canonical mechanics-to-readiness recommendation trigger;
+- correction of optional-signal state ordering;
+- contextual-ambiguity qualification aligned with the established classifier contract without changing its runtime owner;
+- LIVE transcript-packet qualification aligned with current queued delivery-style ownership without changing its runtime owner;
+- Formula/session identity, execution/learning, Marketplace/publication, LIVE reasoning, provider degradation, reconnect ownership, runtime interface freeze, portability, and duplicate-ownership regression guards passing in the refinement review.
 
-Current product priorities that remain open include structured support-recommendation quality, Formula/Marketplace recommendation and empty states, manual Homepage → Library → Ready Room continuity, and continued progressive-disclosure polish.
+Current refinement discipline:
+
+1. Inspect the complete affected owner set before changing implementation.
+2. Verify one canonical owner before moving, deleting, or relocating behavior.
+3. Preserve specialized host boundaries such as `app/george/page.tsx`; do not convert host integration into runtime reasoning ownership.
+4. Prefer existing behavior qualifications when they already cover the behavior; add focused tests when genuinely new behavior requires them.
+5. Treat production, portability, interface-freeze, resilience, and ownership qualifications as regression guards for the established baseline.
+6. Remove stale or dead code only when current ownership and reference evidence prove it obsolete.
+7. Keep Normal GEORGE full route migration and meaningful Resume restoration as known lifecycle work without falsely declaring them the current refinement milestone.
+8. Synchronize all four production authorities as one authority set when the validated checkpoint materially changes.
+
+Current product refinement remains centered on recommendation quality, Formula/Script/Marketplace experience, preparation continuity, progressive disclosure, and removal of proven stale paths without architectural drift.
 
 ## No-Drift Discipline
 

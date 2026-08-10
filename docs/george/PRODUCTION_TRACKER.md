@@ -19,11 +19,13 @@ Read in this order:
 
 Continuation packets provide operational context only. They do not override implementation or these synchronized authorities.
 
-## Synchronized Current Status — 2026-08-07
+## Synchronized Current Status — 2026-08-10
 
 Current branch: `conversation-summary-runtime`
 
-Current validated phase: **Production Completion — conversational preparation and session continuity**.
+Current validated phase: **Production Completion — product refinement over the established production and portability baseline**.
+
+GEORGE is not returning to a production/portability build-out phase. The production runtime, portability boundary, canonical ownership model, operational-learning path, and qualification foundation are established. Current work refines the existing product and adds or corrects focused qualification where new behavior requires it.
 
 The local implementation has one GEORGE intelligence, one runtime, and one reasoning authority. The current branch preserves that architecture while completing these production behaviors:
 
@@ -54,7 +56,7 @@ The local implementation has one GEORGE intelligence, one runtime, and one reaso
 - `lib/george/live-delivery/visual-presentation-policy.ts` plans evidence-first visual stages from existing operational assessment, and `components/george/live/LiveHubVisualCueBridge.tsx` executes those plans without becoming a reasoning owner;
 - staged visual execution is cancellable, lifecycle-safe, and build-qualified by `scripts/george-live-delivery-policy-smoke.mjs`.
 
-Current qualification status: **PASS** at `2fe3cbda` after `git diff --check`, `george:documentation:qualify`, the complete production qualification chain, TypeScript, and the Next.js production build. Legacy preparation keys remain read-compatible while route migrations are incomplete.
+Current qualification status: **PASS** at `2df3d23d` after `git diff --check`, `george:documentation:qualify`, the complete production qualification chain, TypeScript, and the Next.js production build. Legacy preparation keys remain read-compatible while route migrations are incomplete.
 
 ### Route migration status
 
@@ -68,16 +70,16 @@ Current qualification status: **PASS** at `2fe3cbda` after `git diff --check`, `
 
 Strategy remains future workflow over the same Preparation Session. It must not introduce another preparation runtime or semantic layer.
 
-### Current remaining production priorities
+### Current refinement priorities
 
-1. Migrate the deliberate Normal GEORGE → LIVE handoff to the canonical Preparation Session with both `preparationSessionId` and `normalSessionId`.
-2. Add focused Normal-handoff qualification after the production migration.
-3. Implement meaningful Resume eligibility and restoration using canonical session evidence rather than storage-key existence.
-4. Retire legacy preparation compatibility only after all route migrations are validated.
-5. Integrate future Strategy transitions into the same Preparation Session lifecycle after Normal and Resume are canonical.
-6. Continue product priorities including recommendation quality, Formula/Marketplace empty states, manual Homepage → Library → Ready Room continuity, and progressive-disclosure polish.
-7. Preserve adaptive briefing and staged visual behavior through their build-gated qualifications.
-8. Keep the authority set synchronized as production behavior changes.
+1. Continue product refinement from the established runtime and canonical ownership boundaries.
+2. Preserve Preparation → recommendation → working Formula behavior and exact Formula/session identity through execution and learning.
+3. Continue recommendation quality, Formula/Marketplace behavior, manual Homepage → Library → Ready Room continuity, and progressive-disclosure refinement.
+4. Treat Normal GEORGE full route migration and meaningful Resume restoration as known lifecycle work, not as a reopened production/portability phase.
+5. Add or correct focused qualifications when new or refined behavior requires them; do not create redundant qualification surfaces when existing tests already cover the behavior.
+6. Remove stale or dead paths only after canonical ownership and live-reference inspection prove them obsolete.
+7. Preserve adaptive briefing, LIVE delivery, portability, interface-freeze, resilience, and ownership behavior through existing regression guards.
+8. Keep all four production authorities synchronized whenever observable behavior, ownership, workflow semantics, qualification, or the active checkpoint materially changes.
 
 ## Documentation Synchronization Rule
 

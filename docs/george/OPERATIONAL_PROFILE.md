@@ -25,9 +25,11 @@ docs/george/NEXT_THREAD_HANDOFF.md
 
 The implementation remains the source of truth. This document is authoritative while synchronized with the validated production runtime.
 
-## Synchronized Production Behavior — 2026-08-07
+## Synchronized Production Behavior — 2026-08-10
 
 GEORGE improves the probability of the user's desired outcome while keeping explicit user direction and agency authoritative.
+
+Current work is product refinement over the established production and portability baseline. Refinement may improve recommendation behavior, Formula and Script experience, preparation continuity, presentation, and qualification coverage, but it does not create another GEORGE, runtime, reasoning authority, behavioral authority, or canonical owner.
 
 ### Shared preparation authority with route-specific depth
 
