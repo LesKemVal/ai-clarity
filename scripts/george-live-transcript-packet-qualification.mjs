@@ -10,7 +10,7 @@ const adapter = readFileSync(
 for (const expected of [
   'const sendTranscriptPacket = (',
   "type: 'TRANSCRIPT_INPUT'",
-  'sendTranscriptPacket(next, currentContext.deliveryStyle)',
+  'sendTranscriptPacket(next, next.deliveryStyle)',
   'resolvedDeliveryStyle',
   'pendingTranscripts.push({ text: clean, isFinal, turnId, deliveryStyle: resolvedDeliveryStyle })',
 ]) {
@@ -33,8 +33,8 @@ assert.equal(
 )
 
 assert(
-  adapter.includes('sendTranscriptPacket(next, currentContext.deliveryStyle)'),
-  'Queued flush must preserve existing mutable-context delivery-style semantics in this commit'
+  adapter.includes('sendTranscriptPacket(next, next.deliveryStyle)'),
+  'Queued flush must preserve the delivery style captured with the queued transcript'
 )
 
 assert(
