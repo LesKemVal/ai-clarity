@@ -473,24 +473,24 @@ function PanelShell({
         : "border-[#AEB6FF]/[0.18]";
 
   return (
-    <main className="relative flex min-h-[100dvh] items-start justify-center overflow-y-auto bg-black px-4 py-5 text-white">
-      <div className="relative z-10 w-full max-w-[640px]">
-        <div className="mb-2 flex items-center gap-4">
+    <main className="relative flex min-h-[100dvh] items-start justify-center overflow-y-auto bg-black px-4 py-4 text-white sm:py-5">
+      <div className="relative z-10 w-full max-w-[620px]">
+        <div className="flex items-center gap-4">
           <BxPageHeader backLabel="BACK" onBack={onBack} />
         </div>
 
-        <section className="relative mt-4 w-full overflow-hidden rounded-[28px] bg-[#050505] p-5 shadow-none  sm:p-6">
+        <section className="george-motion-fade relative mt-2.5 w-full overflow-hidden rounded-[20px] border border-white/[0.045] bg-[#050505] px-4 py-4 sm:px-5 sm:py-5">
           <div className="flex items-center justify-between gap-4">
-            <div className="text-[9px] uppercase tracking-[0.32em] text-[#D7DBE4]/52">
+            <div className="text-[8px] font-semibold uppercase tracking-[0.25em] text-[#D7DBE4]/46">
               {label}
             </div>
 
-            <div className="rounded-full border border-white/[0.07] bg-white/[0.025] px-2.5 py-1 text-[9px] uppercase tracking-[0.18em] text-white/32">
-              Step {stage}
+            <div className="font-mono text-[8px] uppercase tracking-[0.16em] text-white/24">
+              {stage}/3
             </div>
           </div>
 
-          <h1 className="mt-6 max-w-[560px] text-[38px] font-black uppercase leading-[0.92] tracking-[-0.065em] text-white/96 sm:text-[48px]">
+          <h1 className="mt-3 max-w-[540px] text-[24px] font-semibold leading-[1.08] tracking-[-0.035em] text-white/92 sm:text-[28px]">
             {title}
           </h1>
 
@@ -515,10 +515,10 @@ function AwakeButton({
       type="button"
       disabled={!active}
       onClick={onClick}
-      className={`mt-5 w-full rounded-[1rem] border px-4 py-2.5 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition ${
+      className={`mt-4 w-full rounded-[12px] px-4 py-2.5 text-center text-[10px] font-semibold uppercase tracking-[0.19em] ${
         active
-          ? "border-[#4E7CFF]/55 bg-[#4E7CFF]/[0.10] text-[#D7DCFF]/90 shadow-[0_0_28px_rgba(78,124,255,0.20)] hover:bg-[#4E7CFF]/[0.15] hover:text-white active:scale-[0.98]"
-          : "cursor-default border-white/[0.055] bg-white/[0.018] text-white/20"
+          ? "george-primary-action text-white"
+          : "cursor-default border border-white/[0.055] bg-white/[0.018] text-white/20"
       }`}
     >
       {children}
@@ -702,12 +702,12 @@ export default function LiveEntryClient() {
     | "questions"
     | "popup1"
     | "brief_review"
+    | "premium_briefing"
     | "mechanics"
     | "prep";
 
   const livePreparationHistoryRef = useRef<LivePreparationWorkflowState[]>([]);
   const returnToReadyRoomAfterBriefingRef = useRef(false);
-  const returnToReadyRoomAfterMechanicsRef = useRef(false);
 
   const pushLivePreparationState = (
     state: LivePreparationWorkflowState,
@@ -822,6 +822,13 @@ export default function LiveEntryClient() {
       return;
     }
 
+    if (previous === "premium_briefing") {
+      setShowLiveBriefingRoom(false);
+      setLiveEntryReadyMessageVisible(false);
+      setShowOpenAISignalSurface(true);
+      return;
+    }
+
     if (restoreValidatedNormalOrigin()) return;
 
     if (typeof window !== "undefined" && window.history.length > 1) {
@@ -839,10 +846,14 @@ export default function LiveEntryClient() {
     | "additional"
     | "documents"
     | null
-  >("outcome");
+  >(null);
+  const [liveBriefingSignalsExpanded, setLiveBriefingSignalsExpanded] =
+    useState(false);
   const [liveRoomMoreOpen, setLiveRoomMoreOpen] = useState(false);
   const [liveBriefingToaAccepted, setLiveBriefingToaAccepted] = useState(false);
   const [liveBriefingSupportAccepted, setLiveBriefingSupportAccepted] =
+    useState(false);
+  const [supportAssessmentExplanationOpen, setSupportAssessmentExplanationOpen] =
     useState(false);
   const [liveRecoveryOptions, setLiveRecoveryOptions] = useState<
     LiveRecoveryOptionId[]
@@ -862,11 +873,7 @@ export default function LiveEntryClient() {
   const [receiverProfileConfirmed, setReceiverProfileConfirmed] =
     useState(false);
   const [liveBriefingOpenMechanicsPanel, setLiveBriefingOpenMechanicsPanel] =
-    useState<LiveMechanicsSection | null>("support");
-  const [popup3EditingMechanic, setPopup3EditingMechanic] =
     useState<LiveMechanicsSection | null>(null);
-  const [supportAssessmentExplanationOpen, setSupportAssessmentExplanationOpen] =
-    useState(false);
   const [
     liveBriefingExpandedSupportPanel,
     setLiveBriefingExpandedSupportPanel,
@@ -1130,27 +1137,6 @@ export default function LiveEntryClient() {
     {},
   );
   const [optionalSignalInput, setOptionalSignalInput] = useState("");
-  const [optionalSignalInteractionMode, setOptionalSignalInteractionMode] =
-    useState<"briefing" | "ask_george">("briefing");
-  const [optionalGeorgeResponse, setOptionalGeorgeResponse] = useState("");
-  const [typedOptionalAnswerExample, setTypedOptionalAnswerExample] =
-    useState("");
-  const [optionalSignalInputFocused, setOptionalSignalInputFocused] =
-    useState(false);
-  const [traditionalBriefingRoleInput, setTraditionalBriefingRoleInput] =
-    useState("");
-  const [
-    traditionalBriefingCounterpartyInput,
-    setTraditionalBriefingCounterpartyInput,
-  ] = useState("");
-  const [
-    traditionalBriefingContextInput,
-    setTraditionalBriefingContextInput,
-  ] = useState("");
-  const [
-    traditionalBriefingOutcomeInput,
-    setTraditionalBriefingOutcomeInput,
-  ] = useState("");
   const [showOpenAISignalSurface, setShowOpenAISignalSurface] = useState(false);
   const [typedOptionalSignalQuestion, setTypedOptionalSignalQuestion] =
     useState("");
@@ -1164,6 +1150,20 @@ export default function LiveEntryClient() {
     } | null>(null);
   const [optionalSignalLoading, setOptionalSignalLoading] = useState(false);
   const [optionalSignalComplete, setOptionalSignalComplete] = useState(false);
+  const [traditionalBriefingExamples, setTraditionalBriefingExamples] =
+    useState<string[]>([]);
+  const [
+    traditionalBriefingAskGeorgeActive,
+    setTraditionalBriefingAskGeorgeActive,
+  ] = useState(false);
+  const [
+    traditionalBriefingGeorgeResponse,
+    setTraditionalBriefingGeorgeResponse,
+  ] = useState("");
+  const [
+    traditionalBriefingExampleIndex,
+    setTraditionalBriefingExampleIndex,
+  ] = useState(0);
   const [exampleIndex, setExampleIndex] = useState(0);
   const [preLivePreviewReady, setPreLivePreviewReady] = useState(false);
   const [liveEntryReadyMessageVisible, setLiveEntryReadyMessageVisible] =
@@ -1252,39 +1252,41 @@ export default function LiveEntryClient() {
   useEffect(() => {
     if (showLiveBriefingRoom && liveBriefingStep === 3) {
       const hasCompletedSupportConfiguration = Boolean(
-        liveBriefingActiveSupportStyle &&
-          receiverProfileConfirmed &&
-          liveBriefingCommunicationConfirmed &&
+        (liveBriefingActiveSupportStyle || selectedSupportStyle) &&
+          selectedReceiverProfile &&
+          String(communicationStyle || "").trim() &&
           (liveEntryRoute === "homepage" || liveRecoveryAcknowledged),
       );
-      const hasConfirmedSupportAssessment =
-        liveEntryRoute === "homepage"
-          ? hasCompletedSupportConfiguration && liveBriefingSupportAccepted
-          : hasCompletedSupportConfiguration;
 
-      setLivePrepOpenSection((current) =>
-        hasConfirmedSupportAssessment
-          ? current === "ready"
-            ? "ready"
-            : "formula"
-          : "support",
-      );
+      setLivePrepOpenSection((current) => {
+        if (!hasCompletedSupportConfiguration) {
+          return "support";
+        }
+
+        if (current === "ready") {
+          return "ready";
+        }
+
+        return "formula";
+      });
+
       if (liveEntryRoute !== "homepage") {
         setLiveBriefingSupportAccepted(hasCompletedSupportConfiguration);
       } else if (!hasCompletedSupportConfiguration) {
         setLiveBriefingSupportAccepted(false);
       }
+
       setReadyRoomTypedPrompt("");
       setReadyRoomPromptComplete(false);
     }
   }, [
+    communicationStyle,
     liveBriefingActiveSupportStyle,
-    liveBriefingCommunicationConfirmed,
-    liveBriefingSupportAccepted,
     liveBriefingStep,
     liveEntryRoute,
     liveRecoveryAcknowledged,
-    receiverProfileConfirmed,
+    selectedReceiverProfile,
+    selectedSupportStyle,
     showLiveBriefingRoom,
   ]);
 
@@ -1414,57 +1416,175 @@ export default function LiveEntryClient() {
     setLiveEntryReadyMessageVisible(false);
     setCurrentOptionalSignalQuestion(null);
     setOptionalSignalInput("");
-    setOptionalSignalInteractionMode("briefing");
-    setOptionalGeorgeResponse("");
     setOptionalSignalLoading(false);
     setOptionalSignalComplete(false);
   };
 
-  const traditionalBriefingParagraphActive =
-    isFreshTraditionalPreparation &&
-    showOpenAISignalSurface &&
-    !String(preLiveSignals.role || "").trim() &&
-    !String(preLiveSignals.counterparty || "").trim() &&
-    !String(preLiveSignals.conversationContext || "").trim() &&
-    !String(preLiveSignals.desiredOutcome || "").trim();
+  const traditionalBriefingCoreQuestions = [
+    {
+      key: "clarify_desiredOutcome",
+      label: "Goal",
+      question: "What are you trying to accomplish in this conversation?",
+    },
+    {
+      key: "clarify_role",
+      label: "Role",
+      question: "What is your role in this conversation?",
+    },
+    {
+      key: "clarify_audience",
+      label: "Speaking with",
+      question: "Who are you speaking with?",
+    },
+  ] as const;
 
-  const traditionalBriefingParagraphReady =
-    traditionalBriefingRoleInput.trim().length > 0 &&
-    traditionalBriefingCounterpartyInput.trim().length > 0 &&
-    traditionalBriefingContextInput.trim().length > 0 &&
-    traditionalBriefingOutcomeInput.trim().length > 0;
+  const loadTraditionalBriefingExamples = async (
+    question: {
+      key: string;
+      label: string;
+      question: string;
+    },
+    answers: Record<string, string> = optionalSignalAnswers,
+  ) => {
+    setTraditionalBriefingExampleIndex(0);
 
-  const submitTraditionalBriefingParagraph = () => {
-    if (!traditionalBriefingParagraphReady) return;
+    // The first question has no user signal yet.
+    if (
+      question.key === "clarify_desiredOutcome" &&
+      Object.keys(answers).length === 0
+    ) {
+      setTraditionalBriefingExamples([
+        "I want to get the job.",
+        "I want to negotiate better terms.",
+        "I want to resolve the disagreement.",
+      ]);
+      return;
+    }
 
-    const role = traditionalBriefingRoleInput.trim();
-    const counterparty = traditionalBriefingCounterpartyInput.trim();
-    const conversationContext = traditionalBriefingContextInput.trim();
-    const desiredOutcome = traditionalBriefingOutcomeInput.trim();
+    try {
+      const answeredQuestionKeys = new Set(Object.keys(answers));
+      const priorInteractions = [
+        ...Object.entries(answers).map(([key, answer]) => ({
+          key,
+          question: optionalSignalQuestionHistory[key] || "",
+          answer: String(answer || "").trim(),
+          status: "answered" as const,
+        })),
+        ...Array.from(new Set(skippedOptionalSignalKeys))
+          .filter((key) => !answeredQuestionKeys.has(key))
+          .map((key) => ({
+            key,
+            question: optionalSignalQuestionHistory[key] || "",
+            answer: "",
+            status: "skipped" as const,
+          })),
+      ];
 
-    setPreLiveSignals((current) => ({
+      const response = await fetch("/api/george/live/signal-question", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          interactionMode: "briefing_examples",
+          userTurn: question.question,
+          role:
+            preLiveSignals.role ||
+            chairs.join(", ") ||
+            customChair ||
+            userPosition,
+          broadGoal: preLiveSignals.broadGoal || "",
+          desiredOutcome:
+            answers.clarify_desiredOutcome ||
+            preLiveSignals.desiredOutcome ||
+            objective,
+          acceptableOutcome: preLiveSignals.acceptableOutcome || "",
+          audience:
+            answers.clarify_audience ||
+            preLiveSignals.counterparty ||
+            audienceType,
+          room:
+            conversationType === "Other"
+              ? customConversationType
+              : conversationType,
+          knownContext:
+            answers.clarify_knownContext ||
+            preLiveSignals.conversationContext ||
+            knownContext,
+          documentSummary: prepDocument?.summary || "",
+          priorAnswers: answers,
+          priorInteractions,
+          skippedQuestions: skippedOptionalSignalKeys,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      const keyedExample =
+        data?.examples && !Array.isArray(data.examples)
+          ? question.key === "clarify_role"
+            ? data.examples.role
+            : question.key === "clarify_audience"
+              ? data.examples.counterparty
+              : question.key === "clarify_knownContext"
+                ? data.examples.context
+                : ""
+          : "";
+
+      const rawExamples = Array.isArray(data?.examples)
+        ? data.examples
+        : typeof keyedExample === "string" && keyedExample.trim()
+          ? [keyedExample]
+          : Array.isArray(data?.likelyAnswers)
+            ? data.likelyAnswers
+            : typeof data?.example === "string"
+              ? [data.example]
+              : typeof data?.response === "string"
+                ? data.response
+                    .split("\n")
+                    .map((line: string) =>
+                      line.replace(/^[-*•\d.)\s]+/, "").trim(),
+                    )
+                    .filter(Boolean)
+                : [];
+
+      const cleanExamples = rawExamples
+        .map((value: unknown) => String(value || "").trim())
+        .filter(Boolean)
+        .slice(0, 4);
+
+      setTraditionalBriefingExamples(cleanExamples);
+    } catch {
+      // Examples are assistive presentation only.
+      // Failure must never interrupt briefing or LIVE access.
+      setTraditionalBriefingExamples([]);
+    }
+  };
+
+  const beginTraditionalSequentialBriefing = () => {
+    const firstQuestion = traditionalBriefingCoreQuestions.find(
+      (question) => !optionalSignalAnswers[question.key],
+    );
+
+    if (!firstQuestion) {
+      returnToLiveEntryReadiness();
+      return;
+    }
+
+    const nextQuestion = {
+      ...firstQuestion,
+      why: "",
+      example: "",
+    };
+
+    setCurrentOptionalSignalQuestion(nextQuestion);
+    setOptionalSignalQuestionHistory((current) => ({
       ...current,
-      role,
-      counterparty,
-      conversationContext,
-      desiredOutcome,
+      [nextQuestion.key]:
+        current[nextQuestion.key] || nextQuestion.question,
     }));
-
-    setObjective(desiredOutcome);
-    setKnownContext(conversationContext);
-
-    setTraditionalBriefingRoleInput("");
-    setTraditionalBriefingCounterpartyInput("");
-    setTraditionalBriefingContextInput("");
-    setTraditionalBriefingOutcomeInput("");
-
-    setCurrentOptionalSignalQuestion(null);
     setOptionalSignalInput("");
-    setOptionalSignalInteractionMode("briefing");
-    setOptionalGeorgeResponse("");
     setOptionalSignalLoading(false);
     setOptionalSignalComplete(false);
-    setLiveEntryReadyMessageVisible(false);
+    void loadTraditionalBriefingExamples(nextQuestion);
   };
 
   const requestNextOptionalSignalQuestion = async (
@@ -1545,6 +1665,22 @@ export default function LiveEntryClient() {
         [nextQuestion.key]:
           current[nextQuestion.key] || nextQuestion.question,
       }));
+
+      const responseExamples = Array.isArray(data?.examples)
+        ? data.examples
+            .map((value: unknown) => String(value || "").trim())
+            .filter(Boolean)
+            .slice(0, 4)
+        : typeof data?.example === "string" && data.example.trim()
+          ? [data.example.trim()]
+          : [];
+
+      if (responseExamples.length > 0) {
+        setTraditionalBriefingExamples(responseExamples);
+        setTraditionalBriefingExampleIndex(0);
+      } else {
+        void loadTraditionalBriefingExamples(nextQuestion, answers);
+      }
     } catch {
       const fallbackQuestion = {
         key: `fallback_${Date.now()}`,
@@ -1565,66 +1701,34 @@ export default function LiveEntryClient() {
     }
   };
 
-  const optionalAnswerExamples = currentOptionalSignalQuestion?.example
-    ? [currentOptionalSignalQuestion.example]
-    : [
-        "E.g. They may push back on valuation.",
-        "E.g. I need GEORGE to keep me calm and concise.",
-        "E.g. They may ask for proof, traction, or timing.",
-      ];
-
-  const currentOptionalAnswerExample =
-    optionalAnswerExamples[exampleIndex % optionalAnswerExamples.length];
-
-  useEffect(() => {
-    if (optionalSignalInput.trim() || optionalSignalInputFocused) {
-      setTypedOptionalAnswerExample("");
-      return;
-    }
-
-    setTypedOptionalAnswerExample("");
-    let index = 0;
-    const timer = window.setInterval(() => {
-      index += 1;
-      setTypedOptionalAnswerExample(
-        currentOptionalAnswerExample.slice(0, index),
-      );
-
-      if (index >= currentOptionalAnswerExample.length) {
-        window.clearInterval(timer);
-      }
-    }, 18);
-
-    return () => window.clearInterval(timer);
-  }, [
-    currentOptionalAnswerExample,
-    optionalSignalInput,
-    optionalSignalInputFocused,
-  ]);
-
-  const hasGeorgeSurfaceSignals = Object.keys(preLiveSignals).length > 0;
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setExampleIndex((index) => index + 1);
-    }, 3000);
-
-    return () => window.clearInterval(timer);
-  }, []);
-
   useEffect(() => {
     if (
       !showOpenAISignalSurface ||
-      traditionalBriefingParagraphActive ||
+      !isFreshTraditionalPreparation ||
       liveEntryReadyMessageVisible ||
       currentOptionalSignalQuestion ||
       optionalSignalLoading ||
       optionalSignalComplete
-    )
+    ) {
       return;
-    void requestNextOptionalSignalQuestion();
+    }
+
+    const hasAnyTraditionalBriefingSignal =
+      Boolean(String(preLiveSignals.desiredOutcome || "").trim()) ||
+      Boolean(String(preLiveSignals.role || "").trim()) ||
+      Boolean(String(preLiveSignals.counterparty || "").trim()) ||
+      Boolean(String(preLiveSignals.conversationContext || "").trim()) ||
+      Object.keys(optionalSignalAnswers).length > 0;
+
+    if (!hasAnyTraditionalBriefingSignal) {
+      beginTraditionalSequentialBriefing();
+      return;
+    }
+
+    returnToLiveEntryReadiness();
   }, [
     showOpenAISignalSurface,
-    traditionalBriefingParagraphActive,
+    isFreshTraditionalPreparation,
     liveEntryReadyMessageVisible,
     currentOptionalSignalQuestion?.key,
     optionalSignalLoading,
@@ -1653,82 +1757,118 @@ export default function LiveEntryClient() {
     return () => window.clearInterval(timer);
   }, [currentOptionalSignalQuestion?.key]);
 
+  useEffect(() => {
+    if (traditionalBriefingExamples.length <= 1) {
+      setTraditionalBriefingExampleIndex(0);
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setTraditionalBriefingExampleIndex(
+        (current) =>
+          (current + 1) % traditionalBriefingExamples.length,
+      );
+    }, 2600);
+
+    return () => window.clearInterval(timer);
+  }, [
+    currentOptionalSignalQuestion?.key,
+    traditionalBriefingExamples,
+  ]);
+
+  const submitTraditionalAskGeorge = async () => {
+    if (!currentOptionalSignalQuestion) return false;
+
+    const userTurn = optionalSignalInput.trim();
+    if (!userTurn) return false;
+
+    const answeredQuestionKeys = new Set(
+      Object.keys(optionalSignalAnswers),
+    );
+
+    const priorInteractions = [
+      ...Object.entries(optionalSignalAnswers).map(([key, answer]) => ({
+        key,
+        question: optionalSignalQuestionHistory[key] || "",
+        answer: String(answer || "").trim(),
+        status: "answered" as const,
+      })),
+      ...Array.from(new Set(skippedOptionalSignalKeys))
+        .filter((key) => !answeredQuestionKeys.has(key))
+        .map((key) => ({
+          key,
+          question: optionalSignalQuestionHistory[key] || "",
+          answer: "",
+          status: "skipped" as const,
+        })),
+    ];
+
+    setOptionalSignalLoading(true);
+    setTraditionalBriefingGeorgeResponse("");
+
+    try {
+      const response = await fetch("/api/george/live/signal-question", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          interactionMode: "ask_george",
+          userTurn,
+          role:
+            preLiveSignals.role ||
+            chairs.join(", ") ||
+            customChair ||
+            userPosition,
+          broadGoal: preLiveSignals.broadGoal || "",
+          desiredOutcome:
+            preLiveSignals.desiredOutcome ||
+            optionalSignalAnswers.clarify_desiredOutcome ||
+            objective,
+          acceptableOutcome: preLiveSignals.acceptableOutcome || "",
+          audience:
+            preLiveSignals.counterparty ||
+            optionalSignalAnswers.clarify_audience ||
+            audienceType,
+          room:
+            conversationType === "Other"
+              ? customConversationType
+              : conversationType,
+          knownContext:
+            preLiveSignals.conversationContext ||
+            knownContext,
+          documentSummary: prepDocument?.summary || "",
+          priorAnswers: optionalSignalAnswers,
+          priorInteractions,
+          skippedQuestions: skippedOptionalSignalKeys,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      setTraditionalBriefingGeorgeResponse(
+        String(data?.response || "").trim() ||
+          "I can help with that while keeping this briefing question open.",
+      );
+
+      setOptionalSignalInput("");
+      return true;
+    } catch {
+      setTraditionalBriefingGeorgeResponse(
+        "I couldn't answer that just now. I still have the current briefing question ready.",
+      );
+      return false;
+    } finally {
+      setOptionalSignalLoading(false);
+    }
+  };
+
   const submitOptionalSignalAnswer = async () => {
     if (!currentOptionalSignalQuestion) return false;
 
     const answer = optionalSignalInput.trim();
     if (!answer) return false;
 
-    if (optionalSignalInteractionMode === "ask_george") {
-      const answeredQuestionKeys = new Set(
-        Object.keys(optionalSignalAnswers),
-      );
-      const priorInteractions = [
-        ...Object.entries(optionalSignalAnswers).map(([key, value]) => ({
-          key,
-          question: optionalSignalQuestionHistory[key] || "",
-          answer: String(value || "").trim(),
-          status: "answered" as const,
-        })),
-        ...Array.from(new Set(skippedOptionalSignalKeys))
-          .filter((key) => !answeredQuestionKeys.has(key))
-          .map((key) => ({
-            key,
-            question: optionalSignalQuestionHistory[key] || "",
-            answer: "",
-            status: "skipped" as const,
-          })),
-      ];
-
-      setOptionalSignalLoading(true);
-      setOptionalGeorgeResponse("");
-
-      try {
-        const response = await fetch("/api/george/live/signal-question", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            interactionMode: "ask_george",
-            userTurn: answer,
-            role:
-              preLiveSignals.role ||
-              chairs.join(", ") ||
-              customChair ||
-              userPosition,
-            broadGoal: preLiveSignals.broadGoal || "",
-            desiredOutcome: preLiveSignals.desiredOutcome || objective,
-            acceptableOutcome: preLiveSignals.acceptableOutcome || "",
-            audience: preLiveSignals.counterparty || audienceType,
-            room:
-              conversationType === "Other"
-                ? customConversationType
-                : conversationType,
-            knownContext,
-            documentSummary: prepDocument?.summary || "",
-            priorAnswers: optionalSignalAnswers,
-            priorInteractions,
-            skippedQuestions: skippedOptionalSignalKeys,
-          }),
-        });
-
-        const data = await response.json().catch(() => ({}));
-
-        setOptionalGeorgeResponse(
-          String(data?.response || "").trim() ||
-            "I can answer that while preserving the current briefing question.",
-        );
-        setOptionalSignalInput("");
-        setOptionalSignalInteractionMode("briefing");
-      } catch {
-        setOptionalGeorgeResponse(
-          "I couldn't answer that just now. The current briefing question is still here.",
-        );
-      } finally {
-        setOptionalSignalLoading(false);
-      }
-
-      return true;
-    }
+    setTraditionalBriefingAskGeorgeActive(false);
+    setTraditionalBriefingGeorgeResponse("");
 
     const nextAnswers = {
       ...optionalSignalAnswers,
@@ -1746,8 +1886,6 @@ export default function LiveEntryClient() {
     });
 
     setOptionalSignalInput("");
-    setOptionalSignalInteractionMode("briefing");
-    setOptionalGeorgeResponse("");
 
     try {
       window.localStorage.setItem(
@@ -1755,6 +1893,45 @@ export default function LiveEntryClient() {
         JSON.stringify(nextAnswers),
       );
     } catch {}
+
+    if (isFreshTraditionalPreparation) {
+      const clarificationKey = currentOptionalSignalQuestion.key;
+
+      if (clarificationKey === "clarify_role") {
+        setPreLiveSignals((current) => ({
+          ...current,
+          role: answer,
+        }));
+      } else if (clarificationKey === "clarify_audience") {
+        setPreLiveSignals((current) => ({
+          ...current,
+          counterparty: answer,
+        }));
+      } else if (clarificationKey === "clarify_knownContext") {
+        setPreLiveSignals((current) => ({
+          ...current,
+          conversationContext: answer,
+        }));
+        setKnownContext(answer);
+      } else if (clarificationKey === "clarify_desiredOutcome") {
+        setPreLiveSignals((current) => ({
+          ...current,
+          desiredOutcome: answer,
+        }));
+        setObjective(answer);
+      }
+
+      setCurrentOptionalSignalQuestion(null);
+      setTraditionalBriefingExamples([]);
+      setTraditionalBriefingExampleIndex(0);
+      setOptionalSignalComplete(false);
+
+      await requestNextOptionalSignalQuestion(
+        nextAnswers,
+        skippedOptionalSignalKeys,
+      );
+      return true;
+    }
 
     returnToLiveEntryReadiness();
     return true;
@@ -1769,8 +1946,6 @@ export default function LiveEntryClient() {
     ];
     setSkippedOptionalSignalKeys(nextSkipped);
     setOptionalSignalInput("");
-    setOptionalSignalInteractionMode("briefing");
-    setOptionalGeorgeResponse("");
     returnToLiveEntryReadiness();
   };
 
@@ -1868,8 +2043,7 @@ export default function LiveEntryClient() {
           phase: liveEntryReadyMessageVisible ? "decision" : "questions",
         };
     const returnCheckpoint: PreparationCheckpoint | undefined =
-      returnToReadyRoomAfterBriefingRef.current ||
-      returnToReadyRoomAfterMechanicsRef.current
+      returnToReadyRoomAfterBriefingRef.current
         ? { surface: "ready_room", phase: "readiness" }
         : undefined;
     const steeringPhrases = useRoomPhrases
@@ -2875,10 +3049,6 @@ export default function LiveEntryClient() {
         setSkippedOptionalSignalKeys([]);
         setCurrentOptionalSignalQuestion(null);
         setOptionalSignalInput("");
-        setTraditionalBriefingRoleInput("");
-        setTraditionalBriefingCounterpartyInput("");
-        setTraditionalBriefingContextInput("");
-        setTraditionalBriefingOutcomeInput("");
         setOptionalSignalComplete(false);
         setShowOpenAISignalSurface(false);
         setLiveEntryReadyMessageVisible(false);
@@ -3332,7 +3502,6 @@ export default function LiveEntryClient() {
 
         window.localStorage.removeItem("GEORGE_HOMEPAGE_LIVE_HANDOFF");
       } else if (entryResolution.firstStep === "mechanics") {
-        returnToReadyRoomAfterMechanicsRef.current = false;
         setPreLiveSignals(acquiredSignalsForAccess);
         setLiveEntryReadyMessageVisible(false);
         setShowOpenAISignalSurface(false);
@@ -4984,420 +5153,304 @@ export default function LiveEntryClient() {
   };
 
   const enterLiveFromBriefingSurface = () => {
+    // If briefing was opened from Ready Room, the user has already
+    // completed the Traditional popup sequence. Enter LIVE from there.
     if (returnToReadyRoomAfterBriefingRef.current) {
       returnToReadyRoomAfterBriefingRef.current = false;
       startLive(false, editableResources, true);
       return;
     }
 
+    // Initial Traditional briefing does not own LIVE execution.
+    // Hand back to the established Traditional preparation route:
+    // Popup 1 -> Popup 2 Mechanics -> Popup 3 Ready Room.
     setShowOpenAISignalSurface(false);
     setLiveEntryReadyMessageVisible(false);
     setCurrentOptionalSignalQuestion(null);
     setOptionalSignalLoading(false);
+    setOptionalSignalComplete(true);
+
     livePreparationHistoryRef.current = ["questions"];
+
     setShowLiveBriefingRoom(true);
     setLiveBriefingStep(1);
   };
 
-  const liveEntryQuestionSurface =
-    showOpenAISignalSurface && liveEntryReadyMessageVisible
-        ? {
-            kicker: canonicalPreparationReadiness.thresholdMet
-              ? "LIVE READY"
-              : "LIVE AVAILABLE",
-            label: canonicalPreparationReadiness.thresholdMet
-              ? "Minimum signal acquired"
-              : "Preparation in progress",
-            headline: canonicalPreparationReadiness.thresholdMet
-              ? "You're ready for LIVE."
-              : "LIVE is available.",
-            question: canonicalPreparationReadiness.thresholdMet
-              ? "You're ready for LIVE.\n\nI have enough information to begin supporting you.\n\nAdditional briefing can make my guidance more specific as I learn more about the room."
-              : "Continue preparing, or review the briefing before entering LIVE.\n\nAdditional briefing can make my guidance more specific as I learn more about the room.",
-            helper: nextBriefingBenefit,
-            example: "",
-            inputValue: "",
-            setInputValue: () => {},
-            submit: () => {
-              setLiveEntryReadyMessageVisible(false);
-              void requestNextOptionalSignalQuestion();
-              return true;
-            },
-            loading: false,
-            step: "Ready",
-            primaryAction: "Continue Briefing",
-            liveAvailable: true,
-            readinessMessage: true,
-          }
-        : showOpenAISignalSurface && currentOptionalSignalQuestion
-          ? {
-              kicker: "ADDITIONAL SIGNAL",
-              label: currentOptionalSignalQuestion.label || "Optional signal",
-              headline: canonicalPreparationReadiness.thresholdMet
-                ? "I have enough signal."
-                : "Bring me up to speed.",
-              question: typedOptionalSignalQuestion,
-              helper:
-                optionalSignalInteractionMode === "ask_george"
-                  ? "Ask GEORGE without changing or answering the current briefing question."
-                  : currentOptionalSignalQuestion.why,
-              example:
-                optionalSignalInteractionMode === "ask_george"
-                  ? ""
-                  : currentOptionalSignalQuestion.example,
-              inputValue: optionalSignalInput,
-              setInputValue: setOptionalSignalInput,
-              submit: submitOptionalSignalAnswer,
-              loading: false,
-              step: "Optional",
-              primaryAction:
-                optionalSignalInteractionMode === "ask_george"
-                  ? "Ask GEORGE"
-                  : "Continue preparing",
-              liveAvailable: true,
-              readinessMessage: false,
-            }
-          : showOpenAISignalSurface && optionalSignalLoading
-            ? {
-                kicker: "ADDITIONAL SIGNAL",
-                label: "I’m determining the next useful signal",
-                headline: canonicalPreparationReadiness.thresholdMet
-                  ? "I have enough signal."
-                  : "Bring me up to speed.",
-                question: "One moment.",
-                helper:
-                  "I’m reasoning over the room signal to sharpen my support.",
-                example: "",
-                inputValue: "",
-                setInputValue: () => {},
-                submit: () => false,
-                loading: true,
-                step: "Optional",
-                primaryAction: "Continue",
-                liveAvailable: true,
-                readinessMessage: false,
-              }
-            : null;
+  if (showOpenAISignalSurface) {
+    const briefingSignalLabel = (key: string) => {
+      const normalized = key.toLowerCase();
 
-  if (traditionalBriefingParagraphActive) {
+      if (
+        normalized === "clarify_desiredoutcome" ||
+        normalized === "desiredoutcome" ||
+        normalized === "intent"
+      ) {
+        return "Goal";
+      }
+
+      if (
+        normalized === "clarify_role" ||
+        normalized.includes("role") ||
+        normalized.includes("position")
+      ) {
+        return "Role";
+      }
+
+      if (
+        normalized === "clarify_audience" ||
+        normalized.includes("audience") ||
+        normalized.includes("counterparty") ||
+        normalized.includes("decisionmaker")
+      ) {
+        return "Speaking with";
+      }
+
+      if (
+        normalized === "clarify_knowncontext" ||
+        normalized.includes("context")
+      ) {
+        return "Context";
+      }
+
+      if (
+        normalized.includes("success") ||
+        normalized.includes("condition")
+      ) {
+        return "Success";
+      }
+
+      return key
+        .replace(/^signal_\d+$/, "Additional signal")
+        .replace(/[_-]+/g, " ")
+        .replace(/([a-z])([A-Z])/g, "$1 $2")
+        .replace(/\b\w/g, (character) => character.toUpperCase());
+    };
+
+    const compactBriefingSignalValue = (value: string) => {
+      const compact = value
+        .trim()
+        .replace(/^i(?:'m| am)\s+/i, "")
+        .replace(/^i want to\s+/i, "")
+        .replace(/^i'm looking to\s+/i, "");
+
+      if (compact.length <= 34) return compact;
+
+      return `${compact.slice(0, 31).trimEnd()}…`;
+    };
+
+    const completedTraditionalSignals = Object.entries(
+      optionalSignalAnswers,
+    )
+      .map(([key, value]) => {
+        const answer = String(value || "").trim();
+
+        if (!answer) return null;
+
+        return {
+          key,
+          label: briefingSignalLabel(key),
+          answer: compactBriefingSignalValue(answer),
+          fullAnswer: answer,
+        };
+      })
+      .filter((signal) => signal !== null);
+
+    const briefingSummary = [
+      optionalSignalAnswers.clarify_desiredOutcome
+        ? `I'm looking to ${String(
+            optionalSignalAnswers.clarify_desiredOutcome,
+          ).replace(/[.]+$/, "")}.`
+        : "",
+      optionalSignalAnswers.clarify_role
+        ? `In this conversation I am ${String(
+            optionalSignalAnswers.clarify_role,
+          ).replace(/[.]+$/, "")}.`
+        : "",
+      optionalSignalAnswers.clarify_audience
+        ? `I'm speaking with ${String(
+            optionalSignalAnswers.clarify_audience,
+          ).replace(/[.]+$/, "")}.`
+        : "",
+      optionalSignalAnswers.clarify_knownContext
+        ? `The conversation is about ${String(
+            optionalSignalAnswers.clarify_knownContext,
+          ).replace(/[.]+$/, "")}.`
+        : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
     return (
-      <main className="relative min-h-[100dvh] overflow-y-auto bg-black px-5 py-14 text-white sm:px-8 sm:py-20">
-        <div className="relative z-10 mx-auto w-full max-w-5xl">
-          <div className="mb-6 flex items-center gap-4">
+      <main className="relative min-h-[100dvh] overflow-y-auto bg-black px-5 py-10 text-white sm:px-8 sm:py-14">
+        <div className="relative z-10 mx-auto w-full max-w-[760px]">
+          <div className="flex items-center">
             <BxPageHeader
               backLabel="BACK"
               onBack={goBackFromLiveEntryQuestionSurface}
             />
           </div>
 
-          <section className="relative w-full overflow-hidden rounded-[28px] border border-white/[0.08] bg-[#050505] px-5 py-7 sm:px-8 sm:py-9">
-            <div className="relative z-30 mx-auto max-w-[760px]">
-              <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-white/42">
-                PREPARE WITH GEORGE
-              </div>
-
-              <h1 className="mt-5 font-mono text-[28px] font-black uppercase leading-[0.98] tracking-[-0.055em] text-white sm:text-[36px]">
-                Brief me.
-              </h1>
-
-              <p className="mt-4 max-w-[620px] text-[13px] leading-6 text-white/48">
-                Give me the first pieces of the room. I&apos;ll decide what else
-                I need to know.
-              </p>
-
-              <div className="mt-8">
-                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-white/30">
-                  Example
-                </div>
-
-                <p className="mt-4 text-[17px] leading-[2] text-white/52 sm:text-[18px]">
-                  In this conversation my role is{" "}
-                  <span className="inline rounded-[0.7rem] bg-[#4E7CFF] px-2.5 py-1.5 font-medium text-white">
-                    CEO
-                  </span>
-                  . I am speaking with{" "}
-                  <span className="inline rounded-[0.7rem] bg-[#4E7CFF] px-2.5 py-1.5 font-medium text-white">
-                    a potential investor
-                  </span>{" "}
-                  concerning{" "}
-                  <span className="inline rounded-[0.7rem] bg-[#4E7CFF] px-2.5 py-1.5 font-medium text-white">
-                    our Series A financing
-                  </span>
-                  . My goal is to{" "}
-                  <span className="inline rounded-[0.7rem] bg-[#4E7CFF] px-2.5 py-1.5 font-medium text-white">
-                    secure a second meeting and move into diligence
-                  </span>
-                  .
-                </p>
-              </div>
-
-              <div className="mt-9 border-t border-white/[0.06] pt-8">
-                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-white/36">
-                  Your briefing
-                </div>
-
-                <div className="mt-5 text-[17px] leading-[2.45] text-white/84 sm:text-[19px]">
-                  <span>In this conversation my role is </span>
-                  <input
-                    value={traditionalBriefingRoleInput}
-                    onChange={(event) =>
-                      setTraditionalBriefingRoleInput(event.target.value)
-                    }
-                    placeholder="your role"
-                    aria-label="Your role in this conversation"
-                    className="mx-1 inline-block min-w-[130px] max-w-[220px] rounded-[0.7rem] border border-[#7EA1FF]/55 bg-[#4E7CFF] px-2.5 py-1.5 align-baseline font-medium text-white outline-none placeholder:text-white/55 focus:border-white/75"
-                  />
-
-                  <span>. I am speaking with </span>
-
-                  <input
-                    value={traditionalBriefingCounterpartyInput}
-                    onChange={(event) =>
-                      setTraditionalBriefingCounterpartyInput(
-                        event.target.value,
-                      )
-                    }
-                    placeholder="who"
-                    aria-label="Who you are speaking with"
-                    className="mx-1 inline-block min-w-[150px] max-w-[250px] rounded-[0.7rem] border border-[#7EA1FF]/55 bg-[#4E7CFF] px-2.5 py-1.5 align-baseline font-medium text-white outline-none placeholder:text-white/55 focus:border-white/75"
-                  />
-
-                  <span> concerning </span>
-
-                  <input
-                    value={traditionalBriefingContextInput}
-                    onChange={(event) =>
-                      setTraditionalBriefingContextInput(event.target.value)
-                    }
-                    placeholder="the subject"
-                    aria-label="What the conversation concerns"
-                    className="mx-1 inline-block min-w-[170px] max-w-[290px] rounded-[0.7rem] border border-[#7EA1FF]/55 bg-[#4E7CFF] px-2.5 py-1.5 align-baseline font-medium text-white outline-none placeholder:text-white/55 focus:border-white/75"
-                  />
-
-                  <span>. My goal is to </span>
-
-                  <input
-                    value={traditionalBriefingOutcomeInput}
-                    onChange={(event) =>
-                      setTraditionalBriefingOutcomeInput(event.target.value)
-                    }
-                    placeholder="your goal"
-                    aria-label="Your goal for this conversation"
-                    className="mx-1 inline-block min-w-[190px] max-w-[340px] rounded-[0.7rem] border border-[#7EA1FF]/55 bg-[#4E7CFF] px-2.5 py-1.5 align-baseline font-medium text-white outline-none placeholder:text-white/55 focus:border-white/75"
-                  />
-
-                  <span>.</span>
-                </div>
-
-                <button
-                  type="button"
-                  disabled={!traditionalBriefingParagraphReady}
-                  onClick={() => {
-                    unlockLiveEntryVoice();
-                    submitTraditionalBriefingParagraph();
-                  }}
-                  className={`mt-8 w-full rounded-[14px] border px-4 py-3.5 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.18em] transition active:scale-[0.99] ${
-                    traditionalBriefingParagraphReady
-                      ? "border-[#4E7CFF]/35 bg-[#4E7CFF] text-white hover:border-[#5A84FF] hover:bg-[#5A84FF]"
-                      : "cursor-default border-white/[0.06] bg-white/[0.02] text-white/20"
-                  }`}
-                >
-                  Continue
-                </button>
-              </div>
-            </div>
-          </section>
-        </div>
-      </main>
-    );
-  }
-
-  if (liveEntryQuestionSurface) {
-    return (
-      <main className="relative min-h-[100dvh] overflow-y-auto bg-black px-5 py-14 text-white sm:px-8 sm:py-20">
-        <div className="relative z-10 mx-auto w-full max-w-5xl">
-          <div className="mb-6 flex items-center gap-4">
-            <BxPageHeader
-              backLabel="BACK"
-              onBack={goBackFromLiveEntryQuestionSurface}
-            />
-          </div>
-
-          <section className="relative w-full overflow-hidden rounded-[28px] border border-white/[0.08] bg-[#050505] px-5 py-6 sm:px-8 sm:py-8">
-            <div className="relative z-30 mx-auto max-w-[760px]">
-              <div className="flex items-center justify-between gap-4">
-                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-white/42">
-                  {liveEntryQuestionSurface.kicker}
-                </div>
-                <div className="font-mono text-[8px] uppercase tracking-[0.18em] text-white/24">
-                  {liveEntryQuestionSurface.step}
-                </div>
-              </div>
-
-              <h1 className="mt-5 font-mono text-[28px] font-black uppercase leading-[0.98] tracking-[-0.055em] text-white sm:text-[36px]">
-                {liveEntryQuestionSurface.headline}
-              </h1>
-
-              <div className="mt-7 text-left">
-                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-white/42">
-                  {liveEntryQuestionSurface.label}
-                </div>
-
-                <div
-                  className={`mt-4 min-h-[58px] whitespace-pre-line ${liveEntryQuestionSurface.readinessMessage ? "text-[16px] leading-7" : "text-[20px] leading-[1.5] sm:text-[22px]"} tracking-[-0.025em] text-white/90`}
-                >
-                  {liveEntryQuestionSurface.question}
-                </div>
-
-                <div
-                  className={`mt-3 text-[13px] leading-6 ${liveEntryQuestionSurface.readinessMessage ? "text-white/64" : "text-white/48"}`}
-                >
-                  {liveEntryQuestionSurface.helper}
-                </div>
-
-                {currentOptionalSignalQuestion &&
-                  optionalGeorgeResponse &&
-                  !liveEntryQuestionSurface.readinessMessage && (
-                    <div className="mt-5 rounded-[16px] border border-[#7EA1FF]/20 bg-[#11182A]/55 px-4 py-4">
-                      <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-[#AEB6FF]/64">
-                        GEORGE
-                      </div>
-                      <div className="mt-2.5 text-[13px] leading-6 text-white/72">
-                        {optionalGeorgeResponse}
-                      </div>
-                    </div>
-                  )}
-
-                {!liveEntryQuestionSurface.readinessMessage &&
-                  liveEntryQuestionSurface.example && (
-                    <div className="mt-5 rounded-[16px] border border-white/[0.08] bg-[#08090A] px-4 py-4">
-                      <div className="text-[10px] uppercase tracking-[0.18em] text-white/24">
-                        Example
-                      </div>
-                      <div className="mt-2.5 text-[12.5px] leading-6 text-white/44">
-                        {liveEntryQuestionSurface.example}
-                      </div>
-                    </div>
-                  )}
-
-                {!liveEntryQuestionSurface.loading &&
-                  !liveEntryQuestionSurface.readinessMessage &&
-                  currentOptionalSignalQuestion && (
-                    <div className="mt-5 flex items-center gap-2">
-                      <button
-                        type="button"
-                        aria-pressed={
-                          optionalSignalInteractionMode === "briefing"
-                        }
-                        onClick={() => {
-                          setOptionalSignalInteractionMode("briefing");
-                          setOptionalGeorgeResponse("");
-                        }}
-                        className={
-                          optionalSignalInteractionMode === "briefing"
-                            ? "rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-3 py-2 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white"
-                            : "rounded-[10px] border border-white/[0.10] px-3 py-2 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/45 transition hover:border-white/25 hover:text-white/70"
-                        }
+          <div className="mt-14 sm:mt-20">
+            {completedTraditionalSignals.length > 0 && (
+              <div className="mb-10 grid grid-cols-2 gap-x-8 gap-y-3 transition-all duration-500">
+                {completedTraditionalSignals.map((signal) => (
+                  <div
+                    key={signal.key}
+                    className="flex items-start gap-3 font-mono text-[11px] leading-6 text-white/50 transition-all duration-500"
+                  >
+                    <span className="mt-[1px] text-[#AFC0FF]/80">✓</span>
+                    <span>
+                      <span className="uppercase tracking-[0.16em] text-white/34">
+                        {signal.label}
+                      </span>
+                      <span
+                        className="ml-3 text-white/66"
+                        title={signal.fullAnswer}
                       >
-                        Answer
-                      </button>
+                        {signal.answer}
+                      </span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
 
-                      <button
-                        type="button"
-                        aria-pressed={
-                          optionalSignalInteractionMode === "ask_george"
-                        }
-                        onClick={() => {
-                          setOptionalSignalInteractionMode("ask_george");
-                          setOptionalGeorgeResponse("");
-                        }}
-                        className={
-                          optionalSignalInteractionMode === "ask_george"
-                            ? "rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-3 py-2 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white"
-                            : "rounded-[10px] border border-white/[0.10] px-3 py-2 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/45 transition hover:border-white/25 hover:text-white/70"
-                        }
-                      >
-                        Ask GEORGE
-                      </button>
-                    </div>
-                  )}
+            {optionalSignalLoading && (
+              <div className="font-mono text-[22px] leading-[1.6] text-white/74">
+                ...
+              </div>
+            )}
 
-                {!liveEntryQuestionSurface.loading &&
-                  !liveEntryQuestionSurface.readinessMessage && (
-                    <input
-                      value={liveEntryQuestionSurface.inputValue}
-                      onChange={(event) =>
-                        liveEntryQuestionSurface.setInputValue(
-                          event.target.value,
-                        )
+            {!optionalSignalLoading &&
+              currentOptionalSignalQuestion &&
+              !liveEntryReadyMessageVisible && (
+                <div>
+                  <div className="min-h-[92px] font-mono text-[25px] leading-[1.55] tracking-[-0.025em] text-white/92 sm:text-[30px]">
+                    {typedOptionalSignalQuestion}
+                  </div>
+
+                  <input
+                    value={optionalSignalInput}
+                    onChange={(event) =>
+                      setOptionalSignalInput(event.target.value)
+                    }
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+
+                        if (traditionalBriefingAskGeorgeActive) {
+                          void submitTraditionalAskGeorge();
+                          return;
+                        }
+
+                        void submitOptionalSignalAnswer();
                       }
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter") {
-                          event.preventDefault();
-                          liveEntryQuestionSurface.submit();
-                        }
-                      }}
-                      autoFocus
-                      className="mt-6 w-full rounded-[16px] border border-white/[0.10] bg-[#08090A] px-5 py-4 text-[15px] leading-7 text-white outline-none transition placeholder:text-white/28 focus:border-[#7EA1FF]/55"
-                      placeholder={
-                        optionalSignalInteractionMode === "ask_george"
-                          ? "Ask GEORGE about this conversation or briefing..."
-                          : "say it here..."
-                      }
-                    />
-                  )}
-
-                <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                  <button
-                    type="button"
-                    disabled={liveEntryQuestionSurface.loading}
-                    onClick={() => {
-                      unlockLiveEntryVoice();
-                      liveEntryQuestionSurface.submit();
                     }}
-                    className="rounded-[14px] border border-white/[0.12] bg-white px-4 py-3.5 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-black transition hover:bg-[#0A0C10] active:scale-[0.99] disabled:opacity-40"
+                    autoFocus
+                    placeholder={
+                      traditionalBriefingAskGeorgeActive
+                        ? "Ask me..."
+                        : "Type your answer..."
+                    }
+                    className="mt-10 w-full border-0 border-b border-white/20 bg-transparent px-0 py-4 font-mono text-[18px] leading-7 text-white outline-none transition placeholder:text-white/20 focus:border-[#8FAEFF]/70"
+                  />
+
+                  {!optionalSignalInput.trim() &&
+                    traditionalBriefingExamples.length > 0 && (
+                      <div
+                        key={`${currentOptionalSignalQuestion.key}-${traditionalBriefingExampleIndex}`}
+                        className="mt-3 font-mono text-[12px] leading-5 text-white/30 transition-opacity duration-500"
+                      >
+                        {
+                          traditionalBriefingExamples[
+                            traditionalBriefingExampleIndex %
+                              traditionalBriefingExamples.length
+                          ]
+                        }
+                      </div>
+                    )}
+
+                  {traditionalBriefingGeorgeResponse && (
+                    <div className="mt-7 max-w-[660px] font-mono text-[14px] leading-7 text-white/68">
+                      {traditionalBriefingGeorgeResponse}
+                    </div>
+                  )}
+
+                  <div className="mt-10 max-w-[660px] font-mono text-[11px] leading-6 text-white/36">
+                    You may enter LIVE now, or continue briefing—which will
+                    sharpen my support.
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      onClick={enterLiveFromBriefingSurface}
+                      className="rounded-[11px] bg-[#4E7CFF] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.17em] text-white transition hover:bg-[#5A84FF]"
+                    >
+                      ENTER LIVE
+                    </button>
+
+                    <button
+                      type="button"
+                      aria-pressed={traditionalBriefingAskGeorgeActive}
+                      onClick={() => {
+                        setTraditionalBriefingAskGeorgeActive((current) => !current);
+                        setTraditionalBriefingGeorgeResponse("");
+                        setOptionalSignalInput("");
+                      }}
+                      className={`rounded-[11px] border px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.17em] transition ${
+                        traditionalBriefingAskGeorgeActive
+                          ? "border-[#8FAEFF]/50 bg-[#10182D] text-white"
+                          : "border-white/[0.12] text-white/58 hover:border-white/28 hover:text-white"
+                      }`}
+                    >
+                      {traditionalBriefingAskGeorgeActive
+                        ? "ANSWER BRIEFING"
+                        : "ASK GEORGE"}
+                    </button>
+                  </div>
+
+                </div>
+              )}
+
+            {liveEntryReadyMessageVisible && (
+              <div className="transition-all duration-700">
+                {briefingSummary && (
+                  <div className="font-mono text-[22px] leading-[1.75] tracking-[-0.02em] text-white/82 sm:text-[26px]">
+                    {briefingSummary}
+                  </div>
+                )}
+
+                <div className="mt-7 max-w-[660px] font-mono text-[11px] leading-6 text-white/38">
+                  You may enter LIVE now. I have enough usable signal to
+                  support you. Continuing can still help if you have something
+                  materially new to add; otherwise, more questions may add
+                  little.
+                </div>
+
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={enterLiveFromBriefingSurface}
+                    className="rounded-[12px] bg-[#4E7CFF] px-6 py-3.5 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[#5A84FF]"
                   >
-                    {liveEntryQuestionSurface.primaryAction}
+                    ENTER LIVE
                   </button>
 
                   <button
                     type="button"
-                    disabled={!liveEntryQuestionSurface.liveAvailable}
-                    onClick={enterLiveFromBriefingSurface}
-                    className={`rounded-[14px] border px-4 py-3.5 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.18em] transition active:scale-[0.99] ${
-                      liveEntryQuestionSurface.liveAvailable
-                        ? "border-[#4E7CFF]/35 bg-[#4E7CFF] text-white hover:border-[#5A84FF] hover:bg-[#5A84FF]"
-                        : "cursor-default border-[#4E7CFF]/25 bg-[#4E7CFF] text-white opacity-35"
-                    }`}
+                    onClick={() => {
+                      setLiveEntryReadyMessageVisible(false);
+                      void requestNextOptionalSignalQuestion();
+                    }}
+                    className="rounded-[12px] border border-white/[0.12] px-6 py-3.5 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-white/62 transition hover:border-white/28 hover:text-white"
                   >
-                    {liveEntryQuestionSurface.liveAvailable
-                      ? "Enter LIVE"
-                      : "Add signal for LIVE"}
+                    CONTINUE BRIEFING
                   </button>
                 </div>
-
-                {!liveEntryQuestionSurface.loading &&
-                  !liveEntryQuestionSurface.readinessMessage && (
-                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                      <button
-                        type="button"
-                        onClick={skipOptionalSignalQuestion}
-                        className="rounded-[14px] border border-white/[0.10] px-4 py-3 text-center font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-white/52 transition hover:border-white/24 hover:text-white"
-                      >
-                        Skip
-                      </button>
-                      <button
-                        type="button"
-                        onClick={skipOptionalSignalQuestion}
-                        className="rounded-[14px] border border-white/[0.10] px-4 py-3 text-center font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-white/52 transition hover:border-white/24 hover:text-white"
-                      >
-                        I don&apos;t know
-                      </button>
-                    </div>
-                  )}
               </div>
-            </div>
-          </section>
+            )}
+          </div>
         </div>
       </main>
     );
@@ -5518,6 +5571,7 @@ export default function LiveEntryClient() {
     setLiveBriefingSupportAccepted(false);
     setSupportAssessmentExplanationOpen(false);
     setLiveRecoveryAcknowledged(false);
+    setLiveRecoveryAcknowledgementOpen(false);
     setLiveBriefingCapabilitiesConfirmed(false);
     setLiveBriefingOpenMechanicsPanel(null);
 
@@ -5546,6 +5600,7 @@ export default function LiveEntryClient() {
     setLiveBriefingSupportAccepted(false);
     setSupportAssessmentExplanationOpen(false);
     setLiveRecoveryAcknowledged(false);
+    setLiveRecoveryAcknowledgementOpen(false);
     setLiveBriefingCapabilitiesConfirmed(false);
     setLiveBriefingOpenMechanicsPanel(null);
 
@@ -5589,6 +5644,7 @@ export default function LiveEntryClient() {
     setLiveBriefingSupportAccepted(false);
     setSupportAssessmentExplanationOpen(false);
     setLiveRecoveryAcknowledged(false);
+    setLiveRecoveryAcknowledgementOpen(false);
     setLiveBriefingCapabilitiesConfirmed(false);
     setLiveBriefingOpenMechanicsPanel(null);
 
@@ -5641,9 +5697,9 @@ export default function LiveEntryClient() {
         (panel) => panel.id === selectedReceiverProfile,
       ) || LIVE_RECEIVER_PROFILE_PANELS[0];
     const mechanicsSelectionsComplete = Boolean(
-      liveBriefingActiveSupportStyle &&
-        receiverProfileConfirmed &&
-        liveBriefingCommunicationConfirmed,
+      activeSupportPanelId &&
+        selectedReceiverProfile &&
+        String(communicationStyle || "").trim(),
     );
 
     const compactMechanicsChoice = ({
@@ -5659,8 +5715,8 @@ export default function LiveEntryClient() {
       onChange: () => void;
       recommended?: boolean;
     }) => (
-      <div className="rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-3">
-        <div className="flex items-start justify-between gap-4">
+      <div className="rounded-[0.72rem] border border-white/[0.07] bg-[#080A10]/[0.62] px-3.5 py-2.5">
+        <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2 text-[9px] uppercase tracking-[0.22em] text-white/34">
               <span>{label}</span>
@@ -5670,19 +5726,19 @@ export default function LiveEntryClient() {
                 </span>
               )}
             </div>
-            <div className="mt-1.5 text-[13px] font-semibold text-[#F2F4FF]/88">
+            <div className="mt-1 text-[12.5px] font-semibold text-[#F2F4FF]/88">
               ✓ {value}
             </div>
-            <div className="mt-1 text-[10px] leading-4 text-[#D7DBE4]/46">
+            <div className="mt-0.5 text-[9.5px] leading-4 text-[#D7DBE4]/44">
               {summary}
             </div>
           </div>
           <button
             type="button"
             onClick={onChange}
-            className="shrink-0 rounded-[0.6rem] border border-white/[0.09] px-2.5 py-1 text-[8px] font-semibold uppercase tracking-[0.15em] text-white/48 transition hover:border-white/20 hover:text-white/76"
+            className="george-edit-gleam relative shrink-0 overflow-hidden rounded-[0.55rem] border border-white/[0.12] bg-white/[0.012] px-2.5 py-1 text-[8px] uppercase tracking-[0.15em] text-white/46 transition hover:border-white/[0.22] hover:text-white/72"
           >
-            Change
+            Edit
           </button>
         </div>
       </div>
@@ -5778,39 +5834,67 @@ export default function LiveEntryClient() {
         );
       };
 
+      const resolvedBriefingOutcome =
+        cleanBriefingValue(preLiveSignals.desiredOutcome) ||
+        cleanBriefingValue(objective);
+
+      const resolvedBriefingResponsibility =
+        cleanBriefingValue(preLiveSignals.role) ||
+        cleanBriefingValue(userPosition || chair);
+
+      const resolvedBriefingParticipants =
+        cleanBriefingValue(preLiveSignals.counterparty) ||
+        cleanBriefingValue(audienceType);
+
+      const resolvedBriefingContext =
+        cleanBriefingValue(preLiveSignals.conversationContext) ||
+        cleanBriefingValue(knownContext);
+
+      const resolvedAdditionalSignal =
+        cleanBriefingValue(secondaryPosition) ||
+        Object.values(optionalSignalAnswers)
+          .map((value) => cleanBriefingValue(String(value || "")))
+          .find(Boolean) ||
+        "";
+
       const briefingRows = [
         {
           id: "outcome" as const,
           label: "Desired outcome",
-          summary: cleanBriefingValue(objective) || "Outcome pending",
+          summary: resolvedBriefingOutcome || "Outcome pending",
         },
         {
           id: "responsibility" as const,
           label: "Your responsibility",
           summary:
-            cleanBriefingValue(userPosition || chair) ||
-            "Responsibility pending",
+            resolvedBriefingResponsibility || "Responsibility pending",
         },
         {
           id: "participants" as const,
           label: "Conversation with",
-          summary: cleanBriefingValue(audienceType) || "Participants pending",
+          summary:
+            resolvedBriefingParticipants || "Participants pending",
         },
         {
           id: "context" as const,
           label: "Conversation and known context",
-          summary: cleanBriefingValue(knownContext) || "Context pending",
+          summary: resolvedBriefingContext || "Context pending",
         },
         {
           id: "additional" as const,
           label: "Additional signal",
-          summary: secondaryPosition || "Nothing additional yet",
+          summary:
+            resolvedAdditionalSignal || "Nothing additional yet",
         },
-        {
-          id: "documents" as const,
-          label: "Documents",
-          summary: prepDocument?.name || "No document added",
-        },
+        ...(prepDocument
+          ? [
+              {
+                id: "documents" as const,
+                label: "Documents",
+                summary: prepDocument.name,
+              },
+            ]
+          : []),
       ];
 
       return (
@@ -5823,11 +5907,14 @@ export default function LiveEntryClient() {
           title={
             priorPreparationExplicitlyRestored
               ? "Before we begin..."
-              : "Here’s what I understand"
+              : liveBriefingToaAccepted
+                ? "Here’s what I understand"
+                : "Review my signals..."
           }
           stage={1}
+          onBack={goToPreviousLivePreparationState}
         >
-          <div className="mt-3 rounded-[1.15rem] border border-white/[0.065] bg-[#07090D]/84 p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:p-4">
+          <div className="mt-3 rounded-[14px] border border-white/[0.055] bg-[#07090D]/72 p-3 sm:p-3.5">
             <div>
               <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/34">
                 Operational briefing
@@ -5841,7 +5928,51 @@ export default function LiveEntryClient() {
               </p>
             </div>
 
-            <div className="mt-4 divide-y divide-white/[0.045] rounded-[1rem] border border-white/[0.055] bg-[#0A0C10]">
+            <div className="mt-3 overflow-hidden rounded-[12px] border border-white/[0.06] bg-[#090B0E]">
+              <button
+                type="button"
+                aria-expanded={liveBriefingSignalsExpanded}
+                onClick={() => {
+                  setLiveBriefingSignalsExpanded((current) => {
+                    const next = !current;
+
+                    if (!next) {
+                      setLiveBriefingOpenSection(null);
+                    }
+
+                    return next;
+                  });
+                }}
+                className="relative flex w-full items-center justify-between gap-4 overflow-hidden px-3.5 py-3 text-left transition hover:bg-white/[0.018]"
+              >
+                <span className="min-w-0">
+                  <span className="block text-[9px] font-semibold uppercase tracking-[0.2em] text-white/38">
+                    Clarify Signals
+                  </span>
+                  <span className="mt-1 block text-[11px] leading-4 text-white/30">
+                    Review or edit what GEORGE will carry into LIVE.
+                  </span>
+                </span>
+
+                <span
+                  aria-hidden="true"
+                  className={`shrink-0 text-[13px] text-white/36 transition-transform duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)] ${
+                    liveBriefingSignalsExpanded ? "rotate-45" : ""
+                  }`}
+                >
+                  +
+                </span>
+              </button>
+
+              <div
+                className={`grid transition-[grid-template-rows,opacity,transform] duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)] ${
+                  liveBriefingSignalsExpanded
+                    ? "grid-rows-[1fr] translate-y-0 opacity-100"
+                    : "pointer-events-none grid-rows-[0fr] -translate-y-2 opacity-0"
+                }`}
+              >
+                <div className="min-h-0 overflow-hidden">
+                  <div className="divide-y divide-white/[0.04] border-t border-white/[0.04]">
               {briefingRows.map((row) => {
                 const open = liveBriefingOpenSection === row.id;
 
@@ -5850,7 +5981,7 @@ export default function LiveEntryClient() {
                     <button
                       type="button"
                       onClick={() => toggleBriefingSection(row.id)}
-                      className={`relative flex w-full items-start justify-between gap-4 overflow-hidden px-4 py-3.5 text-left transition ${
+                      className={`relative flex w-full items-start justify-between gap-4 overflow-hidden px-3.5 py-2.5 text-left transition ${
                         row.id === "documents"
                           ? "border-[#4E7CFF]/22 bg-[#4E7CFF]/[0.07] hover:bg-[#4E7CFF]/[0.11]"
                           : "hover:bg-white/[0.018]"
@@ -5865,7 +5996,7 @@ export default function LiveEntryClient() {
                         </span>
                       </span>
 
-                      <span className="shrink-0 rounded-full border border-white/[0.07] px-2.5 py-1 text-[8px] uppercase tracking-[0.15em] text-white/36">
+                      <span className="george-edit-gleam relative shrink-0 overflow-hidden rounded-[0.55rem] border border-white/[0.12] bg-white/[0.012] px-2.5 py-1 text-[8px] uppercase tracking-[0.15em] text-white/46 transition hover:border-white/[0.22] hover:text-white/72">
                         {open ? "Close" : "Edit"}
                       </span>
                     </button>
@@ -5989,7 +6120,7 @@ export default function LiveEntryClient() {
                             <button
                               type="button"
                               onClick={() => setLiveBriefingOpenSection(null)}
-                              className="mt-3 rounded-full border border-white/[0.07] px-3 py-1.5 text-[8px] font-semibold uppercase tracking-[0.16em] text-white/40 transition hover:border-white/[0.14] hover:text-white/66"
+                              className="george-edit-gleam relative mt-3 overflow-hidden rounded-[0.55rem] border border-white/[0.12] bg-white/[0.012] px-2.5 py-1 text-[8px] font-semibold uppercase tracking-[0.15em] text-white/46 transition hover:border-white/[0.22] hover:text-white/72"
                             >
                               Done
                             </button>
@@ -6000,6 +6131,9 @@ export default function LiveEntryClient() {
                   </div>
                 );
               })}
+                  </div>
+                </div>
+              </div>
             </div>
 
             {(briefingUnderstandingSignals.length > 0 ||
@@ -6043,7 +6177,11 @@ export default function LiveEntryClient() {
               onChange={(event) => {
                 unlockLiveEntryVoice();
                 setLiveBriefingToaAccepted(event.target.checked);
-                if (event.target.checked) setLiveBriefingOpenSection(null);
+
+                if (event.target.checked) {
+                  setLiveBriefingOpenSection(null);
+                  setLiveBriefingSignalsExpanded(false);
+                }
               }}
               className="mt-1 h-4 w-4 accent-[#4E7CFF]"
             />
@@ -6088,12 +6226,6 @@ export default function LiveEntryClient() {
     if (liveBriefingStep === 2) {
       const liveTierLabel = String(tier || "smart").toUpperCase();
       const goBackFromMechanics = () => {
-        if (returnToReadyRoomAfterMechanicsRef.current) {
-          returnToReadyRoomAfterMechanicsRef.current = false;
-          setLiveBriefingStep(3);
-          return;
-        }
-
         goToPreviousLivePreparationState();
       };
       const confirmPrivacyAndContinue = () => {
@@ -6143,62 +6275,113 @@ export default function LiveEntryClient() {
           onBack={goBackFromMechanics}
         >
           <div className="mt-3 space-y-3">
-            {liveBriefingActiveSupportStyle &&
-            liveBriefingOpenMechanicsPanel !== "support"
-              ? compactMechanicsChoice({
-                  label: "GEORGE's support",
-                  value: activeAdaptiveSupportPanel.label,
-                  summary: activeAdaptiveSupportPanel.line,
-                  onChange: () =>
-                    setLiveBriefingOpenMechanicsPanel("support"),
-                })
-              : (
+            <div>
+              {compactMechanicsChoice({
+                label: "GEORGE's support",
+                value: activeAdaptiveSupportPanel.label,
+                summary: activeAdaptiveSupportPanel.line,
+                onChange: () =>
+                  setLiveBriefingOpenMechanicsPanel((current) =>
+                    current === "support" ? null : "support",
+                  ),
+              })}
+
+              <div
+                className={`grid transition-[grid-template-rows,opacity,transform,margin] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  liveBriefingOpenMechanicsPanel === "support"
+                    ? "mt-2 grid-rows-[1fr] translate-y-0 opacity-100"
+                    : "mt-0 grid-rows-[0fr] -translate-y-1 opacity-0"
+                }`}
+              >
+                <div className="overflow-hidden">
                   <LiveAdaptiveSupportPanel
                     activePanel={activeAdaptiveSupportPanel}
                     open={true}
                     panels={LIVE_SUPPORT_PANELS}
-                    onToggle={() => {
-                      if (liveBriefingActiveSupportStyle) {
-                        setLiveBriefingOpenMechanicsPanel(null);
-                      }
-                    }}
+                    onToggle={() =>
+                      setLiveBriefingOpenMechanicsPanel(null)
+                    }
                     onSelect={setActiveAdaptiveSupport}
                   />
-                )}
 
-            {receiverProfileConfirmed &&
-            liveBriefingOpenMechanicsPanel !== "receiver"
-              ? compactMechanicsChoice({
-                  label: "Delivery profile",
-                  value: activeReceiverPanel.label,
-                  summary: activeReceiverPanel.line,
-                  onChange: () =>
-                    setLiveBriefingOpenMechanicsPanel("receiver"),
-                })
-              : (
+                  <div className="mt-2 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setLiveBriefingOpenMechanicsPanel(null)
+                      }
+                      className="george-edit-gleam relative shrink-0 overflow-hidden rounded-[0.55rem] border border-white/[0.12] bg-white/[0.012] px-2.5 py-1 text-[8px] uppercase tracking-[0.15em] text-white/46 transition hover:border-white/[0.22] hover:text-white/72"
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              {compactMechanicsChoice({
+                label: "Delivery profile",
+                value: activeReceiverPanel.label,
+                summary: activeReceiverPanel.line,
+                onChange: () =>
+                  setLiveBriefingOpenMechanicsPanel((current) =>
+                    current === "receiver" ? null : "receiver",
+                  ),
+              })}
+
+              <div
+                className={`grid transition-[grid-template-rows,opacity,transform,margin] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  liveBriefingOpenMechanicsPanel === "receiver"
+                    ? "mt-2 grid-rows-[1fr] translate-y-0 opacity-100"
+                    : "mt-0 grid-rows-[0fr] -translate-y-1 opacity-0"
+                }`}
+              >
+                <div className="overflow-hidden">
                   <LiveReceiverProfilePanel
                     activePanel={activeReceiverPanel}
                     open={true}
                     panels={LIVE_RECEIVER_PROFILE_PANELS}
-                    onToggle={() => {
-                      if (receiverProfileConfirmed) {
-                        setLiveBriefingOpenMechanicsPanel(null);
-                      }
-                    }}
+                    onToggle={() =>
+                      setLiveBriefingOpenMechanicsPanel(null)
+                    }
                     onSelect={setActiveReceiverProfile}
                   />
-                )}
 
-            {liveBriefingCommunicationConfirmed &&
-            liveBriefingOpenMechanicsPanel !== "speaking"
-              ? compactMechanicsChoice({
-                  label: "Speaking style",
-                  value: communicationStyle,
-                  summary: "Support will follow this speaking style in LIVE.",
-                  onChange: () =>
-                    setLiveBriefingOpenMechanicsPanel("speaking"),
-                })
-              : (
+                  <div className="mt-2 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setLiveBriefingOpenMechanicsPanel(null)
+                      }
+                      className="george-edit-gleam relative shrink-0 overflow-hidden rounded-[0.55rem] border border-white/[0.12] bg-white/[0.012] px-2.5 py-1 text-[8px] uppercase tracking-[0.15em] text-white/46 transition hover:border-white/[0.22] hover:text-white/72"
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              {compactMechanicsChoice({
+                label: "Speaking style",
+                value: communicationStyle,
+                summary: "Support will follow this speaking style in LIVE.",
+                onChange: () =>
+                  setLiveBriefingOpenMechanicsPanel((current) =>
+                    current === "speaking" ? null : "speaking",
+                  ),
+              })}
+
+              <div
+                className={`grid transition-[grid-template-rows,opacity,transform,margin] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  liveBriefingOpenMechanicsPanel === "speaking"
+                    ? "mt-2 grid-rows-[1fr] translate-y-0 opacity-100"
+                    : "mt-0 grid-rows-[0fr] -translate-y-1 opacity-0"
+                }`}
+              >
+                <div className="overflow-hidden">
                   <LiveSpeakingStylePanel
                     confirmed={false}
                     open={true}
@@ -6211,28 +6394,36 @@ export default function LiveEntryClient() {
                     }
                     onSelect={setActiveCommunicationStyle}
                   />
-                )}
 
-            {liveRecoveryAcknowledged ? (
-              compactMechanicsChoice({
-                label: "Mechanics acknowledgement",
-                value: "Acknowledged",
-                summary: "You remain the final authority in LIVE.",
-                onChange: () => {
-                  setLiveRecoveryAcknowledged(false);
-                  setLiveBriefingCapabilitiesConfirmed(false);
-                  setLiveRecoveryAcknowledgementOpen(true);
-                },
-              })
-            ) : (
-              <div
-                className={`rounded-[0.82rem] border px-4 py-3 transition ${
-                  liveRecoveryAcknowledgementOpen
-                    ? "border-[#D7DCFF]/18 bg-[#D7DCFF]/[0.035] text-[#D7DBE4]/72"
-                    : "border-white/[0.08] bg-[#080A10]/[0.52] text-[#D7DBE4]/58 hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]"
+                  <div className="mt-2 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setLiveBriefingOpenMechanicsPanel(null)
+                      }
+                      className="george-edit-gleam relative shrink-0 overflow-hidden rounded-[0.55rem] border border-white/[0.12] bg-white/[0.012] px-2.5 py-1 text-[8px] uppercase tracking-[0.15em] text-white/46 transition hover:border-white/[0.22] hover:text-white/72"
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              className={`rounded-[0.72rem] border px-3.5 py-2.5 transition ${
+                liveRecoveryAcknowledged
+                  ? "border-[#D7DCFF]/18 bg-[#D7DCFF]/[0.035]"
+                  : "border-white/[0.07] bg-[#080A10]/[0.52]"
+              }`}
+            >
+              <label
+                className={`flex items-start gap-3 ${
+                  mechanicsSelectionsComplete
+                    ? "cursor-pointer"
+                    : "cursor-default"
                 }`}
               >
-              <label className="flex cursor-pointer items-start gap-3">
                 <input
                   type="checkbox"
                   disabled={!mechanicsSelectionsComplete}
@@ -6255,49 +6446,67 @@ export default function LiveEntryClient() {
                     setLiveRecoveryAcknowledged(false);
                     setLiveBriefingCapabilitiesConfirmed(false);
                   }}
-                  className="mt-1 h-4 w-4 accent-[#D7DCFF]"
+                  className="mt-0.5 h-3.5 w-3.5 shrink-0 accent-[#D7DCFF]"
                 />
 
-                <span className="text-[12px] leading-5">
-                  <span className="block font-semibold text-[#F2F4FF]/82">
-                    GEORGE complements your judgment, communication style, and
-                    effort.
+                <span className="min-w-0">
+                  <span className="block text-[9px] uppercase tracking-[0.22em] text-white/34">
+                    Mechanics acknowledgement
                   </span>
 
-                  {!liveRecoveryAcknowledgementOpen &&
-                    !liveRecoveryAcknowledged && (
-                      <span className="mt-1 block text-[#D7DBE4]/50">
-                        {mechanicsSelectionsComplete
-                          ? "Check once to review. Check again to acknowledge."
+                  <span className="mt-1 block text-[12.5px] font-semibold text-[#F2F4FF]/88">
+                    {liveRecoveryAcknowledged
+                      ? "✓ Final authority acknowledged"
+                      : "Final authority"}
+                  </span>
+
+                  <span className="mt-0.5 block text-[9.5px] leading-4 text-[#D7DBE4]/46">
+                    {liveRecoveryAcknowledged
+                      ? "You remain the final authority in LIVE."
+                      : liveRecoveryAcknowledgementOpen
+                        ? "Review the acknowledgement below, then check again."
+                        : mechanicsSelectionsComplete
+                          ? "GEORGE complements your judgment, communication style, and effort."
                           : "Choose support, delivery, and speaking style first."}
-                      </span>
-                    )}
+                  </span>
                 </span>
               </label>
 
-              {liveRecoveryAcknowledgementOpen && (
-                <div className="mt-3 border-l border-[#D7DCFF]/18 pl-3 text-[12px] leading-5 text-[#D7DBE4]/64">
-                  I understand that GEORGE is {liveTierLabel}, but I remain the
-                  final authority. GEORGE supports me by adapting how it
-                  listens, responds, and delivers help based on the mechanics I
-                  choose. If GEORGE&apos;s support does not fit the
-                  conversation, I may ignore it, revise it, or take another
-                  approach. GEORGE complements my effort; it does not replace my
-                  responsibility.{" "}
-                  <button
-                    type="button"
-                    onClick={(event) => {
-                      event.preventDefault();
-                      window.open("/privacy", "_blank");
-                    }}
-                    className="text-[#D7DCFF]/72 underline underline-offset-4"
-                  >
-                    Privacy
-                  </button>
+              <div
+                className={`grid transition-[grid-template-rows,opacity,transform,margin] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  liveRecoveryAcknowledgementOpen &&
+                  !liveRecoveryAcknowledged
+                    ? "mt-2 grid-rows-[1fr] translate-y-0 opacity-100"
+                    : "mt-0 grid-rows-[0fr] -translate-y-1 opacity-0"
+                }`}
+              >
+                <div className="overflow-hidden">
+                  <div className="border-l border-[#D7DCFF]/18 pl-3 text-[10px] leading-5 text-[#D7DBE4]/58">
+                    I understand that GEORGE is {liveTierLabel}, but I remain
+                    the final authority. GEORGE supports me by adapting how it
+                    listens, responds, and delivers help based on the mechanics
+                    I choose. If GEORGE&apos;s support does not fit the
+                    conversation, I may ignore it, revise it, or take another
+                    approach. GEORGE complements my effort; it does not replace
+                    my responsibility.{" "}
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        window.open("/privacy", "_blank");
+                      }}
+                      className="text-[#D7DCFF]/72 underline underline-offset-4"
+                    >
+                      Privacy
+                    </button>
+                  </div>
+
+                  <div className="mt-2 text-[9px] uppercase tracking-[0.16em] text-[#D7DBE4]/42">
+                    Check again to acknowledge.
+                  </div>
                 </div>
-              )}
               </div>
-            )}
+            </div>
 
             <div className="grid gap-2 sm:grid-cols-2">
               <button
@@ -6306,7 +6515,6 @@ export default function LiveEntryClient() {
                   !mechanicsSelectionsComplete || !liveRecoveryAcknowledged
                 }
                 onClick={() => {
-                  returnToReadyRoomAfterMechanicsRef.current = false;
                   transitionToLivePreparationState({
                     previousState: "mechanics",
                     nextStep: 3,
@@ -6315,7 +6523,7 @@ export default function LiveEntryClient() {
                 }}
                 className={`rounded-[0.75rem] border px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] transition ${
                   mechanicsSelectionsComplete && liveRecoveryAcknowledged
-                    ? "border-[#4E7CFF]/65 bg-[#4E7CFF] text-white shadow-[0_10px_28px_rgba(78,124,255,0.26)] hover:border-[#7EA1FF]/80 hover:bg-[#5B86FF]"
+                    ? "george-live-primary-shimmer border-[#D8DEE8]/70 bg-[#4E7CFF] text-white shadow-[0_10px_28px_rgba(78,124,255,0.26)] hover:border-[#EEF1F6]/80 hover:bg-[#5B86FF]"
                     : "cursor-default border-white/[0.05] bg-transparent text-white/20"
                 }`}
               >
@@ -6326,6 +6534,11 @@ export default function LiveEntryClient() {
         </PanelShell>
       );
     }
+
+    const supportLabel =
+      activeSupportPanelId === "response"
+        ? "Adaptive response"
+        : "Adaptive cues";
 
     const activeFormula =
       selectedFormula || operationalRecommendation?.recommendedFormula || null;
@@ -6345,50 +6558,32 @@ export default function LiveEntryClient() {
       }
 
       if (livePrepOpenSection === "formula") {
-        goToPreviousLivePreparationState();
+        setLivePrepOpenSection("support");
         return;
       }
 
       goToPreviousLivePreparationState();
     };
 
-    const supportAssessmentSummary = `${activeAdaptiveSupportPanel.label} · ${activeReceiverPanel.label} · ${communicationStyle}`;
+    const compactChoice = (
+      label: string,
+      value: string,
+      onClick: () => void,
+    ) => (
+      <button
+        type="button"
+        onClick={onClick}
+        className="flex w-full -translate-y-1 items-center justify-between gap-4 rounded-[11px] border border-white/[0.09] bg-white/[0.025] px-4 py-3 text-left transition-all duration-500 ease-out hover:-translate-y-1.5 hover:border-[#8FAEFF]/32"
+      >
+        <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-white/34">
+          {label}
+        </span>
+        <span className="text-[12px] font-semibold text-white/82">
+          ✓ {value}
+        </span>
+      </button>
+    );
 
-    const changeMechanicFromReadyRoom = (
-      section: LiveMechanicsSection,
-    ) => {
-      if (liveEntryRoute === "homepage") {
-        setLiveBriefingSupportAccepted(false);
-        setSupportAssessmentExplanationOpen(false);
-        setLivePrepOpenSection("support");
-        setPopup3EditingMechanic(section);
-        return;
-      }
-
-      returnToReadyRoomAfterMechanicsRef.current = true;
-      setLiveBriefingOpenMechanicsPanel(section);
-      setLiveBriefingStep(2);
-      setShowLiveBriefingRoom(true);
-    };
-
-    const reopenSupportAssessment = () => {
-      if (liveEntryRoute !== "homepage") {
-        changeMechanicFromReadyRoom("support");
-        return;
-      }
-
-      setPopup3EditingMechanic(null);
-      setSupportAssessmentExplanationOpen(false);
-      setLiveBriefingSupportAccepted(false);
-      setLivePrepOpenSection("support");
-    };
-
-    const confirmSupportAssessment = () => {
-      setPopup3EditingMechanic(null);
-      setSupportAssessmentExplanationOpen(false);
-      setLiveBriefingSupportAccepted(true);
-      setLivePrepOpenSection("formula");
-    };
 
     return (
       <PanelShell
@@ -6406,182 +6601,93 @@ export default function LiveEntryClient() {
 
           <div className="mt-4 overflow-hidden rounded-[16px] border border-white/[0.075] bg-[#07090D] px-5 py-5">
             <div className="space-y-3">
-              {liveBriefingSupportAccepted &&
-                compactMechanicsChoice({
-                  label:
-                    liveEntryRoute === "homepage"
-                      ? "Support assessment"
-                      : "Popup 2 mechanics",
-                  value:
-                    liveEntryRoute === "homepage"
-                      ? "I agree with this assessment"
-                      : "Mechanics acknowledged",
-                  summary: supportAssessmentSummary,
-                  onChange: reopenSupportAssessment,
-                })}
+              {livePrepOpenSection !== "support" &&
+                compactChoice(
+                  "Support",
+                  supportLabel,
+                  () => setLivePrepOpenSection("support"),
+                )}
 
               {livePrepOpenSection === "ready" &&
-                compactMechanicsChoice({
-                  label: "Formula",
-                  value: activeFormulaLabel,
-                  summary: formulaProofLabel,
-                  onChange: () => setLivePrepOpenSection("formula"),
-                })}
+                compactChoice(
+                  "Formula",
+                  `${activeFormulaLabel} · ${formulaProofLabel}`,
+                  () => setLivePrepOpenSection("formula"),
+                )}
             </div>
 
             <section
               className={`grid transition-all duration-500 ease-out ${
-                livePrepOpenSection === "support" &&
-                !liveBriefingSupportAccepted
+                livePrepOpenSection === "support"
                   ? "mt-5 grid-rows-[1fr] translate-y-0 opacity-100"
                   : "pointer-events-none grid-rows-[0fr] -translate-y-5 opacity-0"
               }`}
             >
               <div className="overflow-hidden">
-                <h2 className="min-h-[70px] max-w-[580px] font-mono text-[19px] leading-8 tracking-[-0.025em] text-white sm:text-[23px]">
+                <h2 className="min-h-[70px] max-w-[560px] font-mono text-[19px] leading-8 tracking-[-0.025em] text-white sm:text-[23px]">
                   {readyRoomTypedPrompt}
                 </h2>
 
-                <div className="rounded-[14px] border border-[#7EA1FF]/[0.14] bg-[#4E7CFF]/[0.035] p-3">
-                  <div className="mb-3 flex items-center justify-between gap-3">
-                    <div>
-                      <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.2em] text-[#D7DCFF]/52">
-                        Current-session support
-                      </div>
-                      <div className="mt-1 text-[11px] leading-5 text-white/42">
-                        {liveEntryRoute === "homepage"
-                          ? "Recommended from this Homepage briefing."
-                          : "Complete these selections in Mechanics before continuing."}
-                      </div>
-                    </div>
-                    <span className="shrink-0 font-mono text-[8px] uppercase tracking-[0.17em] text-[#AFC0FF]/52">
-                      Review
-                    </span>
+                {liveEntryRoute === "homepage" ? (
+                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                    {(["advice", "response"] as const).map((id) => {
+                      const selected =
+                        liveBriefingSupportAccepted &&
+                        activeSupportPanelId === id;
+
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          onClick={() => {
+                            setActiveAdaptiveSupport(id);
+                            setLiveBriefingSupportAccepted(true);
+
+                            window.setTimeout(() => {
+                              setLivePrepOpenSection("formula");
+                            }, 360);
+                          }}
+                          className={`flex items-start gap-3 rounded-[12px] border px-4 py-4 text-left transition-all duration-300 ${
+                            selected
+                              ? "border-[#8FAEFF]/55 bg-[#101A31] -translate-y-0.5"
+                              : "border-white/[0.09] bg-white/[0.02] hover:-translate-y-0.5 hover:border-white/22"
+                          }`}
+                        >
+                          <span
+                            className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-[4px] border text-[10px] transition ${
+                              selected
+                                ? "border-[#8FAEFF]/70 bg-[#4E7CFF] text-white"
+                                : "border-white/22 text-transparent"
+                            }`}
+                          >
+                            ✓
+                          </span>
+                          <span>
+                            <span className="block text-[13px] font-semibold text-white/86">
+                              {id === "advice"
+                                ? "Adaptive cues"
+                                : "Adaptive response"}
+                            </span>
+                            <span className="mt-1 block text-[11px] leading-5 text-white/42">
+                              {id === "advice"
+                                ? "Brief support at the right moment."
+                                : "A complete response when the room requires one."}
+                            </span>
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
-
-                  <div className="space-y-2">
-                    {compactMechanicsChoice({
-                      label: "Support behavior",
-                      value: activeAdaptiveSupportPanel.label,
-                      summary: activeAdaptiveSupportPanel.line,
-                      recommended: liveEntryRoute === "homepage",
-                      onChange: () =>
-                        changeMechanicFromReadyRoom("support"),
-                    })}
-                    {compactMechanicsChoice({
-                      label: "Delivery profile",
-                      value: activeReceiverPanel.label,
-                      summary: activeReceiverPanel.line,
-                      recommended: liveEntryRoute === "homepage",
-                      onChange: () =>
-                        changeMechanicFromReadyRoom("receiver"),
-                    })}
-                    {compactMechanicsChoice({
-                      label: "Speaking style",
-                      value: communicationStyle,
-                      summary:
-                        "Support will follow this speaking style in LIVE.",
-                      recommended: liveEntryRoute === "homepage",
-                      onChange: () =>
-                        changeMechanicFromReadyRoom("speaking"),
-                    })}
+                ) : (
+                  <div className="mt-5">
+                    {compactChoice(
+                      "Support",
+                      supportLabel,
+                      goToPreviousLivePreparationState,
+                    )}
                   </div>
+                )}
 
-                  {liveEntryRoute === "homepage" &&
-                    popup3EditingMechanic === "support" && (
-                      <div className="mt-3">
-                        <LiveAdaptiveSupportPanel
-                          activePanel={activeAdaptiveSupportPanel}
-                          open={true}
-                          panels={LIVE_SUPPORT_PANELS}
-                          onToggle={() => setPopup3EditingMechanic(null)}
-                          onSelect={(panelId) => {
-                            setActiveAdaptiveSupport(panelId);
-                            setPopup3EditingMechanic(null);
-                          }}
-                        />
-                      </div>
-                    )}
-
-                  {liveEntryRoute === "homepage" &&
-                    popup3EditingMechanic === "receiver" && (
-                      <div className="mt-3">
-                        <LiveReceiverProfilePanel
-                          activePanel={activeReceiverPanel}
-                          open={true}
-                          panels={LIVE_RECEIVER_PROFILE_PANELS}
-                          onToggle={() => setPopup3EditingMechanic(null)}
-                          onSelect={(profile) => {
-                            setActiveReceiverProfile(profile);
-                            setPopup3EditingMechanic(null);
-                          }}
-                        />
-                      </div>
-                    )}
-
-                  {liveEntryRoute === "homepage" &&
-                    popup3EditingMechanic === "speaking" && (
-                      <div className="mt-3">
-                        <LiveSpeakingStylePanel
-                          confirmed={false}
-                          open={true}
-                          selectedStyle={communicationStyle}
-                          onEdit={() => setPopup3EditingMechanic("speaking")}
-                          onOpen={() => setPopup3EditingMechanic("speaking")}
-                          onSelect={(style) => {
-                            setActiveCommunicationStyle(style);
-                            setPopup3EditingMechanic(null);
-                          }}
-                        />
-                      </div>
-                    )}
-
-                  {liveEntryRoute === "homepage" ? (
-                    <div className="mt-4 rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-3">
-                      <label className="flex cursor-pointer items-start gap-3">
-                        <input
-                          type="checkbox"
-                          checked={liveBriefingSupportAccepted}
-                          onChange={(event) => {
-                            if (!supportAssessmentExplanationOpen) {
-                              setSupportAssessmentExplanationOpen(true);
-                              setLiveBriefingSupportAccepted(false);
-                              return;
-                            }
-
-                            if (event.target.checked) {
-                              confirmSupportAssessment();
-                            }
-                          }}
-                          className="mt-1 h-4 w-4 accent-[#D7DCFF]"
-                        />
-                        <span className="text-[12px] font-semibold leading-5 text-[#F2F4FF]/82">
-                          Do you agree with this assessment?
-                        </span>
-                      </label>
-
-                      {supportAssessmentExplanationOpen && (
-                        <div className="mt-3 border-l border-[#D7DCFF]/18 pl-3 text-[12px] leading-5 text-[#D7DBE4]/64">
-                          GEORGE will support you with {activeAdaptiveSupportPanel.label.toLowerCase()} through {activeReceiverPanel.label.toLowerCase()}, using a {communicationStyle.toLowerCase()} speaking style. This assessment fits the current briefing for {objectiveLabel} in {roomLabel}. You may still change any selection. Agreement authorizes GEORGE to use these settings in LIVE.
-                        </div>
-                      )}
-
-                      {!supportAssessmentExplanationOpen && (
-                        <div className="mt-2 pl-7 text-[10px] leading-4 text-[#D7DBE4]/46">
-                          Check once to review. Check again to agree.
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => changeMechanicFromReadyRoom("support")}
-                      className="mt-4 w-full rounded-[0.75rem] border border-[#4E7CFF]/45 bg-[#4E7CFF]/10 px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#D7DCFF]/76 transition hover:border-[#7EA1FF]/70 hover:text-white"
-                    >
-                      Return to Mechanics
-                    </button>
-                  )}
-                </div>
               </div>
             </section>
 

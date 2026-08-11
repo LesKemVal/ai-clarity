@@ -1,5 +1,7 @@
 "use client";
 
+import BxPageHeader from "@/components/BxPageHeader";
+
 import { useEffect, useState } from "react";
 
 import {
@@ -475,6 +477,27 @@ export default function OperationalLibraryClient() {
             homepagePreparationSignals.broadGoal ||
             undefined,
           briefingComplete: true,
+          preparationContext: {
+            role: homepagePreparationSignals.role || undefined,
+            desiredOutcome:
+              homepagePreparationSignals.desiredOutcome ||
+              homepagePreparationSignals.broadGoal ||
+              undefined,
+            conversationContext:
+              homepagePreparationSignals.knownContext ||
+              homepagePreparationSignals.conversationType ||
+              undefined,
+            audience:
+              homepagePreparationSignals.audience ||
+              undefined,
+            knownFacts: [
+              ...Object.values(
+                homepagePreparationSignals.optionalSignals || {},
+              ),
+            ]
+              .map((value) => String(value || "").trim())
+              .filter(Boolean),
+          },
         };
 
         const [formulaResponse, scriptResponse, catalogResponse, recommendationResponse] = await Promise.all([
@@ -1102,7 +1125,19 @@ export default function OperationalLibraryClient() {
     : "BRANESX";
 
   return (
-    <div className="george-motion-fade-soft mt-10 space-y-8">
+    <>
+      <BxPageHeader
+        backLabel="BACK"
+        onBack={
+          livePrepReturnAvailable
+            ? returnToLivePrep
+            : () => {
+                window.location.href = "/george";
+              }
+        }
+      />
+
+      <div className="george-motion-fade-soft mt-10 space-y-8">
       <section
         data-marketplace-hero="operational-strategy"
         className="overflow-hidden rounded-[24px] border border-white/14 bg-[#090909] shadow-[0_24px_80px_rgba(0,0,0,0.42)]"
@@ -2106,5 +2141,6 @@ export default function OperationalLibraryClient() {
         )}
       </section>
     </div>
+    </>
   );
 }

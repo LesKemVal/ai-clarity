@@ -1,11 +1,9 @@
 import OperationalLibraryClient from "./OperationalLibraryClient";
-import BxPageHeader from "@/components/BxPageHeader";
 
 export default function GeorgeLibraryPage() {
   return (
     <main className="min-h-screen bg-black text-white">
       <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-12">
-        <BxPageHeader backHref="/george" />
         <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/38">WORKSPACE / LIBRARY</p>
         <h1 className="mt-3 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">
           Operational Library

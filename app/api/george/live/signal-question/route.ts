@@ -16,7 +16,7 @@ type PriorInteraction = {
 }
 
 type SignalQuestionRequest = {
-  interactionMode?: 'briefing' | 'ask_george'
+  interactionMode?: 'briefing' | 'ask_george' | 'briefing_examples'
   userTurn?: string
   role?: string
   broadGoal?: string
@@ -130,8 +130,134 @@ export async function POST(req: Request) {
     )
 
     const interactionMode =
-      body.interactionMode === 'ask_george' ? 'ask_george' : 'briefing'
+      body.interactionMode === 'ask_george'
+        ? 'ask_george'
+        : body.interactionMode === 'briefing_examples'
+          ? 'briefing_examples'
+          : 'briefing'
     const userTurn = clean(body.userTurn)
+
+    if (interactionMode === 'briefing_examples') {
+      const desiredOutcome = clean(body.desiredOutcome)
+      const role = clean(body.role)
+      const counterparty = clean(body.audience)
+
+      const fallbackExamples = {
+        role: "interviewee",
+        counterparty: "hiring manager",
+        context: "the position",
+      }
+
+      if (!desiredOutcome || !process.env.OPENAI_API_KEY) {
+        return NextResponse.json({
+          examples: fallbackExamples,
+        })
+      }
+
+      const completion = await openai.chat.completions.create({
+        model:
+          process.env.OPENAI_MODEL_INTELLIGENT ||
+          process.env.OPENAI_MODEL ||
+          'gpt-4o',
+        temperature: 0.2,
+        response_format: { type: 'json_object' },
+        messages: [
+          {
+            role: 'system',
+            content: `
+You provide quiet example answers for GEORGE's conversational LIVE briefing.
+
+The user supplies their GOAL first. They may also have supplied their ROLE and/or COUNTERPARTY.
+
+Treat every non-empty supplied value as established evidence for this examples request.
+
+Return strict JSON:
+{
+  "role": string,
+  "counterparty": string,
+  "context": string
+}
+
+These are EXAMPLES ONLY. They are not facts and must never become canonical signals unless the user supplies or accepts them.
+
+Infer only the still-missing examples from the established evidence.
+
+Each returned value must look like an ACTUAL ANSWER the user could naturally type into the blank.
+
+Progressive rules:
+- Goal only: suggest plausible role, counterparty, and context.
+- Goal + role: use both to refine counterparty and context.
+- Goal + role + counterparty: use all three to refine context.
+- Never contradict a supplied value.
+- Never replace a supplied value with a different guess.
+- Never invent a transaction type, relationship, instrument, agreement, or subject that the established evidence does not support.
+- If the precise subject is still uncertain, prefer a conservative phrase grounded in the evidence, such as "the deal", "the investment", "the position", "the dispute", or similarly direct wording.
+
+Good:
+goal: "get hired for a stocking position"
+role: "interviewee"
+counterparty: "hiring manager"
+context: "the stocking position"
+
+Good:
+goal: "secure investment for my company"
+role: "CEO"
+counterparty: "potential investor"
+context: "our financing round"
+
+Bad:
+role: "your role"
+counterparty: "who you're speaking with"
+context: "what the conversation concerns"
+
+Bad:
+role: "someone seeking employment"
+counterparty: "the person responsible for evaluating candidates"
+context: "the opportunity being discussed"
+
+Rules:
+- Prefer ordinary role names: interviewee, CEO, manager, employee, attorney, parent, buyer, seller, founder.
+- Keep every answer short.
+- Use natural language.
+- Do not explain the answer.
+- Do not prepend "e.g.", "example", or a label.
+- Do not invent specifics unsupported by the goal.
+- When several roles are plausible, choose the simplest broadly plausible example.
+            `.trim(),
+          },
+          {
+            role: 'user',
+            content: JSON.stringify({
+              desiredOutcome,
+              role,
+              counterparty,
+            }),
+          },
+        ],
+      })
+
+      try {
+        const parsed = JSON.parse(
+          completion.choices?.[0]?.message?.content || '{}',
+        )
+
+        return NextResponse.json({
+          examples: {
+            role:
+              clean(parsed?.role) || fallbackExamples.role,
+            counterparty:
+              clean(parsed?.counterparty) ||
+              fallbackExamples.counterparty,
+            context:
+              clean(parsed?.context) || fallbackExamples.context,
+          },
+        })
+      } catch {
+        return NextResponse.json({
+          examples: fallbackExamples,
+        })
+      }
+    }
 
     const knownSignal = {
       role: clean(body.role),
@@ -278,7 +404,19 @@ You are GEORGE's adaptive preparation reasoning authority.
 
 The desired outcome establishes the briefing mission.
 
-Treat an explicit desiredOutcome as established current-session operational evidence. Do not ask the user to restate, rename, validate, or generically clarify an outcome they have already selected or stated.
+Treat an explicit desiredOutcome as established current-session operational evidence when its meaning is operationally clear. A non-empty field is not automatically resolved.
+
+If any established signal is syntactically incomplete, semantically ambiguous, internally contradictory, or supports multiple materially different interpretations, clarification outranks downstream questioning. Ask one concise clarification question before proceeding.
+
+Do not silently choose among materially different meanings. For example, if the user is discussing funding and enters "150B" as the goal, do not decide whether they mean raising $150B, securing a $150B investment, reaching a $150B valuation, or something else. Ask the user to establish the intended meaning.
+
+When clarifying an existing canonical signal, use one of these semantic keys so the confirmed answer can replace the ambiguous value:
+- clarify_role
+- clarify_audience
+- clarify_knownContext
+- clarify_desiredOutcome
+
+Do not ask the user to restate, rename, validate, or generically clarify a signal whose meaning is already operationally clear.
 
 Determine the user's present intent before collecting unrelated signals. Use explicit current-session statements first, then current-session conversation evidence, then relevant history as supporting context, and general inference last. The user may have already expressed the intent or outcome in desiredOutcome, broadGoal, knownContext, or priorInteractions. Reason across all of them before deciding what remains unresolved.
 
@@ -392,9 +530,27 @@ When another briefing interaction is appropriate, also generate:
 2. Why this is important
 3. Example of how to construct a strong answer
 
-The example must be a concise response formula tailored to the question and the established briefing evidence, not a completed answer for the user to copy. Prefer the form: "For example: Describe X, Y, and Z."
+The example must be a short, plausible REAL ANSWER the user could naturally type in response to the question.
 
-The example must help answer the new question without restating the established outcome or suggesting a different outcome. If the user has already established an outcome such as closing a sale, do not offer examples such as finalizing the deal, setting an appointment, or choosing another objective. Instead illustrate the unresolved information the question is seeking.
+It must not be an instruction, response formula, checklist, or description of what the user should provide.
+
+Good:
+question: "What specific type of stocking job are you most interested in?"
+example: "Warehouse stocking."
+
+Good:
+question: "Who will be making the hiring decision?"
+example: "The store manager."
+
+Bad:
+"Specify whether you are interested in grocery, warehouse, or retail stocking."
+
+Bad:
+"Describe the person responsible for the hiring decision."
+
+The example is illustrative only. Never treat it as established evidence unless the user actually supplies or accepts it.
+
+The example must directly answer the new question in natural user language without restating the established outcome or suggesting a different outcome. If the user has already established an outcome such as closing a sale, do not offer examples such as finalizing the deal, setting an appointment, or choosing another objective. Instead illustrate the unresolved information the question is seeking.
 
 Do not use the example or helper as interface guidance. Do not write "Answer if useful, or skip," repeat the question, or explain that the answer may improve GEORGE's context, timing, or support.
 
@@ -447,7 +603,7 @@ You are GEORGE's preparation question eligibility reviewer.
 
 You are reviewing whether GEORGE's proposed briefing question is legitimate to ask.
 
-The desired outcome is already established operational evidence and defines the briefing mission.
+The desired outcome is established operational evidence and defines the briefing mission only when its meaning is operationally clear. A populated but materially ambiguous signal remains eligible for one clarification question.
 
 A proposed question is legitimate only if ALL of these are true:
 
@@ -459,7 +615,7 @@ Do not approve a question merely because the user could answer it.
 2. NOVELTY
 The requested information is not already established semantically and is not reasonably inferable from the accumulated evidence.
 
-Do not ask the user to restate, rename, narrow, validate, or translate information GEORGE already has.
+Do not ask the user to restate, rename, narrow, validate, or translate information GEORGE already understands. This prohibition does not apply when the existing value is materially ambiguous and different interpretations would change preparation or LIVE support.
 
 3. INFORMATION AUTHORITY
 The user is the proper authority for the requested information.

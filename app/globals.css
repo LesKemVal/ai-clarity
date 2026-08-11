@@ -2127,3 +2127,258 @@ button:active,
 }
 
 /* GEORGE MATERIAL MOTION — END */
+
+/* GEORGE PRIMARY ACTION MATERIAL — START */
+
+@keyframes georgePrimaryActionGleam {
+  0%,
+  14% {
+    transform: translateX(-220%) skewX(-18deg);
+    opacity: 0;
+  }
+
+  22% {
+    opacity: 0.12;
+  }
+
+  34% {
+    transform: translateX(520%) skewX(-18deg);
+    opacity: 0;
+  }
+
+  58% {
+    transform: translateX(520%) skewX(-18deg);
+    opacity: 0;
+  }
+
+  66% {
+    opacity: 0.12;
+  }
+
+  78% {
+    transform: translateX(-220%) skewX(-18deg);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateX(-220%) skewX(-18deg);
+    opacity: 0;
+  }
+}
+
+.george-primary-action {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  box-sizing: border-box;
+  border: 1px solid rgba(216, 222, 232, 0.62);
+  background: #4e7cff;
+  box-shadow: none;
+}
+
+.george-primary-action::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+  top: -70%;
+  bottom: -70%;
+  left: -24%;
+  width: 16%;
+  transform: translateX(-220%) skewX(-18deg);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(230, 234, 242, 0.04),
+    rgba(255, 255, 255, 0.34),
+    rgba(218, 224, 234, 0.06),
+    transparent
+  );
+  filter: blur(0.45px);
+  opacity: 0;
+  animation: georgePrimaryActionGleam 6.4s ease-in-out infinite;
+}
+
+.george-primary-action:hover {
+  border-color: rgba(229, 233, 240, 0.72);
+  background: #4e7cff;
+  box-shadow: none;
+}
+
+.george-primary-action:active {
+  transform: translateY(1px) scale(0.992);
+}
+
+.george-primary-action:disabled,
+.george-primary-action[aria-disabled="true"] {
+  border-color: rgba(255, 255, 255, 0.055);
+  background: rgba(255, 255, 255, 0.018);
+  box-shadow: none;
+}
+
+.george-primary-action:disabled::before,
+.george-primary-action[aria-disabled="true"]::before {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .george-primary-action::before {
+    display: none;
+    animation: none !important;
+  }
+
+  .george-primary-action:hover {
+    transform: none;
+  }
+}
+
+/* GEORGE PRIMARY ACTION MATERIAL — END */
+
+
+/* GEORGE EDIT UTILITY GLEAM — START */
+
+@keyframes georgeEditUtilityGleam {
+  0%,
+  18% {
+    transform: translateX(-220%) skewX(-18deg);
+    opacity: 0;
+  }
+
+  26% {
+    opacity: 0.16;
+  }
+
+  38% {
+    transform: translateX(500%) skewX(-18deg);
+    opacity: 0;
+  }
+
+  60% {
+    transform: translateX(500%) skewX(-18deg);
+    opacity: 0;
+  }
+
+  68% {
+    opacity: 0.16;
+  }
+
+  80% {
+    transform: translateX(-220%) skewX(-18deg);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateX(-220%) skewX(-18deg);
+    opacity: 0;
+  }
+}
+
+.george-edit-gleam {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.george-edit-gleam::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+  top: -75%;
+  bottom: -75%;
+  left: -26%;
+  width: 18%;
+  transform: translateX(-220%) skewX(-18deg);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(226, 231, 239, 0.04),
+    rgba(255, 255, 255, 0.30),
+    rgba(218, 224, 234, 0.05),
+    transparent
+  );
+  filter: blur(0.4px);
+  opacity: 0;
+  animation: georgeEditUtilityGleam 6.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .george-edit-gleam::after {
+    display: none;
+    animation: none !important;
+  }
+}
+
+/* GEORGE EDIT UTILITY GLEAM — END */
+
+/* GEORGE LIVE BUTTON SHIMMER — START */
+
+@keyframes georgeLiveButtonShimmer {
+  0%,
+  16% {
+    transform: translateX(-240%) skewX(-18deg);
+    opacity: 0;
+  }
+
+  25% {
+    opacity: 0.28;
+  }
+
+  38% {
+    transform: translateX(560%) skewX(-18deg);
+    opacity: 0;
+  }
+
+  62% {
+    transform: translateX(560%) skewX(-18deg);
+    opacity: 0;
+  }
+
+  71% {
+    opacity: 0.28;
+  }
+
+  84%,
+  100% {
+    transform: translateX(-240%) skewX(-18deg);
+    opacity: 0;
+  }
+}
+
+.george-live-primary-shimmer {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.george-live-primary-shimmer::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+  top: -80%;
+  bottom: -80%;
+  left: -22%;
+  width: 18%;
+  transform: translateX(-240%) skewX(-18deg);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(230, 234, 241, 0.03) 25%,
+    rgba(255, 255, 255, 0.34) 50%,
+    rgba(225, 230, 238, 0.04) 75%,
+    transparent 100%
+  );
+  filter: blur(0.35px);
+  opacity: 0;
+  animation: georgeLiveButtonShimmer 5.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .george-live-primary-shimmer::after {
+    display: none;
+    animation: none !important;
+  }
+}
+
+/* GEORGE LIVE BUTTON SHIMMER — END */

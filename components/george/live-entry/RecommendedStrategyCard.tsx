@@ -149,35 +149,38 @@ export function RecommendedStrategyCard({
   if (explanationOpen) {
     return (
       <section
-        className="mt-3 rounded-[12px] border border-white/[0.08] bg-white/[0.02] px-4 py-4 transition-all duration-500 ease-out"
+        className="mt-3 rounded-[11px] border border-white/[0.07] bg-white/[0.015] px-4 py-3.5 transition-all duration-500 ease-out"
         onPointerDown={restartIdleTimer}
         onPointerMove={restartIdleTimer}
         onKeyDown={restartIdleTimer}
         onWheel={restartIdleTimer}
         onTouchMove={restartIdleTimer}
       >
-        <button
-          type="button"
-          onClick={closeExplanation}
-          className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-[#AFC0FF]/62 transition hover:text-white"
-        >
-          Back
-        </button>
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-white/32">
+              Conversation formula
+            </div>
+            <div className="mt-1.5 text-[13px] font-semibold text-white/84">
+              {formulaName}
+            </div>
+          </div>
 
-        <div className="mt-4 text-[15px] font-semibold tracking-[-0.02em] text-white/86">
-          {formulaName}
-        </div>
-
-        <div className="mt-4 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/34">
-          What this formula does
+          <button
+            type="button"
+            onClick={closeExplanation}
+            className="shrink-0 font-mono text-[7px] font-semibold uppercase tracking-[0.14em] text-white/34 transition hover:text-white/70"
+          >
+            Close
+          </button>
         </div>
 
         {explanationItems.length > 0 ? (
-          <div className="mt-3 space-y-2">
+          <div className="mt-4 space-y-2 border-t border-white/[0.055] pt-3">
             {explanationItems.map((item, index) => (
               <div
                 key={`${formula.id}-explanation-${index}`}
-                className="flex items-start gap-2 text-[11px] leading-5 text-white/62"
+                className="flex items-start gap-2 text-[11px] leading-5 text-white/58"
               >
                 <span className="mt-[8px] h-1 w-1 shrink-0 rounded-full bg-[#8FAEFF]/70" />
                 <span>{item}</span>
@@ -185,57 +188,47 @@ export function RecommendedStrategyCard({
             ))}
           </div>
         ) : (
-          <p className="mt-3 text-[11px] leading-5 text-white/50">
+          <p className="mt-4 border-t border-white/[0.055] pt-3 text-[11px] leading-5 text-white/50">
             {formula.bestUsedFor?.[0] ||
               "This formula provides the operational sequence for the current conversation."}
           </p>
         )}
-
-        <button
-          type="button"
-          onClick={onChooseAnother}
-          className="mt-5 inline-flex h-9 items-center justify-center rounded-[9px] border border-[#7898FF]/[0.24] bg-[#4E7CFF]/[0.08] px-4 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-[#D4DCFF]/72 transition hover:border-[#7898FF]/45 hover:text-white"
-        >
-          Browse Formula Library
-        </button>
       </section>
     );
   }
 
   return (
-    <section className="mt-3 rounded-[12px] border border-white/[0.08] bg-white/[0.02] px-4 py-4 transition-all duration-500 ease-out">
-      <div className="text-[8px] font-semibold uppercase tracking-[0.2em] text-[#9BA8BC]/42">
-        Recommended formula
-      </div>
+    <section className="mt-3 rounded-[11px] border border-white/[0.07] bg-white/[0.015] px-4 py-3.5 transition-all duration-500 ease-out">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-[#9BA8BC]/42">
+            Recommended formula
+          </div>
 
-      <div className="mt-1.5 text-[15px] font-semibold tracking-[-0.02em] text-white/86">
-        {formulaName}
-      </div>
+          <div className="mt-1.5 text-[13px] font-semibold tracking-[-0.01em] text-white/86">
+            {formulaName}
+          </div>
+        </div>
 
-      <button
-        type="button"
-        onClick={openExplanation}
-        className="mt-4 block font-mono text-[9px] font-semibold uppercase tracking-[0.17em] text-[#AFC0FF]/68 transition hover:text-white"
-      >
-        What this formula does
-      </button>
-
-      <button
-        type="button"
-        onClick={onChooseAnother}
-        className="mt-3 block font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/44 transition hover:text-white"
-      >
-        Browse Formula Library
-      </button>
-
-      {onContinue && (
         <button
           type="button"
-          onClick={onContinue}
-          className="mt-5 inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-[#7898FF]/55 bg-[#4E7CFF] px-4 font-mono text-[9px] font-semibold uppercase tracking-[0.17em] text-white transition hover:bg-[#5B86FF]"
+          onClick={openExplanation}
+          className="shrink-0 font-mono text-[7px] font-semibold uppercase tracking-[0.14em] text-white/34 transition hover:text-white/70"
         >
-          Use this formula
+          View
         </button>
+      </div>
+
+      {onContinue && (
+        <div className="mt-3 border-t border-white/[0.055] pt-3">
+          <button
+            type="button"
+            onClick={onContinue}
+            className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-[#AFC0FF]/66 transition hover:text-white"
+          >
+            Use formula
+          </button>
+        </div>
       )}
     </section>
   );
