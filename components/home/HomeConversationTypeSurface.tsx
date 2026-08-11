@@ -2355,10 +2355,10 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                       Direction
                     </div>
                     <h3 className="mt-2.5 font-mono text-[17px] font-semibold leading-6 tracking-[-0.03em] text-white sm:text-[22px] sm:leading-7">
-                      What are you trying to accomplish?
+                      What do you want to take away from this conversation?
                     </h3>
                     <p className="mt-2 max-w-2xl text-[11px] leading-[1.65] text-white/48 sm:text-[12px] sm:leading-5">
-                      Give GEORGE the direction first. I’ll use it with what I already understand about this conversation to refine the briefing.
+                      Choose the direction that best describes what you want from this conversation. I’ll use your role and this direction together to refine the briefing.
                     </p>
                     <p className="mt-2.5 font-mono text-[9px] uppercase tracking-[0.10em] text-white/34">
                       {missionTier === "smart"
@@ -2418,7 +2418,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                           htmlFor="homepage-custom-mission"
                           className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42"
                         >
-                          What are you trying to accomplish?
+                          What do you want to take away from this conversation?
                         </label>
                         <div className="mt-2 flex flex-col gap-2 sm:flex-row">
                           <input
