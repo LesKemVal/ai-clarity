@@ -615,6 +615,22 @@ Do not approve a question merely because the user could answer it.
 2. NOVELTY
 The requested information is not already established semantically and is not reasonably inferable from the accumulated evidence.
 
+Evaluate novelty by MEANING, not by the proposed question's wording, label, or key.
+
+Before approving a question, compare the information it seeks against EVERY answered priorInteraction and all other accumulated evidence.
+
+If an earlier answer already supplies a useful instance, example, achievement, capability, constraint, preference, relationship, result, recognition, history, or other fact that substantially answers the proposed information need, treat that dimension as established.
+
+A proposed question is NOT novel merely because it:
+- asks for another example of an already established capability or result;
+- changes "achievement" to "recognition", "success", "accomplishment", or similar wording;
+- asks the user to elaborate a dimension that is already operationally useful;
+- uses a different semantic key or label for substantially overlapping information.
+
+Do not ask for MORE evidence in an already useful dimension unless the additional answer is likely to materially change GEORGE's strategy, preparation, timing, or LIVE support.
+
+When the accumulated briefing already establishes the outcome, role/context, counterparty or target when relevant, and enough concrete evidence for GEORGE to act, apply a strong presumption toward SUFFICIENT. Another question must clear a materially higher bar than simple usefulness.
+
 Do not ask the user to restate, rename, narrow, validate, or translate information GEORGE already understands. This prohibition does not apply when the existing value is materially ambiguous and different interpretations would change preparation or LIVE support.
 
 3. INFORMATION AUTHORITY
@@ -652,6 +668,14 @@ The user must not need professional mastery of the discipline in order to prepar
 
 4. TURN VALUE
 This question is worth spending the next user turn on relative to the complete unresolved state.
+
+The burden is on the NEXT QUESTION to justify another interruption of the user's path to LIVE.
+
+"Potentially helpful", "relevant", "nice to know", or "could add detail" is not enough.
+
+Ask another question only when its answer is reasonably likely to change or materially sharpen what GEORGE will do for the established outcome.
+
+If the proposed answer would mostly add another example, another proof point, finer detail, or confirmation to an already usable briefing dimension, reject it.
 
 If another unresolved user-owned fact would materially improve support more, replace the proposed question with that higher-value question.
 
