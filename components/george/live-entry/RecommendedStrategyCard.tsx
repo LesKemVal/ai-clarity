@@ -10,7 +10,7 @@ type RecommendedStrategyCardProps = {
   loading: boolean;
   selectedFormula: OperationalFormula | null;
   onChooseAnother: () => void;
-  onContinue?: () => void;
+  onUseFormula?: (formula: OperationalFormula) => void;
 };
 
 const EXPLANATION_STORAGE_KEY =
@@ -22,9 +22,10 @@ export function RecommendedStrategyCard({
   loading,
   selectedFormula,
   onChooseAnother,
-  onContinue,
+  onUseFormula,
 }: RecommendedStrategyCardProps) {
   const [explanationOpen, setExplanationOpen] = useState(false);
+  const [formulaDetailsOpen, setFormulaDetailsOpen] = useState(false);
   const idleTimerRef = useRef<number | null>(null);
 
   const formula =
@@ -119,13 +120,6 @@ export function RecommendedStrategyCard({
           >
             Browse Formula Library
           </button>
-          <button
-            type="button"
-            onClick={onContinue}
-            className="inline-flex h-9 items-center justify-center rounded-[9px] border border-white/[0.12] px-4 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/58 transition hover:border-white/28 hover:text-white"
-          >
-            Continue without formula
-          </button>
         </div>
       </section>
     );
@@ -134,6 +128,11 @@ export function RecommendedStrategyCard({
   const formulaName =
     formula.name?.trim() ||
     `Formula ${String(formula.id || formula.version)}`;
+
+  const recommendationExplanation =
+    recommendation?.recommendationSummary?.trim() ||
+    formula.bestUsedFor?.[0]?.trim() ||
+    "This strategy gives me an operational reference for the outcome you are pursuing in this room.";
 
   const explanationItems = (formula.steps || [])
     .map(
@@ -145,6 +144,7 @@ export function RecommendedStrategyCard({
     )
     .filter(Boolean)
     .slice(0, 4);
+
 
   if (explanationOpen) {
     return (
@@ -175,24 +175,43 @@ export function RecommendedStrategyCard({
           </button>
         </div>
 
-        {explanationItems.length > 0 ? (
-          <div className="mt-4 space-y-2 border-t border-white/[0.055] pt-3">
-            {explanationItems.map((item, index) => (
-              <div
-                key={`${formula.id}-explanation-${index}`}
-                className="flex items-start gap-2 text-[11px] leading-5 text-white/58"
-              >
-                <span className="mt-[8px] h-1 w-1 shrink-0 rounded-full bg-[#8FAEFF]/70" />
-                <span>{item}</span>
-              </div>
-            ))}
+        <div className="mt-4 border-t border-white/[0.055] pt-3">
+          <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.17em] text-white/34">
+            Why I recommend this
           </div>
-        ) : (
-          <p className="mt-4 border-t border-white/[0.055] pt-3 text-[11px] leading-5 text-white/50">
-            {formula.bestUsedFor?.[0] ||
-              "This formula provides the operational sequence for the current conversation."}
+
+          <p className="mt-2 text-[11px] leading-5 text-white/58">
+            {recommendationExplanation}
           </p>
-        )}
+
+          {explanationItems.length > 0 && (
+            <>
+              <button
+                type="button"
+                onClick={() =>
+                  setFormulaDetailsOpen((current) => !current)
+                }
+                className="mt-4 font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-[#AFC0FF]/68 transition hover:text-white"
+              >
+                {formulaDetailsOpen ? "Hide formula" : "View formula"}
+              </button>
+
+              {formulaDetailsOpen && (
+                <div className="mt-3 space-y-2 border-t border-white/[0.055] pt-3">
+                  {explanationItems.map((item, index) => (
+                    <div
+                      key={`${formula.id}-explanation-${index}`}
+                      className="flex items-start gap-2 text-[11px] leading-5 text-white/58"
+                    >
+                      <span className="mt-[8px] h-1 w-1 shrink-0 rounded-full bg-[#8FAEFF]/70" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </section>
     );
   }
@@ -219,11 +238,11 @@ export function RecommendedStrategyCard({
         </button>
       </div>
 
-      {onContinue && (
+      {onUseFormula && (
         <div className="mt-3 border-t border-white/[0.055] pt-3">
           <button
             type="button"
-            onClick={onContinue}
+            onClick={() => onUseFormula(formula)}
             className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-[#AFC0FF]/66 transition hover:text-white"
           >
             Use formula

@@ -2382,3 +2382,49 @@ button:active,
 }
 
 /* GEORGE LIVE BUTTON SHIMMER — END */
+
+.george-thinking-dots > span {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.72);
+  opacity: 0.22;
+  transform: scale(0.86);
+  animation: george-thinking-step 1.2s linear infinite;
+}
+
+.george-thinking-dots > span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.george-thinking-dots > span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes george-thinking-step {
+  0%,
+  16% {
+    opacity: 0.22;
+    transform: scale(0.86);
+  }
+
+  17%,
+  42% {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+
+  43%,
+  100% {
+    opacity: 0.22;
+    transform: scale(0.86);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .george-thinking-dots > span {
+    animation: none;
+    opacity: 0.55;
+  }
+}
