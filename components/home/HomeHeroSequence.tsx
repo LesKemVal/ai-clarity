@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import { requestFreshNormalBrowserSession } from "@/lib/george/session/store";
 
+const COMMUNICATION_LEVELS = [
+  "Smart",
+  "INTELLIGENT",
+  "BRILLIANT",
+] as const;
+
 const OPERATIONAL_SECTIONS = [
-  {
-    heading: "Relentless objective focus",
-    paragraph:
-      "Every recommendation GEORGE delivers to your screen, audio glasses, or earbuds is designed to move the conversation one step closer to your objective. Every cue, every response, and every strategy serves a purpose.",
-  },
   {
     heading: "Continuous tracking",
     paragraph:
@@ -28,6 +29,11 @@ const OPERATIONAL_SECTIONS = [
     heading: "Dynamic redirection",
     paragraph:
       "If a negotiation stalls, a prospect raises an unexpected objection, or an interviewer suddenly changes direction, GEORGE immediately abandons the previous strategy, reassesses the conversation, and delivers new guidance to keep you moving toward your objective.",
+  },
+  {
+    heading: "Relentless objective focus",
+    paragraph:
+      "Every recommendation GEORGE delivers to your screen, audio glasses, or earbuds is designed to move the conversation one step closer to your objective. Every cue, every response, and every strategy serves a purpose.",
   },
 ] as const;
 
@@ -51,19 +57,31 @@ export function HomeHeroSequence() {
     const section = OPERATIONAL_SECTIONS[sectionIndex];
     setMessageVisible(true);
 
+    const LEVEL_SETTLE_MS = 720;
+
     if (reducedMotion) {
       setTypedParagraph(section.paragraph);
     } else {
       setTypedParagraph("");
-      let characterIndex = 0;
-      const typingTimer = window.setInterval(() => {
-        characterIndex += 1;
-        setTypedParagraph(section.paragraph.slice(0, characterIndex));
-        if (characterIndex >= section.paragraph.length) {
-          window.clearInterval(typingTimer);
-        }
-      }, 28);
-      timers.add(typingTimer);
+
+      const typingStartTimer = window.setTimeout(() => {
+        if (!active) return;
+
+        let characterIndex = 0;
+        const typingTimer = window.setInterval(() => {
+          characterIndex += 1;
+          setTypedParagraph(section.paragraph.slice(0, characterIndex));
+
+          if (characterIndex >= section.paragraph.length) {
+            window.clearInterval(typingTimer);
+            timers.delete(typingTimer);
+          }
+        }, 28);
+
+        timers.add(typingTimer);
+      }, LEVEL_SETTLE_MS);
+
+      timers.add(typingStartTimer);
     }
 
     const schedule = (callback: () => void, delay: number) => {
@@ -82,7 +100,9 @@ export function HomeHeroSequence() {
           (current + 1) % OPERATIONAL_SECTIONS.length,
         );
       }, reducedMotion ? 180 : 600);
-    }, reducedMotion ? 8000 : section.paragraph.length * 28 + 8500);
+    }, reducedMotion
+      ? 8000
+      : 720 + section.paragraph.length * 28 + 8500);
 
     return () => {
       active = false;
@@ -97,8 +117,7 @@ export function HomeHeroSequence() {
   };
 
   const startLive = () => {
-    window.localStorage.setItem("george_start_new_live", "1");
-    window.location.href = "/george/live-entry?source=start";
+    window.location.href = "/george/live-entry?source=orientation";
   };
 
   return (
@@ -106,24 +125,46 @@ export function HomeHeroSequence() {
       <button
         type="button"
         onClick={startNormal}
-        className="absolute left-5 top-5 z-40 flex h-[58px] w-[58px] items-center justify-center"
+        className="absolute left-5 top-5 z-40 flex h-[86px] w-[86px] items-center justify-center sm:h-[104px] sm:w-[104px]"
         aria-label="Open GEORGE"
       >
         <img
           src="/logofav.png"
           alt="Bx"
-          className="h-[52px] w-[52px] object-contain opacity-95"
+          className="h-[78px] w-[78px] object-contain opacity-95 sm:h-[96px] sm:w-[96px]"
         />
       </button>
 
-      <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[1500px] flex-col px-5 pb-6 pt-[14vh] sm:px-10 sm:pb-8 sm:pt-[18vh]">
+      <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[1500px] flex-col px-5 pb-6 pt-[19vh] sm:px-10 sm:pb-8 sm:pt-[23vh]">
         <div className="max-w-4xl">
-          <h1 className="font-mono text-[42px] font-black uppercase leading-[0.94] tracking-[-0.045em] text-white sm:text-[68px] md:text-[88px]">
-            GEORGE
+          <h1 className="font-mono tracking-[-0.045em]">
+            <span className="flex flex-col items-start">
+              <span className="relative block h-[36px] w-full sm:h-[54px] md:h-[66px]">
+                <span
+                  key={`level-${sectionIndex}`}
+                  className={`george-home-level-fade absolute bottom-0 left-0 block text-[34px] font-black leading-none sm:text-[52px] md:text-[64px] ${
+                    COMMUNICATION_LEVELS[
+                      sectionIndex % COMMUNICATION_LEVELS.length
+                    ] === "BRILLIANT"
+                      ? "text-[#9fb7ff] [text-shadow:0_0_10px_rgba(126,156,255,0.75),0_0_24px_rgba(78,124,255,0.55)]"
+                      : COMMUNICATION_LEVELS[
+                            sectionIndex % COMMUNICATION_LEVELS.length
+                          ] === "INTELLIGENT"
+                        ? "text-[#d4dcff]"
+                        : "text-white"
+                  }`}
+                >
+                  {COMMUNICATION_LEVELS[
+                    sectionIndex % COMMUNICATION_LEVELS.length
+                  ]}
+                </span>
+              </span>
+
+              <span className="mt-3 block text-[34px] font-medium leading-none text-white/72 sm:mt-4 sm:text-[52px] md:text-[64px]">
+                Communication
+              </span>
+            </span>
           </h1>
-          <div className="bx-command-shimmer mt-3 inline-flex overflow-hidden rounded-[7px] bg-[#C7CBD1] px-3 py-1.5 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-black sm:mt-4 sm:px-4 sm:py-2 sm:text-[15px]">
-            Intelligent Communication
-          </div>
           <div className="mt-8 min-h-[12rem] max-w-4xl sm:mt-10 sm:min-h-[14rem]">
             <div
               aria-live="polite"
@@ -131,9 +172,12 @@ export function HomeHeroSequence() {
                 messageVisible ? "opacity-100" : "opacity-0"
               }`}
             >
-              <div className="relative z-10 flex items-center justify-between gap-4">
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white/68">
-                {OPERATIONAL_SECTIONS[sectionIndex].heading}
+              <div className="relative z-10 flex h-[18px] items-center justify-between gap-4 [perspective:700px]">
+                <p
+                  key={`capability-${sectionIndex}`}
+                  className="george-home-capability-flip absolute left-0 top-0 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white/68"
+                >
+                  {OPERATIONAL_SECTIONS[sectionIndex].heading}
                 </p>
               </div>
               <p className="relative z-10 mt-4 max-w-3xl text-[20px] font-medium leading-[1.55] sm:text-[28px] sm:leading-[1.45]">

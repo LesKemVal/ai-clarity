@@ -1,6 +1,7 @@
 export type LiveEntryRoute = 'homepage' | 'normal' | 'direct'
 
 export type LiveEntryFirstStep =
+  | 'orientation'
   | 'questions'
   | 'mechanics'
   | 'prep'
@@ -37,8 +38,8 @@ const FRESH_DIRECT_SOURCES = new Set(['signal', 'home', 'founder'])
 
 function resolveRoute(source: string | null): LiveEntryRoute {
   if (source === 'homepage') return 'homepage'
-  if (source && source !== 'start') return 'normal'
-  return 'direct'
+  if (source === 'orientation' || source === 'start' || !source) return 'direct'
+  return 'normal'
 }
 
 export function resolveLiveEntry(
@@ -75,10 +76,12 @@ export function resolveLiveEntry(
     isFreshLiveStart,
     preLiveReady,
     firstStep:
-      route === 'homepage' && input.homepageHandoff
-        ? 'prep'
-        : route === 'normal'
-          ? 'mechanics'
-          : 'questions',
+      input.source === 'orientation'
+        ? 'orientation'
+        : route === 'homepage' && input.homepageHandoff
+          ? 'prep'
+          : route === 'normal'
+            ? 'mechanics'
+            : 'questions',
   }
 }

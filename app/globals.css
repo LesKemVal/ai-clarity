@@ -2428,3 +2428,60 @@ button:active,
     opacity: 0.55;
   }
 }
+
+/* Homepage communication level only.
+   Communication itself remains mounted and stationary. */
+@keyframes george-home-level-fade {
+  0% {
+    opacity: 0.38;
+    transform: translateY(3px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.george-home-level-fade {
+  animation: george-home-level-fade 720ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .george-home-level-fade {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+
+/* Homepage capability label flip. */
+@keyframes george-home-capability-flip {
+  0% {
+    opacity: 0;
+    transform: rotateX(-88deg) translateY(-3px);
+  }
+
+  55% {
+    opacity: 0.72;
+    transform: rotateX(-18deg) translateY(-1px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: rotateX(0deg) translateY(0);
+  }
+}
+
+.george-home-capability-flip {
+  transform-origin: center top;
+  backface-visibility: hidden;
+  animation: george-home-capability-flip 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .george-home-capability-flip {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -3142,6 +3142,18 @@ export default function LiveEntryClient() {
       } = entryResolution;
 
       setLiveEntryRoute(entryResolution.route);
+
+      if (entryResolution.firstStep === "orientation") {
+        setShowQuickLiveSetup(false);
+        setShowLiveBriefingRoom(false);
+        setShowOpenAISignalSurface(false);
+        setLiveEntryReadyMessageVisible(false);
+      } else if (entryResolution.firstStep === "questions") {
+        setShowQuickLiveSetup(false);
+        setShowLiveBriefingRoom(false);
+        setShowOpenAISignalSurface(true);
+      }
+
       setPreLivePreviewReady(preLiveReady);
 
       if (normalPreparationSeed) {
@@ -7439,97 +7451,99 @@ export default function LiveEntryClient() {
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-[640px] pt-2">
-        <section className="rounded-[1.25rem] border border-white/[0.08] bg-[#050505] p-4 shadow-[0_18px_50px_rgba(0,0,0,0.55)] sm:p-5">
-          <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/42">
-            ENTER LIVE
+        <section className="overflow-hidden rounded-[1.5rem] border border-white/[0.10] bg-[#F1F0EB] text-[#101114] shadow-[0_24px_80px_rgba(0,0,0,0.48)]">
+          <div className="px-5 pb-6 pt-6 sm:px-7 sm:pb-8 sm:pt-8">
+            <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.26em] text-black/42">
+              GEORGE LIVE
+            </div>
+
+            <h1 className="mt-4 max-w-[520px] text-[34px] font-semibold leading-[0.98] tracking-[-0.055em] text-black sm:text-[46px]">
+              Intelligence that stays with you in the room.
+            </h1>
+
+            <p className="mt-5 max-w-[500px] text-[14px] leading-6 text-black/58 sm:text-[15px]">
+              Hear what matters. See what matters. Keep your attention on the
+              conversation while GEORGE adapts with you.
+            </p>
           </div>
 
-          <h1 className="mt-3 text-[28px] font-semibold leading-tight tracking-[-0.04em] text-white/92 sm:text-[34px]">
-            How do you want to enter?
-          </h1>
+          <div className="border-y border-black/[0.08] bg-[#E7E6E0] px-5 py-6 sm:px-7">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-[1.1rem] border border-black/[0.08] bg-white/55 p-4">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-[#D84A45]" />
+                  <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.20em] text-black/48">
+                    Audio
+                  </span>
+                </div>
+                <p className="mt-3 text-[13px] font-medium leading-5 text-black/78">
+                  Short, discreet support you can hear without leaving the
+                  conversation.
+                </p>
+              </div>
 
-          <p className="mt-2 max-w-[520px] text-[13px] leading-6 text-white/44">
-            Enter immediately, brief GEORGE first, or return to Normal GEORGE to
-            think and plan.
-          </p>
+              <div className="rounded-[1.1rem] border border-black/[0.08] bg-white/55 p-4">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-[#3B9A68]" />
+                  <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.20em] text-black/48">
+                    Visual
+                  </span>
+                </div>
+                <p className="mt-3 text-[13px] font-medium leading-5 text-black/78">
+                  Persistent, skimmable guidance when a screen or visual
+                  receiver is available.
+                </p>
+              </div>
 
-          <div className="mt-4 grid gap-2">
-            <button
-              type="button"
-              onClick={openQuickLiveSetup}
-              className="rounded-[0.95rem] border border-[#4E7CFF]/38 bg-[#090D18] px-4 py-3 text-left transition hover:border-[#4E7CFF]/58 hover:bg-[#0C1222] active:scale-[0.99]"
-            >
-              <span className="block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/84">
-                Enter now
-              </span>
-              <span className="mt-1 block text-[13px] leading-5 text-white/58">
-                Start LIVE with minimal preparation.
-              </span>
-              <span className="mt-2 block text-[11px] leading-5 text-white/32">
-                I’ll learn from the room as the conversation unfolds.
-              </span>
-            </button>
+              <div className="rounded-[1.1rem] border border-black/[0.08] bg-[#15171A] p-4 text-white">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-[#D84A45]" />
+                  <span className="h-2 w-2 rounded-full bg-[#3B9A68]" />
+                  <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.20em] text-white/48">
+                    Audio + Visual
+                  </span>
+                </div>
+                <p className="mt-3 text-[13px] font-medium leading-5 text-white/78">
+                  GEORGE uses each channel where it helps most while one
+                  intelligence follows the room.
+                </p>
+              </div>
+            </div>
+          </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                setShowOpenAISignalSurface(true);
-                setCurrentOptionalSignalQuestion(null);
-                setOptionalSignalLoading(false);
-                setOptionalSignalComplete(false);
-                setLiveEntryReadyMessageVisible(false);
-                setShowLiveBriefingRoom(false);
-              }}
-              className="rounded-[0.95rem] border border-white/[0.09] bg-[#080808] px-4 py-3 text-left transition hover:border-[#D7DCFF]/24 hover:bg-[#0D0D0D] active:scale-[0.99]"
-            >
-              <span className="block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#F2F4FF]/82">
-                Prepare with GEORGE
-              </span>
-              <span className="mt-1 block text-[13px] leading-5 text-white/58">
-                Build a complete operational briefing before entering LIVE.
-              </span>
-              <span className="mt-2 block text-[11px] leading-5 text-white/32">
-                Recommended when context, stakes, or the desired outcome require
-                preparation.
-              </span>
-            </button>
+          <div className="px-5 py-6 sm:px-7 sm:py-7">
+            <div className="grid gap-5 sm:grid-cols-[1fr_auto] sm:items-end">
+              <div>
+                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-black/36">
+                  BEFORE YOU ENTER
+                </div>
+                <p className="mt-2 max-w-[410px] text-[13px] leading-6 text-black/58">
+                  Brief GEORGE on the conversation. I’ll use that context to
+                  prepare how I support you before the room begins.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  window.localStorage.setItem("george_start_new_live", "1");
+                  window.location.href = "/george/live-entry?source=start";
+                }}
+                className="min-h-[48px] rounded-[0.95rem] bg-black px-6 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.20em] text-white transition hover:bg-black/82 active:scale-[0.99]"
+              >
+                PREPARE FOR LIVE
+              </button>
+            </div>
 
             <button
               type="button"
               onClick={() => {
                 window.location.href = "/george";
               }}
-              className="rounded-[0.95rem] border border-[#4E7CFF]/40 bg-[#4E7CFF] px-4 py-2.5 text-left text-white shadow-[0_0_26px_rgba(78,124,255,0.20)] transition hover:bg-[#5478F0] active:scale-[0.99]"
+              className="mt-5 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-black/38 transition hover:text-black/68"
             >
-              <span className="block text-[11px] font-semibold uppercase tracking-[0.22em] text-white">
-                Normal GEORGE
-              </span>
-              <span className="mt-1 block text-[13px] leading-5 text-white/82">
-                Think, plan, or prepare before entering LIVE.
-              </span>
-              <span className="mt-3 inline-flex items-center text-[11px] font-medium tracking-[0.08em] text-white/88">
-                Open Normal GEORGE →
-              </span>
+              Continue in Normal GEORGE →
             </button>
-
-            {hasLiveSession && (
-              <button
-                type="button"
-                onClick={() => setShowResumeConversationList(true)}
-                className="rounded-[0.95rem] border border-white/[0.07] bg-white/[0.018] px-4 py-3 text-left transition hover:border-[#D7DCFF]/20 hover:bg-[#D7DCFF]/[0.045] active:scale-[0.99]"
-              >
-                <span className="block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#F2F4FF]/76">
-                  Resume Conversation
-                </span>
-                <span className="mt-1 block text-[12px] leading-5 text-white/52">
-                  Continue an existing LIVE conversation.
-                </span>
-                <span className="mt-2 block text-[12px] leading-5 text-white/34">
-                  GEORGE restores previous objectives, context, and conversation
-                  continuity before re-entering the room.
-                </span>
-              </button>
-            )}
           </div>
         </section>
 

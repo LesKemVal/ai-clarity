@@ -68,19 +68,22 @@ function SelectionAcknowledgement({ label }: { label: string }) {
 
 const HOMEPAGE_ROLES: readonly HomepageRole[] = [
   {
-    id: "sales",
-    label: "Sales",
-    category: "Conversation starters",
+    id: "salesperson",
+    label: "Salesperson",
+    category: "Sales & Outreach",
     conversationTypeId: "discovery-call",
     featured: true,
     summary:
-      "Navigating aggressive pricing pushback, defending contract profit margins, or closing high-value software and service agreements with corporate buyers.",
-    capabilities: ["Discovery", "Value framing", "Objection handling", "Next steps"],
-    relevantGoalIds: [
-      "close-sale",
-      "set-appointment",
-      "protect-margin",
-      "advance-buyer",
+      "Uncovering hidden buyer pain points through structured discovery, handling unexpected competitive threats smoothly, or locking down immediate purchase commitments before ending a call.",
+    capabilities: [
+      "Discovery and qualification",
+      "Rhetorical flow",
+      "Value framing",
+      "Objection handling",
+      "Transitions",
+      "Closing and next steps",
+      "Recovery",
+      "Adapting to buyer reaction",
     ],
   },
   {
@@ -178,25 +181,6 @@ const HOMEPAGE_ROLES: readonly HomepageRole[] = [
       "Appointment setting",
       "Consistency across high call volume",
       "Adapting when another strategy performs better",
-    ],
-  },
-  {
-    id: "salesperson",
-    label: "Salesperson",
-    category: "Sales & Outreach",
-    conversationTypeId: "discovery-call",
-    featured: true,
-    summary:
-      "Uncovering hidden buyer pain points through structured discovery, handling unexpected competitive threats smoothly, or locking down immediate purchase commitments before ending a call.",
-    capabilities: [
-      "Discovery and qualification",
-      "Rhetorical flow",
-      "Value framing",
-      "Objection handling",
-      "Transitions",
-      "Closing and next steps",
-      "Recovery",
-      "Adapting to buyer reaction",
     ],
   },
   {
@@ -1306,6 +1290,12 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   }, [isMissionTransition, phase, selectedRole]);
 
   function selectRole(role: HomepageRole) {
+    if (role.id === "other") {
+      window.localStorage.setItem("george_start_new_live", "1");
+      window.location.href = "/george/live-entry?source=start";
+      return;
+    }
+
     if (loadPreparationSession()?.provenance.entrySource === "homepage") {
       clearPreparationSession();
     }
@@ -2037,10 +2027,10 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                 BRANESX
               </p>
               <h1 className="mt-4 max-w-6xl font-mono text-[34px] font-black uppercase leading-[0.98] tracking-[-0.06em] sm:text-[54px]">
-                If success depends on what you say, how you say it, or how you adapt while saying it, GEORGE can help.
+                What is your Role in the conversation?
               </h1>
               <p className="mt-6 max-w-3xl text-[16px] leading-8 text-white/68">
-                Start from your role in the conversation, then define your objective. Intelligent communication can mean the difference between success and failure.
+                Start from your role... then define your objective.
               </p>
 
               <div className="mt-10">
