@@ -583,8 +583,8 @@ a[href*="/george/live"]:active {
 
 /* BRANESx command-surface phase */
 
-textarea,
-textarea:focus {
+textarea:not([data-george-textarea]),
+textarea:not([data-george-textarea]):focus {
   border-color: rgba(170, 180, 255, 0.22) !important;
   box-shadow:
     0 0 0 1px rgba(170, 180, 255, 0.14),
@@ -1374,7 +1374,7 @@ textarea:focus {
 
 /* command surface */
 
-textarea::placeholder {
+textarea:not([data-george-textarea])::placeholder {
   color: rgba(255, 255, 255, 0.22) !important;
 }
 
