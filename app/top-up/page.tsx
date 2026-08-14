@@ -94,14 +94,17 @@ export default function TopUpPage() {
       ? checkout
       : null
   })
-  const [currentTier] = useState<TierId>(() => {
-    if (typeof window === 'undefined') return 'smart'
+  const [currentTier, setCurrentTier] = useState<TierId>('smart')
 
+  useEffect(() => {
     const stored = window.localStorage.getItem('george_tier')
-    return stored === 'intelligent' || stored === 'brilliant'
-      ? stored
-      : 'smart'
-  })
+
+    setCurrentTier(
+      stored === 'intelligent' || stored === 'brilliant'
+        ? stored
+        : 'smart'
+    )
+  }, [])
 
   const currentUsageGuidance = useMemo(() => {
     if (intent === 'conversation' || intent === 'pro') {
@@ -297,10 +300,26 @@ export default function TopUpPage() {
     if (!code) return
 
     try {
+      const sessionResponse = await fetch('/api/session', {
+        method: 'GET',
+        cache: 'no-store',
+      })
+      const session = await sessionResponse.json().catch(() => ({}))
+      const continuityEmail =
+        sessionResponse.ok &&
+        session?.source === 'continuity' &&
+        typeof session?.email === 'string' &&
+        session.email.includes('@')
+          ? session.email
+          : null
+
       const response = await fetch('/api/founder-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({
+          code,
+          ...(continuityEmail ? { email: continuityEmail } : {}),
+        }),
       })
 
       const data = await response.json().catch(() => ({}))
@@ -312,6 +331,7 @@ export default function TopUpPage() {
 
       localStorage.setItem('george_tier', data.tier)
       localStorage.setItem('george_founder_access', 'server-verified')
+      setCurrentTier(data.tier)
 
       setMessage(`Founder ${data.tier === 'brilliant' ? 'Brilliant' : 'Intelligent'} access activated.`)
       setTimeout(() => {
