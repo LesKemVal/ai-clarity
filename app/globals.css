@@ -26,6 +26,69 @@
 
   --accent: #72afe8;
   --accent-bright: #7cb7ff;
+
+  /*
+   * GEORGE Visual System v1
+   * Semantic foundation.
+   * Existing production values are preserved while presentation
+   * ownership migrates toward canonical tokens and primitives.
+   */
+
+  /* Color */
+  --george-color-background: var(--surface-0);
+  --george-color-surface: var(--surface-1);
+  --george-color-surface-raised: var(--surface-2);
+  --george-color-text-primary: var(--steel-100);
+  --george-color-text-secondary: var(--steel-300);
+  --george-color-text-muted: var(--steel-500);
+  --george-color-border: var(--border-subtle);
+  --george-color-border-strong: rgba(255,255,255,.10);
+  --george-color-focus: #7cb7ff;
+  --george-color-success: #72c99a;
+  --george-color-warning: #d8b56d;
+  --george-color-danger: #e07b7b;
+  --george-color-live: #72afe8;
+  --george-color-accent: var(--accent);
+
+  /* Spacing */
+  --george-space-1: 0.25rem;
+  --george-space-2: 0.5rem;
+  --george-space-3: 0.75rem;
+  --george-space-4: 1rem;
+  --george-space-5: 1.5rem;
+  --george-space-6: 2rem;
+  --george-space-7: 3rem;
+  --george-space-8: 4rem;
+
+  /* Radius */
+  --george-radius-none: 0;
+  --george-radius-sm: 0.375rem;
+  --george-radius-md: 0.625rem;
+  --george-radius-lg: 0.875rem;
+  --george-radius-xl: 1.125rem;
+  --george-radius-full: 9999px;
+
+  /* Borders */
+  --george-border-width: 1px;
+  --george-border-subtle: var(--border-subtle);
+  --george-border-default: var(--border-soft);
+  --george-border-strong: rgba(255,255,255,.10);
+
+  /* Elevation */
+  --george-shadow-raised: 0 14px 34px rgba(0,0,0,.20);
+  --george-shadow-overlay: 0 24px 72px rgba(0,0,0,.48);
+
+  /* Focus */
+  --george-focus-width: 2px;
+  --george-focus-offset: 2px;
+  --george-focus-color: var(--george-color-focus);
+
+  /* Layers */
+  --george-z-base: 0;
+  --george-z-raised: 10;
+  --george-z-navigation: 30;
+  --george-z-overlay: 80;
+  --george-z-dialog: 100;
 }
 
 html,
