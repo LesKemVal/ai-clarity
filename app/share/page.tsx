@@ -1,6 +1,7 @@
 'use client'
 
 import { ShareIcon } from '@/components/icons/ShareIcon'
+import { Textarea } from '@/components/ui/Textarea'
 
 import { useMemo, useState } from 'react'
 
@@ -72,11 +73,11 @@ export default function SharePage() {
             </h1>
 
             <div className="mt-5 rounded-[1rem] border border-[#8FB6C9]/[0.11] bg-[#8FB6C9]/[0.045] p-4">
-              <textarea
+              <Textarea
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
                 rows={4}
-                className="w-full resize-none border-0 bg-transparent text-[18px] leading-7 tracking-[-0.03em] text-[#F2F4FF]/88 outline-none placeholder:text-white/20"
+                className="resize-none rounded-none border-0 bg-transparent p-0 text-[18px] leading-7 tracking-[-0.03em] text-[#F2F4FF]/88 placeholder:text-white/20 focus:border-transparent"
                 placeholder={DEFAULT_SHARE_MESSAGE}
               />
             </div>
