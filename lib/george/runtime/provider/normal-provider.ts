@@ -1257,9 +1257,12 @@ function semanticProposalPreservesDiscoveredCandidates(
 
   if (
     discoveredActNow &&
-    !normalCandidateIdentityMatches(
-      comparison.bestActionNow,
-      discoveredActNow
+    (
+      !comparison.bestActionNow ||
+      !normalCandidateIdentityMatches(
+        comparison.bestActionNow,
+        discoveredActNow
+      )
     )
   ) {
     return false
@@ -1267,9 +1270,12 @@ function semanticProposalPreservesDiscoveredCandidates(
 
   if (
     discoveredSignal &&
-    !normalCandidateIdentityMatches(
-      comparison.candidateSignal,
-      discoveredSignal
+    (
+      !comparison.candidateSignal ||
+      !normalCandidateIdentityMatches(
+        comparison.candidateSignal,
+        discoveredSignal
+      )
     )
   ) {
     return false
