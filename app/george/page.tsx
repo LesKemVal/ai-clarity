@@ -168,6 +168,7 @@ import { buildLiveRuntimeContext } from "@/lib/george/live-runtime/live-runtime-
 import type { LiveOutcomeObservation } from "@/lib/george/live-runtime/live-outcome-review";
 import { PostLiveConversationRecordPanel } from "@/components/george/live/PostLiveConversationRecordPanel";
 import { StructuredLiveNotice } from "@/components/george/live/StructuredLiveNotice";
+import { LiveExitPanel } from "@/components/george/live/LiveExitPanel";
 import { LiveSessionDetailsPanel } from "@/components/george/live/LiveSessionDetailsPanel";
 import { LiveOutcomeReviewPanel } from "@/components/george/live/LiveOutcomeReviewPanel";
 import { LiveRoomStatusPanel } from "@/components/george/live/LiveRoomStatusPanel";
@@ -8878,105 +8879,26 @@ I’ll stay with you.`,
                           document.body,
                         )}
 
-                      {showExitPopup && (
-                        <style>{`
-    .george-live-route {
-      filter: blur(14px);
-      transition: filter 180ms ease;
-    }
-  `}</style>
-                      )}
-
                       {showExitPopup &&
                         typeof document !== "undefined" &&
                         createPortal(
-                          <>
-                            <div
-                              role="button"
-                              tabIndex={0}
-                              aria-label="Close leave LIVE popup"
-                              onClick={() => setShowExitPopup(false)}
-                              onKeyDown={(event) => {
-                                if (
-                                  event.key === "Escape" ||
-                                  event.key === "Enter" ||
-                                  event.key === " "
-                                ) {
-                                  setShowExitPopup(false);
-                                }
-                              }}
-                              className="fixed inset-0 z-[80] flex items-center justify-center bg-black george-motion-fade-soft/58 px-4 backdrop-blur-[14px]"
-                            >
-                              <div
-                                onClick={(e) => e.stopPropagation()}
-                                className={`relative z-[181] w-[min(360px,calc(100vw-32px))] px-3 py-2.5 md:px-5 md:py-4 md:px-5 md:py-4 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}
-                              >
-                                <div className="mb-2 flex items-center justify-between">
-                                  <div className="text-[9px] uppercase tracking-[0.22em] text-white/24">
-                                    Leave LIVE
-                                  </div>
-
-                                  <button
-                                    type="button"
-                                    onClick={() => setShowExitPopup(false)}
-                                    className="text-[13px] text-white/28 transition hover:text-white/72"
-                                  >
-                                    ×
-                                  </button>
-                                </div>
-
-                                <p className="mb-3 text-[11px] leading-5 text-white/34">
-                                  Save this LIVE conversation, leave without
-                                  saving, or continue.
-                                </p>
-
-                                <div className="grid gap-1">
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setShowExitPopup(false);
-                                      window.localStorage.setItem(
-                                        "george_start_new_live",
-                                        "1",
-                                      );
-                                      openLiveEntry();
-                                    }}
-                                    className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-[#D7DBE4]/58 transition hover:text-white active:scale-[0.98]"
-                                  >
-                                    New LIVE
-                                  </button>
-
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      openLiveOutcomeExitReview("save")
-                                    }
-                                    className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
-                                  >
-                                    Save and exit
-                                  </button>
-
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      openLiveOutcomeExitReview("discard")
-                                    }
-                                    className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-red-100/58 transition hover:text-red-100/88 active:scale-[0.98]"
-                                  >
-                                    Exit without saving
-                                  </button>
-
-                                  <button
-                                    type="button"
-                                    onClick={() => setShowExitPopup(false)}
-                                    className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
-                                  >
-                                    Continue LIVE
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </>,
+                          <LiveExitPanel
+                            onClose={() => setShowExitPopup(false)}
+                            onNewLive={() => {
+                              setShowExitPopup(false);
+                              window.localStorage.setItem(
+                                "george_start_new_live",
+                                "1",
+                              );
+                              openLiveEntry();
+                            }}
+                            onSaveAndExit={() =>
+                              openLiveOutcomeExitReview("save")
+                            }
+                            onDiscardAndExit={() =>
+                              openLiveOutcomeExitReview("discard")
+                            }
+                          />,
                           document.body,
                         )}
 
