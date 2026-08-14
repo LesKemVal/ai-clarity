@@ -33,6 +33,7 @@ import {
 
 import Image from "next/image";
 import BxPageHeader from "@/components/BxPageHeader";
+import { Button } from "@/components/ui/Button";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   legacyAssistModeFromSupportStyle,
@@ -512,18 +513,15 @@ function AwakeButton({
   onClick: () => void;
 }) {
   return (
-    <button
-      type="button"
+    <Button
+      variant="primary"
+      size="md"
       disabled={!active}
       onClick={onClick}
-      className={`mt-4 w-full rounded-[12px] px-4 py-2.5 text-center text-[10px] font-semibold uppercase tracking-[0.19em] ${
-        active
-          ? "george-primary-action text-white"
-          : "cursor-default border border-white/[0.055] bg-white/[0.018] text-white/20"
-      }`}
+      className="mt-4 w-full rounded-[12px] px-4 py-2.5 text-center text-[10px] uppercase tracking-[0.19em] disabled:text-white/20"
     >
       {children}
-    </button>
+    </Button>
   );
 }
 
