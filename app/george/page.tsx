@@ -135,7 +135,6 @@ import {
   setActiveMode,
   updateActiveSessionMessages,
   updateSessionLinkage,
-  updateCampaignSessionMetadata,
   getCampaignSessions,
   getSessionsForMode,
   deleteSession,
@@ -2549,12 +2548,6 @@ export default function Page({
 
     return () => window.clearTimeout(timer);
   }, [liveMode, currentTier, liveGuidance]);
-  const [attemptStartTime, setAttemptStartTime] = useState<number | null>(null);
-  const [showOutcomeBar, setShowOutcomeBar] = useState(false);
-  const [lastOutcomeContext, setLastOutcomeContext] = useState<string | null>(
-    null,
-  );
-
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [showTierModal, setShowTierModal] = useState(false);
   const [loginEmailInput, setLoginEmailInput] = useState("");
@@ -8907,121 +8900,6 @@ I’ll stay with you.`,
                     </div>
                   </div>
                 </div>
-
-                {showOutcomeBar && (
-                  <div className="fixed bottom-[140px] left-0 right-0 z-[80] mx-auto w-[calc(100%-24px)] max-w-[600px] rounded-xl border border-white/[0.05] bg-black/72 -[10px] px-5 py-4 ">
-                    <div className="text-[11px] text-[#D7DBE4]/60 mb-2">
-                      What happened here?
-                    </div>
-
-                    <div className="flex justify-between gap-2">
-                      {(
-                        [
-                          ["WIN", "✓ Won", "text-[#8FB6C9]"],
-                          ["LOSS", "✗ Lost", "text-red-400"],
-                          ["FOLLOW_UP", "↻ Follow-up", "text-yellow-400"],
-                        ] as const
-                      ).map(([signal, label, colorClass]) => (
-                        <button
-                          key={signal}
-                          onClick={() => {
-                            const history = JSON.parse(
-                              window.localStorage.getItem("GEORGE_OUTCOMES") ||
-                                "[]",
-                            );
-                            history.unshift({
-                              signal,
-                              context: lastOutcomeContext,
-                              ts: Date.now(),
-                            });
-                            window.localStorage.setItem(
-                              "GEORGE_OUTCOMES",
-                              JSON.stringify(history.slice(0, 50)),
-                            );
-
-                            const sessions = getCampaignSessions();
-                            const updatedSessions = Array.isArray(sessions)
-                              ? sessions.map((session: any) => {
-                                  if (
-                                    activeCampaignId &&
-                                    session.id !== activeCampaignId
-                                  )
-                                    return session;
-
-                                  const perf = session.performance || {
-                                    calls: 0,
-                                    objections: 0,
-                                    callbacks: 0,
-                                    closes: 0,
-                                    weakSpots: [],
-                                    wins: 0,
-                                    losses: 0,
-                                    followUps: 0,
-                                    history: [],
-                                  };
-
-                                  const nextPerf = {
-                                    ...perf,
-                                    wins:
-                                      (perf.wins || 0) +
-                                      (signal === "WIN" ? 1 : 0),
-                                    losses:
-                                      (perf.losses || 0) +
-                                      (signal === "LOSS" ? 1 : 0),
-                                    followUps:
-                                      (perf.followUps || 0) +
-                                      (signal === "FOLLOW_UP" ? 1 : 0),
-                                    closes:
-                                      (perf.closes || 0) +
-                                      (signal === "WIN" ? 1 : 0),
-                                    callbacks:
-                                      (perf.callbacks || 0) +
-                                      (signal === "FOLLOW_UP" ? 1 : 0),
-                                    history: [
-                                      {
-                                        signal,
-                                        context: lastOutcomeContext,
-                                        ts: Date.now(),
-                                        duration: attemptStartTime
-                                          ? Date.now() - attemptStartTime
-                                          : null,
-                                      },
-                                      ...((perf.history || []) as any[]),
-                                    ].slice(0, 50),
-                                  };
-
-                                  return { ...session, performance: nextPerf };
-                                })
-                              : [];
-
-                            updateCampaignSessionMetadata(
-                              activeCampaignId,
-                              (metadata) => {
-                                const current = (metadata.performance ||
-                                  {}) as any;
-                                const next =
-                                  updatedSessions.find(
-                                    (item: any) => item.id === activeCampaignId,
-                                  )?.performance || current;
-
-                                return {
-                                  ...metadata,
-                                  performance: next,
-                                };
-                              },
-                            );
-
-                            setShowOutcomeBar(false);
-                            setLastOutcomeContext(null);
-                          }}
-                          className={`flex-1 rounded-lg border border-white/[0.05] py-1 text-[12px] ${colorClass}`}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
 
                 {liveMode && showLiveQuickMenu && (
                   <div className="pointer-events-none fixed inset-0 z-[71] bg-black george-motion-fade-soft/68 -[10px]" />
