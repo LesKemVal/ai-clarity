@@ -1,4 +1,5 @@
 import OperationalLibraryClient from "./OperationalLibraryClient";
+import { Surface } from "@/components/ui/Surface";
 
 export default function GeorgeLibraryPage() {
   return (
@@ -14,9 +15,32 @@ export default function GeorgeLibraryPage() {
         </p>
 
         <div className="mt-6 grid gap-3 text-sm leading-6 text-white/54 md:grid-cols-3">
-          <div className="rounded-xl border border-white/[0.07] bg-white/[0.018] p-4"><strong className="block text-white/78">Discover</strong>Browse catalog strategies supplied by the canonical Marketplace service.</div>
-          <div className="rounded-xl border border-white/[0.07] bg-white/[0.018] p-4"><strong className="block text-white/78">Reuse</strong>Use accessible formulas and scripts as Preparation evidence when they fit.</div>
-          <div className="rounded-xl border border-white/[0.07] bg-white/[0.018] p-4"><strong className="block text-white/78">Decide</strong>Entitlement and recommendation status remain explicit; GEORGE never silently adopts an asset.</div>
+          <Surface
+            variant="base"
+            radius="lg"
+            className="rounded-xl border-white/[0.07] bg-white/[0.018] p-4"
+          >
+            <strong className="block text-white/78">Discover</strong>
+            Browse catalog strategies supplied by the canonical Marketplace service.
+          </Surface>
+
+          <Surface
+            variant="base"
+            radius="lg"
+            className="rounded-xl border-white/[0.07] bg-white/[0.018] p-4"
+          >
+            <strong className="block text-white/78">Reuse</strong>
+            Use accessible formulas and scripts as Preparation evidence when they fit.
+          </Surface>
+
+          <Surface
+            variant="base"
+            radius="lg"
+            className="rounded-xl border-white/[0.07] bg-white/[0.018] p-4"
+          >
+            <strong className="block text-white/78">Decide</strong>
+            Entitlement and recommendation status remain explicit; GEORGE never silently adopts an asset.
+          </Surface>
         </div>
 
         <OperationalLibraryClient />
