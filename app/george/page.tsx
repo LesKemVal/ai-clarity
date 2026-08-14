@@ -110,6 +110,8 @@ import {
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import { operationalMotion } from "@/lib/george/ui/operational-motion";
+import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
 import Sidebar from "@/components/Sidebar";
 import { ShareIcon } from "@/components/icons/ShareIcon";
 import ContinuityCapsule from "@/components/george/ContinuityCapsule";
@@ -9021,7 +9023,7 @@ I’ll stay with you.`,
                                     <span className="block text-[9px] uppercase tracking-[0.18em] text-white/24">
                                       Desired outcome
                                     </span>
-                                    <input
+                                    <Input
                                       value={liveOutcomeReview.desiredOutcome}
                                       onChange={(event) =>
                                         setLiveOutcomeReview({
@@ -9094,7 +9096,7 @@ I’ll stay with you.`,
                                     <span className="block text-[9px] uppercase tracking-[0.18em] text-white/24">
                                       Possible secondary outcome
                                     </span>
-                                    <textarea
+                                    <Textarea
                                       value={
                                         liveOutcomeReview.possibleSecondaryOutcome
                                       }
@@ -9114,7 +9116,7 @@ I’ll stay with you.`,
                                     <span className="block text-[9px] uppercase tracking-[0.18em] text-white/24">
                                       Notes
                                     </span>
-                                    <textarea
+                                    <Textarea
                                       value={liveOutcomeReview.notes}
                                       onChange={(event) =>
                                         setLiveOutcomeReview({
