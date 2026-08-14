@@ -170,6 +170,7 @@ import { PostLiveConversationRecordPanel } from "@/components/george/live/PostLi
 import { StructuredLiveNotice } from "@/components/george/live/StructuredLiveNotice";
 import { LiveExitPanel } from "@/components/george/live/LiveExitPanel";
 import { TierAccessPanel } from "@/components/george/access/TierAccessPanel";
+import { ContinuityRestorePanel } from "@/components/george/access/ContinuityRestorePanel";
 import { LiveSessionDetailsPanel } from "@/components/george/live/LiveSessionDetailsPanel";
 import { LiveOutcomeReviewPanel } from "@/components/george/live/LiveOutcomeReviewPanel";
 import { LiveRoomStatusPanel } from "@/components/george/live/LiveRoomStatusPanel";
@@ -9677,181 +9678,70 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
         {showUpgradeModal &&
           typeof document !== "undefined" &&
           createPortal(
-            <>
-              <div
-                role="button"
-                tabIndex={0}
-                aria-label="Close continuity panel"
-                onClick={() => setShowUpgradeModal(false)}
-                onKeyDown={(event) => {
-                  if (
-                    event.key === "Escape" ||
-                    event.key === "Enter" ||
-                    event.key === " "
-                  ) {
-                    setShowUpgradeModal(false);
+            <ContinuityRestorePanel
+              email={loginEmailInput}
+              linkSent={loginLinkSent}
+              sending={loginSending}
+              onEmailChange={setLoginEmailInput}
+              onSendLink={async () => {
+                const email =
+                  loginEmailInput.trim().toLowerCase();
+
+                if (!email) {
+                  setToastMessage("Enter your email first.");
+                  setShowToast(true);
+                  return;
+                }
+
+                setLoginSending(true);
+
+                try {
+                  const response = await fetch(
+                    "/api/continuity/request-link",
+                    {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({ email }),
+                    },
+                  );
+
+                  const data = await response.json();
+
+                  if (!response.ok) {
+                    setToastMessage(
+                      data?.error ||
+                        "Unable to send login link.",
+                    );
+                    setShowToast(true);
+                    return;
                   }
-                }}
-                className="pointer-events-auto fixed inset-0 z-[200] bg-black george-motion-fade-soft/24 -[8px]"
-              />
 
-              <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 py-6 overflow-y-auto">
-                <div
-                  className="pointer-events-auto w-full max-w-[360px] rounded-[1.35rem] border border-white/[0.055] bg-[#05070B]/42 p-[13px] shadow-[0_8px_24px_rgba(0,0,0,0.14)] ring-1 ring-white/[0.018] -[14px]"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="mb-4">
-                    <div className="inline-flex rounded-full border border-white/[0.055] bg-black/28 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-[#D7DBE4]/58">
-                      GEORGE Continuity
-                    </div>
-
-                    <p className="mt-4 text-[15px] font-medium text-[#F4F6FA]/92">
-                      Restore this device.
-                    </p>
-
-                    <p className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/42">
-                      A secured link verifies continuity, tier access, and LIVE
-                      eligibility.
-                    </p>
-                  </div>
-
-                  {loginLinkSent ? (
-                    <div className="rounded-[1rem] border border-white/[0.05] bg-white/[0.018] px-3.5 py-3.5">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-[12px] text-[#D7DBE4]">
-                          ✓
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-[#D7DBE4]/90">
-                            Link sent
-                          </p>
-                          <p className="mt-0.5 text-[11px] text-[#D7DBE4]/42">
-                            Check your email and open the GEORGE link.
-                          </p>
-                        </div>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setLoginLinkSent(false);
-                          setLoginEmailInput("");
-                        }}
-                        className="mt-7 text-[11px] text-[#D7DBE4]/48 transition hover:text-[#D7DBE4]/80"
-                      >
-                        Use a different email
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      <div className="rounded-[1rem] border border-white/[0.05] bg-black/18 px-3.5 py-2.5">
-                        <label className="block text-[10px] uppercase tracking-[0.2em] text-[#D7DBE4]/38">
-                          Email
-                        </label>
-
-                        <input
-                          type="email"
-                          value={loginEmailInput}
-                          onChange={(event) =>
-                            setLoginEmailInput(
-                              event.target.value.trim().toLowerCase(),
-                            )
-                          }
-                          placeholder="you@example.com"
-                          autoComplete="email"
-                          className="mt-2 w-full bg-transparent text-sm text-[#D7DBE4] outline-none placeholder:text-[#D7DBE4]/22"
-                        />
-                      </div>
-
-                      <button
-                        type="button"
-                        disabled={loginSending}
-                        onClick={async () => {
-                          const email = loginEmailInput.trim().toLowerCase();
-
-                          if (!email) {
-                            setToastMessage("Enter your email first.");
-                            setShowToast(true);
-                            return;
-                          }
-
-                          setLoginSending(true);
-
-                          try {
-                            const response = await fetch(
-                              "/api/continuity/request-link",
-                              {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ email }),
-                              },
-                            );
-
-                            const data = await response.json();
-
-                            if (!response.ok) {
-                              setToastMessage(
-                                data?.error || "Unable to send login link.",
-                              );
-                              setShowToast(true);
-                              return;
-                            }
-
-                            setLoginLinkSent(true);
-                            setToastMessage("Secure link sent.");
-                            setShowToast(true);
-                          } catch {
-                            setToastMessage("Unable to send login link.");
-                            setShowToast(true);
-                          } finally {
-                            setLoginSending(false);
-                          }
-                        }}
-                        className="w-full rounded-full border border-white/[0.07] bg-[#D7DBE4]/88 px-4 py-2.5 text-[12px] font-medium tracking-[0.06em] text-[#05070B] transition hover:bg-white disabled:opacity-45"
-                      >
-                        {loginSending ? "Sending…" : "Send secure link"}
-                      </button>
-
-                      <p className="px-1 text-[10.5px] leading-5 text-[#D7DBE4]/35">
-                        Intelligent and Brilliant use verified continuity before
-                        LIVE access.
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="mt-3 flex items-center justify-between border-t border-white/[0.03] pt-2.5">
-                    <button
-                      type="button"
-                      onClick={redeemFounderCode}
-                      className="text-[11px] text-[#D7DBE4]/46 transition hover:text-[#D7DBE4]/80"
-                    >
-                      Founder code
-                    </button>
-
-                    <div className="flex items-center gap-4">
-                      <button
-                        type="button"
-                        onClick={() => window.open("/top-up", "_blank")}
-                        className="text-[11px] text-[#D7DBE4]/46 transition hover:text-[#D7DBE4]/80"
-                      >
-                        Options
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setShowUpgradeModal(false)}
-                        className="text-[11px] text-[#D7DBE4]/46 transition hover:text-[#D7DBE4]/80"
-                      >
-                        Close
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </>,
+                  setLoginLinkSent(true);
+                  setToastMessage("Secure link sent.");
+                  setShowToast(true);
+                } catch {
+                  setToastMessage(
+                    "Unable to send login link.",
+                  );
+                  setShowToast(true);
+                } finally {
+                  setLoginSending(false);
+                }
+              }}
+              onUseDifferentEmail={() => {
+                setLoginLinkSent(false);
+                setLoginEmailInput("");
+              }}
+              onFounderCode={redeemFounderCode}
+              onOptions={() =>
+                window.open("/top-up", "_blank")
+              }
+              onClose={() => setShowUpgradeModal(false)}
+            />,
             document.body,
           )}
-
 
         {activeCheckout &&
           typeof document !== "undefined" &&
