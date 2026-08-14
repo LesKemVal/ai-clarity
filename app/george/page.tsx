@@ -114,7 +114,6 @@ import Sidebar from "@/components/Sidebar";
 import { ShareIcon } from "@/components/icons/ShareIcon";
 import ContinuityCapsule from "@/components/george/ContinuityCapsule";
 import MemoryContinuityPanel from "@/components/george/settings/MemoryContinuityPanel";
-import TypingPrescriptionSurface from "@/components/george/TypingPrescriptionSurface";
 import DesktopOperationalSurface from "@/components/george/DesktopOperationalSurface";
 import GeorgePaymentElement from "@/components/george/checkout/GeorgePaymentElement";
 import HeadsetOperatorIcon from "@/components/george/HeadsetOperatorIcon";
@@ -2649,7 +2648,6 @@ export default function Page({
     }
   };
 
-  const [showCampaignUpgradeGate, setShowCampaignUpgradeGate] = useState(false);
   const [upgradeCtaWord, setUpgradeCtaWord] = useState<
     "Intelligent" | "Brilliant"
   >("Intelligent");
@@ -4144,9 +4142,6 @@ I’ll stay with you.`,
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const [showScrollHint, setShowScrollHint] = useState(false);
-  const [expandedMessages, setExpandedMessages] = useState<
-    Record<number, boolean>
-  >({});
   const [responseActionMenuIndex, setResponseActionMenuIndex] = useState<
     number | null
   >(null);
@@ -6260,9 +6255,6 @@ I’ll stay with you.`,
 
   const showDesktopOperationalSurface = !hasUserMessageForSurface;
 
-  const showTypingPrescription =
-    hasDraftInput && !pendingImage && shouldKeepHeroVisible;
-
   const isRuntimeTransitioning = hasVisibleThread || liveMode;
 
   useEffect(() => {
@@ -6526,8 +6518,6 @@ I’ll stay with you.`,
     messagesRef.current = [];
     liveSessionWriteReadyRef.current = false;
   };
-
-  const resumeLiveConversation = () => {};
 
   {
     false && showMobileHero && (
@@ -6810,7 +6800,6 @@ I’ll stay with you.`,
               setRerouteSignal(0);
               setSuggestedPrompts([]);
               setSuggestedSignal(0);
-              setExpandedMessages({});
               setShowScrollHint(false);
               userPinnedBottomRef.current = true;
 
@@ -7411,12 +7400,6 @@ I’ll stay with you.`,
                     </section>
                   )}
 
-                {false && null}
-
-                {false && showTypingPrescription && !liveMode && (
-                  <TypingPrescriptionSurface />
-                )}
-
                 {!liveMode &&
                   unfinishedTrajectories.length > 0 &&
                   !hasDraftInput && (
@@ -7589,20 +7572,6 @@ I’ll stay with you.`,
                           )}
                         </div>
 
-                        {false && (m.content || "").length > 420 && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setExpandedMessages((prev) => ({
-                                ...prev,
-                                [i]: !prev[i],
-                              }))
-                            }
-                            className="mt-1 px-1 text-[11px] tracking-[0.12em] text-[#D7DBE4]/34 transition hover:text-[#D7DBE4]/34"
-                          >
-                            {expandedMessages[i] ? "See less" : "Continue"}
-                          </button>
-                        )}
 
                         {m.role === "user" && !liveMode && (
                           <div className="mt-2 flex items-center gap-1.5 pr-1 text-[#D7DBE4]/72">
@@ -8244,8 +8213,6 @@ I’ll stay with you.`,
                     </button>
                   </div>
                 )}
-
-                {false && null}
 
                 {showLiveEntrySequence &&
                   (forceLive || liveMode) &&
@@ -10935,54 +10902,6 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
             document.body,
           )}
 
-        {false && showCampaignUpgradeGate && (
-          <div className="fixed inset-x-0 bottom-[96px] transition-all duration-150 ease-out z-[95] flex justify-center px-4">
-            <div className="w-full max-w-[420px] md:max-w-[720px] xl:max-w-[920px] md:max-w-[720px] xl:max-w-[920px] md:max-w-[420px] md:max-w-[720px] xl:max-w-[920px] xl:max-w-[760px] rounded-[1.65rem] border border-white/[0.07] bg-[#05080D]/88 px-5 py-4 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  ">
-              <div className="mb-2 flex items-start justify-between gap-2">
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.22em] text-[#D7DBE4]/72 mb-2">
-                    Structured LIVE
-                  </p>
-                  <p className="mt-0.5 text-[14px] font-semibold text-[#D7DBE4] mt-1 mb-2">
-                    This is a structured LIVE session.
-                  </p>
-                  <p className="mt-1 text-[11px] leading-5 text-neutral-500">
-                    Structured LIVE support is being prepared.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowCampaignUpgradeGate(false)}
-                  className="rounded-full border border-white/[0.06] bg-white/[0.03] px-1.5.5 py-1 text-[11px] text-neutral-500 transition hover:border-white/25 hover:bg-white/[0.022] hover:text-[#D7DBE4]/92"
-                >
-                  Close
-                </button>
-              </div>
-
-              <div className="rounded-[1rem] border border-white/[0.05] bg-black/35 px-5 py-4 text-xs leading-6 text-neutral-300 shadow-inner shadow-black/30">
-                <div className="font-medium text-[#D7DBE4]/80">
-                  Structured LIVE will let you:
-                </div>
-                <div className="mt-1.5 space-y-1">
-                  <div>• resume structured conversations</div>
-                  <div>• use scripts and guided flow</div>
-                  <div>• continue where you left off</div>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setShowCampaignUpgradeGate(false);
-                  setShowUpgradeModal(true);
-                }}
-                className="mt-4 w-full rounded-[1.2rem] max-w-full border transition duration-150 border-white/[0.09] bg-white/[0.032] px-5 py-4 text-sm font-semibold text-[#D7DBE4] shadow-[0_12px_28px_rgba(0,0,0,0.24)] hover:border-white/[0.18] hover:bg-white/[0.075]"
-              >
-                Upgrade to continue this campaign
-              </button>
-            </div>
-          </div>
-        )}
 
         {activeCheckout &&
           typeof document !== "undefined" &&
