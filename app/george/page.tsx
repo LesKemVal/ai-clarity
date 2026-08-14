@@ -691,6 +691,24 @@ function renderAssistantContent(text: string, liveMode: boolean) {
                 );
               }
 
+              const routeLink = line.match(
+                /^\[([^\]]+)\]\((\/[^)]+)\)$/,
+              );
+
+              if (routeLink) {
+                return (
+                  <div key={lineIndex}>
+                    <a
+                      href={routeLink[2]}
+                      className="inline-flex items-center gap-1.5 border-b border-[#8FAEFF]/34 pb-[1px] font-medium text-[#AFC0FF]/82 transition hover:border-[#AFC0FF]/72 hover:text-[#DCE5FF]"
+                    >
+                      {routeLink[1]}
+                      <span aria-hidden="true">→</span>
+                    </a>
+                  </div>
+                );
+              }
+
               return <div key={lineIndex}>{line}</div>;
             })}
           </div>
@@ -7390,7 +7408,7 @@ I’ll stay with you.`,
                       }
                     : undefined
                 }
-                className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain bg-transparent px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) && !showLiveEntrySequence ? "pb-[390px] md:pb-[280px]" : showPreLiveSignalSurface ? "pb-[220px] md:pb-[250px]" : "pb-[210px] md:pb-[250px]"} md:px-6 space-y-3 ${
+                className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain bg-transparent px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) && !showLiveEntrySequence ? "pb-[390px] md:pb-[280px]" : showPreLiveSignalSurface ? "pb-[220px] md:pb-[250px]" : "pb-0"} md:px-6 space-y-3 ${
                   (forceLive || liveMode) && !showLiveEntrySequence
                     ? ""
                     : hasVisibleThread && !isPreLiveSignalAcquisition
@@ -7442,19 +7460,11 @@ I’ll stay with you.`,
                                     }}
                                   >
                                     <div className="col-start-1 row-start-1 inline-flex w-fit max-w-[calc(100vw-40px)] rounded-[22px] border border-[#3657A8]/55 bg-[#172347] px-6 py-4 text-[26px] font-medium leading-8 tracking-[-0.03em] text-[#F4F8FF] shadow-[0_18px_60px_rgba(12,27,68,0.48)] [backface-visibility:hidden] sm:px-8 sm:py-5 sm:text-[34px]">
-                                      {
-                                        homepageHeroSequence[
-                                          homepageHeroFlip.front
-                                        ]
-                                      }
+                                      {`${homepageHeroSequence[homepageHeroFlip.front]}?`}
                                     </div>
 
                                     <div className="col-start-1 row-start-1 inline-flex w-fit max-w-[calc(100vw-40px)] rounded-[22px] border border-[#3657A8]/55 bg-[#172347] px-6 py-4 text-[26px] font-medium leading-8 tracking-[-0.03em] text-[#F4F8FF] shadow-[0_18px_60px_rgba(12,27,68,0.48)] [backface-visibility:hidden] [transform:rotateX(180deg)] sm:px-8 sm:py-5 sm:text-[34px]">
-                                      {
-                                        homepageHeroSequence[
-                                          homepageHeroFlip.back
-                                        ]
-                                      }
+                                      {`${homepageHeroSequence[homepageHeroFlip.back]}?`}
                                     </div>
                                   </div>
                                 </div>
@@ -7912,24 +7922,9 @@ I’ll stay with you.`,
 
                                         {[
                                           {
-                                            label: "PLAN",
-                                            prompt:
-                                              "Help me plan the best next steps from here.",
-                                          },
-                                          {
                                             label: "DECK",
                                             prompt:
                                               "Help me build a presentation deck from this conversation.",
-                                          },
-                                          {
-                                            label: "WRITE",
-                                            prompt:
-                                              "Help me write what I need from this conversation.",
-                                          },
-                                          {
-                                            label: "REVIEW",
-                                            prompt:
-                                              "Review what we have so far and identify what should improve.",
                                           },
                                         ].map((capability) => (
                                           <button
@@ -8429,7 +8424,7 @@ I’ll stay with you.`,
                       ? "h-[300px] md:h-[320px]"
                       : isNormalPreparationBriefingActive
                         ? "h-[294px] md:h-[320px]"
-                      : "h-[270px] md:h-[290px]"
+                      : "h-[24px] md:h-[32px]"
                   }`}
                 />
               </div>
@@ -9848,24 +9843,13 @@ Continue from here, tell me what changed, or start fresh.`,
                   <div className="pointer-events-none fixed inset-0 z-[71] bg-black george-motion-fade-soft/68 -[10px]" />
                 )}
 
-                {!(forceLive || liveMode) && (
-                  <>
-                    <div
-                      className={`pointer-events-none fixed inset-x-0 bottom-0 z-[40] bg-[#000000] ${
-                        isNormalPreparationBriefingActive
-                          ? "h-[112px] md:h-[184px]"
-                          : "h-[176px] md:h-[248px]"
-                      }`}
-                    />
-                    <div
-                      className={`pointer-events-none fixed inset-x-0 z-[40] bg-gradient-to-t from-[#000000] via-[#000000]/88 to-transparent ${
-                        isNormalPreparationBriefingActive
-                          ? "bottom-[104px] h-[40px] md:bottom-[176px] md:h-[56px]"
-                          : "bottom-[160px] h-[72px] md:bottom-[232px] md:h-[120px]"
-                      }`}
-                    />
-                  </>
-                )}
+                {!(forceLive || liveMode) &&
+                  isNormalPreparationBriefingActive && (
+                    <>
+                      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[40] h-[112px] bg-[#000000] md:h-[184px]" />
+                      <div className="pointer-events-none fixed inset-x-0 bottom-[104px] z-[40] h-[40px] bg-gradient-to-t from-[#000000] via-[#000000]/88 to-transparent md:bottom-[176px] md:h-[56px]" />
+                    </>
+                  )}
 
                 <style jsx global>{`
   @keyframes tierSignalPrimary {
@@ -10168,6 +10152,14 @@ Continue from here, tell me what changed, or start fresh.`,
                     </div>
                   </div>
                 )}
+
+                {!(forceLive || liveMode) &&
+                  !isNormalPreparationBriefingActive && (
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none fixed inset-x-0 bottom-0 z-[180] h-[130px] bg-black before:absolute before:inset-x-0 before:-top-[18px] before:h-[18px] before:bg-gradient-to-t before:from-black before:to-transparent md:h-[166px]"
+                    />
+                  )}
 
                 <div
                   className={`${
