@@ -347,13 +347,6 @@ const GEORGE_PREPARATION_TAGLINES = [
   "preparation makes better outcomes more likely.",
 ];
 
-const OPERATIONAL_SIGNALS = [
-  "Add visual context during LIVE. GEORGE can reference documents, screenshots, and photos in real time.",
-  "Say “shorter” if you want compressed responses.",
-  "Say “line” if you want exact wording.",
-  "Use your outcome-shift phrase when the room may be changing direction.",
-  "LIVE works best when GEORGE can support you discreetly.",
-];
 
 function getLiveRuntimeSteeringLabels(room?: string | null) {
   const clean = String(room || "")
@@ -411,45 +404,6 @@ function getLiveResponseServingTags(
   return tags.slice(0, 3);
 }
 
-function getLiveRoomSignal(room: string) {
-  if (room === "Interview") {
-    return "Interview loaded. GEORGE is watching credibility, proof, pacing, pressure, and answer clarity.";
-  }
-
-  if (room === "Meeting") {
-    return "Meeting loaded. GEORGE is watching alignment, decision pressure, timing, and the next useful move.";
-  }
-
-  if (room === "Boardroom") {
-    return "Boardroom loaded. GEORGE is watching assumptions, methodology, evidence, variance, forecast confidence, and executive clarity.";
-  }
-
-  if (room === "Negotiation") {
-    return "Negotiation loaded. GEORGE is watching leverage, concessions, timing, alternatives, pressure, and control.";
-  }
-
-  if (room === "Sales Call") {
-    return "Sales call loaded. GEORGE is watching trust, objections, timing, buying signals, and closing movement.";
-  }
-
-  if (room === "Debate") {
-    return "Debate loaded. GEORGE is watching contradiction, proof demands, interruptions, framing, and control.";
-  }
-
-  if (room === "Doctor Appointment") {
-    return "Doctor appointment loaded. GEORGE is watching symptoms, diagnosis clarity, treatment risk, questions, and what cannot be missed.";
-  }
-
-  if (room === "Presentation") {
-    return "Presentation loaded. GEORGE is watching pacing, audience pressure, message clarity, proof, and the close.";
-  }
-
-  if (room === "Everyday Conversation") {
-    return "Conversation loaded. GEORGE is watching tone, timing, pressure, and the next useful line.";
-  }
-
-  return "LIVE loaded. GEORGE is watching the room, the chair, the outcome, and the next useful signal.";
-}
 
 type Message = {
   role: "assistant" | "user" | "system";
@@ -596,32 +550,6 @@ declare global {
   }
 }
 
-function TypewriterText({
-  text,
-  speed = 14,
-}: {
-  text: string;
-  speed?: number;
-}) {
-  const [display, setDisplay] = useState("");
-
-  useEffect(() => {
-    let i = 0;
-    setDisplay("");
-
-    const interval = setInterval(() => {
-      i += 1;
-      setDisplay(text.slice(0, i));
-      if (i >= text.length) {
-        clearInterval(interval);
-      }
-    }, speed);
-
-    return () => clearInterval(interval);
-  }, [text, speed]);
-
-  return <>{display}</>;
-}
 
 function renderAssistantContent(text: string, liveMode: boolean) {
   const cleaned = String(text || "")
