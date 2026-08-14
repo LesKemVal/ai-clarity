@@ -1,6 +1,7 @@
 'use client'
 
 import { ShareIcon } from '@/components/icons/ShareIcon'
+import { IconButton } from '@/components/ui/IconButton'
 
 import { ReactNode, useEffect, useState } from 'react'
 import Sidebar, { PromptItem } from '@/components/Sidebar'
@@ -130,10 +131,11 @@ export default function PageShell({
               <div className="flex items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-2.5">
                   {withSidebar && (
-                    <button
-                      type="button"
+                    <IconButton
+                      variant="secondary"
+                      size="md"
                       onClick={() => setShowSidebar(true)}
-                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.55rem] border border-white/[0.05] bg-white/[0.014] text-white/60 transition hover:border-white/[0.12] hover:bg-white/[0.024] hover:text-white/82 xl:hidden"
+                      className="rounded-[0.55rem] border-white/[0.05] bg-white/[0.014] text-white/60 hover:border-white/[0.12] hover:bg-white/[0.024] hover:text-white/82 xl:hidden"
                       aria-label="Open menu"
                     >
                       <svg
@@ -144,7 +146,7 @@ export default function PageShell({
                       >
                         <path d="M4 7h16M4 12h16M4 17h16" />
                       </svg>
-                    </button>
+                    </IconButton>
                   )}
 
                   <Brand compact subtitle={eyebrow || 'GEORGE'} />
