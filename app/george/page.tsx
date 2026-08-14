@@ -6240,7 +6240,6 @@ I’ll stay with you.`,
     !showPreLiveSignalSurface;
 
   const showGeorgeHeroTitle = true;
-  const showGeorgeHeroTagline = !normalConversationStarted;
   const showGeorgeSupportCopy = !normalConversationStarted;
   const hasUserMessageForSurface = normalConversationStarted;
 
@@ -6518,22 +6517,6 @@ I’ll stay with you.`,
     messagesRef.current = [];
     liveSessionWriteReadyRef.current = false;
   };
-
-  {
-    false && showMobileHero && (
-      <div className="flex flex-col items-center justify-center text-center pt-20 pb-6 md:pt-28 md:pb-10">
-        <div className="text-[32px] font-semibold tracking-[0.25em] text-[#D7DBE4]">
-          GEORGE
-        </div>
-
-        <div className="mt-2 text-[12px] tracking-[0.18em] text-neutral-500">
-          Smart. Intelligent. Brilliant.
-        </div>
-
-        <div className="mt-4 flex items-center gap-[7px]"></div>
-      </div>
-    );
-  }
 
   useEffect(() => {
     if (showConversation) {
@@ -6915,14 +6898,6 @@ I’ll stay with you.`,
               } md:h-screen md:min-h-0 md:overflow-hidden md:overscroll-none md:px-10 md:pb-0 xl:px-16`}
             >
               <header className="fixed inset-x-0 top-0 z-[170] flex min-h-[60px] justify-center bg-[#000000]/92 px-4 py-2 shadow-[0_18px_60px_rgba(0,0,0,0.38)] backdrop-blur-xl transition duration-200">
-                {false && !(forceLive || liveMode) && !showMobileHero && (
-                  <div
-                    data-mobile-george-center
-                    className="pointer-events-none absolute left-1/2 top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#D7DBE4]/62 md:hidden"
-                  >
-                    GEORGE
-                  </div>
-                )}
                 <div className="relative flex w-full max-w-6xl items-center justify-between">
                   <button
                     type="button"
@@ -7386,13 +7361,6 @@ I’ll stay with you.`,
                                   </div>
                                 </div>
                               </div>
-                            )}
-
-                          {false &&
-                            showGeorgeHeroTagline &&
-                            !hasSentFirstNormalMessage &&
-                            showPreLiveSignalSurface && (
-                              <p>Start with your desired outcome.</p>
                             )}
 
                         </div>
