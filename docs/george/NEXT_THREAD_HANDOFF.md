@@ -213,3 +213,204 @@ No new recommendation status, presentation owner, Formula lifecycle state, or Sc
 Validated commit:
 
 3edd3454 Clarify working formula recommendation summary
+<!-- GEORGE_CODEX_LAUNCH_COMPLETION_2026_08_11 -->
+## Production Continuation — Launch Completion Audit
+
+The next thread begins with inspection of the synchronized authorities and current repository state, not architectural redesign.
+
+Current synchronized implementation checkpoint:
+
+- branch: conversation-summary-runtime;
+- implementation HEAD before documentation synchronization commit: cf261fa4;
+- qualified reasoning/session checkpoint: 888eb420;
+- qualified Normal LIVE preparation-answer checkpoint: 285d80fe;
+- qualified conversation-presentation checkpoint: 16d2bab7;
+- qualified top-up continuity checkpoint: 37dd706e;
+- qualified LIVE orientation presentation checkpoint: cf261fa4;
+- implementation work is settled for this synchronization pass;
+- only the four GEORGE production authorities should remain modified while documentation synchronization is in progress;
+- inspect current git status and implementation again at the start of the next thread.
+
+### Read first
+
+Read completely and in order:
+
+1. docs/george/PRODUCTION_TRACKER.md
+2. docs/george/RUNTIME_ARCHITECTURE.md
+3. docs/george/OPERATIONAL_PROFILE.md
+4. docs/george/NEXT_THREAD_HANDOFF.md
+
+Then inspect git status, HEAD/upstream, changed files, complete scoped diffs, and canonical owners before asking Codex to change anything.
+
+### Product direction established before Codex
+
+Normal is the primary conversational strategy/briefing surface.
+
+Normal may carry useful current-session context into LIVE.
+
+Traditional provides intentional clean-context separation when the user wants the new LIVE interaction kept apart from the current conversation.
+
+GEORGE may adapt inside Normal LIVE when the conversation changes. A context change does not require leaving LIVE.
+
+GEORGE does not manufacture a reason for LIVE. If strategy reveals a useful real-world interaction, GEORGE may recommend executing it. If not, continue building strategy in Normal.
+
+LIVE should be explained as execution: lines, cues, responses, positioning, signal/leverage recognition, recovery, next moves, and post-interaction assessment.
+
+Before LIVE, GEORGE should use briefing evidence to recommend an appropriate receiver/support method and help the user technically prepare for the actual environment: in-person, telephone, video, desktop/mobile, earbuds, audio glasses, or supported text-capable smart/AR glasses.
+
+After LIVE, GEORGE should identify what changed and let the user decide whether the result joins the current strategy, starts a new conversation, remains separate, produces follow-up/email, or leads to another execution.
+
+Email is a future/continuing execution surface over the same session and intelligence boundaries, not another intelligence.
+
+### Shared-agency language
+
+Do not over-explain temporary/shared agency.
+
+Communicate it through concrete execution.
+
+Representative framing:
+
+"My role: Get a commitment to [desired action/outcome] from [person/organization]. I will follow the conversation and use your voice to position the request, respond to resistance, recognize leverage and signals, and move toward a clear commitment or next step. I will respond quickly and deliberately. Just monitor the screen or audio device. We will make it work."
+
+Existing user-agency doctrine remains authoritative.
+
+### Codex mission
+
+Use Codex to finish the product/portability/launch audit without redesigning GEORGE.
+
+Codex is an implementation accelerator, not architectural authority.
+
+Prompt Codex in bounded inspection-first passes.
+
+For each pass tell Codex:
+
+"Read the four GEORGE production authorities first. Inspect implementation before proposing changes. Identify the complete affected owner set and the canonical owner for each responsibility. Search for duplicate ownership. Do not redesign GEORGE, create another runtime or reasoning authority, flatten entry routes, or move runtime intelligence into presentation. Report findings before patching. Make the smallest production-grade change justified by implementation. Run focused qualifications and build. Stop before commit unless explicitly instructed."
+
+### Codex audit sequence
+
+Pass 1 — Presentation and asset inventory
+
+Ask Codex to inventory:
+
+- BX branding;
+- logos;
+- imagery;
+- icons;
+- premium/tier buttons and treatments;
+- shared controls;
+- LIVE-specific presentation;
+- Homepage presentation;
+- Marketplace/Library presentation;
+- animation;
+- typography treatments;
+- route-specific CSS;
+- global CSS;
+- large mixed-responsibility components.
+
+Goal: determine which presentation assets should become independently maintainable modules/files so branding and premium presentation can be changed later without disturbing runtime behavior.
+
+Do not patch during the inventory pass.
+
+Pass 2 — Presentation decomposition
+
+Using Pass 1 evidence, extract only presentation concerns with proven boundaries.
+
+Do not move reasoning, preparation authority, receiver policy, routing, delivery policy, Formula/Script logic, learning, or session ownership.
+
+Do not decompose merely to make files shorter.
+
+Pass 3 — Receiver and hardware portability
+
+Inspect the canonical receiver contract and prove realization for:
+
+- desktop/mobile visual;
+- audio;
+- visual-only;
+- audio-visual;
+- audio glasses;
+- supported text-capable smart/AR glasses.
+
+Identify the smallest adapter boundary required for hardware-specific APIs.
+
+No glasses-specific GEORGE or glasses-specific reasoning runtime.
+
+Pass 4 — Interaction lifecycle
+
+Qualify:
+
+Normal strategy
+→ optional LIVE execution opportunity
+→ briefing/context adoption or separation
+→ technical readiness
+→ LIVE
+→ post-interaction assessment
+→ strategy/new conversation/separate/follow-up
+→ next execution.
+
+Include context changes while already LIVE.
+
+Pass 5 — Email continuity
+
+Inspect the correct integration boundary for reading, summarizing, drafting, user review, and authorized sending of interaction-related email.
+
+Do not create duplicate memory or strategy ownership.
+
+Pass 6 — Launch quality
+
+Audit:
+
+- responsive behavior;
+- accessibility;
+- keyboard/focus semantics;
+- touch behavior;
+- reduced motion;
+- asset loading;
+- image optimization;
+- client bundle/payload;
+- render churn;
+- browser/device compatibility;
+- refresh/reconnect;
+- microphone denial/loss;
+- voice degradation;
+- visual fallback;
+- provider degradation;
+- stale state;
+- session isolation;
+- privacy/security boundaries;
+- sensitive logging;
+- production observability.
+
+Pass 7 — Ownership and dead-code audit
+
+Search for duplicate owners, obsolete compatibility paths, unused presentation state, dead CSS, stale assets, and unreachable branches.
+
+Remove only what implementation/reference evidence proves obsolete.
+
+Pass 8 — Final production qualification
+
+Run the established focused qualification suite, documentation qualification, production build, scoped diff inspection, and launch acceptance scenarios.
+
+Do not declare launch-ready merely because the build passes.
+
+### Launch acceptance direction
+
+Before launch, demonstrate at minimum:
+
+- Normal can develop strategy and enter LIVE without losing useful context;
+- Traditional can intentionally isolate a new LIVE interaction;
+- LIVE can adapt when the user changes topic/context;
+- GEORGE can identify a useful execution opportunity without inventing one;
+- receiver recommendation reflects briefing and environment;
+- visual can provide a low-friction starting demonstration;
+- phone/in-person/video preparation is understandable;
+- supported smart/AR glasses can consume canonical delivery through adapters;
+- LIVE support remains outcome-oriented;
+- post-LIVE assessment identifies facts, unresolved issues, commitments, and next action;
+- results can return to strategy or remain separate by user choice;
+- email/follow-up integration respects user authority;
+- branding/premium/presentation assets can be changed without disturbing operational intelligence;
+- session isolation, recovery, privacy, accessibility, performance, and production qualifications pass.
+
+The objective of the Codex phase is not another architecture.
+
+The objective is to finish GEORGE as a launch-grade, maintainable, portable product while preserving the operational intelligence already built.

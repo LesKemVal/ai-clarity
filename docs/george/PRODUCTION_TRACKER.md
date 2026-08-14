@@ -1829,3 +1829,322 @@ The working-hypothesis summary does not change Formula status, verification, evi
 Validated implementation commit:
 
 3edd3454 Clarify working formula recommendation summary
+<!-- GEORGE_PRODUCTION_COMPLETION_SYNC_2026_08_14 -->
+## Production Completion Synchronization — Reasoning, Sessions, Preparation, Continuity, and Presentation
+
+The following production boundaries are implemented, qualified, and committed.
+
+They are current implementation state, not future architecture.
+
+### Canonical Normal response authority
+
+Normal response execution preserves one reasoning authority.
+
+The qualified response sequence is:
+
+semantic proposal
+
+→ Operational Judgment
+
+→ provider execution
+
+Operational Judgment owns consequential evidence-acquisition authorization.
+
+Signal-question machinery does not independently decide whether GEORGE should ask another question. It may ask only an evidence question authorized by Operational Judgment.
+
+Adaptive sequencing is judgment-first:
+
+- zero useful evidence questions returns to judgment;
+- one useful evidence question returns to judgment;
+- multiple useful evidence needs may justify additional acquisition;
+- duplicate evidence requests are rejected;
+- consequential clarification remains distinct from ordinary evidence acquisition;
+- skip returns to judgment-first reassessment rather than owning progression.
+
+Validated implementation commit:
+
+888eb420 Qualify reasoning authority and session isolation
+
+### Fresh Normal and session isolation
+
+Fresh Normal has one canonical session owner.
+
+`createFreshNormalSession()` clears browser-scoped Normal workspace state and creates the new Normal session.
+
+Fresh Normal does not inherit unrelated Normal conversation state or stale LIVE preparation state.
+
+LIVE preparation return remains subject to canonical entry-resolution validation.
+
+Traditional LIVE, Normal LIVE, and Homepage preparation remain legitimate distinct entry routes over the shared LIVE runtime. Their choreography must not be flattened merely because they converge on shared runtime authority.
+
+Session continuity and session-isolation qualification pass.
+
+The production TypeScript boundary also excludes `archive/source-history` while retaining canonical GEORGE production source.
+
+Validated implementation commit:
+
+888eb420 Qualify reasoning authority and session isolation
+
+### Normal LIVE preparation answer preservation
+
+An answer supplied during Normal LIVE preparation is preserved as part of the canonical visible preparation conversation before reassessment.
+
+Preparation interactions preserve their evidence-need identity.
+
+Canonical preparation-session knowledge supplies the current signals and objective used for subsequent preparation reasoning.
+
+Answered and skipped preparation interactions both return to judgment-first reassessment.
+
+Skip does not own the next action.
+
+Validated implementation commit:
+
+285d80fe Preserve Normal LIVE preparation answers
+
+### Conversation presentation boundary
+
+Conversation presentation refinements remain downstream of runtime and reasoning authority.
+
+Normal LIVE continues to start through `openLiveEntry`.
+
+Route-link rendering, spacing, conversation controls, and related presentation behavior do not acquire preparation, reasoning, session, or LIVE runtime ownership.
+
+Validated implementation commit:
+
+16d2bab7 Refine GEORGE conversation presentation
+
+### Top-up continuity activation
+
+Top-up remains a consumer of existing server authority.
+
+When verified continuity identity is available from `/api/session`, the top-up surface may pass that continuity email to the existing founder-code authority.
+
+The server-verified founder-code result remains authoritative for tier activation.
+
+The client updates its tier from that verified result.
+
+No new authentication, continuity, entitlement, or subscriber authority was introduced in the top-up surface.
+
+Validated implementation commit:
+
+37dd706e Preserve top-up continuity activation
+
+### LIVE orientation presentation
+
+LIVE orientation presentation is implemented as a downstream visual boundary.
+
+The existing LIVE entry consumer uses the orientation presentation asset and associated presentation CSS.
+
+This boundary does not create:
+
+- another LIVE runtime;
+- another LIVE entry owner;
+- another reasoning authority;
+- another preparation authority;
+- another receiver authority.
+
+Presentation remains downstream of the established LIVE entry and runtime contracts.
+
+Validated implementation commit:
+
+cf261fa4 Add LIVE orientation presentation assets
+
+### Current production position
+
+The production focus is now launch completion and portability qualification over the established runtime and reasoning architecture.
+
+Do not reopen the qualified reasoning, session, preparation, entry, or presentation ownership boundaries merely to perform launch cleanup.
+
+Remaining launch work must continue to follow the production discipline:
+
+Inspect implementation.
+
+Identify canonical ownership.
+
+Detect duplicate ownership.
+
+Patch only the justified owner or presentation boundary.
+
+Qualify the affected behavior.
+
+Build at meaningful checkpoints.
+
+Synchronize production documentation with implementation.
+
+<!-- GEORGE_CODEX_LAUNCH_COMPLETION_2026_08_11 -->
+## Production Direction — Conversational Execution and Codex Launch Completion
+
+GEORGE remains one operational intelligence. Normal and LIVE are operating modes over that intelligence.
+
+### Normal as conversational briefing
+
+Normal GEORGE is the broadest conversational preparation surface.
+
+A user may develop an idea, strategy, problem, opportunity, or objective in Normal and then take useful elements of that work into LIVE.
+
+Normal-to-LIVE does not require the upcoming interaction to be identical to the preceding Normal conversation. GEORGE may adapt conversationally when the user changes context.
+
+If the user wants the new LIVE interaction isolated from the current Normal conversation, Traditional LIVE provides intentional clean-context separation.
+
+Canonical user-facing orientation:
+
+"You can take elements of what we have been discussing here into LIVE support, or separate the current conversation entirely by using the Traditional Route."
+
+Traditional is therefore not an error path or evidence that Normal LIVE lacks sufficient capability. It is an intentional preparation/context-isolation option.
+
+### LIVE must have an execution purpose
+
+GEORGE does not manufacture a reason to use LIVE.
+
+When the current strategy presents a useful real-world interaction, GEORGE may identify it and propose execution.
+
+Example:
+
+A user developing a regulated capital strategy may benefit from contacting an appropriate broker-dealer or other relevant participant to resolve eligibility, process, economics, timing, requirements, or another material unknown.
+
+GEORGE may propose that interaction because it advances the strategy and also gives the user a concrete opportunity to experience LIVE.
+
+The recommendation must remain outcome-driven rather than demonstration-driven.
+
+If no useful interaction is apparent, GEORGE should invite the user to continue building strategy in Normal rather than forcing LIVE.
+
+### Execution framing and shared agency
+
+GEORGE should communicate LIVE capability through concrete execution rather than lengthy explanations of abstract agency.
+
+Useful framing includes:
+
+"My role: Get a commitment to [desired action/outcome] from [person/organization]. I will follow the conversation and use your voice to position the request, respond to resistance, recognize leverage and signals, and move toward a clear commitment or next step. I will respond quickly and deliberately. Just monitor the screen or audio device. We will make it work."
+
+Alternative fact-finding framing may establish the facts, uncertainties, verification targets, or commitments GEORGE and the user intend to resolve before the interaction ends.
+
+This language makes temporary/shared execution agency understandable through the work itself.
+
+It does not remove user authority. Existing user-agency doctrine remains controlling.
+
+GEORGE may provide lines, cues, responses, positioning, recovery, signal recognition, leverage recognition, next moves, and post-interaction assessment in service of the desired outcome.
+
+### Technical preparation is part of briefing
+
+Before LIVE, GEORGE should understand enough about the intended interaction and available hardware to recommend how support should reach the user.
+
+Relevant evidence may include:
+
+- in-person, telephone, video, presentation, or another interaction environment;
+- desktop/mobile visual availability;
+- earbuds or another audio device;
+- supported audio glasses;
+- supported text-capable smart or AR glasses;
+- user preference and environmental constraints.
+
+GEORGE recommends the support method from briefing evidence while preserving the users ability to change it.
+
+When a useful execution opportunity exists but receiver evidence is weak, visual support may be the conservative demonstration starting point because it can expose lines, cues, signals, responses, and next moves without requiring audio hardware.
+
+This is a starting recommendation, not a permanent default.
+
+### Smart-glasses portability
+
+Launch qualification must prove that the existing receiver contract can be realized by supported smart/AR glasses without creating a glasses-specific GEORGE, reasoning system, or LIVE runtime.
+
+Text-capable glasses should be able to receive glanceable approved visual guidance.
+
+Audio-capable glasses may receive compact immediate steering.
+
+Device adapters may translate the canonical receiver/delivery contract to hardware APIs. They must not acquire reasoning, support-behavior, operational-assessment, receiver-policy, routing, Formula, Script, or learning authority.
+
+### Before and after execution
+
+Before an interaction, the user may confirm or revise the objective, intended result, receiver, support style, context relationship, and other materially editable preparation choices.
+
+GEORGE may ask matter-of-factly whether anything has changed rather than repeating the entire briefing.
+
+After an interaction, GEORGE should resolve what happened before asking what happens next.
+
+Example:
+
+"We got the answer on eligibility and process. Economics is still unresolved. They committed to sending the requirements tomorrow. I recommend we add this to the current strategy and resolve economics before the next conversation."
+
+Possible continuity choices include adding the result to the current strategy, starting a new conversation, or keeping the interaction separate.
+
+Temporary room adaptation does not silently become durable strategy or preference.
+
+### Email as execution continuity
+
+Email is a natural continuation of operational execution.
+
+Where authorized and technically available, GEORGE should be able to read a relevant incoming message, relate it to the interaction and strategy, summarize what changed, draft or recommend the response, and present the proposed action to the user before sending unless the user has explicitly authorized the applicable execution behavior.
+
+Email capability must consume canonical session, strategy, Formula, Script, Conversation Record, and user-authority boundaries rather than create another intelligence or memory system.
+
+### Codex launch-completion audit
+
+Remaining launch-completion work may use Codex as an implementation and audit accelerator, not as a new architectural authority.
+
+Codex must begin by reading the synchronized production authorities and inspecting repository status and implementation before proposing changes.
+
+Primary audit areas:
+
+1. Presentation asset decomposition.
+   Inspect large page/component/CSS surfaces and identify presentation assets that can be separated into maintainable canonical modules without moving runtime authority.
+
+2. Brand asset system.
+   Inventory BX marks, logos, premium controls, imagery, icons, animation, typography treatments, and other branded presentation assets. Establish predictable asset locations and reusable presentation primitives where implementation evidence supports them.
+
+3. Premium/product controls.
+   Separate reusable premium buttons, tier treatments, marketplace controls, LIVE controls, and related presentation primitives where doing so improves customization without creating competing behavior ownership.
+
+4. CSS ownership.
+   Identify duplicated, dead, route-specific, and globally scoped presentation CSS. Consolidate only after proving canonical ownership and references.
+
+5. Host-surface decomposition.
+   Inspect app/george/page.tsx and other large hosts responsibility by responsibility. Extract only behavior or presentation whose canonical ownership demonstrably belongs elsewhere. Do not reduce a host merely to reduce line count.
+
+6. Route and state integrity.
+   Preserve Traditional, Quick LIVE, Homepage, Normal, and eventual Resume choreography. Do not flatten legitimate entry routes.
+
+7. Receiver/device portability.
+   Prove desktop/mobile, audio, visual, audio-visual, and supported smart-glasses realization through the existing receiver contract. Hardware integration belongs in adapters, not reasoning.
+
+8. Responsive and accessibility qualification.
+   Inspect keyboard operation, focus, semantic controls, readable contrast, reduced motion, touch targets, viewport behavior, screen-reader semantics, and device-specific presentation.
+
+9. Performance and payload.
+   Inspect asset sizes, image loading, unnecessary client code, route bundles, font usage, render churn, and avoidable browser work without weakening runtime behavior.
+
+10. Failure and recovery.
+    Qualify refresh, reconnect, interrupted preparation, provider degradation, device loss, microphone denial, voice failure, missing visual receiver, stale browser state, and safe continuation.
+
+11. Security/privacy boundary.
+    Inspect client/server secret boundaries, authorization, storage, document/email exposure, logging, retention, and accidental leakage of conversation or operational data.
+
+12. Session isolation.
+    Prove unrelated sessions do not inherit briefing, Formula, Script, LIVE setup, signals, email context, Conversation Records, or transient execution state.
+
+13. Post-interaction continuity.
+    Prove LIVE results can return to strategy, follow-up, email, another interaction, or intentional separation without creating duplicate memory ownership.
+
+14. Launch observability.
+    Ensure production diagnostics can identify route, preparation, receiver, LIVE transport, reasoning, delivery, and recovery failures without exposing sensitive conversation content unnecessarily.
+
+15. Dead-code and duplicate-ownership audit.
+    Remove only behavior proven obsolete through implementation/reference inspection.
+
+### Codex operating protocol
+
+For every audit item:
+
+Inspect implementation.
+Identify affected owners.
+Identify canonical owner.
+Search for duplicate ownership.
+State the smallest proposed change.
+Patch only the canonical owner or presentation module justified by inspection.
+Run focused qualification.
+Run production build at meaningful checkpoints.
+Inspect the resulting diff.
+Synchronize all four production authorities when behavior, ownership, qualification, or doctrine materially changes.
+
+Codex must not redesign GEORGE, create another runtime, create another reasoning authority, flatten route choreography, move reasoning into rendering, or treat file decomposition as permission to move semantic ownership.
+
+The target is a launch-grade product whose operational intelligence remains stable while presentation, branding, premium surfaces, receivers, and future hardware integrations become easier to manipulate and extend.

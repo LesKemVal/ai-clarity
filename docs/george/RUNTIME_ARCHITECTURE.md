@@ -1930,3 +1930,247 @@ This communicates that the Formula is GEORGE's current operational approach rath
 The summary is derived from the recommendation result already owned by Operational Memory. No separate presentation authority or reasoning owner is introduced.
 
 Refined, confirmed, incomplete-briefing, and synthesis-degradation summaries remain separate existing branches.
+<!-- GEORGE_QUALIFIED_RUNTIME_SYNC_2026_08_14 -->
+## Qualified Runtime Synchronization — Response Authority, Sessions, Preparation, and Presentation
+
+This section records qualified production architecture.
+
+It does not introduce another runtime or another owner.
+
+### Normal response authority
+
+Normal response execution preserves one canonical reasoning sequence:
+
+semantic proposal
+
+→ Operational Judgment
+
+→ provider execution
+
+The semantic proposal supplies structured reasoning input.
+
+Operational Judgment owns the consequential operational decision, including whether additional user-owned evidence is worth acquiring before execution.
+
+Provider execution realizes the authorized result.
+
+Provider execution does not reopen Operational Judgment merely because it can generate language.
+
+### Consequential signal acquisition
+
+Signal acquisition is subordinate to Operational Judgment.
+
+Canonical sequence:
+
+known evidence
+
+→ semantic proposal
+
+→ Operational Judgment
+
+→ no additional evidence required: continue toward execution
+
+or
+
+→ one consequential evidence need authorized
+
+→ authorized signal-question formulation
+
+→ user answer or skip
+
+→ preparation evidence update
+
+→ Operational Judgment reassessment
+
+The authorized signal-question owner may formulate the strongest concise question for the exact evidence need already authorized by Operational Judgment.
+
+It may not:
+
+- decide whether another question should be asked;
+- substitute another evidence need;
+- broaden or narrow the authorized evidence need;
+- create a questionnaire;
+- own progression after the answer;
+- own progression after a skip.
+
+Duplicate or unauthorized evidence requests are rejected.
+
+Answer and skip both return to judgment-first reassessment.
+
+### Fresh Normal session boundary
+
+`createFreshNormalSession()` is the canonical Fresh Normal creation boundary.
+
+Canonical behavior:
+
+Fresh Normal request
+
+→ clear browser-scoped Normal workspace
+
+→ create Normal session
+
+A fresh Normal workspace must not silently inherit unrelated Normal conversation state or stale LIVE preparation state.
+
+Consumers request Fresh Normal through the canonical session owner rather than independently reconstructing cleanup semantics.
+
+### LIVE preparation identity and return validation
+
+Browser storage existence alone does not authorize preparation reuse.
+
+Canonical LIVE entry resolution validates preparation identity against the current route and its required session relationship.
+
+Normal-origin preparation must match the active Normal session identity.
+
+Homepage-origin preparation must preserve Homepage provenance.
+
+Return-state preparation is valid only when both the return snapshot and current canonical stored preparation independently validate to the same preparation identity.
+
+This validation belongs to the canonical LIVE entry-resolution boundary.
+
+### Distinct LIVE entry choreography
+
+GEORGE has multiple legitimate LIVE entry routes.
+
+They share LIVE runtime authority but do not have identical entry choreography.
+
+Normal LIVE may carry qualified current-session work into LIVE.
+
+Traditional LIVE may intentionally establish a separate preparation context.
+
+Homepage preparation may enter through its own established preparation route.
+
+These routes must not be flattened merely because they converge on the same LIVE runtime.
+
+Normal LIVE starts through the established `openLiveEntry` consumer path.
+
+Entry presentation does not own LIVE runtime creation.
+
+### Normal LIVE preparation answer preservation
+
+Preparation answers are operational evidence and visible conversation state.
+
+When the user answers a Normal LIVE preparation question, the answer is preserved in the visible preparation conversation before reassessment.
+
+The preparation interaction preserves the evidence-need identity associated with the question.
+
+Canonical preparation state supplies the current objective and accumulated signals used for subsequent preparation reasoning.
+
+Canonical sequence:
+
+authorized preparation question
+
+→ answer or skip
+
+→ preserve interaction identity
+
+→ update canonical preparation evidence
+
+→ return to Operational Judgment
+
+Skip is an interaction result.
+
+Skip is not a progression authority.
+
+### Presentation boundary
+
+Conversation presentation and LIVE orientation presentation remain downstream of semantic and runtime authority.
+
+Presentation may control:
+
+- layout;
+- spacing;
+- route-link rendering;
+- visual hierarchy;
+- orientation imagery;
+- typography;
+- animation;
+- presentation controls.
+
+Presentation may not acquire:
+
+- reasoning authority;
+- Operational Judgment authority;
+- preparation ownership;
+- session ownership;
+- LIVE entry ownership;
+- receiver-policy ownership;
+- delivery-routing ownership.
+
+The LIVE orientation asset and its CSS are therefore presentation realization over the established LIVE entry contract.
+
+### Top-up continuity boundary
+
+Top-up is a consumer of existing continuity and founder-access server authority.
+
+Canonical relationship:
+
+verified continuity session
+
+→ optional continuity identity supplied to founder-code request
+
+→ existing founder-code server authority verifies access
+
+→ verified tier returned
+
+→ client reflects verified tier
+
+The top-up surface does not become an authentication, continuity, entitlement, subscriber, or tier authority.
+
+### Production TypeScript boundary
+
+`archive/source-history` is historical source, not production runtime source.
+
+It is excluded from the production TypeScript program.
+
+Canonical GEORGE application and runtime source remains inside the production TypeScript program.
+
+Historical source must not become a competing compile-time implementation surface.
+
+### Ownership consequence
+
+These qualified boundaries reinforce the existing architecture:
+
+one operational intelligence;
+
+one reasoning authority;
+
+one canonical owner per responsibility;
+
+distinct entry choreography where product behavior requires it;
+
+shared runtime authority where execution converges;
+
+presentation downstream of semantics;
+
+consumers do not recreate server or runtime ownership.
+
+Launch completion and portability work must preserve these boundaries.
+
+<!-- GEORGE_CODEX_LAUNCH_COMPLETION_2026_08_11 -->
+## Conversational Execution and Launch-Portability Boundary
+
+Normal may carry relevant current-session work into LIVE while Traditional may intentionally establish a separate preparation context. These are different entry experiences over the existing shared Preparation/LIVE architecture, not separate intelligences or runtimes.
+
+LIVE is an execution mode. GEORGE may identify a useful interaction from Normal strategy work and propose executing it, but it does not manufacture an interaction merely to justify LIVE.
+
+Preparation may consume communication-medium and receiver evidence to recommend how GEORGE should accompany the user. In-person, telephone, video, presentation, desktop/mobile, earbuds, audio glasses, and text-capable smart/AR glasses are realization evidence. They do not alter reasoning authority.
+
+The existing receiver architecture remains canonical:
+
+operational reasoning
+→ support behavior
+→ operational assessment
+→ receiver policy
+→ delivery routing
+→ presentation/device realization
+
+Hardware-specific smart-glasses integration belongs downstream in device/host adapters. A hardware adapter may translate approved canonical delivery into the device API but may not reason, reassess, choose a Formula, select support behavior, rewrite receiver policy, or learn.
+
+Normal conversational briefing may lead to a proposed real-world execution. Before execution, editable current choices remain available for confirmation or revision. After execution, Conversation Package / Conversation Record / operational-learning boundaries remain authoritative while the user decides whether the result belongs to the current strategy, a new conversation, or separate continuity.
+
+Email and other follow-up channels are execution surfaces over existing session and operational authority. They must not become independent memory, reasoning, strategy, Formula, or learning owners.
+
+Presentation decomposition for launch must preserve ownership. Large hosts may be decomposed only after responsibility-level inspection proves the extracted concern is presentation, reusable host integration, or another already-defined owner. File size alone is not architectural evidence.
+
+Branding, BX assets, premium controls, route-specific visual systems, icons, animation, typography, and other product presentation should become independently maintainable where useful, but presentation modules remain downstream of semantic/runtime authority.
+
+Codex launch work must preserve the established runtime and use existing production, portability, ownership, resilience, and interface qualifications as regression guards.
