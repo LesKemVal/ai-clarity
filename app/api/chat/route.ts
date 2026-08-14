@@ -67,15 +67,24 @@ import { resolveRuntimeControls } from '@/lib/george/runtime/resolve-runtime-con
 import { buildJudgmentSurfaceState, buildJudgmentSurfaceNote } from '@/lib/george/runtime/judgment-surface'
 import { evaluateLiveRecommendationEvidence } from '@/lib/george/runtime/live-recommendation-governor'
 import {
+  runNormalExecutionCompletion,
+  runNormalSemanticProposal,
   runNormalTextCompletion,
   type NormalProviderSemanticIntent,
   type NormalProviderSemanticJudgment,
 } from '@/lib/george/runtime/provider/normal-provider'
 import {
+  buildProviderResolvedNormalExecutionRequest,
   isStandaloneAmbiguousKnowledgeQuestion,
   resolveGeorgeRuntimePipeline,
-  selectGeorgeRuntimeAuthoritySnapshot,
+  selectProviderResolvedGeorgeRuntimeAuthoritySnapshot,
 } from '@/lib/george/runtime/runtime-pipeline'
+import {
+  buildNormalLiveOperationalJudgmentResult,
+  buildNormalOperationalResponseResult,
+  NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST,
+  normalizeOperationalPreparationContext,
+} from '@/lib/george/runtime/operational-judgment'
 import { createOperationalMemory } from '@/lib/george/operational-memory/operational-memory'
 import { createRedisOperationalFormulaLibrary } from '@/lib/george/operational-memory/redis-formula-library'
 import {
@@ -86,6 +95,9 @@ import {
   shouldRetrieveOperationalMemory,
 } from '@/lib/george/operational-memory/retrieval-policy'
 import { createOperationalMemoryRuntimeEvidence } from '@/lib/george/operational-memory/runtime-evidence'
+import type { RetrievedOperationalFormula } from '@/lib/george/operational-memory/types'
+import { projectNormalPreparationEvidence } from '@/lib/george/live-runtime/live-preparation-controller'
+import { formulateAuthorizedSignalQuestion } from '@/lib/george/live-runtime/authorized-signal-question'
 import { readGeorgeSession } from '@/lib/security/george-session'
 
 const openai = new OpenAI({
@@ -108,6 +120,7 @@ type IncomingMessage = {
   imageDataUrl?: string | null
   imageDataUrls?: string[] | null
   source?: 'user_input' | 'sidebar_prompt' | 'live_transcript' | 'third_party_speech' | 'system_override'
+  presentationMode?: string | null
 } | null
 
 type FilteredIncomingMessage = {
@@ -116,6 +129,7 @@ type FilteredIncomingMessage = {
   imageDataUrl?: string | null
   imageDataUrls?: string[] | null
   source?: 'user_input' | 'sidebar_prompt' | 'live_transcript' | 'third_party_speech' | 'system_override'
+  presentationMode?: string | null
 }
 
 type CleanMessage = {
@@ -124,6 +138,7 @@ type CleanMessage = {
   imageDataUrl?: string | null
   imageDataUrls?: string[] | null
   source?: 'user_input' | 'sidebar_prompt' | 'live_transcript' | 'third_party_speech' | 'system_override'
+  presentationMode?: string | null
 }
 
 
@@ -656,12 +671,53 @@ export async function POST(req: NextRequest) {
       typeof body?.contextTurnCount === 'number' && Number.isFinite(body.contextTurnCount)
         ? body.contextTurnCount
         : 0
+    const preparationTransport =
+      body?.preparationContext &&
+      typeof body.preparationContext === 'object' &&
+      !Array.isArray(body.preparationContext)
+        ? (body.preparationContext as Record<string, unknown>)
+        : null
+    const preparationEvidenceProjection = preparationTransport
+      ? projectNormalPreparationEvidence({
+          session: preparationTransport.session,
+          activeNormalSessionId:
+            typeof preparationTransport.activeNormalSessionId === 'string'
+              ? preparationTransport.activeNormalSessionId
+              : null,
+          linkedPreparationSessionId:
+            typeof preparationTransport.linkedPreparationSessionId === 'string'
+              ? preparationTransport.linkedPreparationSessionId
+              : null,
+          currentConversation: incomingMessages.filter(isValidIncomingMessage),
+          evidenceSufficiency:
+            preparationTransport.evidenceSufficiency === 'sufficient'
+              ? 'sufficient'
+              : 'unresolved',
+          signalAcquisitionAllowed:
+            preparationTransport.signalAcquisitionAllowed !== false,
+        })
+      : null
+    const preparationContext = normalizeOperationalPreparationContext(
+      preparationEvidenceProjection
+    )
+    const operationalJudgmentRequest =
+      body?.requestPurpose === NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST &&
+      preparationContext?.entrySource === 'normal'
 
 
-    const tier =
+    const sessionTier =
+      session?.tier === 'smart' ||
+      session?.tier === 'intelligent' ||
+      session?.tier === 'brilliant'
+        ? session.tier
+        : null
+
+    const requestedTier =
       body?.tier === 'intelligent' || body?.tier === 'brilliant'
         ? body.tier
         : 'smart'
+
+    const tier = sessionTier || requestedTier
 
     const messages: CleanMessage[] = incomingMessages
       .filter(isValidIncomingMessage)
@@ -677,6 +733,10 @@ export async function POST(req: NextRequest) {
           m.source === 'system_override'
             ? m.source
             : 'user_input',
+        presentationMode:
+          typeof m.presentationMode === 'string'
+            ? m.presentationMode
+            : null,
       }))
       .filter((m: CleanMessage) => m.content.length > 0 || Boolean(m.imageDataUrl) || Boolean(m.imageDataUrls?.length))
 
@@ -937,6 +997,7 @@ LANGUAGE MODE: SPANISH
 
     const useCompactNormalKnowledgePrompt =
       currentRuntime === 'normal_george' &&
+      !preparationContext &&
       isStandaloneAmbiguousKnowledgeQuestion(latestUserRaw)
 
     const baseSystemPrompt = useCompactNormalKnowledgePrompt
@@ -967,35 +1028,58 @@ LANGUAGE MODE: SPANISH
       currentContextSufficient: currentOperationalContextSufficient,
     })
 
-    if (operationalMemoryUserId && shouldRetrieveCurrentOperationalMemory) {
+    if (
+      operationalMemoryUserId &&
+      (shouldRetrieveCurrentOperationalMemory || preparationContext?.formula)
+    ) {
       const operationalMemoryRetrievalStartedAt = Date.now()
 
       try {
         const operationalMemoryStartedAt = performance.now()
-
-        const formulaContext = buildFormulaRetrievalContext({
-          userId: operationalMemoryUserId,
-          roomType: normalizeFormulaRetrievalType(
-            operationalMemoryContext.roomType
-          ),
-          objectiveType: normalizeFormulaRetrievalType(
-            operationalMemoryContext.objectiveType
-          ),
-          observedSignalTypes: Array.isArray(
-            operationalMemoryContext.observedSignalTypes
-          )
-            ? operationalMemoryContext.observedSignalTypes
-                .map(normalizeFormulaRetrievalType)
-                .filter((value: string | undefined): value is string => Boolean(value))
-            : [],
-        })
-
+        const formulaLibrary = createRedisOperationalFormulaLibrary()
         const operationalMemory = createOperationalMemory({
-          formulaLibrary: createRedisOperationalFormulaLibrary(),
+          formulaLibrary,
         })
+        let retrieved: RetrievedOperationalFormula[] = []
+        let selected: RetrievedOperationalFormula[] = []
 
-        const retrieved = await operationalMemory.retrieve(formulaContext)
-        const selected = applyOperationalMemoryRetrievalPolicy(retrieved)
+        if (shouldRetrieveCurrentOperationalMemory) {
+          const formulaContext = buildFormulaRetrievalContext({
+            userId: operationalMemoryUserId,
+            roomType: normalizeFormulaRetrievalType(
+              operationalMemoryContext.roomType
+            ),
+            objectiveType: normalizeFormulaRetrievalType(
+              operationalMemoryContext.objectiveType
+            ),
+            observedSignalTypes: Array.isArray(
+              operationalMemoryContext.observedSignalTypes
+            )
+              ? operationalMemoryContext.observedSignalTypes
+                  .map(normalizeFormulaRetrievalType)
+                  .filter((value: string | undefined): value is string => Boolean(value))
+              : [],
+          })
+          retrieved = await operationalMemory.retrieve(formulaContext)
+          selected = applyOperationalMemoryRetrievalPolicy(retrieved)
+        }
+
+        if (preparationContext?.formula) {
+          const selectedFormula = await operationalMemory.retrieveSelected({
+            selection: preparationContext.formula,
+            userId: operationalMemoryUserId,
+          })
+
+          if (selectedFormula) {
+            selected = [
+              selectedFormula,
+              ...selected.filter(
+                (candidate) =>
+                  candidate.formula.id !== selectedFormula.formula.id
+              ),
+            ]
+          }
+        }
 
         operationalMemoryEvidence =
           createOperationalMemoryRuntimeEvidence(selected)
@@ -1024,13 +1108,50 @@ LANGUAGE MODE: SPANISH
       room: currentRuntime === 'live_george' ? 'LIVE' : undefined,
     })
 
+    const providerPrompt = {
+      languageRule,
+      modeBlock,
+      baseSystemPrompt,
+      messageSourceBlock,
+      controlStateBlock,
+      runtimeScoresBlock,
+      scoreAwareSteeringBlock,
+      conversationEngineRulesBlock,
+      universalLiveOpeningBlock,
+      liveDisciplineBlock,
+      dynamicRuntimeBlocks,
+      includeLiveDiscipline:
+        presentationMode === 'live' ||
+        presentationMode === 'cue_based' ||
+        presentationMode === 'compressed',
+      operationalJudgmentRequest,
+      recentMessages: recentMessages.map((message) => ({
+        role: message.role,
+        content: message.content,
+        imageDataUrls:
+          message.role === 'user'
+            ? (
+                message.imageDataUrls?.length
+                  ? message.imageDataUrls
+                  : message.imageDataUrl
+                    ? [message.imageDataUrl]
+                    : []
+              ).slice(0, 10)
+            : undefined,
+      })),
+    }
+
     const runtimePipeline = resolveGeorgeRuntimePipeline({
       currentRuntime,
       latestUserText: latestUserRaw,
       previousUserText,
       voiceMode,
-      objectiveKnown: passiveIntentState.objectiveState !== 'unclear',
-      signalUsable: judgmentSurface.signalSufficiency !== 'insufficient',
+      objectiveKnown:
+        Boolean(preparationContext?.objective) ||
+        passiveIntentState.objectiveState !== 'unclear',
+      signalUsable:
+        preparationContext?.evidenceSufficiency === 'sufficient' ||
+        judgmentSurface.signalSufficiency !== 'insufficient',
       executionImminent: passiveIntentState.executionImminent,
       tier,
       hasImageInput,
@@ -1043,27 +1164,8 @@ LANGUAGE MODE: SPANISH
       liveRecommendationEvidence,
       operationalSignals: coreInterpretation.operationalSignals || [],
       operationalMemoryEvidence,
-      providerPrompt: {
-        languageRule,
-        modeBlock,
-        baseSystemPrompt,
-        messageSourceBlock,
-        controlStateBlock,
-        runtimeScoresBlock,
-        scoreAwareSteeringBlock,
-        conversationEngineRulesBlock,
-        universalLiveOpeningBlock,
-        liveDisciplineBlock,
-        dynamicRuntimeBlocks,
-        includeLiveDiscipline:
-          presentationMode === 'live' ||
-          presentationMode === 'cue_based' ||
-          presentationMode === 'compressed',
-        recentMessages: recentMessages.map((message) => ({
-          role: message.role,
-          content: message.content,
-        })),
-      },
+      preparationContext,
+      providerPrompt,
       governedContextNotes: {
         liveRuntimeContext,
         shelvedCampaignRuntimeNote,
@@ -1084,24 +1186,28 @@ LANGUAGE MODE: SPANISH
       },
     })
 
-    const {
-      operationalResourceMonitor,
-      providerRequest,
-      providerResolution,
-    } = runtimePipeline
-
-    const runtimeAuthoritySnapshot =
-      selectGeorgeRuntimeAuthoritySnapshot(runtimePipeline)
+    const { providerRequest, providerResolution } = runtimePipeline
 
     const model = providerResolution.model
     const { systemContent, messages: providerMessages } = providerRequest
 
 
+    const normalSemanticPhase = currentRuntime === 'normal_george'
+    const ordinaryNormalTwoStage =
+      normalSemanticPhase && !operationalJudgmentRequest
+    const providerFallback = providerResolution.fallback
+
     let reply = ''
     let providerSemanticIntent: NormalProviderSemanticIntent = null
     let providerSemanticJudgment: NormalProviderSemanticJudgment | null = null
+    let resolvedSemanticProvider = providerResolution.provider
+    let resolvedSemanticModel = model
+    let providerExecutionSource:
+      | 'normal_provider_execution'
+      | 'canonical_presentation'
+      | null = null
 
-    if (hasImageInput) {
+    if (hasImageInput && currentRuntime === 'live_george') {
       const input: ResponsesCreateInput = [
         {
           role: 'system',
@@ -1149,8 +1255,50 @@ LANGUAGE MODE: SPANISH
       })
 
       reply = response.output_text.trim()
+    } else if (normalSemanticPhase) {
+      let semanticProposal = null
+
+      if (providerFallback) {
+        try {
+          semanticProposal = await runNormalSemanticProposal({
+            provider: providerResolution.provider,
+            model,
+            systemContent,
+            messages: providerMessages,
+          })
+        } catch (error) {
+          console.warn(
+            `[GEORGE][normal-semantic] ${providerResolution.provider} failed; falling back to ${providerFallback.provider}.`,
+            error instanceof Error ? error.message : error
+          )
+        }
+      }
+
+      if (!semanticProposal) {
+        const semanticTarget = providerFallback || providerResolution
+
+        semanticProposal = await runNormalSemanticProposal({
+          provider: semanticTarget.provider,
+          model: semanticTarget.model,
+          systemContent,
+          messages: providerMessages,
+        })
+
+        resolvedSemanticProvider = semanticTarget.provider
+        resolvedSemanticModel = semanticTarget.model
+      }
+
+      if (!semanticProposal) {
+        return NextResponse.json(
+          { error: 'No semantic proposal generated.' },
+          { status: 502 }
+        )
+      }
+
+      providerSemanticIntent = semanticProposal.semanticIntent
+      providerSemanticJudgment = semanticProposal.semanticJudgment
     } else {
-      if (providerResolution.provider === 'groq') {
+      if (providerFallback) {
         try {
           const providerResult = await runNormalTextCompletion({
             provider: providerResolution.provider,
@@ -1161,28 +1309,22 @@ LANGUAGE MODE: SPANISH
 
           reply = providerResult?.text || ''
           providerSemanticIntent =
-            providerResult?.semanticIntent ?? null
+          providerResult?.semanticIntent ?? null
           providerSemanticJudgment =
             providerResult?.semanticJudgment ?? null
         } catch (error) {
           console.warn(
-            '[GEORGE][normal-fast-lane] Groq failed; falling back to OpenAI.',
+            `[GEORGE][normal-fast-lane] ${providerResolution.provider} failed; falling back to ${providerFallback.provider}.`,
             error instanceof Error ? error.message : error
           )
         }
       }
 
       if (!reply) {
+        const textTarget = providerFallback || providerResolution
         const providerResult = await runNormalTextCompletion({
-          provider: 'openai',
-          model:
-            providerResolution.provider === 'groq'
-              ? (
-                  process.env.OPENAI_MODEL_INTELLIGENT ||
-                  process.env.OPENAI_MODEL ||
-                  'gpt-4o'
-                )
-              : model,
+          provider: textTarget.provider,
+          model: textTarget.model,
           systemContent,
           messages: providerMessages,
         })
@@ -1195,37 +1337,233 @@ LANGUAGE MODE: SPANISH
       }
     }
 
-    if (!reply) {
+    if (!normalSemanticPhase && !reply) {
       return NextResponse.json(
         { error: 'No response generated.' },
         { status: 502 }
       )
     }
 
+    const runtimeAuthoritySnapshot =
+      selectProviderResolvedGeorgeRuntimeAuthoritySnapshot({
+        snapshot: runtimePipeline,
+        currentRuntime,
+        latestUserText: latestUserRaw,
+        voiceMode,
+        executionImminent: passiveIntentState.executionImminent === true,
+        operationalSignals: coreInterpretation.operationalSignals || [],
+        judgmentSurface,
+        providerReasoning:
+          providerSemanticJudgment?.operationalReasoning || null,
+        providerCapability:
+          providerSemanticJudgment?.capability || null,
+        capabilityExplicitlyRequested:
+          providerSemanticJudgment?.capabilityExplicitlyRequested === true,
+        capabilityRecommendationMaterial:
+          providerSemanticJudgment?.capabilityRecommendationMaterial === true,
+        canonicalSignalAcquisition: normalSemanticPhase,
+        signalAcquisitionAllowed: operationalJudgmentRequest
+          ? preparationContext?.evidenceSufficiency === 'unresolved' &&
+            preparationContext.signalAcquisitionAllowed
+          : ordinaryNormalTwoStage
+            ? true
+            : undefined,
+        operationalJudgmentRequest,
+        ordinaryNormalRequest: ordinaryNormalTwoStage,
+      })
+
     const latestUserText =
       latestUserRaw.toLowerCase()
+    let normalOperationalResult = ordinaryNormalTwoStage
+      ? buildNormalOperationalResponseResult({
+          operationalJudgment:
+            runtimeAuthoritySnapshot.operationalJudgment,
+        })
+      : null
+    let authorizedSignalQuestion = false
 
-    reply = enforcePresentationMode(reply, presentationMode)
-    reply = renderOperationalExcellenceOutput({
-      reply,
-      presentationMode,
-      latestUserText,
-    })
+    if (
+      ordinaryNormalTwoStage &&
+      runtimeAuthoritySnapshot.operationalJudgment.realization
+        .executionGenerationRequired
+    ) {
+      const executionRequest = buildProviderResolvedNormalExecutionRequest({
+        authority: runtimeAuthoritySnapshot,
+        latestUserText: latestUserRaw,
+        hasPreparationContext: Boolean(preparationContext),
+        prompt: providerPrompt,
+      })
+      let executionResult = null
+      const acceptedJudgment =
+        runtimeAuthoritySnapshot.operationalJudgment
+      const authorizedSignal =
+        acceptedJudgment.signalAcquisition.shouldAcquire
+          ? acceptedJudgment.signalAcquisition.requestedSignal
+          : null
 
-    reply = appendPostResponseNotices({
-      reply,
-      messageCount: messages.length,
-      latestUserText,
-    })
+      if (authorizedSignal) {
+        try {
+          const formulation = await formulateAuthorizedSignalQuestion({
+            client: openai,
+            model: resolvedSemanticModel,
+            authorizedEvidenceNeed: authorizedSignal,
+            authorizationReason:
+              acceptedJudgment.signalAcquisition.reason,
+            knownSignal: {
+              latestUserText: latestUserRaw,
+              knownEvidence:
+                acceptedJudgment.operationalDisposition.knownEvidence,
+              consequentialUncertainty:
+                acceptedJudgment.operationalDisposition
+                  .consequentialUncertainty,
+            },
+          })
+
+          if (formulation.status === 'question') {
+            executionResult = {
+              text: formulation.question,
+              source: 'normal_provider_execution' as const,
+            }
+            authorizedSignalQuestion = true
+          }
+        } catch (error) {
+          console.warn(
+            '[GEORGE][normal-signal-question] Authorized question formulation failed.',
+            error instanceof Error ? error.message : error
+          )
+        }
+      } else {
+        try {
+          executionResult = await runNormalExecutionCompletion({
+            provider: resolvedSemanticProvider,
+            model: resolvedSemanticModel,
+            systemContent: executionRequest.systemContent,
+            messages: executionRequest.messages,
+            acceptedJudgment,
+            acceptedExecutionPolicy:
+              runtimeAuthoritySnapshot.executionPolicy,
+          })
+        } catch (error) {
+          console.warn(
+            '[GEORGE][normal-execution] Provider execution failed.',
+            error instanceof Error ? error.message : error
+          )
+        }
+
+        if (
+          !executionResult &&
+          providerFallback &&
+          resolvedSemanticProvider !== providerFallback.provider
+        ) {
+          executionResult = await runNormalExecutionCompletion({
+            provider: providerFallback.provider,
+            model: providerFallback.model,
+            systemContent: executionRequest.systemContent,
+            messages: executionRequest.messages,
+            acceptedJudgment,
+            acceptedExecutionPolicy:
+              runtimeAuthoritySnapshot.executionPolicy,
+          })
+        }
+      }
+
+      normalOperationalResult = buildNormalOperationalResponseResult({
+        operationalJudgment: acceptedJudgment,
+        executionText: executionResult?.text || null,
+        authorizedSignalQuestion,
+        governedProviderExecution:
+          Boolean(executionResult) && !authorizedSignalQuestion,
+      })
+      providerExecutionSource = executionResult?.source || null
+    } else if (ordinaryNormalTwoStage) {
+      providerExecutionSource = 'canonical_presentation'
+    }
+
+    if (ordinaryNormalTwoStage) {
+      reply = normalOperationalResult?.message || ''
+
+      if (!reply) {
+        return NextResponse.json(
+          {
+            error:
+              'Canonical Operational Judgment required execution, but no governed execution was generated.',
+          },
+          { status: 502 }
+        )
+      }
+    }
+
+    if (!operationalJudgmentRequest) {
+      reply = enforcePresentationMode(reply, presentationMode)
+      reply = renderOperationalExcellenceOutput({
+        reply,
+        presentationMode,
+        latestUserText,
+        canonicalExecution: Boolean(normalOperationalResult),
+      })
+
+      reply = appendPostResponseNotices({
+        reply,
+        messageCount: messages.length,
+        latestUserText,
+        operationalJudgment:
+          normalOperationalResult?.operationalJudgment || null,
+      })
+
+      if (normalOperationalResult) {
+        normalOperationalResult = buildNormalOperationalResponseResult({
+          operationalJudgment:
+            runtimeAuthoritySnapshot.operationalJudgment,
+          executionText: reply,
+          authorizedSignalQuestion,
+          governedProviderExecution:
+            providerExecutionSource === 'normal_provider_execution' &&
+            !authorizedSignalQuestion,
+        })
+        reply = normalOperationalResult.message || ''
+
+        if (!reply) {
+          return NextResponse.json(
+            {
+              error:
+                'Governed presentation did not conform to canonical Operational Judgment.',
+            },
+            { status: 502 }
+          )
+        }
+      }
+    }
+
+    const operationalJudgmentResult = operationalJudgmentRequest
+      ? buildNormalLiveOperationalJudgmentResult({
+          operationalJudgment:
+            runtimeAuthoritySnapshot.operationalJudgment,
+        })
+      : null
 
     return NextResponse.json({
-      message: reply,
-      operationalResourceMonitor,
+      message: operationalJudgmentRequest
+        ? operationalJudgmentResult?.message || ''
+        : reply,
+      operationalResourceMonitor:
+        runtimeAuthoritySnapshot.operationalResourceMonitor,
       runtimeAuthoritySnapshot: {
         ...runtimeAuthoritySnapshot,
         providerSemanticIntent,
         providerSemanticJudgment,
       },
+      operationalJudgmentResult,
+      normalOperationalResult,
+      responseAuthority: ordinaryNormalTwoStage
+        ? {
+            source: 'operational_judgment',
+            realization: normalOperationalResult?.realization || 'unavailable',
+            providerExecutionSource,
+            executionAccepted:
+              normalOperationalResult?.executionAccepted === true,
+            preAcceptanceProviderTextUsed: false,
+          }
+        : null,
     })
   } catch (err: unknown) {
     console.error('Chat route error:', err)

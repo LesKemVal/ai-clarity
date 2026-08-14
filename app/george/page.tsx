@@ -44,6 +44,7 @@ const GEORGE_LIVE_VISUAL_COMPOSER_STYLE = `
 `;
 
 import {
+  clearPreparationSession,
   clearLivePreparationPreviewReady,
   clearLivePreparationSignals,
   isLivePreparationPreviewReady,
@@ -53,8 +54,9 @@ import {
   saveLivePreparationSignals,
 } from "@/lib/george/live-browser/live-preparation-browser-storage";
 import {
-  createPreparationSession,
   normalizePreparationInteractions,
+  normalizeExplicitNormalPreparationObjective,
+  reconcileNormalPreparationSession,
   type PreparationCheckpoint,
   type PreparationQuestion,
   type PreparationSessionV1,
@@ -124,6 +126,7 @@ import {
 } from "@/lib/george/live-runtime/live-guidance";
 import {
   consumeFreshNormalBrowserSessionRequest,
+  createFreshNormalSession,
   createSession,
   ensureGeorgeBrowserInstanceScope,
   getActiveMode,
@@ -199,21 +202,22 @@ import {
 } from "@/lib/george/live-runtime/live-friction";
 import type { OperationalResourceMonitorState } from "@/lib/george/runtime/operational-resource-monitor";
 import type { GeorgeRuntimeAuthoritySnapshot } from "@/lib/george/runtime/runtime-pipeline";
+import {
+  NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST,
+  type GeorgeOperationalDisposition,
+  type NormalLiveOperationalJudgmentResult,
+} from "@/lib/george/runtime/operational-judgment";
+
+type NormalOperationalJudgmentRequestOptions = {
+  signalAcquisitionAllowed?: boolean;
+};
+
+type NormalPreparationJudgmentResult = {
+  runtimeAuthoritySnapshot: GeorgeRuntimeAuthoritySnapshot;
+  operationalJudgmentResult: NormalLiveOperationalJudgmentResult;
+};
 
 const GEORGE_LAST_NORMAL_DRAFT = "george_last_normal_draft";
-const NORMAL_PREPARATION_PLACEHOLDER_OUTCOMES = new Set([
-  "in progress",
-  "outcome not set",
-  "the desired outcome",
-  "carry this session into live",
-]);
-
-function normalizeExplicitNormalPreparationObjective(value: unknown) {
-  const objective = String(value || "").trim();
-  return NORMAL_PREPARATION_PLACEHOLDER_OUTCOMES.has(objective.toLowerCase())
-    ? ""
-    : objective;
-}
 
 const LIVE_ENTRY_RESPONSIBILITY_MARKER = "[RESPONSIBILITY_CHECKPOINT]";
 const LIVE_ENTRY_TOA_MARKER = "[TOA_CHECKPOINT]";
@@ -462,46 +466,6 @@ type Message = {
   servingTags?: string[];
   presentationMode?: "live_preparation";
 };
-
-function buildNormalPreparationConversationEvidence(messages: Message[]) {
-  const conversationEvidence = messages
-    .filter(
-      (message) =>
-        (message.role === "user" || message.role === "assistant") &&
-        message.presentationMode !== "live_preparation" &&
-        message.source !== "system_override" &&
-        String(message.content || "").trim(),
-    )
-    .slice(-8)
-    .map((message) => {
-      const speaker = message.role === "user" ? "User" : "GEORGE";
-      return `${speaker}: ${String(message.content || "").trim()}`;
-    })
-    .join("\n")
-    .slice(0, 2800)
-    .trim();
-
-  return conversationEvidence
-    ? `Current-session conversation evidence (provisional until qualified for LIVE preparation):\n${conversationEvidence}`
-    : "";
-}
-
-const UNIVERSAL_NORMAL_LIVE_ORIENTATION = `Bring me into your next meeting, interview, negotiation, sales call, presentation, or other important conversation.
-
-While you speak and lead naturally, I’ll listen in real time and quietly support you through your audio or visual device.
-
-I’ll help you stay on message, recover when the conversation changes, surface the right fact or argument at the moment it matters, and keep moving toward your objective.
-
-Tap LIVE again to tailor my support for this conversation.`;
-
-function buildNormalLiveOrientationMessage(objective = "") {
-  const normalizedObjective = String(objective || "").trim();
-  if (!normalizedObjective) return UNIVERSAL_NORMAL_LIVE_ORIENTATION;
-
-  return `I’ll be with you during this conversation while you continue speaking and leading naturally. I’ll listen in real time and quietly support you through your audio or visual device, helping you move toward “${normalizedObjective}” by surfacing the right fact, argument, recovery, or next move when it matters.
-
-Tap LIVE again and I’ll tailor that support for this conversation.`;
-}
 
 function buildNormalPreparationQuestionContent(question: PreparationQuestion) {
   const questionText = String(question.question || "").trim();
@@ -1135,11 +1099,8 @@ export default function Page({
   const [preLiveSignalComplete, setPreLiveSignalComplete] = useState(false);
   const [normalPreparationSession, setNormalPreparationSession] =
     useState<PreparationSessionV1 | null>(null);
-  const [normalLiveOrientationActive, setNormalLiveOrientationActive] =
-    useState(false);
-  const [normalLiveOrientationSessionId, setNormalLiveOrientationSessionId] =
-    useState<string | null>(null);
-
+  const [normalOperationalDisposition, setNormalOperationalDisposition] =
+    useState<GeorgeOperationalDisposition | null>(null);
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -1158,20 +1119,6 @@ export default function Page({
       }
     } catch {}
   }, []);
-
-  useEffect(() => {
-    if (!normalLiveOrientationActive) return;
-
-    const activeNormalSession = getActiveSessionForMode("normal");
-    if (
-      messages.length === 0 ||
-      (normalLiveOrientationSessionId &&
-        activeNormalSession?.id !== normalLiveOrientationSessionId)
-    ) {
-      setNormalLiveOrientationActive(false);
-      setNormalLiveOrientationSessionId(null);
-    }
-  }, [messages, normalLiveOrientationActive, normalLiveOrientationSessionId]);
 
   const isManualLive =
     conversationMode === "manual_live" || activePromptContext === "manual_live";
@@ -2507,8 +2454,6 @@ export default function Page({
         ? storedPreparationSession
         : null,
     );
-    setNormalLiveOrientationActive(false);
-    setNormalLiveOrientationSessionId(null);
 
     const transientDraft = freshNormalEntryRequested
       ? { restored: false as const, messages: [] }
@@ -3284,6 +3229,12 @@ export default function Page({
   const messagesRef = useRef<Message[]>([
     { role: "assistant", content: "GEORGE" },
   ]);
+  const normalOperationalJudgmentRequestRef = useRef<
+    ((
+      session: PreparationSessionV1,
+      options?: NormalOperationalJudgmentRequestOptions,
+    ) => Promise<NormalPreparationJudgmentResult | null>) | null
+  >(null);
 
   const preserveNormalDraft = () => {
     if (typeof window === "undefined") return;
@@ -3357,151 +3308,18 @@ export default function Page({
     const normalSessionId = String(activeNormalSession.id || "").trim();
     if (!normalSessionId) return null;
 
-    const storedSession = loadPreparationSession();
-    const existingSession =
-      storedSession?.provenance.entrySource === "normal" &&
-      storedSession.relations.normalSessionId === normalSessionId
-        ? storedSession
-        : null;
-    const normalizedSignals = Object.fromEntries(
-      Object.entries(signals)
-        .map(([key, value]) => [key, String(value || "").trim()])
-        .filter(([, value]) => Boolean(value)),
-    );
-    const explicitCurrentObjective =
-      normalizeExplicitNormalPreparationObjective(explicitObjective);
-    const metadataObjective = normalizeExplicitNormalPreparationObjective(
-      activeNormalSession.metadata?.desiredOutcome,
-    );
-    const objective =
-      explicitCurrentObjective ||
-      metadataObjective ||
-      existingSession?.knowledge.objective ||
-      "";
-    const inferredDirection =
-      !objective && normalizedSignals.desiredOutcome
-        ? normalizedSignals.desiredOutcome
-        : "";
-    const canonicalSignals = {
-      ...(existingSession?.knowledge.additionalSignals || {}),
-      ...normalizedSignals,
-    };
-
-    if (objective) {
-      canonicalSignals.desiredOutcome = objective;
-      delete canonicalSignals.proposedOutcome;
-    } else {
-      delete canonicalSignals.desiredOutcome;
-      if (inferredDirection) {
-        canonicalSignals.proposedOutcome = inferredDirection;
-      }
-    }
-
-    const role = String(
-      normalizedSignals.role ||
-        activeNormalSession.metadata?.role ||
-        activeNormalSession.metadata?.responsibility ||
-        existingSession?.knowledge.role ||
-        "",
-    ).trim();
-    const audience = String(
-      normalizedSignals.counterparty ||
-        normalizedSignals.audience ||
-        activeNormalSession.metadata?.targetAudience ||
-        activeNormalSession.metadata?.audience ||
-        existingSession?.knowledge.audience ||
-        "",
-    ).trim();
-    const currentSessionConversationEvidence = existingSession
-      ? ""
-      : buildNormalPreparationConversationEvidence(messagesRef.current);
-    const knownContext = Array.from(
-      new Set(
-        [
-          normalizedSignals.conversationContext,
-          sourceContext,
-          inferredDirection ? `Proposed outcome: ${inferredDirection}` : "",
-          currentSessionConversationEvidence,
-          existingSession?.knowledge.knownContext,
-          activeNormalSession.summary,
-          activeNormalSession.lastKnownState,
-        ]
-          .map((value) => String(value || "").trim())
-          .filter(Boolean),
-      ),
-    ).join("\n");
-    const previousCheckpoint = existingSession?.workflow.current;
-    const checkpointChanged =
-      previousCheckpoint &&
-      JSON.stringify(previousCheckpoint) !== JSON.stringify(checkpoint);
-    const checkpointHistory = existingSession
-      ? [
-          ...existingSession.workflow.history,
-          ...(checkpointChanged ? [previousCheckpoint] : []),
-        ]
-      : [];
-    const session = createPreparationSession({
-      preparationSessionId: existingSession?.preparationSessionId,
-      provenance:
-        existingSession?.provenance || {
-          entrySource: "normal",
-          restoredFrom: {
-            kind: "normal_session",
-            id: normalSessionId,
-          },
-        },
-      createdAt: existingSession?.createdAt,
+    const session = reconcileNormalPreparationSession({
+      existingSession: loadPreparationSession(),
+      normalSessionId,
+      activeSessionMetadata: activeNormalSession.metadata || {},
+      signals,
+      acceptedObjective: explicitObjective,
+      currentConversation: messagesRef.current,
+      briefing,
+      checkpoint,
       updatedAt: Date.now(),
-      knowledge: {
-        objective,
-        name: existingSession?.knowledge.name,
-        role,
-        participants: audience
-          ? [audience]
-          : existingSession?.knowledge.participants || [],
-        audience,
-        perspectives: existingSession?.knowledge.perspectives || [],
-        conversation: {
-          id: normalSessionId,
-          title: String(
-            activeNormalSession.metadata?.conversationType ||
-              activeNormalSession.metadata?.room ||
-              existingSession?.knowledge.conversation.title ||
-              "",
-          ).trim(),
-          group: existingSession?.knowledge.conversation.group,
-        },
-        knownContext,
-        communicationMedium:
-          normalizedSignals.communicationMedium ||
-          existingSession?.knowledge.communicationMedium,
-        receiverEvidence: existingSession?.knowledge.receiverEvidence,
-        acceptableOutcome:
-          normalizedSignals.acceptableOutcome ||
-          existingSession?.knowledge.acceptableOutcome,
-        secondaryOutcome:
-          normalizedSignals.secondaryOutcome ||
-          normalizedSignals.fallbackOutcome ||
-          existingSession?.knowledge.secondaryOutcome,
-        roomObjective: existingSession?.knowledge.roomObjective,
-        additionalSignals: canonicalSignals,
-        documents: existingSession?.knowledge.documents || [],
-      },
-      briefing: briefing || existingSession?.briefing,
-      assets: existingSession?.assets,
-      support: existingSession?.support || { overrides: {} },
-      workflow: {
-        current: checkpoint,
-        history: checkpointHistory,
-        ...(existingSession?.workflow.returnTo
-          ? { returnTo: existingSession.workflow.returnTo }
-          : {}),
-      },
-      relations: {
-        ...existingSession?.relations,
-        normalSessionId,
-      },
     });
+    if (!session) return null;
 
     savePreparationSession(session);
     updateSessionLinkage(normalSessionId, {
@@ -3669,84 +3487,200 @@ export default function Page({
     setRerouteSignal(0);
   };
 
+  const presentNormalOperationalJudgmentResponse = (content: string) => {
+    const normalizedContent = String(content || "").trim();
+    if (!normalizedContent) return;
+
+    const latestMessage = messagesRef.current[messagesRef.current.length - 1];
+    if (
+      latestMessage?.role === "assistant" &&
+      String(latestMessage.content || "").trim() === normalizedContent
+    ) {
+      return;
+    }
+
+    const assistantMessage: Message = {
+      role: "assistant",
+      content: normalizedContent,
+    };
+
+    setMessages((previous) => {
+      const next = [...previous, assistantMessage];
+      messagesRef.current = next;
+      return next;
+    });
+  };
+
+  const consumeNormalOperationalJudgment = (
+    judgmentResult: NormalPreparationJudgmentResult,
+    preparationSession: PreparationSessionV1,
+  ) => {
+    const operationalJudgment =
+      judgmentResult.operationalJudgmentResult.operationalJudgment;
+    const disposition =
+      operationalJudgment.operationalDisposition.disposition;
+    const canonicalObjective = normalizeExplicitNormalPreparationObjective(
+      operationalJudgment.operationalDisposition.operationalObjective ||
+        preparationSession.knowledge.objective,
+    );
+    const executionDisposition =
+      disposition === "execution_ready" ||
+      disposition === "execution_opportunity";
+    const decisionSession = beginNormalLivePreparation({
+      signals: preparationSession.knowledge.additionalSignals,
+      explicitObjective: canonicalObjective,
+      briefing: {
+        priorInteractions: preparationSession.briefing.priorInteractions,
+        currentQuestion: undefined,
+      },
+      checkpoint: { surface: "briefing", phase: "decision" },
+    });
+
+    setNormalOperationalDisposition(disposition);
+    setCurrentPreLiveQuestion(null);
+    setShowPreLiveSignalSurface(true);
+    setPreLiveSignalComplete(
+      Boolean(executionDisposition && canonicalObjective),
+    );
+    setActivePromptContext(
+      executionDisposition && canonicalObjective
+        ? "pre_live_signal_ready"
+        : null,
+    );
+    setActivePromptLabel(
+      executionDisposition && canonicalObjective ? "LIVE Ready" : "LIVE",
+    );
+    presentNormalOperationalJudgmentResponse(
+      judgmentResult.operationalJudgmentResult.message || "",
+    );
+
+    return decisionSession || preparationSession;
+  };
+
   const requestNormalAdaptiveQuestion = async (
     preparationSession: PreparationSessionV1,
   ) => {
     if (normalAdaptiveQuestionRequestRef.current) return;
-
-    const existingQuestion = preparationSession.briefing.currentQuestion;
-    if (existingQuestion) {
-      presentNormalAdaptiveQuestion(existingQuestion);
-      return;
-    }
 
     normalAdaptiveQuestionRequestRef.current = true;
 
     try {
       const priorInteractions =
         preparationSession.briefing.priorInteractions;
-      const priorAnswers = Object.fromEntries(
-        priorInteractions
-          .filter((interaction) => interaction.status === "answered")
-          .map((interaction) => [interaction.key, interaction.answer]),
-      );
-      const skippedQuestions = priorInteractions
-        .filter((interaction) => interaction.status === "skipped")
-        .map((interaction) => interaction.key);
-      const documentSummary = preparationSession.knowledge.documents
-        .map((document) => document.summary || document.name)
-        .filter(Boolean)
-        .join("\n");
+      const judgmentResult =
+        await normalOperationalJudgmentRequestRef.current?.(
+          preparationSession,
+        );
 
-      const response = await fetch("/api/george/live/signal-question", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          role: preparationSession.knowledge.role || "",
-          broadGoal:
-            preparationSession.knowledge.additionalSignals.broadGoal || "",
-          desiredOutcome: preparationSession.knowledge.objective,
-          acceptableOutcome:
-            preparationSession.knowledge.acceptableOutcome || "",
-          audience: preparationSession.knowledge.audience || "",
-          room: preparationSession.knowledge.conversation.title || "",
-          knownContext: preparationSession.knowledge.knownContext || "",
-          documentSummary,
-          priorAnswers,
-          priorInteractions,
-          skippedQuestions,
-        }),
-      });
-      const payload = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error("Adaptive briefing question request failed.");
+      if (!judgmentResult) {
+        throw new Error("Operational Judgment request failed.");
       }
 
-      if (
-        payload?.status === "sufficient" ||
-        !String(payload?.question || "").trim()
-      ) {
-        const decisionSession = beginNormalLivePreparation({
+      const operationalJudgment =
+        judgmentResult.operationalJudgmentResult.operationalJudgment;
+      const canonicalObjective = normalizeExplicitNormalPreparationObjective(
+        operationalJudgment.operationalDisposition.operationalObjective ||
+          preparationSession.knowledge.objective,
+      );
+      const canonicalPreparationSession =
+        beginNormalLivePreparation({
           signals: preparationSession.knowledge.additionalSignals,
-          explicitObjective: preparationSession.knowledge.objective,
-          briefing: {
-            priorInteractions,
-            currentQuestion: undefined,
-          },
-          checkpoint: { surface: "briefing", phase: "decision" },
-        });
-        const objective = normalizeExplicitNormalPreparationObjective(
-          decisionSession?.knowledge.objective,
-        );
+          explicitObjective: canonicalObjective,
+          briefing: preparationSession.briefing,
+          checkpoint: preparationSession.workflow.current,
+        }) || preparationSession;
+      const authorizedEvidenceNeed = String(
+        operationalJudgment.signalAcquisition.requestedSignal || "",
+      ).trim();
+      const signalAcquisitionAuthorized = Boolean(
+        operationalJudgment.signalAcquisition.shouldAcquire &&
+          authorizedEvidenceNeed,
+      );
 
-        setCurrentPreLiveQuestion(null);
-        setShowPreLiveSignalSurface(true);
-        setPreLiveSignalComplete(Boolean(objective));
-        setActivePromptContext(
-          objective ? "pre_live_signal_ready" : "pre_live_signal_acquisition",
+      if (!signalAcquisitionAuthorized) {
+        consumeNormalOperationalJudgment(
+          judgmentResult,
+          canonicalPreparationSession,
         );
-        setActivePromptLabel(objective ? "LIVE Ready" : "LIVE");
+        return;
+      }
+
+      setNormalOperationalDisposition("unresolved");
+
+      const activeNormalSession = getActiveSessionForMode("normal");
+
+      const normalAdaptivePayload = {
+        normalPreparationContext: {
+          session: canonicalPreparationSession,
+          activeNormalSessionId: activeNormalSession?.id || null,
+          linkedPreparationSessionId:
+            activeNormalSession?.metadata?.preparationSessionId || null,
+          currentConversation: messagesRef.current,
+          evidenceSufficiency: "unresolved" as const,
+          signalAcquisitionAllowed: true,
+        },
+        authorizedEvidenceNeed,
+        authorizationReason:
+          operationalJudgment.signalAcquisition.reason,
+      };
+
+      console.log("[GEORGE][NORMAL_LIVE][ADAPTIVE_REQUEST]", {
+        normalSessionId:
+          canonicalPreparationSession.relations.normalSessionId || null,
+        preparationSessionId:
+          canonicalPreparationSession.preparationSessionId,
+        payload: normalAdaptivePayload,
+      });
+
+      const returnToCanonicalJudgment = async () => {
+        const reassessedJudgment =
+          await normalOperationalJudgmentRequestRef.current?.(
+            canonicalPreparationSession,
+            { signalAcquisitionAllowed: false },
+          );
+
+        if (!reassessedJudgment) {
+          throw new Error("Operational Judgment reassessment failed.");
+        }
+
+        consumeNormalOperationalJudgment(
+          reassessedJudgment,
+          canonicalPreparationSession,
+        );
+      };
+
+      let response: Response;
+      let payload: any;
+
+      try {
+        response = await fetch("/api/george/live/signal-question", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(normalAdaptivePayload),
+        });
+        payload = await response.json().catch(() => ({}));
+      } catch {
+        await returnToCanonicalJudgment();
+        return;
+      }
+
+      console.log("[GEORGE][NORMAL_LIVE][ADAPTIVE_RESPONSE]", {
+        status: payload?.status || null,
+        nextAction: payload?.nextAction || null,
+        transitionReason: payload?.transitionReason || null,
+        question: payload?.question || null,
+        key: payload?.key || null,
+        understanding: payload?.understanding || null,
+        directions: payload?.directions || [],
+      });
+
+      if (!response.ok) {
+        await returnToCanonicalJudgment();
+        return;
+      }
+
+      if (payload?.nextAction !== "ask_question") {
+        await returnToCanonicalJudgment();
         return;
       }
 
@@ -3892,59 +3826,17 @@ export default function Page({
       ...(objective ? { desiredOutcome: objective } : {}),
     });
     setShowPreLiveSignalSurface(true);
-
-    if (preparationSession.briefing.currentQuestion) {
-      presentNormalAdaptiveQuestion(
-        preparationSession.briefing.currentQuestion,
-      );
-      return;
-    }
+    setNormalOperationalDisposition(null);
 
     setCurrentPreLiveQuestion(null);
-    setPreLiveSignalComplete(Boolean(objective));
-    setActivePromptContext(
-      objective ? "pre_live_signal_ready" : "pre_live_signal_acquisition",
-    );
-    setActivePromptLabel(objective ? "LIVE Ready" : "LIVE");
-  };
-
-  const orientNormalLive = () => {
-    if (typeof window === "undefined" || normalLiveOrientationActive) return;
-
-    const activeNormalSession = getActiveSessionForMode("normal");
-    const validatedPreparationSession = loadValidatedNormalPreparationSession();
-    const knownObjective = normalizeExplicitNormalPreparationObjective(
-      validatedPreparationSession?.knowledge.objective ||
-        activeNormalSession?.metadata?.desiredOutcome,
-    );
-    const orientationMessage: Message = {
-      role: "assistant",
-      content: buildNormalLiveOrientationMessage(knownObjective),
-      source: "system_override",
-    };
-
-    setMessages((prev) => {
-      const next = [...prev, orientationMessage];
-      messagesRef.current = next;
-      return next;
-    });
-    setNormalLiveOrientationSessionId(activeNormalSession?.id || null);
-    setNormalLiveOrientationActive(true);
-    setInput("");
-    setInterimTranscript("");
-    setSuggestedPrompts([]);
-    setSuggestedSignal(Date.now());
+    setPreLiveSignalComplete(false);
+    setActivePromptContext("pre_live_signal_acquisition");
+    setActivePromptLabel("LIVE");
+    void requestNormalAdaptiveQuestion(preparationSession);
   };
 
   const handleNormalLiveControl = () => {
-    if (normalLiveOrientationActive) {
-      setNormalLiveOrientationActive(false);
-      setNormalLiveOrientationSessionId(null);
-      startLiveSignalAcquisition();
-      return;
-    }
-
-    orientNormalLive();
+    startLiveSignalAcquisition();
   };
 
   useEffect(() => {
@@ -4200,8 +4092,6 @@ export default function Page({
     // LIVE preparation cannot survive into the new workspace.
     setShowPreLiveSignalSurface(false);
     setNormalPreparationSession(null);
-    setNormalLiveOrientationActive(false);
-    setNormalLiveOrientationSessionId(null);
     setCurrentPreLiveQuestion(null);
     setPreLiveSignals({});
     setPreLiveSignalComplete(false);
@@ -5467,6 +5357,10 @@ I’ll stay with you.`,
       options?: {
         hidden?: boolean;
         source?: Message["source"];
+        preparationContext?: PreparationSessionV1;
+        preparationEvidenceSufficiency?: "unresolved" | "sufficient";
+        signalAcquisitionAllowed?: boolean;
+        requestPurpose?: typeof NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST;
       },
     ) => {
       let text = (overrideText ?? input).trim();
@@ -5499,10 +5393,6 @@ I’ll stay with you.`,
       const detectedDomain = preProviderResolution.metadata.detectedDomain;
       const activeDomain = preProviderResolution.metadata.activeDomain;
       const providerSystemContext = preProviderResolution.systemContext || "";
-      const directResponse =
-        preProviderResolution.mode === "direct"
-          ? preProviderResolution.response
-          : null;
 
       if (detectedDomain) {
         setLastDomain(detectedDomain);
@@ -5514,7 +5404,10 @@ I’ll stay with you.`,
         setLastGuidedLine(preProviderResolution.guidedLine);
       }
 
-      if (preProviderResolution.mode === "return") {
+      if (
+        !options?.preparationContext &&
+        preProviderResolution.mode === "return"
+      ) {
         return preProviderResolution.response;
       }
 
@@ -5775,33 +5668,6 @@ I’ll stay with you.`,
       startBridgeSpeech();
 
       try {
-        if (directResponse) {
-          stopBridgeSpeech();
-          const assistantMessage: Message = {
-            role: "assistant",
-            content: directResponse,
-            constrained: false,
-          };
-
-          assistantRevealedRef.current = false;
-
-          setMessages((prev) => {
-            const next = [...prev, assistantMessage];
-            messagesRef.current = next;
-            return next;
-          });
-
-          setPendingAssistantMessage(null);
-
-          if (activePromptContext) {
-            setContextTurnCount((prev) => prev + 1);
-          }
-
-          stopBridgeSpeech();
-          speakText(assistantMessage.content);
-          return;
-        }
-
         const liveFastPath = liveMode
           ? tryLiveFastPath({
               input: text,
@@ -5876,6 +5742,24 @@ I’ll stay with you.`,
           observedSignalTypes: [],
         };
 
+        const preparationContext = options?.preparationContext
+          ? {
+              session: options.preparationContext,
+              activeNormalSessionId:
+                activeOperationalSession?.mode === "normal"
+                  ? activeOperationalSession.id
+                  : null,
+              linkedPreparationSessionId:
+                activeOperationalSession?.mode === "normal"
+                  ? activeOperationalSession.metadata?.preparationSessionId || null
+                  : null,
+              evidenceSufficiency:
+                options.preparationEvidenceSufficiency || "sufficient",
+              signalAcquisitionAllowed:
+                options.signalAcquisitionAllowed !== false,
+            }
+          : null;
+
         const res = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -5893,6 +5777,8 @@ I’ll stay with you.`,
             tier: currentTier,
             language,
             operationalMemoryContext,
+            preparationContext,
+            requestPurpose: options?.requestPurpose,
           }),
         });
 
@@ -5926,13 +5812,44 @@ I’ll stay with you.`,
 
         setOperationalResourceMonitor(data?.operationalResourceMonitor || null);
 
-        if (data?.runtimeAuthoritySnapshot) {
+        const runtimeAuthoritySnapshot = data?.runtimeAuthoritySnapshot
+          ? (data.runtimeAuthoritySnapshot as GeorgeRuntimeAuthoritySnapshot)
+          : null;
+
+        if (runtimeAuthoritySnapshot) {
           setCanonicalRuntimeAuthority(
-            data.runtimeAuthoritySnapshot as GeorgeRuntimeAuthoritySnapshot,
+            runtimeAuthoritySnapshot,
           );
         }
 
-        let finalContent = data.message;
+        const operationalJudgmentResult =
+          data?.operationalJudgmentResult as
+            | NormalLiveOperationalJudgmentResult
+            | null;
+
+        if (
+          options?.requestPurpose ===
+          NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST
+        ) {
+          setPendingAssistantMessage(null);
+          stopBridgeSpeech();
+
+          if (
+            !runtimeAuthoritySnapshot ||
+            operationalJudgmentResult?.request !==
+              NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST ||
+            operationalJudgmentResult.source !== "operational_judgment"
+          ) {
+            return null;
+          }
+
+          return {
+            runtimeAuthoritySnapshot,
+            operationalJudgmentResult,
+          };
+        }
+
+        let finalContent = String(data.message || "");
 
         if (typeof finalContent === "string" && liveMode && voiceOn) {
           finalContent = governLiveResponse(finalContent, {
@@ -6019,6 +5936,35 @@ I’ll stay with you.`,
       activePromptContext,
     ],
   );
+
+  normalOperationalJudgmentRequestRef.current = async (
+    preparationSession,
+    options,
+  ) => {
+    const reasoningAnchor =
+      "Apply the Normal LIVE Operational Judgment request to the current validated evidence.";
+
+    const result = await handleSend(reasoningAnchor, {
+      hidden: true,
+      source: "user_input",
+      preparationContext: preparationSession,
+      preparationEvidenceSufficiency: "unresolved",
+      signalAcquisitionAllowed:
+        options?.signalAcquisitionAllowed !== false,
+      requestPurpose: NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST,
+    });
+
+    if (
+      !result ||
+      typeof result !== "object" ||
+      !("runtimeAuthoritySnapshot" in result) ||
+      !("operationalJudgmentResult" in result)
+    ) {
+      return null;
+    }
+
+    return result as NormalPreparationJudgmentResult;
+  };
 
   const handleLiveFinalTranscript = useCallback(
     (text: string) => {
@@ -6508,30 +6454,23 @@ I’ll stay with you.`,
       },
       checkpoint: {
         surface: "briefing",
-        phase: shouldRequestNextQuestion ? "questions" : "decision",
+        phase: "questions",
       },
     });
-    const objective = normalizeExplicitNormalPreparationObjective(
-      nextPreparationSession?.knowledge.objective,
-    );
 
     setCurrentPreLiveQuestion(null);
-    setPreLiveSignalComplete(
-      shouldRequestNextQuestion ? false : Boolean(objective),
-    );
+    setPreLiveSignalComplete(false);
     setShowPreLiveSignalSurface(true);
 
-    if (shouldRequestNextQuestion && nextPreparationSession) {
+    if (nextPreparationSession) {
       setActivePromptContext("pre_live_signal_acquisition");
       setActivePromptLabel("LIVE");
       void requestNormalAdaptiveQuestion(nextPreparationSession);
       return true;
     }
 
-    setActivePromptContext(
-      objective ? "pre_live_signal_ready" : "pre_live_signal_acquisition",
-    );
-    setActivePromptLabel(objective ? "LIVE Ready" : "LIVE");
+    setActivePromptContext("pre_live_signal_acquisition");
+    setActivePromptLabel("LIVE");
 
     return true;
   };
@@ -6547,32 +6486,34 @@ I’ll stay with you.`,
       normalPreparationActions.push({
         label: "SKIP",
         action: () => {
-          submitPreLiveSignalAnswer("Skip to next question", "skipped");
+          submitPreLiveSignalAnswer("Skip", "skipped");
         },
       });
     }
 
-    if (normalPreparationQuestionIsOptional && normalPreparationObjective) {
-      normalPreparationActions.push({
-        label: "START LIVE",
-        action: openLiveEntry,
-        emphasis: "primary",
-      });
-    }
   }
 
-  if (normalBriefingActionState === "decision" && normalPreparationObjective) {
+  const normalDecisionSupportsLive =
+    normalOperationalDisposition === "execution_ready" ||
+    normalOperationalDisposition === "execution_opportunity";
+
+  if (normalBriefingActionState === "decision") {
+    if (normalDecisionSupportsLive && normalPreparationObjective) {
+      normalPreparationActions.push(
+        {
+          label: "NEXT QUESTION",
+          action: continueNormalAdaptiveBriefing,
+          emphasis: "secondary",
+        },
+        {
+          label: "START LIVE",
+          action: openLiveEntry,
+          emphasis: "primary",
+        },
+      );
+    }
+
     normalPreparationActions.push(
-      {
-        label: "NEXT QUESTION",
-        action: continueNormalAdaptiveBriefing,
-        emphasis: "secondary",
-      },
-      {
-        label: "START LIVE",
-        action: openLiveEntry,
-        emphasis: "primary",
-      },
       {
         label: "CLOSE",
         action: closeNormalPreparationBriefing,
@@ -6855,6 +6796,14 @@ I’ll stay with you.`,
                   });
                 }
               } catch {}
+
+              createFreshNormalSession(
+                [],
+                "New Session",
+                getSubscriberSessionMetadata() || {},
+              );
+              clearPreparationSession();
+              preLiveSessionIdRef.current = null;
 
               setShowPreLiveSignalSurface(false);
               setNormalPreparationSession(null);
@@ -7943,8 +7892,6 @@ I’ll stay with you.`,
                                             phase={
                                               preLiveSignalComplete
                                                 ? "ready"
-                                                : normalLiveOrientationActive
-                                                  ? "orientation"
                                                 : showPreLiveSignalSurface
                                                   ? "preparing"
                                                   : "available"
@@ -7952,11 +7899,7 @@ I’ll stay with you.`,
                                             onPrepare={() => {
                                               handleNormalLiveControl();
                                             }}
-                                            onStart={
-                                              normalLiveOrientationActive
-                                                ? handleNormalLiveControl
-                                                : openLiveEntry
-                                            }
+                                            onStart={openLiveEntry}
                                           />
                                         )}
 

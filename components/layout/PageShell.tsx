@@ -5,6 +5,8 @@ import { ShareIcon } from '@/components/icons/ShareIcon'
 import { ReactNode, useEffect, useState } from 'react'
 import Sidebar, { PromptItem } from '@/components/Sidebar'
 import Brand from '@/components/Brand'
+import { clearPreparationSession } from '@/lib/george/live-browser/live-preparation-browser-storage'
+import { createFreshNormalSession } from '@/lib/george/session/store'
 
 type PageShellProps = {
   children: ReactNode
@@ -113,6 +115,8 @@ export default function PageShell({
             setShowSidebar={setShowSidebar}
             voiceActive={false}
             onNewSession={() => {
+              createFreshNormalSession()
+              clearPreparationSession()
               window.location.href = '/george'
             }}
             onPromptSelect={(prompt) => goToGeorge(prompt)}

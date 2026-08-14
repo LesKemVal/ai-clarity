@@ -1,6 +1,25 @@
 import OpenAI from 'openai'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, getRequestIdentity } from '@/lib/security/rate-limit'
+import {
+  preparationEvidenceNeedIsAlreadyKnown,
+  projectNormalPreparationEvidence,
+  resolveAdaptivePreparationTransition,
+} from '@/lib/george/live-runtime/live-preparation-controller'
+import { createOperationalMemory } from '@/lib/george/operational-memory/operational-memory'
+import { createRedisOperationalFormulaLibrary } from '@/lib/george/operational-memory/redis-formula-library'
+import {
+  applyOperationalMemoryRetrievalPolicy,
+  buildFormulaRetrievalContext,
+  normalizeFormulaRetrievalType,
+} from '@/lib/george/operational-memory/retrieval-policy'
+import {
+  buildOperationalMemoryEvidenceNote,
+  createOperationalMemoryRuntimeEvidence,
+} from '@/lib/george/operational-memory/runtime-evidence'
+import type { RetrievedOperationalFormula } from '@/lib/george/operational-memory/types'
+import { readGeorgeSession } from '@/lib/security/george-session'
+import { formulateAuthorizedSignalQuestion } from '@/lib/george/live-runtime/authorized-signal-question'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -13,6 +32,7 @@ type PriorInteraction = {
   question: string
   answer: string
   status: PriorInteractionStatus
+  evidenceNeed?: string
 }
 
 type SignalQuestionRequest = {
@@ -32,8 +52,34 @@ type SignalQuestionRequest = {
     question?: string
     answer?: string
     status?: 'answered' | 'skipped' | 'unknown'
+    evidenceNeed?: string
   }>
   skippedQuestions?: string[]
+  pendingQuestion?: {
+    key?: string
+    question?: string
+    evidenceNeed?: string
+  } | null
+  formula?: {
+    id?: string
+    version?: number
+    source?: 'george' | 'user'
+  } | null
+  authorizedEvidenceNeed?: string
+  authorizationReason?: string
+  normalPreparationContext?: {
+    session?: unknown
+    activeNormalSessionId?: string | null
+    linkedPreparationSessionId?: string | null
+    currentConversation?: Array<{
+      role?: string
+      content?: string | null
+      source?: string | null
+      presentationMode?: string | null
+    }>
+    evidenceSufficiency?: 'unresolved' | 'sufficient'
+    signalAcquisitionAllowed?: boolean
+  } | null
 }
 
 function clean(value: unknown) {
@@ -60,6 +106,9 @@ function normalizePriorInteractions(
           interaction?.status === 'unknown'
             ? interaction.status
             : 'unknown',
+        ...(clean(interaction?.evidenceNeed)
+          ? { evidenceNeed: clean(interaction?.evidenceNeed) }
+          : {}),
       }))
     : []
 
@@ -94,7 +143,7 @@ function normalizePriorInteractions(
   return interactions
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const rate = checkRateLimit({
       key: `live-signal-question:${getRequestIdentity(req)}`,
@@ -106,6 +155,8 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           status: 'sufficient',
+          nextAction: 'invoke_operational_judgment',
+          transitionReason: 'evidence_sufficient',
           question: '',
           label: 'Signal sufficient',
           helper: 'GEORGE has enough signal for LIVE support.',
@@ -116,18 +167,51 @@ export async function POST(req: Request) {
     }
 
     const body = (await req.json()) as SignalQuestionRequest
-    const priorAnswers =
+    const normalPreparationInput = body.normalPreparationContext
+    const normalPreparationProjection = normalPreparationInput
+      ? projectNormalPreparationEvidence({
+          session: normalPreparationInput.session,
+          activeNormalSessionId:
+            normalPreparationInput.activeNormalSessionId,
+          linkedPreparationSessionId:
+            normalPreparationInput.linkedPreparationSessionId,
+          currentConversation: normalPreparationInput.currentConversation,
+          evidenceSufficiency:
+            normalPreparationInput.evidenceSufficiency,
+          signalAcquisitionAllowed:
+            normalPreparationInput.signalAcquisitionAllowed,
+        })
+      : null
+    let priorAnswers =
       body.priorAnswers && typeof body.priorAnswers === 'object'
         ? body.priorAnswers
         : {}
-    const skippedQuestions = Array.isArray(body.skippedQuestions)
+    let skippedQuestions = Array.isArray(body.skippedQuestions)
       ? body.skippedQuestions.map(String)
       : []
-    const priorInteractions = normalizePriorInteractions(
+    let priorInteractions = normalizePriorInteractions(
       body.priorInteractions,
       priorAnswers,
       skippedQuestions
     )
+
+    if (normalPreparationProjection) {
+      priorInteractions = normalPreparationProjection.priorInteractions.map(
+        (interaction) => ({ ...interaction })
+      )
+      priorAnswers = Object.fromEntries(
+        priorInteractions
+          .filter((interaction) => interaction.status === 'answered')
+          .map((interaction) => [interaction.key, interaction.answer])
+      )
+      skippedQuestions = priorInteractions
+        .filter((interaction) => interaction.status === 'skipped')
+        .map((interaction) => interaction.key)
+    }
+    const session = await readGeorgeSession(req)
+    const operationalMemoryUserId = String(session?.email || '')
+      .trim()
+      .toLowerCase()
 
     const interactionMode =
       body.interactionMode === 'ask_george'
@@ -141,16 +225,11 @@ export async function POST(req: Request) {
       const desiredOutcome = clean(body.desiredOutcome)
       const role = clean(body.role)
       const counterparty = clean(body.audience)
+      const knownContext = clean(body.knownContext)
 
-      const fallbackExamples = {
-        role: "interviewee",
-        counterparty: "hiring manager",
-        context: "the position",
-      }
-
-      if (!desiredOutcome || !process.env.OPENAI_API_KEY) {
+      if (!desiredOutcome || !userTurn || !process.env.OPENAI_API_KEY) {
         return NextResponse.json({
-          examples: fallbackExamples,
+          examples: [],
         })
       }
 
@@ -159,7 +238,7 @@ export async function POST(req: Request) {
           process.env.OPENAI_MODEL_INTELLIGENT ||
           process.env.OPENAI_MODEL ||
           'gpt-4o',
-        temperature: 0.2,
+        temperature: 0.25,
         response_format: { type: 'json_object' },
         messages: [
           {
@@ -167,70 +246,70 @@ export async function POST(req: Request) {
             content: `
 You provide quiet example answers for GEORGE's conversational LIVE briefing.
 
-The user supplies their GOAL first. They may also have supplied their ROLE and/or COUNTERPARTY.
+The user's desired outcome is already established.
 
-Treat every non-empty supplied value as established evidence for this examples request.
+Do not suggest another outcome.
+
+Generate several plausible answers to the CURRENT BRIEFING QUESTION using the established desired outcome and accumulated briefing evidence.
 
 Return strict JSON:
+
 {
-  "role": string,
-  "counterparty": string,
-  "context": string
+  "examples": string[]
 }
 
-These are EXAMPLES ONLY. They are not facts and must never become canonical signals unless the user supplies or accepts them.
+Return 4 concise examples whenever the evidence supports four plausible answers.
 
-Infer only the still-missing examples from the established evidence.
+Each example must:
+- directly answer the current question;
+- sound like something the user could naturally type;
+- remain subordinate to the established desired outcome;
+- use established role, counterparty, context, and prior-interaction evidence when available;
+- never contradict established evidence;
+- never invent unsupported facts, relationships, transactions, commitments, permissions, or capabilities;
+- remain short enough for rotating interface guidance;
+- never begin with "For example", "Example", "e.g.", or a label;
+- never explain why the answer is useful;
+- never propose a different desired outcome.
 
-Each returned value must look like an ACTUAL ANSWER the user could naturally type into the blank.
+These examples are presentation guidance only.
 
-Progressive rules:
-- Goal only: suggest plausible role, counterparty, and context.
-- Goal + role: use both to refine counterparty and context.
-- Goal + role + counterparty: use all three to refine context.
-- Never contradict a supplied value.
-- Never replace a supplied value with a different guess.
-- Never invent a transaction type, relationship, instrument, agreement, or subject that the established evidence does not support.
-- If the precise subject is still uncertain, prefer a conservative phrase grounded in the evidence, such as "the deal", "the investment", "the position", "the dispute", or similarly direct wording.
+They are not canonical evidence unless the user actually supplies or accepts the information.
+
+Example:
+
+desired outcome: "Get the job"
+current question: "What is your role in this conversation?"
 
 Good:
-goal: "get hired for a stocking position"
-role: "interviewee"
-counterparty: "hiring manager"
-context: "the stocking position"
+- "Candidate for the operations role."
+- "Internal manager applying for the promotion."
+- "External candidate meeting the leadership team."
+- "Final-round candidate."
+
+Example:
+
+desired outcome: "Secure the investment"
+current question: "Who will you be speaking with?"
 
 Good:
-goal: "secure investment for my company"
-role: "CEO"
-counterparty: "potential investor"
-context: "our financing round"
+- "The lead investor."
+- "A partner at the fund."
+- "An angel investor who reviewed the deck."
+- "The investment committee lead."
 
-Bad:
-role: "your role"
-counterparty: "who you're speaking with"
-context: "what the conversation concerns"
-
-Bad:
-role: "someone seeking employment"
-counterparty: "the person responsible for evaluating candidates"
-context: "the opportunity being discussed"
-
-Rules:
-- Prefer ordinary role names: interviewee, CEO, manager, employee, attorney, parent, buyer, seller, founder.
-- Keep every answer short.
-- Use natural language.
-- Do not explain the answer.
-- Do not prepend "e.g.", "example", or a label.
-- Do not invent specifics unsupported by the goal.
-- When several roles are plausible, choose the simplest broadly plausible example.
+The established outcome is the mission anchor.
             `.trim(),
           },
           {
             role: 'user',
             content: JSON.stringify({
+              currentQuestion: userTurn,
               desiredOutcome,
               role,
               counterparty,
+              knownContext,
+              priorInteractions,
             }),
           },
         ],
@@ -238,40 +317,193 @@ Rules:
 
       try {
         const parsed = JSON.parse(
-          completion.choices?.[0]?.message?.content || '{}',
+          completion.choices?.[0]?.message?.content || '{}'
         )
 
+        const examples = Array.isArray(parsed?.examples)
+          ? parsed.examples
+              .map((value: unknown) => clean(value))
+              .filter(Boolean)
+              .slice(0, 4)
+          : []
+
         return NextResponse.json({
-          examples: {
-            role:
-              clean(parsed?.role) || fallbackExamples.role,
-            counterparty:
-              clean(parsed?.counterparty) ||
-              fallbackExamples.counterparty,
-            context:
-              clean(parsed?.context) || fallbackExamples.context,
-          },
+          examples,
         })
       } catch {
         return NextResponse.json({
-          examples: fallbackExamples,
+          examples: [],
         })
       }
     }
 
+    let operationalMemoryEvidence = ''
+    const effectiveRole = normalPreparationProjection?.role || clean(body.role)
+    const effectiveDesiredOutcome =
+      normalPreparationProjection?.objective || clean(body.desiredOutcome)
+    const effectiveAcceptableOutcome =
+      normalPreparationProjection?.acceptableOutcome ||
+      clean(body.acceptableOutcome)
+    const effectiveAudience =
+      normalPreparationProjection?.audience || clean(body.audience)
+    const effectiveRoom = normalPreparationProjection?.room || clean(body.room)
+    const effectiveFormula = normalPreparationProjection?.formula || body.formula
+    const effectiveKnownContext = normalPreparationProjection
+      ? normalPreparationProjection.currentUserEvidence.join('\n')
+      : clean(body.knownContext)
+    const effectiveDocumentSummary = normalPreparationProjection
+      ? normalPreparationProjection.qualifiedDocumentEvidence.join('\n')
+      : clean(body.documentSummary)
+
+    if (
+      operationalMemoryUserId &&
+      ((effectiveRoom && effectiveDesiredOutcome) ||
+        clean(effectiveFormula?.id))
+    ) {
+      try {
+        const formulaLibrary = createRedisOperationalFormulaLibrary()
+        const operationalMemory = createOperationalMemory({ formulaLibrary })
+        let selected: RetrievedOperationalFormula[] = []
+
+        if (effectiveRoom && effectiveDesiredOutcome) {
+          const retrieved = await operationalMemory.retrieve(
+            buildFormulaRetrievalContext({
+              userId: operationalMemoryUserId,
+              roomType: normalizeFormulaRetrievalType(effectiveRoom),
+              objectiveType: normalizeFormulaRetrievalType(
+                effectiveDesiredOutcome
+              ),
+              observedSignalTypes: priorInteractions
+                .filter((interaction) => interaction.status === 'answered')
+                .map((interaction) =>
+                  normalizeFormulaRetrievalType(
+                    interaction.evidenceNeed || interaction.key
+                  )
+                )
+                .filter(
+                  (value: string | undefined): value is string =>
+                    Boolean(value)
+                ),
+            })
+          )
+          selected = applyOperationalMemoryRetrievalPolicy(retrieved)
+        }
+
+        const selectedFormula = await operationalMemory.retrieveSelected({
+          selection: clean(effectiveFormula?.id)
+            ? {
+                id: clean(effectiveFormula?.id),
+                version: Number(effectiveFormula?.version),
+              }
+            : null,
+          userId: operationalMemoryUserId,
+        })
+
+        if (selectedFormula) {
+          selected = [
+            selectedFormula,
+            ...selected.filter(
+              (candidate) =>
+                candidate.formula.id !== selectedFormula.formula.id
+            ),
+          ]
+        }
+
+        operationalMemoryEvidence = buildOperationalMemoryEvidenceNote(
+          createOperationalMemoryRuntimeEvidence(selected)
+        )
+      } catch (error) {
+        console.error(
+          '[GEORGE][LIVE_SIGNAL_QUESTION][OPERATIONAL_MEMORY_FAILED]',
+          error
+        )
+      }
+    }
+
     const knownSignal = {
-      role: clean(body.role),
+      role: effectiveRole,
       broadGoal: clean(body.broadGoal),
-      desiredOutcome: clean(body.desiredOutcome),
-      acceptableOutcome: clean(body.acceptableOutcome),
-      audience: clean(body.audience),
-      room: clean(body.room),
-      knownContext: clean(body.knownContext),
-      documentSummary: clean(body.documentSummary),
+      desiredOutcome: effectiveDesiredOutcome,
+      acceptableOutcome: effectiveAcceptableOutcome,
+      audience: effectiveAudience,
+      room: effectiveRoom,
+      knownContext: effectiveKnownContext,
+      documentSummary: effectiveDocumentSummary,
       priorAnswers,
       priorInteractions,
       skippedQuestions,
+      pendingQuestion:
+        normalPreparationProjection?.pendingQuestion ||
+        (body.pendingQuestion && typeof body.pendingQuestion === 'object'
+          ? {
+              key: clean(body.pendingQuestion.key),
+              question: clean(body.pendingQuestion.question),
+              evidenceNeed: clean(body.pendingQuestion.evidenceNeed),
+            }
+          : null),
+      evidenceAuthority: normalPreparationProjection
+        ? {
+            normalSessionId: normalPreparationProjection.normalSessionId,
+            preparationSessionId:
+              normalPreparationProjection.preparationSessionId,
+            sourcePrecedence: normalPreparationProjection.sourcePrecedence,
+            currentUserEvidence:
+              normalPreparationProjection.currentUserEvidence,
+            confirmedPreparationEvidence:
+              normalPreparationProjection.confirmedPreparationEvidence,
+            provisionalPreparationEvidence:
+              normalPreparationProjection.provisionalPreparationEvidence,
+            inferenceEvidence: normalPreparationProjection.inferenceEvidence,
+            skippedEvidenceNeeds:
+              normalPreparationProjection.skippedEvidenceNeeds,
+          }
+        : null,
+      operationalMemoryEvidence,
     }
+    const authorizedEvidenceNeed = clean(body.authorizedEvidenceNeed)
+    const authorizationReason = clean(body.authorizationReason)
+
+    if (
+      authorizedEvidenceNeed &&
+      body.normalPreparationContext &&
+      !normalPreparationProjection
+    ) {
+      return NextResponse.json({
+        status: 'unavailable',
+        nextAction: 'no_question',
+        transitionReason: 'invalid_preparation_identity',
+        question: '',
+        authorizedEvidenceNeed,
+      })
+    }
+
+    if (
+      authorizedEvidenceNeed &&
+      normalPreparationProjection &&
+      preparationEvidenceNeedIsAlreadyKnown(
+        normalPreparationProjection,
+        authorizedEvidenceNeed
+      )
+    ) {
+      return NextResponse.json({
+        status: 'unavailable',
+        nextAction: 'no_question',
+        transitionReason: 'evidence_already_known',
+        question: '',
+        authorizedEvidenceNeed,
+      })
+    }
+
+    console.log("[GEORGE][LIVE_SIGNAL_QUESTION][EVIDENCE]", {
+      interactionMode,
+      userTurn,
+      knownSignal: {
+        ...knownSignal,
+        operationalMemoryEvidence: operationalMemoryEvidence
+          ? '[validated operational memory evidence available]'
+          : '',
+      },
+    })
 
     if (interactionMode === 'ask_george' && userTurn) {
       if (!process.env.OPENAI_API_KEY) {
@@ -344,51 +576,82 @@ Return JSON:
     }
 
     if (!process.env.OPENAI_API_KEY) {
-      const interactionKeys = new Set(
-        priorInteractions.map((interaction) => clean(interaction.key).toLowerCase())
-      )
-      const fallback = knownSignal.desiredOutcome
-        ? interactionKeys.has('outcomesuccess')
-          ? null
-          : {
-            question: 'What would make that outcome meaningfully successful in this conversation?',
-            label: 'Meaningful success',
-            key: 'outcomeSuccess',
-            example: 'For example: Describe the result, condition, or next step that would show the conversation worked.',
-            }
-        : interactionKeys.has('desiredoutcome')
-          ? interactionKeys.has('intent')
-            ? null
-            : {
-                question: 'What are you trying to make happen in this conversation?',
-                label: 'Current intent',
-                key: 'intent',
-                example: 'For example: Describe the action, conversation, or decision you are trying to move forward.',
-              }
-          : {
-              question: 'What outcome are you hoping to achieve?',
-              label: 'Desired outcome',
-              key: 'desiredOutcome',
-              example: 'For example: Describe the specific result, who or what it affects, and what would make it successful.',
-            }
+      return NextResponse.json({
+        status: authorizedEvidenceNeed ? 'unavailable' : 'sufficient',
+        nextAction: authorizedEvidenceNeed
+          ? 'no_question'
+          : 'invoke_operational_judgment',
+        transitionReason: authorizedEvidenceNeed
+          ? 'question_formulation_unavailable'
+          : 'evidence_sufficient',
+        question: '',
+        label: 'Signal sufficient',
+        why: 'No fixed fallback question is authoritative without adaptive evidence reasoning.',
+        example: '',
+        helper: 'GEORGE will reason from the current validated evidence.',
+        key: 'signal_sufficient',
+      })
+    }
 
-      if (!fallback) {
+    if (authorizedEvidenceNeed) {
+      const formulation = await formulateAuthorizedSignalQuestion({
+        client: openai,
+        model:
+          process.env.OPENAI_MODEL_INTELLIGENT ||
+          process.env.OPENAI_MODEL ||
+          'gpt-4o',
+        authorizedEvidenceNeed,
+        authorizationReason,
+        knownSignal,
+      })
+
+      if (formulation.status !== 'question') {
         return NextResponse.json({
-          status: 'sufficient',
+          status: 'unavailable',
+          nextAction: 'no_question',
+          transitionReason: formulation.reason,
           question: '',
-          label: 'Signal sufficient',
-          why: 'No additional current-session signal is required before the user decides whether to continue.',
-          example: '',
-          helper: 'No additional current-session signal is required before the user decides whether to continue.',
-          key: 'signal_sufficient',
+          authorizedEvidenceNeed,
+        })
+      }
+
+      const transition = resolveAdaptivePreparationTransition({
+        assessment: {
+          status: 'question',
+          key: formulation.key,
+          label: formulation.label,
+          question: formulation.question,
+          why: formulation.why,
+          example: formulation.example,
+          evidenceNeed: authorizedEvidenceNeed,
+          eligibility: 'eligible',
+        },
+        priorInteractions,
+        authorizedEvidenceNeed,
+      })
+
+      if (transition.nextAction !== 'ask_question') {
+        return NextResponse.json({
+          status: 'unavailable',
+          nextAction: 'no_question',
+          transitionReason: transition.reason,
+          question: '',
+          authorizedEvidenceNeed,
         })
       }
 
       return NextResponse.json({
         status: 'question',
-        ...fallback,
-        why: 'This establishes the current conversation before GEORGE asks for unrelated preparation details.',
-        helper: 'This establishes the current conversation before GEORGE asks for unrelated preparation details.',
+        nextAction: transition.nextAction,
+        transitionReason: transition.reason,
+        question: transition.question.question,
+        label: transition.question.label,
+        why: transition.question.why,
+        example: transition.question.example,
+        helper: transition.question.why,
+        key: transition.question.key,
+        evidenceNeed: authorizedEvidenceNeed,
+        clarificationRequired: false,
       })
     }
 
@@ -400,7 +663,7 @@ Return JSON:
         {
           role: 'system',
           content: `
-You are GEORGE's adaptive preparation reasoning authority.
+You are GEORGE's adaptive preparation evidence-acquisition authority.
 
 The desired outcome establishes the briefing mission.
 
@@ -484,6 +747,12 @@ Reason from the entire briefing conversation and all available operational signa
 
 Treat priorInteractions as the canonical accumulated briefing conversation. Use priorAnswers and skippedQuestions only as backward-compatible supporting fields, and do not count equivalent history more than once.
 
+A skipped interaction means only that the user chose not to provide that evidence. Reassess the complete current state after a skip. Do not automatically ask another question, stop acquisition, enter LIVE, or continue Normal because of the skip itself.
+
+pendingQuestion is a previously proposed but unanswered question. It is not a committed next step. Reassess whether its evidence need remains the single strongest material gap under the current evidence before asking it again.
+
+Operational Memory Evidence, when present, comes from validated Formula and memory retrieval. Treat it as strategic evidence that may change which uncertainty matters or make another question unnecessary. It never defines a fixed question sequence and never overrides current-session evidence.
+
 For every response, also form GEORGE's current operational understanding from the accumulated evidence and identify concise direction candidates that best represent what the user may be trying to accomplish now.
 
 Keep these concepts distinct:
@@ -524,7 +793,50 @@ When knownContext changes the situation, update both understanding and direction
 
 Treat understanding and directions as provisional operational synthesis, not new user facts.
 
-When another briefing interaction is appropriate, also generate:
+EVIDENCE DISCIPLINE
+
+Unresolved is a valid operational state.
+
+Do not fill a blank merely because the response structure contains one.
+
+For every material unknown, determine which of these applies:
+
+1. KNOWN
+The value is directly established by current-session evidence.
+
+2. SAFELY INFERABLE
+The value follows strongly enough from established evidence that materially different interpretations are unlikely.
+
+3. GEORGE CAN ESTABLISH
+The value is not yet known, but GEORGE should determine it through its own professional reasoning, research, available tools, operational knowledge, or other authorized capability rather than asking the user to perform GEORGE's work.
+
+4. USER-OWNED
+The value depends on a fact, preference, constraint, commitment, authority, capability, observation, decision, or circumstance that only the user can reasonably supply.
+
+5. UNRESOLVED
+The value cannot yet be established responsibly.
+
+Use this order:
+
+known
+→ safely infer
+→ GEORGE establishes
+→ ask the user when the information is genuinely user-owned
+→ remain unresolved when evidence is still insufficient.
+
+Never guess in order to make the briefing appear complete.
+
+Never convert a plausible example, prior suggestion, inferred interaction, or GEORGE-generated recommendation into established user evidence.
+
+A structured field may remain empty when evidence does not support a responsible value.
+
+Do not ask the user for professional reasoning GEORGE should perform itself.
+
+Do not ask a question merely because a field is empty.
+
+Ask only when the missing user-owned information would materially change strategy, preparation, execution, timing, support, or likelihood of achieving the established outcome.
+
+When another briefing question is appropriate, also generate:
 
 1. Question
 2. Why this is important
@@ -559,7 +871,23 @@ Never ask for elaboration merely because an established answer is broad.
 Never ask solely because information is missing.
 Do not ask about participants, role, documents, objections, timing, audience, or background until the user's intent and outcome make that signal materially useful.
 
-Return JSON matching the existing schema.
+Return JSON matching this schema:
+{
+  "status": "question" | "sufficient",
+  "question": "the single justified question, or empty when sufficient",
+  "label": "short presentation label",
+  "why": "why this evidence materially changes preparation",
+  "example": "a concise natural example answer",
+  "key": "stable semantic key",
+  "evidenceNeed": "a concise domain-neutral description of the underlying user-owned fact being acquired",
+  "clarificationRequired": false,
+  "understanding": "current evidence-based understanding",
+  "directions": ["current plausible intended result"]
+}
+
+evidenceNeed identifies meaning, not wording. Semantically equivalent questions must use the same evidenceNeed even when phrased differently.
+clarificationRequired is true only when an answered or unknown prior interaction remains materially ambiguous or incomplete and clarification is necessary for a consequential decision.
+When status is sufficient, question, evidenceNeed, and key may be empty.
           `.trim(),
         },
         {
@@ -572,13 +900,19 @@ Return JSON matching the existing schema.
     const raw = completion.choices?.[0]?.message?.content || '{}'
     const parsed = JSON.parse(raw)
 
-    let status = parsed?.status === 'sufficient' ? 'sufficient' : 'question'
+    let status: 'sufficient' | 'question' =
+      parsed?.status === 'sufficient' ? 'sufficient' : 'question'
     let question = clean(parsed?.question)
     let label = clean(parsed?.label) || (status === 'sufficient' ? 'Signal sufficient' : 'Additional signal')
     let why = clean(parsed?.why) || clean(parsed?.helper) || (status === 'sufficient' ? 'Additional signal is unlikely to materially improve context, timing, or support.' : 'This may improve GEORGE’s context, timing, and support.')
     let example = clean(parsed?.example) || (status === 'sufficient' ? '' : 'For example: Describe the key facts, the result that matters, and any constraint that changes the answer.')
     let helper = clean(parsed?.helper) || why
     let key = clean(parsed?.key) || `signal_${Date.now()}`
+    let evidenceNeed = clean(parsed?.evidenceNeed) || key
+    let eligibility: 'eligible' | 'clarification' | 'duplicate' =
+      parsed?.clarificationRequired === true
+        ? 'clarification'
+        : 'eligible'
     const understanding = clean(parsed?.understanding)
     const directions = Array.isArray(parsed?.directions)
       ? parsed.directions
@@ -618,6 +952,8 @@ The requested information is not already established semantically and is not rea
 Evaluate novelty by MEANING, not by the proposed question's wording, label, or key.
 
 Before approving a question, compare the information it seeks against EVERY answered priorInteraction and all other accumulated evidence.
+
+Compare the proposed evidenceNeed against the meaning of every prior interaction, including older interactions that do not yet have an evidenceNeed field. Wording changes do not create novelty.
 
 If an earlier answer already supplies a useful instance, example, achievement, capability, constraint, preference, relationship, result, recognition, history, or other fact that substantially answers the proposed information need, treat that dimension as established.
 
@@ -693,11 +1029,20 @@ Do not create fixed questionnaires.
 Do not use discipline-specific question sequences.
 Do not ask questions solely because information is missing.
 
+A skipped interaction is not automatically resolved, but asking the same evidence request again is not justified merely because the user skipped it. Reassess whether a different user-owned fact is material or whether GEORGE should proceed without it.
+
 Return JSON only:
 
 If the proposed question passes every eligibility test:
 {
-  "verdict": "user_owned_fact"
+  "verdict": "user_owned_fact",
+  "evidenceNeed": "stable semantic description of the user-owned fact",
+  "clarificationRequired": false
+}
+
+If the proposed wording requests evidence that is materially equivalent to a prior interaction and no consequential clarification exception applies:
+{
+  "verdict": "duplicate_question"
 }
 
 If the proposed question fails, but a better user-owned fact is worth asking:
@@ -709,7 +1054,9 @@ If the proposed question fails, but a better user-owned fact is worth asking:
     "label": "short label",
     "why": "concise reason this answer materially sharpens support toward the established outcome",
     "example": "For example: Describe the relevant facts.",
-    "key": "semantic_key"
+    "key": "semantic_key",
+    "evidenceNeed": "stable semantic description of the user-owned fact",
+    "clarificationRequired": false
   }
 }
 
@@ -722,7 +1069,9 @@ If the proposed question fails because it delegates GEORGE-owned reasoning:
     "label": "short label",
     "why": "concise reason",
     "example": "For example: Describe the relevant facts.",
-    "key": "semantic_key"
+    "key": "semantic_key",
+    "evidenceNeed": "stable semantic description of the user-owned fact",
+    "clarificationRequired": false
   }
 }
 
@@ -744,6 +1093,7 @@ If no additional user-owned information has enough operational value:
                 label,
                 why,
                 example,
+                evidenceNeed,
               },
             }),
           },
@@ -756,13 +1106,23 @@ If no additional user-owned information has enough operational value:
       const verdict = clean(eligibilityParsed?.verdict)
       const replacement = eligibilityParsed?.replacement
 
+      if (verdict === 'user_owned_fact') {
+        evidenceNeed =
+          clean(eligibilityParsed?.evidenceNeed) || evidenceNeed
+        eligibility =
+          eligibilityParsed?.clarificationRequired === true
+            ? 'clarification'
+            : eligibility
+      }
+
       if (
         verdict === 'george_owned_reasoning' ||
         verdict === 'replace_question' ||
+        verdict === 'duplicate_question' ||
         verdict === 'sufficient'
       ) {
         const replacementStatus =
-          verdict === 'sufficient'
+          verdict === 'sufficient' || verdict === 'duplicate_question'
             ? 'sufficient'
             : replacement?.status === 'question'
               ? 'question'
@@ -786,6 +1146,11 @@ If no additional user-owned information has enough operational value:
           key =
             clean(replacement?.key) ||
             `signal_${Date.now()}`
+          evidenceNeed = clean(replacement?.evidenceNeed) || key
+          eligibility =
+            replacement?.clarificationRequired === true
+              ? 'clarification'
+              : 'eligible'
         } else {
           status = 'sufficient'
           question = ''
@@ -795,38 +1160,89 @@ If no additional user-owned information has enough operational value:
           example = ''
           helper = why
           key = 'signal_sufficient'
+          evidenceNeed = ''
+          eligibility =
+            verdict === 'duplicate_question' ? 'duplicate' : 'eligible'
         }
       }
     }
 
-    if (status === 'sufficient' || !question) {
-      return NextResponse.json({
-        status: 'sufficient',
-        question: '',
+    const transition = resolveAdaptivePreparationTransition({
+      assessment: {
+        status,
+        key,
         label,
+        question,
         why,
         example,
-        helper,
-        key,
+        evidenceNeed,
+        eligibility,
+      },
+      priorInteractions,
+    })
+
+    if (transition.nextAction === 'invoke_operational_judgment') {
+      console.log("[GEORGE][LIVE_SIGNAL_QUESTION][DECISION]", {
+        status: 'sufficient',
+        nextAction: transition.nextAction,
+        transitionReason: transition.reason,
+        understanding,
+        directions,
+      })
+
+      return NextResponse.json({
+        status: 'sufficient',
+        nextAction: transition.nextAction,
+        transitionReason: transition.reason,
+        question: '',
+        label: 'Signal sufficient',
+        why:
+          transition.reason === 'duplicate_evidence_request'
+            ? 'The proposed evidence request is already represented in preparation history.'
+            : why,
+        example: '',
+        helper:
+          transition.reason === 'duplicate_evidence_request'
+            ? 'GEORGE will reason from the evidence already acquired.'
+            : helper,
+        key: 'signal_sufficient',
         understanding,
         directions,
       })
     }
 
+    const nextQuestion = transition.question
+
+    console.log("[GEORGE][LIVE_SIGNAL_QUESTION][DECISION]", {
+      status: 'question',
+      nextAction: transition.nextAction,
+      transitionReason: transition.reason,
+      question: nextQuestion.question,
+      key: nextQuestion.key,
+      understanding,
+      directions,
+    })
+
     return NextResponse.json({
       status: 'question',
-      question,
-      label,
-      why,
-      example,
-      helper,
-      key,
+      nextAction: transition.nextAction,
+      transitionReason: transition.reason,
+      question: nextQuestion.question,
+      label: nextQuestion.label,
+      why: nextQuestion.why,
+      example: nextQuestion.example,
+      helper: nextQuestion.why,
+      key: nextQuestion.key,
+      evidenceNeed: nextQuestion.evidenceNeed,
+      clarificationRequired: nextQuestion.clarificationRequired === true,
       understanding,
       directions,
     })
   } catch {
     return NextResponse.json({
       status: 'sufficient',
+      nextAction: 'invoke_operational_judgment',
+      transitionReason: 'evidence_sufficient',
       question: '',
       label: 'Signal sufficient',
       why: 'GEORGE will proceed from the available operational signal.',

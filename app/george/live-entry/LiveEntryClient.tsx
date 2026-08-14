@@ -26,7 +26,6 @@ import {
   clearLivePreparationSignals,
   isLivePreparationPreviewReady,
   loadPreparationSession,
-  loadLivePreparationSignals,
   markLivePreparationPreviewReady,
   savePreparationSession,
   saveLivePreparationSignals,
@@ -103,6 +102,8 @@ import {
 } from "@/lib/george/live-entry/outcome-briefing-presentation";
 import {
   resolveLiveEntry,
+  validateLiveEntryPreparation,
+  validateLiveEntryPreparationReturn,
   type HomepageLiveHandoff,
   type LiveEntryRoute,
 } from "@/lib/george/live-entry/entry-resolution";
@@ -1018,39 +1019,95 @@ export default function LiveEntryClient() {
           preparationSessionId?: string;
         };
 
-        const restoredPreparationSession = normalizePreparationSession(
+        const snapshotPreparationSession = normalizePreparationSession(
           snapshot.preparationSession,
         );
         const source = new URLSearchParams(window.location.search).get(
           "source",
         );
+        const preparationSessionId = params.get("preparationSessionId");
+        const normalSessionId = params.get("normalSessionId");
+        const activeNormalSession = getActiveSessionForMode("normal");
+        const restoredPreparationSession =
+          validateLiveEntryPreparationReturn({
+            source,
+            preparationSessionId,
+            normalSessionId,
+            activeNormalSessionId: activeNormalSession?.id,
+            snapshotPreparation: snapshotPreparationSession,
+            storedPreparation: loadPreparationSession(),
+          });
 
-        if (
-          source === "homepage" &&
-          restoredPreparationSession?.provenance.entrySource === "homepage"
-        ) {
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.searchParams.delete("return");
+        window.history.replaceState({}, "", cleanUrl.toString());
+
+        if (!restoredPreparationSession) return;
+
+        if (source === "homepage") {
           homepagePreparationSeedRef.current = restoredPreparationSession;
-          savePreparationSession(restoredPreparationSession);
-        } else {
-          const preparationSessionId = params.get("preparationSessionId");
-          const normalSessionId = params.get("normalSessionId");
-          const activeNormalSession = getActiveSessionForMode("normal");
+        } else if (source === "start") {
+          const resolvedTraditionalPreparation = resolvePreparationSession(
+            restoredPreparationSession,
+          );
+          const traditionalSignals =
+            resolvedTraditionalPreparation.signals;
+          const traditionalRoom = String(
+            restoredPreparationSession.knowledge.conversation.title || "",
+          ).trim();
+          const traditionalAudience = String(
+            restoredPreparationSession.knowledge.audience ||
+              traditionalSignals.counterparty ||
+              "",
+          ).trim();
+          const traditionalRole = String(
+            restoredPreparationSession.knowledge.role ||
+              traditionalSignals.role ||
+              "",
+          ).trim();
 
-          if (
-            preparationSessionId &&
-            normalSessionId &&
-            activeNormalSession?.id === normalSessionId &&
-            restoredPreparationSession?.provenance.entrySource === "normal" &&
-            restoredPreparationSession.preparationSessionId ===
-              preparationSessionId &&
-            restoredPreparationSession.relations.normalSessionId ===
-              normalSessionId
-          ) {
-            normalPreparationSeedRef.current = restoredPreparationSession;
-            savePreparationSession(restoredPreparationSession);
-            linkNormalPreparationSurface("preparation");
+          traditionalPreparationIdentityRef.current = {
+            preparationSessionId:
+              restoredPreparationSession.preparationSessionId,
+            createdAt: restoredPreparationSession.createdAt,
+          };
+          setPreLiveSignals(traditionalSignals);
+          setObjective(restoredPreparationSession.knowledge.objective);
+          setKnownContext(
+            restoredPreparationSession.knowledge.knownContext || "",
+          );
+          if (traditionalRoom) {
+            const knownRoom = CONVERSATION_TYPES.some(
+              (option) => option.label === traditionalRoom,
+            );
+            setConversationType(knownRoom ? traditionalRoom : "Other");
+            if (!knownRoom) setCustomConversationType(traditionalRoom);
           }
+          if (traditionalAudience) setAudienceType(traditionalAudience);
+          if (traditionalRole) setUserPosition(traditionalRole);
+          if (restoredPreparationSession.support.runtimePreferences.pacing) {
+            setPacing(
+              restoredPreparationSession.support.runtimePreferences.pacing,
+            );
+          }
+          if (
+            restoredPreparationSession.support.runtimePreferences
+              .recoveryOptionIds.length > 0
+          ) {
+            setLiveRecoveryOptions(
+              normalizeLiveRecoverySelection(
+                restoredPreparationSession.support.runtimePreferences
+                  .recoveryOptionIds,
+              ),
+            );
+          }
+          setIsFreshTraditionalPreparation(true);
+        } else {
+          normalPreparationSeedRef.current = restoredPreparationSession;
+          linkNormalPreparationSurface("preparation");
         }
+
+        savePreparationSession(restoredPreparationSession);
 
         setShowLiveBriefingRoom(true);
         setLiveBriefingStep(3);
@@ -1124,9 +1181,6 @@ export default function LiveEntryClient() {
           );
         }
 
-        const cleanUrl = new URL(window.location.href);
-        cleanUrl.searchParams.delete("return");
-        window.history.replaceState({}, "", cleanUrl.toString());
       } catch (error) {
         console.warn(
           "[GEORGE][LIVE_ENTRY][PREP_RETURN_RESTORE_FAILED]",
@@ -1146,6 +1200,10 @@ export default function LiveEntryClient() {
   const [showOpenAISignalSurface, setShowOpenAISignalSurface] = useState(false);
   const [typedOptionalSignalQuestion, setTypedOptionalSignalQuestion] =
     useState("");
+  const [traditionalBriefingProductThought, setTraditionalBriefingProductThought] =
+    useState("");
+  const [traditionalBriefingProductThoughtVisible, setTraditionalBriefingProductThoughtVisible] =
+    useState(false);
   const [currentOptionalSignalQuestion, setCurrentOptionalSignalQuestion] =
     useState<{
       key: string;
@@ -1229,6 +1287,89 @@ export default function LiveEntryClient() {
   );
   const currentRoomPhraseExample =
     roomPhraseExamples[exampleIndex % roomPhraseExamples.length];
+
+  useEffect(() => {
+    if (!showOpenAISignalSurface) {
+      setTraditionalBriefingProductThought("");
+      setTraditionalBriefingProductThoughtVisible(false);
+      return;
+    }
+
+    const thoughts = [
+      "Intelligent communication matters when circumstances are not equal.",
+      "A useful conversation should change what happens next.",
+      "The objective gives every signal in the room meaning.",
+      "What is not said can matter as much as what is said.",
+      "The right response depends on what just changed.",
+      "A commitment is more useful than a promising conversation.",
+      "Preparation improves what I can recognize while it is happening.",
+      "The room can change. The outcome does not have to.",
+    ];
+
+    let thoughtIndex = 0;
+    let characterIndex = 0;
+    let typingTimer: number | null = null;
+    let holdTimer: number | null = null;
+    let transitionTimer: number | null = null;
+    let cancelled = false;
+
+    const clearTimers = () => {
+      if (typingTimer !== null) window.clearInterval(typingTimer);
+      if (holdTimer !== null) window.clearTimeout(holdTimer);
+      if (transitionTimer !== null) window.clearTimeout(transitionTimer);
+      typingTimer = null;
+      holdTimer = null;
+      transitionTimer = null;
+    };
+
+    const presentThought = () => {
+      if (cancelled) return;
+
+      clearTimers();
+      characterIndex = 0;
+
+      const message = thoughts[thoughtIndex % thoughts.length];
+
+      setTraditionalBriefingProductThought("");
+      setTraditionalBriefingProductThoughtVisible(true);
+
+      typingTimer = window.setInterval(() => {
+        if (cancelled) return;
+
+        characterIndex += 1;
+        setTraditionalBriefingProductThought(
+          message.slice(0, characterIndex),
+        );
+
+        if (characterIndex >= message.length) {
+          if (typingTimer !== null) {
+            window.clearInterval(typingTimer);
+            typingTimer = null;
+          }
+
+          holdTimer = window.setTimeout(() => {
+            if (cancelled) return;
+
+            setTraditionalBriefingProductThoughtVisible(false);
+
+            transitionTimer = window.setTimeout(() => {
+              if (cancelled) return;
+
+              thoughtIndex = (thoughtIndex + 1) % thoughts.length;
+              presentThought();
+            }, 900);
+          }, 3200);
+        }
+      }, 32);
+    };
+
+    presentThought();
+
+    return () => {
+      cancelled = true;
+      clearTimers();
+    };
+  }, [showOpenAISignalSurface]);
 
   useEffect(() => {
     if (!useRoomPhrases || customRoomPhrases.trim() || roomPhraseFocused) {
@@ -1459,7 +1600,7 @@ export default function LiveEntryClient() {
     {
       key: "clarify_desiredOutcome",
       label: "Goal",
-      question: "What are you trying to accomplish in this conversation?",
+      question: "What are you looking to gain with Intelligent communication?",
     },
     {
       key: "clarify_role",
@@ -1489,9 +1630,16 @@ export default function LiveEntryClient() {
       Object.keys(answers).length === 0
     ) {
       setTraditionalBriefingExamples([
-        "I want to get the job.",
-        "I want to negotiate better terms.",
-        "I want to resolve the disagreement.",
+        "Get the job.",
+        "Close the sale.",
+        "Secure the investment.",
+        "Win the contract.",
+        "Get the promotion.",
+        "Reach a settlement.",
+        "Secure the partnership.",
+        "Get the loan approved.",
+        "Retain the client.",
+        "Get the proposal approved.",
       ]);
       return;
     }
@@ -1901,6 +2049,9 @@ export default function LiveEntryClient() {
 
     const answer = optionalSignalInput.trim();
     if (!answer) return false;
+
+    setTraditionalBriefingProductThoughtVisible(false);
+    setTraditionalBriefingProductThought("");
 
     setTraditionalBriefingAskGeorgeActive(false);
     setTraditionalBriefingGeorgeResponse("");
@@ -2828,9 +2979,11 @@ export default function LiveEntryClient() {
 
     try {
       const params = new URLSearchParams(window.location.search);
+      const isPreparationReturn = params.get("return") === "live-prep";
       const shouldResetLiveEntry =
-        params.get("source") === "start" ||
-        window.localStorage.getItem("george_start_new_live") === "1";
+        !isPreparationReturn &&
+        (params.get("source") === "start" ||
+          window.localStorage.getItem("george_start_new_live") === "1");
 
       if (shouldResetLiveEntry) {
         clearLivePreparationPreviewReady();
@@ -2840,77 +2993,6 @@ export default function LiveEntryClient() {
         window.localStorage.removeItem("GEORGE_LIVE_SETUP");
         window.localStorage.removeItem("george_live_setup_active");
         window.localStorage.removeItem("george_live_runtime_support");
-      }
-
-      const acquiredSignals = shouldResetLiveEntry
-        ? {}
-        : loadLivePreparationSignals();
-      setPreLiveSignals(acquiredSignals);
-
-      if (acquiredSignals.name) {
-        const normalizedName = String(acquiredSignals.name).trim();
-        window.localStorage.setItem("george_name", normalizedName);
-        window.localStorage.setItem("george_profile_name", normalizedName);
-        window.localStorage.setItem("george_user_name", normalizedName);
-      }
-
-      if (acquiredSignals.role) {
-        const normalizedRole = String(acquiredSignals.role).trim();
-        const knownChair = CHAIR_OPTIONS.some(
-          (option) =>
-            option.label.toLowerCase() === normalizedRole.toLowerCase(),
-        );
-        if (knownChair) {
-          const matched = CHAIR_OPTIONS.find(
-            (option) =>
-              option.label.toLowerCase() === normalizedRole.toLowerCase(),
-          );
-          setChairs(matched ? [matched.label] : []);
-          setUserPosition(matched?.label || normalizedRole);
-        } else {
-          setChairs(["Other"]);
-          setCustomChair(normalizedRole);
-          setUserPosition(normalizedRole);
-        }
-        setChairSectionCollapsed(true);
-      }
-
-      if (acquiredSignals.counterparty) {
-        const normalizedAudience = String(acquiredSignals.counterparty).trim();
-        const matchedAudience = AUDIENCE_TYPES.find(
-          (option) =>
-            option.label.toLowerCase() === normalizedAudience.toLowerCase() ||
-            option.label.toLowerCase() ===
-              normalizedAudience.toLowerCase().replace(/s$/, ""),
-        );
-
-        setAudienceType(matchedAudience?.label || normalizedAudience);
-      }
-
-      if (acquiredSignals.desiredOutcome) {
-        setObjective(String(acquiredSignals.desiredOutcome).trim());
-      }
-
-      const acquiredContext = [
-        acquiredSignals.counterparty
-          ? `Speaking with: ${acquiredSignals.counterparty}`
-          : null,
-        acquiredSignals.desiredOutcome
-          ? `Desired outcome: ${acquiredSignals.desiredOutcome}`
-          : null,
-        acquiredSignals.acceptableOutcome
-          ? `Acceptable outcome: ${acquiredSignals.acceptableOutcome}`
-          : null,
-      ]
-        .filter(Boolean)
-        .join("\n");
-
-      if (acquiredContext && !knownContext.trim()) {
-        setKnownContext(acquiredContext);
-      }
-
-      if (Object.keys(acquiredSignals).length > 0) {
-        setShowOpenAISignalSurface(true);
       }
     } catch {}
 
@@ -2940,20 +3022,14 @@ export default function LiveEntryClient() {
         const submittedPreparationSession = normalizePreparationSession(
           homepageHandoff?.preparationSession,
         );
-        const storedPreparationSession =
-          params.get("return") === "live-prep"
-            ? loadPreparationSession()
-            : null;
+        homepagePreparationSeed = validateLiveEntryPreparation({
+          source,
+          preparationSessionId:
+            submittedPreparationSession?.preparationSessionId || null,
+          candidate: submittedPreparationSession,
+        });
 
-        if (
-          submittedPreparationSession?.provenance.entrySource === "homepage"
-        ) {
-          homepagePreparationSeed = submittedPreparationSession;
-        } else if (
-          storedPreparationSession?.provenance.entrySource === "homepage"
-        ) {
-          homepagePreparationSeed = storedPreparationSession;
-        } else if (homepageHandoff) {
+        if (!homepagePreparationSeed && homepageHandoff) {
           const legacySignals = homepageHandoff.signals || {};
           const legacyAudience = String(
             legacySignals.counterparty || legacySignals.audience || "",
@@ -3024,18 +3100,13 @@ export default function LiveEntryClient() {
       const handedNormalSessionId = params.get("normalSessionId");
       const activeNormalSession = getActiveSessionForMode("normal");
       const storedNormalPreparationSession = loadPreparationSession();
-      const normalPreparationSeed =
-        (source === null || source === "signal" || source === "message") &&
-        handedPreparationSessionId &&
-        handedNormalSessionId &&
-        activeNormalSession?.id === handedNormalSessionId &&
-        storedNormalPreparationSession?.provenance.entrySource === "normal" &&
-        storedNormalPreparationSession.preparationSessionId ===
-          handedPreparationSessionId &&
-        storedNormalPreparationSession.relations.normalSessionId ===
-          handedNormalSessionId
-          ? storedNormalPreparationSession
-          : null;
+      const normalPreparationSeed = validateLiveEntryPreparation({
+        source,
+        preparationSessionId: handedPreparationSessionId,
+        normalSessionId: handedNormalSessionId,
+        activeNormalSessionId: activeNormalSession?.id,
+        candidate: storedNormalPreparationSession,
+      });
 
       if (normalPreparationSeed) {
         normalPreparationSeedRef.current = normalPreparationSeed;
@@ -3058,7 +3129,8 @@ export default function LiveEntryClient() {
         homepageHandoff?.workflowAction || "",
       );
 
-      const isStartSource = source === "start";
+      const isStartSource =
+        source === "start" && params.get("return") !== "live-prep";
       setIsFreshTraditionalPreparation(isStartSource);
       setPriorPreparationExplicitlyRestored(false);
 
@@ -3111,7 +3183,7 @@ export default function LiveEntryClient() {
         ? {}
         : normalPreparationSeed
           ? resolvePreparationSession(normalPreparationSeed).signals
-          : loadLivePreparationSignals();
+          : {};
 
       const entryResolution = resolveLiveEntry({
         source,
@@ -3128,6 +3200,7 @@ export default function LiveEntryClient() {
         preparationPreviewReady: isLivePreparationPreviewReady(),
         devPreview: params.get("devPreview") === "1",
         startNewLive:
+          params.get("return") !== "live-prep" &&
           window.localStorage.getItem("george_start_new_live") === "1",
         hasLiveSetup: Boolean(window.localStorage.getItem("GEORGE_LIVE_SETUP")),
         hasActiveLiveSetup: Boolean(
@@ -4110,8 +4183,19 @@ export default function LiveEntryClient() {
     console.info("[GEORGE][LIVE_ENTRY][FORMULA_SELECTION_REQUESTED]");
 
     try {
+      const activePreparationSession = showQuickLiveSetup
+        ? quickLivePreparationSession
+        : homepagePreparationSession ||
+          normalPreparationSession ||
+          traditionalPreparationSession;
       const returnUrl = new URL(window.location.href);
       returnUrl.searchParams.set("return", "live-prep");
+      if (activePreparationSession?.preparationSessionId) {
+        returnUrl.searchParams.set(
+          "preparationSessionId",
+          activePreparationSession.preparationSessionId,
+        );
+      }
 
       window.sessionStorage.setItem(
         "GEORGE_LIVE_PREP_RETURN_URL",
@@ -4145,20 +4229,13 @@ export default function LiveEntryClient() {
           skippedOptionalSignalKeys,
           livePreparationHistory: livePreparationHistoryRef.current,
           georgeSessionId:
-            normalPreparationSession?.relations.normalSessionId ||
-            homepagePreparationSession?.relations.normalSessionId ||
-            getActiveSessionIdForMode("normal") ||
-            undefined,
+            activePreparationSession?.relations.normalSessionId,
           preparationSessionId:
-            (homepagePreparationSession || normalPreparationSession)
-              ?.preparationSessionId,
-          preparationSession:
-            homepagePreparationSession || normalPreparationSession,
+            activePreparationSession?.preparationSessionId,
+          preparationSession: activePreparationSession,
         }),
       );
 
-      const activePreparationSession =
-        homepagePreparationSession || normalPreparationSession;
       if (activePreparationSession) {
         savePreparationSession(activePreparationSession);
       }
@@ -5438,7 +5515,7 @@ export default function LiveEntryClient() {
                     <button
                       type="button"
                       onClick={enterLiveFromBriefingSurface}
-                      className="rounded-[11px] bg-[#4E7CFF] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.17em] text-white transition hover:bg-[#5A84FF]"
+                      className="george-live-primary-shimmer relative overflow-hidden rounded-[11px] bg-[#4E7CFF] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.17em] text-white transition hover:bg-[#5A84FF]"
                     >
                       ENTER LIVE
                     </button>
@@ -5463,6 +5540,24 @@ export default function LiveEntryClient() {
                     </button>
                   </div>
 
+                  <div
+                    aria-hidden="true"
+                    className={`mt-8 min-h-[58px] max-w-[680px] transition-opacity duration-700 ${
+                      traditionalBriefingProductThoughtVisible
+                        ? "opacity-100"
+                        : "opacity-0"
+                    }`}
+                  >
+                    {traditionalBriefingProductThought && (
+                      <p className="font-mono text-[16px] leading-7 tracking-[-0.015em] text-white/48 sm:text-[18px] sm:leading-8">
+                        <span className="text-[#8FAEFF]/44">“</span>
+                        {traditionalBriefingProductThought}
+                        <span className="text-[#8FAEFF]/44">”</span>
+                        <span className="ml-1 text-white/20">|</span>
+                      </p>
+                    )}
+                  </div>
+
                 </div>
               )}
 
@@ -5483,7 +5578,7 @@ export default function LiveEntryClient() {
                   <button
                     type="button"
                     onClick={enterLiveFromBriefingSurface}
-                    className="rounded-[12px] bg-[#4E7CFF] px-6 py-3.5 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[#5A84FF]"
+                    className="george-live-primary-shimmer relative overflow-hidden rounded-[12px] bg-[#4E7CFF] px-6 py-3.5 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-[#5A84FF]"
                   >
                     ENTER LIVE
                   </button>
@@ -7437,112 +7532,230 @@ export default function LiveEntryClient() {
   }
 
   return (
-    <main className="relative min-h-[100dvh] overflow-y-auto overflow-x-hidden bg-black px-4 pb-10 pt-4 text-white sm:px-5 sm:pt-5">
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        <HomeHeroConversationTicker />
-      </div>
-
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
-
-      <div className="relative z-30 mx-auto w-full max-w-[640px]">
-        <div className="mb-5 inline-flex w-fit items-center rounded-[12px] border border-white/[0.04] bg-black/[0.92] px-3 py-2 shadow-[0_8px_24px_rgba(0,0,0,0.42)]">
-          <BxPageHeader backLabel="" />
+    <main className="relative min-h-[100dvh] overflow-y-auto overflow-x-hidden bg-[#F2F0EA] text-white">
+      {liveEntryRoute !== "direct" && (
+        <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+          <HomeHeroConversationTicker />
         </div>
+      )}
+
+      {liveEntryRoute !== "direct" && (
+        <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
+      )}
+
+      <div className="absolute left-6 top-5 z-50 sm:left-10 sm:top-7">
+        <img
+          src="/george/live-orientation/bx-live-orientation.png"
+          alt="BRANESX"
+          className="h-[108px] w-auto object-contain sm:h-[132px] lg:h-[142px]"
+        />
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-[640px] pt-2">
-        <section className="overflow-hidden rounded-[1.5rem] border border-white/[0.10] bg-[#F1F0EB] text-[#101114] shadow-[0_24px_80px_rgba(0,0,0,0.48)]">
-          <div className="px-5 pb-6 pt-6 sm:px-7 sm:pb-8 sm:pt-8">
-            <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.26em] text-black/42">
-              GEORGE LIVE
+      <div className="relative z-10 w-full">
+        <section className="george-live-orientation relative min-h-[100dvh] w-full overflow-hidden text-[#111214]">
+
+          <div className="relative z-10">
+            {/* HERO */}
+            <div className="mx-auto grid min-h-[100dvh] w-full max-w-[1680px] gap-10 px-6 pb-16 pt-[185px] sm:px-10 sm:pb-20 sm:pt-[210px] lg:grid-cols-[0.96fr_1.04fr] lg:items-center lg:gap-16 lg:px-16 lg:pt-[190px] xl:px-20">
+              <div className="max-w-[610px]">
+                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.32em] text-black/40">
+                  BRANESX · GEORGE LIVE
+                </div>
+
+                <h1 className="mt-5 max-w-[760px] text-[44px] font-semibold leading-[0.91] tracking-[-0.065em] text-black sm:text-[62px] lg:text-[76px]">
+                  Better communication should not belong only to people who
+                  already have every advantage.
+                </h1>
+
+                <p className="mt-7 max-w-[600px] text-[15px] leading-7 text-black/60 sm:text-[17px] sm:leading-8">
+                  GEORGE helps you prepare, communicate, and adapt around the
+                  outcome you&apos;re trying to achieve.
+                </p>
+
+                <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-black/38">
+                  <span>Prepare</span>
+                  <span aria-hidden="true" className="text-black/18">•</span>
+                  <span>Strategize</span>
+                  <span aria-hidden="true" className="text-black/18">•</span>
+                  <span>Adapt</span>
+                </div>
+
+
+              </div>
+
+              {/* CODE-BUILT FOAM CHARACTER / RECEIVER STORY */}
+              <div className="relative mx-auto flex min-h-[420px] w-full max-w-[540px] items-center justify-center sm:min-h-[500px]">
+                <div className="george-foam-stage">
+                  <div className="george-foam-shadow" />
+
+                  <div className="george-foam-person">
+                    <div className="george-foam-head">
+                      <div className="george-foam-face-dot george-foam-face-dot-left" />
+                      <div className="george-foam-face-dot george-foam-face-dot-right" />
+
+                      <div className="george-foam-earpiece">
+                        <span className="george-foam-earpiece-core" />
+                      </div>
+                    </div>
+
+                    <div className="george-foam-neck" />
+                    <div className="george-foam-body" />
+
+                    <div className="george-foam-screen">
+                      <div className="george-foam-screen-top">
+                        <span />
+                        <span />
+                        <span />
+                      </div>
+                      <div className="george-foam-screen-line george-foam-screen-line-1" />
+                      <div className="george-foam-screen-line george-foam-screen-line-2" />
+                      <div className="george-foam-screen-line george-foam-screen-line-3" />
+                    </div>
+                  </div>
+
+                  <div className="george-foam-signal george-foam-signal-audio">
+                    <span className="bg-[#D9544F]" />
+                    AUDIO
+                  </div>
+
+                  <div className="george-foam-signal george-foam-signal-visual">
+                    <span className="bg-[#3B9C69]" />
+                    VISUAL
+                  </div>
+
+                  <div className="george-foam-pulse george-foam-pulse-one" />
+                  <div className="george-foam-pulse george-foam-pulse-two" />
+                </div>
+              </div>
             </div>
 
-            <h1 className="mt-4 max-w-[520px] text-[34px] font-semibold leading-[0.98] tracking-[-0.055em] text-black sm:text-[46px]">
-              Intelligence that stays with you in the room.
-            </h1>
+            {/* PRACTICAL VALUE */}
+            <section className="border-t border-black/[0.08] bg-white/38 px-6 py-14 sm:px-10 sm:py-18 lg:px-16 lg:py-20 xl:px-20">
+              <div className="mx-auto w-full max-w-[1440px]">
+                <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16">
+                  <div>
+                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.28em] text-black/36">
+                      PRACTICAL VALUE
+                    </div>
 
-            <p className="mt-5 max-w-[500px] text-[14px] leading-6 text-black/58 sm:text-[15px]">
-              Hear what matters. See what matters. Keep your attention on the
-              conversation while GEORGE adapts with you.
-            </p>
+                    <h2 className="mt-4 max-w-[480px] text-[36px] font-semibold leading-[0.96] tracking-[-0.055em] text-black sm:text-[48px]">
+                      What can we get done?
+                    </h2>
+                  </div>
+
+                  <div className="max-w-[760px]">
+                    <p className="text-[18px] font-medium leading-8 tracking-[-0.025em] text-black/76 sm:text-[22px] sm:leading-9">
+                      Prepare an interview. Negotiate a sale. Defend a proposal.
+                      Ask for capital. Handle an objection. Explain a difficult
+                      idea. Lead a meeting. Recover when the conversation changes.
+                    </p>
+
+                    <p className="mt-6 max-w-[650px] text-[14px] leading-7 text-black/48">
+                      The objective is yours. GEORGE helps you prepare the
+                      strategy, recognize what matters in the conversation, and
+                      decide what may move you closer to it.
+                    </p>
+
+                    <div className="mt-8 inline-flex items-center gap-3 rounded-full border border-black/[0.08] bg-white/54 px-4 py-2.5">
+                      <span className="h-2 w-2 rounded-full bg-[#3B9C69]" />
+                      <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-black/42">
+                        Make the next conversation better than the last
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* NORMAL + LIVE */}
+            <section className="border-t border-black/[0.08] bg-[#181A19] px-6 py-14 text-white sm:px-10 sm:py-18 lg:px-16 lg:py-20 xl:px-20">
+              <div className="mx-auto grid w-full max-w-[1440px] gap-10 lg:grid-cols-[0.84fr_1.16fr] lg:items-start lg:gap-20">
+                <div>
+                  <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.28em] text-white/34">
+                    ONE GEORGE
+                  </div>
+
+                  <h2 className="mt-4 max-w-[560px] text-[38px] font-semibold leading-[0.96] tracking-[-0.055em] text-white sm:text-[52px]">
+                    Think before the room. Adapt inside it.
+                  </h2>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="rounded-[1.15rem] border border-white/[0.08] bg-white/[0.035] p-5">
+                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-white/38">
+                      NORMAL
+                    </div>
+
+                    <div className="mt-6 text-[21px] font-semibold tracking-[-0.035em] text-white/90">
+                      Prepare the work.
+                    </div>
+
+                    <p className="mt-3 text-[13px] leading-6 text-white/48">
+                      Think, research, build, decide, write, prepare, and develop
+                      strategy before the conversation begins.
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        window.location.href = "/george";
+                      }}
+                      className="mt-7 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 transition hover:text-white/76"
+                    >
+                      OPEN NORMAL GEORGE →
+                    </button>
+                  </div>
+
+                  <div className="rounded-[1.15rem] border border-white/[0.08] bg-white/[0.035] p-5">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-white/38">
+                        LIVE
+                      </div>
+
+                      <div className="inline-flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-[#D9544F]" />
+                        <span className="h-2 w-2 rounded-full bg-[#3B9C69]" />
+                      </div>
+                    </div>
+
+                    <div className="mt-6 text-[21px] font-semibold tracking-[-0.035em] text-white/90">
+                      Carry the intelligence with you.
+                    </div>
+
+                    <p className="mt-3 text-[13px] leading-6 text-white/48">
+                      GEORGE follows the conversation and adapts support as the
+                      room, resistance, opportunity, evidence, or objective
+                      changes.
+                    </p>
+
+                    <div className="mt-7 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/30">
+                      Audio · Visual · Both
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
 
-          <div className="border-y border-black/[0.08] bg-[#E7E6E0] px-5 py-6 sm:px-7">
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-[1.1rem] border border-black/[0.08] bg-white/55 p-4">
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-[#D84A45]" />
-                  <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.20em] text-black/48">
-                    Audio
-                  </span>
-                </div>
-                <p className="mt-3 text-[13px] font-medium leading-5 text-black/78">
-                  Short, discreet support you can hear without leaving the
-                  conversation.
-                </p>
-              </div>
-
-              <div className="rounded-[1.1rem] border border-black/[0.08] bg-white/55 p-4">
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-[#3B9A68]" />
-                  <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.20em] text-black/48">
-                    Visual
-                  </span>
-                </div>
-                <p className="mt-3 text-[13px] font-medium leading-5 text-black/78">
-                  Persistent, skimmable guidance when a screen or visual
-                  receiver is available.
-                </p>
-              </div>
-
-              <div className="rounded-[1.1rem] border border-black/[0.08] bg-[#15171A] p-4 text-white">
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-[#D84A45]" />
-                  <span className="h-2 w-2 rounded-full bg-[#3B9A68]" />
-                  <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.20em] text-white/48">
-                    Audio + Visual
-                  </span>
-                </div>
-                <p className="mt-3 text-[13px] font-medium leading-5 text-white/78">
-                  GEORGE uses each channel where it helps most while one
-                  intelligence follows the room.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="px-5 py-6 sm:px-7 sm:py-7">
-            <div className="grid gap-5 sm:grid-cols-[1fr_auto] sm:items-end">
-              <div>
-                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-black/36">
-                  BEFORE YOU ENTER
-                </div>
-                <p className="mt-2 max-w-[410px] text-[13px] leading-6 text-black/58">
-                  Brief GEORGE on the conversation. I’ll use that context to
-                  prepare how I support you before the room begins.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => {
-                  window.localStorage.setItem("george_start_new_live", "1");
-                  window.location.href = "/george/live-entry?source=start";
-                }}
-                className="min-h-[48px] rounded-[0.95rem] bg-black px-6 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.20em] text-white transition hover:bg-black/82 active:scale-[0.99]"
-              >
-                PREPARE FOR LIVE
-              </button>
-            </div>
-
+          {/* PERSISTENT LIVE ACCESS */}
+          <div className="pointer-events-none fixed right-4 top-[max(1rem,env(safe-area-inset-top))] z-[80] sm:right-7 sm:top-7">
             <button
               type="button"
               onClick={() => {
-                window.location.href = "/george";
+                window.localStorage.setItem("george_start_new_live", "1");
+                window.location.href = "/george/live-entry?source=start";
               }}
-              className="mt-5 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-black/38 transition hover:text-black/68"
+              className="pointer-events-auto inline-flex min-h-[48px] items-center gap-4 rounded-[0.95rem] border border-black/[0.10] bg-black px-4 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white shadow-[0_12px_32px_rgba(0,0,0,0.18)] transition hover:bg-[#171717] active:scale-[0.99] sm:min-h-[52px] sm:px-5 sm:text-[10px]"
+              aria-label="Prepare for LIVE"
             >
-              Continue in Normal GEORGE →
+              <span>PREPARE FOR LIVE</span>
+
+              <span
+                aria-hidden="true"
+                className="george-live-cta-arrow inline-block text-[17px] leading-none"
+              >
+                →
+              </span>
             </button>
           </div>
         </section>

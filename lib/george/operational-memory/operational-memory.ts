@@ -18,7 +18,10 @@ import {
   extractOperationalFormulas,
   type OperationalFormulaExtractionOptions,
 } from './formula-extractor'
-import type { OperationalFormulaLibrary } from './formula-library'
+import {
+  resolveSelectedOperationalFormula,
+  type OperationalFormulaLibrary,
+} from './formula-library'
 import {
   materializeOperationalFormulaHypothesis,
   type OperationalStrategyHypothesis,
@@ -116,6 +119,14 @@ export type OperationalMemory = {
   retrieve(
     context: FormulaRetrievalContext
   ): Promise<RetrievedOperationalFormula[]>
+  retrieveSelected(input: {
+    selection?: {
+      id: string
+      version: number
+    } | null
+    userId: string
+    organizationId?: string
+  }): Promise<RetrievedOperationalFormula | null>
   recommend(
     input: OperationalRecommendationInput
   ): Promise<OperationalRecommendation>
@@ -152,6 +163,10 @@ export function createOperationalMemory(
   return {
     retrieve(context) {
       return formulaLibrary.retrieve(context)
+    },
+
+    async retrieveSelected(input) {
+      return resolveSelectedOperationalFormula(formulaLibrary, input)
     },
 
     async recommend(input) {

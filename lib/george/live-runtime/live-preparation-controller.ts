@@ -20,6 +20,7 @@ export type PreparationInteraction = {
   question: string
   answer: string
   status: PreparationInteractionStatus
+  evidenceNeed?: string
 }
 
 export type PreparationQuestion = {
@@ -28,7 +29,35 @@ export type PreparationQuestion = {
   question: string
   why: string
   example: string
+  evidenceNeed?: string
+  clarificationRequired?: boolean
 }
+
+export type AdaptivePreparationAssessment = {
+  status: 'question' | 'sufficient'
+  key?: string
+  label?: string
+  question?: string
+  why?: string
+  example?: string
+  evidenceNeed?: string
+  eligibility?: 'eligible' | 'clarification' | 'duplicate'
+}
+
+export type AdaptivePreparationTransition =
+  | {
+      nextAction: 'ask_question'
+      question: PreparationQuestion
+      reason: 'material_evidence_gap' | 'consequential_clarification'
+    }
+  | {
+      nextAction: 'invoke_operational_judgment'
+      reason:
+        | 'evidence_sufficient'
+        | 'invalid_question'
+        | 'duplicate_evidence_request'
+        | 'unauthorized_evidence_request'
+    }
 
 export type PreparationCheckpoint =
   | {
@@ -190,6 +219,133 @@ export type LivePreparationRouteContext = {
   conversationGroup?: string | null
 }
 
+export type NormalPreparationConversationMessage = Readonly<{
+  role?: 'user' | 'assistant' | 'system' | string
+  content?: string | null
+  source?: string | null
+  presentationMode?: string | null
+}>
+
+export type PreparationEvidenceSource =
+  | 'current_explicit_user'
+  | 'confirmed_preparation_answer'
+  | 'qualified_document'
+  | 'active_normal_session_metadata'
+  | 'persisted_preparation'
+  | 'operational_memory'
+  | 'inference'
+
+export type PreparationEvidencePrecedence = Readonly<{
+  source: PreparationEvidenceSource
+  rank: number
+  authority: 'user_owned' | 'qualified' | 'provisional'
+}>
+
+export const NORMAL_PREPARATION_EVIDENCE_PRECEDENCE = Object.freeze([
+  Object.freeze({
+    source: 'current_explicit_user' as const,
+    rank: 1,
+    authority: 'user_owned' as const,
+  }),
+  Object.freeze({
+    source: 'confirmed_preparation_answer' as const,
+    rank: 2,
+    authority: 'user_owned' as const,
+  }),
+  Object.freeze({
+    source: 'qualified_document' as const,
+    rank: 3,
+    authority: 'qualified' as const,
+  }),
+  Object.freeze({
+    source: 'active_normal_session_metadata' as const,
+    rank: 4,
+    authority: 'provisional' as const,
+  }),
+  Object.freeze({
+    source: 'persisted_preparation' as const,
+    rank: 5,
+    authority: 'provisional' as const,
+  }),
+  Object.freeze({
+    source: 'operational_memory' as const,
+    rank: 6,
+    authority: 'provisional' as const,
+  }),
+  Object.freeze({
+    source: 'inference' as const,
+    rank: 7,
+    authority: 'provisional' as const,
+  }),
+] satisfies readonly PreparationEvidencePrecedence[])
+
+export type NormalPreparationEvidenceProjection = Readonly<{
+  preparationSessionId: string
+  normalSessionId: string
+  entrySource: 'normal'
+  preparationUpdatedAt: number
+  objective?: string
+  acceptableOutcome?: string
+  role?: string
+  audience?: string
+  room?: string
+  knownEvidence: readonly string[]
+  currentUserEvidence: readonly string[]
+  confirmedPreparationEvidence: readonly string[]
+  qualifiedDocumentEvidence: readonly string[]
+  provisionalPreparationEvidence: readonly string[]
+  inferenceEvidence: readonly string[]
+  skippedEvidenceNeeds: readonly string[]
+  pendingQuestion?: Readonly<{
+    key: string
+    question: string
+    evidenceNeed?: string
+  }>
+  priorInteractions: readonly Readonly<{
+    key: string
+    question: string
+    answer: string
+    status: PreparationInteractionStatus
+    evidenceNeed?: string
+  }>[]
+  sourcePrecedence: readonly PreparationEvidencePrecedence[]
+  evidenceSufficiency: 'unresolved' | 'sufficient'
+  signalAcquisitionAllowed: boolean
+  formula?: Readonly<{
+    id: string
+    version: number
+    source: 'george' | 'user'
+  }>
+}>
+
+export type ProjectNormalPreparationEvidenceInput = Readonly<{
+  session: unknown
+  activeNormalSessionId?: string | null
+  linkedPreparationSessionId?: string | null
+  currentConversation?: readonly NormalPreparationConversationMessage[] | null
+  evidenceSufficiency?: 'unresolved' | 'sufficient'
+  signalAcquisitionAllowed?: boolean
+}>
+
+export type ReconcileNormalPreparationSessionInput = Readonly<{
+  existingSession?: unknown
+  normalSessionId: string
+  activeSessionMetadata?: Readonly<Record<string, unknown>> | null
+  signals?: Readonly<Record<string, unknown>> | null
+  acceptedObjective?: unknown
+  currentConversation?: readonly NormalPreparationConversationMessage[] | null
+  briefing?: PreparationSessionV1['briefing']
+  checkpoint: PreparationCheckpoint
+  updatedAt?: number
+}>
+
+const NORMAL_PREPARATION_PLACEHOLDER_OUTCOMES = new Set([
+  'in progress',
+  'outcome not set',
+  'the desired outcome',
+  'carry this session into live',
+])
+
 function cleanString(value: unknown): string {
   return String(value ?? '').trim()
 }
@@ -197,6 +353,108 @@ function cleanString(value: unknown): string {
 function cleanOptionalString(value: unknown): string | undefined {
   const cleanValue = cleanString(value)
   return cleanValue || undefined
+}
+
+export function normalizeExplicitNormalPreparationObjective(value: unknown) {
+  const objective = cleanString(value)
+  return NORMAL_PREPARATION_PLACEHOLDER_OUTCOMES.has(objective.toLowerCase())
+    ? ''
+    : objective
+}
+
+function normalizeEvidenceField(value: unknown) {
+  return cleanString(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '')
+    .replace(/^clarify/, '')
+}
+
+const PREPARATION_FIELD_ALIASES = Object.freeze({
+  objective: new Set([
+    'objective',
+    'desiredoutcome',
+    'intent',
+    'conversationintent',
+  ]),
+  acceptableOutcome: new Set(['acceptableoutcome']),
+  role: new Set(['role', 'userrole', 'responsibility']),
+  audience: new Set(['audience', 'counterparty']),
+  room: new Set(['room', 'conversation', 'interactioncontext']),
+  knownContext: new Set(['knowncontext', 'conversationcontext']),
+})
+
+type PreparationField = keyof typeof PREPARATION_FIELD_ALIASES
+
+function interactionField(
+  interaction: PreparationInteraction,
+): PreparationField | null {
+  const candidates = [
+    normalizeEvidenceField(interaction.key),
+    normalizeEvidenceField(interaction.evidenceNeed),
+  ].filter(Boolean)
+
+  for (const [field, aliases] of Object.entries(PREPARATION_FIELD_ALIASES)) {
+    if (candidates.some((candidate) => aliases.has(candidate))) {
+      return field as PreparationField
+    }
+  }
+
+  return null
+}
+
+function latestAnsweredField(
+  interactions: readonly PreparationInteraction[],
+  field: PreparationField,
+) {
+  return [...interactions]
+    .reverse()
+    .find(
+      (interaction) =>
+        interaction.status === 'answered' &&
+        cleanString(interaction.answer) &&
+        interactionField(interaction) === field,
+    )?.answer
+}
+
+function stripGeneratedNormalConversationEvidence(value: unknown) {
+  const context = cleanString(value)
+  if (!context) return ''
+
+  return context
+    .split(
+      /\n?Current-session user evidence \(provisional until qualified for LIVE preparation\):\n?/i,
+    )[0]
+    .trim()
+}
+
+function currentNormalUserEvidence(
+  messages: readonly NormalPreparationConversationMessage[] | null | undefined,
+) {
+  return (messages || [])
+    .filter(
+      (message) =>
+        message.role === 'user' &&
+        message.presentationMode !== 'live_preparation' &&
+        message.source !== 'system_override' &&
+        cleanString(message.content),
+    )
+    .slice(-12)
+    .map((message) => cleanString(message.content))
+}
+
+function buildPersistedNormalConversationContext(
+  messages: readonly NormalPreparationConversationMessage[] | null | undefined,
+) {
+  const evidence = currentNormalUserEvidence(messages)
+    .slice(-8)
+    .map((content) => `User: ${content}`)
+    .join('\n')
+    .slice(0, 2800)
+    .trim()
+
+  return evidence
+    ? `Current-session user evidence (provisional until qualified for LIVE preparation):\n${evidence}`
+    : ''
 }
 
 function uniqueStrings(values: unknown): string[] {
@@ -265,10 +523,113 @@ export function normalizePreparationInteractions(
       question: cleanString(interaction.question),
       answer: cleanString(interaction.answer),
       status,
+      ...(cleanOptionalString(interaction.evidenceNeed)
+        ? { evidenceNeed: cleanOptionalString(interaction.evidenceNeed) }
+        : {}),
     })
   }
 
   return Array.from(normalized.values())
+}
+
+function normalizeEvidenceRequest(value: unknown) {
+  return cleanString(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+}
+
+/**
+ * Canonical preparation progression boundary. Semantic reasoning determines
+ * whether a material gap exists and describes that gap; this controller owns
+ * only the resulting preparation state transition.
+ */
+export function resolveAdaptivePreparationTransition(input: {
+  assessment: AdaptivePreparationAssessment
+  priorInteractions?: PreparationInteraction[] | null
+  authorizedEvidenceNeed?: string | null
+}): AdaptivePreparationTransition {
+  if (input.assessment.status === 'sufficient') {
+    return {
+      nextAction: 'invoke_operational_judgment',
+      reason: 'evidence_sufficient',
+    }
+  }
+
+  const key = cleanString(input.assessment.key)
+  const question = cleanString(input.assessment.question)
+  const evidenceNeed = cleanString(
+    input.assessment.evidenceNeed || input.assessment.key
+  )
+
+  if (!key || !question || !evidenceNeed) {
+    return {
+      nextAction: 'invoke_operational_judgment',
+      reason: 'invalid_question',
+    }
+  }
+
+  const authorizedEvidenceNeed = normalizeEvidenceRequest(
+    input.authorizedEvidenceNeed
+  )
+
+  if (
+    authorizedEvidenceNeed &&
+    normalizeEvidenceRequest(evidenceNeed) !== authorizedEvidenceNeed
+  ) {
+    return {
+      nextAction: 'invoke_operational_judgment',
+      reason: 'unauthorized_evidence_request',
+    }
+  }
+
+  if (input.assessment.eligibility === 'duplicate') {
+    return {
+      nextAction: 'invoke_operational_judgment',
+      reason: 'duplicate_evidence_request',
+    }
+  }
+
+  const normalizedNeed = normalizeEvidenceRequest(evidenceNeed)
+  const duplicateInteraction = normalizePreparationInteractions(
+    input.priorInteractions
+  ).find((interaction) => {
+    const priorNeed = normalizeEvidenceRequest(
+      interaction.evidenceNeed || interaction.key || interaction.question
+    )
+    return priorNeed && priorNeed === normalizedNeed
+  })
+  const clarificationRequired =
+    input.assessment.eligibility === 'clarification'
+  const clarificationAllowed = Boolean(
+    duplicateInteraction &&
+      clarificationRequired &&
+      (duplicateInteraction.status === 'answered' ||
+        duplicateInteraction.status === 'unknown')
+  )
+
+  if (duplicateInteraction && !clarificationAllowed) {
+    return {
+      nextAction: 'invoke_operational_judgment',
+      reason: 'duplicate_evidence_request',
+    }
+  }
+
+  return {
+    nextAction: 'ask_question',
+    question: {
+      key,
+      label: cleanString(input.assessment.label) || 'Additional signal',
+      question,
+      why: cleanString(input.assessment.why),
+      example: cleanString(input.assessment.example),
+      evidenceNeed,
+      ...(clarificationRequired ? { clarificationRequired: true } : {}),
+    },
+    reason: clarificationRequired
+      ? 'consequential_clarification'
+      : 'material_evidence_gap',
+  }
 }
 
 export function buildPreparationInteractions(input: {
@@ -426,6 +787,16 @@ export function createPreparationSession(
               question: cleanString(currentQuestion.question),
               why: cleanString(currentQuestion.why),
               example: cleanString(currentQuestion.example),
+              ...(cleanOptionalString(currentQuestion.evidenceNeed)
+                ? {
+                    evidenceNeed: cleanOptionalString(
+                      currentQuestion.evidenceNeed,
+                    ),
+                  }
+                : {}),
+              ...(currentQuestion.clarificationRequired
+                ? { clarificationRequired: true }
+                : {}),
             },
           }
         : {}),
@@ -530,6 +901,435 @@ export function normalizePreparationSession(
     workflow: session.workflow,
     relations: session.relations,
   })
+}
+
+/**
+ * Canonical Normal preparation reconciliation. Callers provide current raw
+ * sources; this owner applies their precedence and returns one normalized
+ * PreparationSessionV1 without assigning operational meaning to the result.
+ */
+export function reconcileNormalPreparationSession(
+  input: ReconcileNormalPreparationSessionInput,
+): PreparationSessionV1 | null {
+  const normalSessionId = cleanString(input.normalSessionId)
+  if (!normalSessionId) return null
+
+  const candidate = normalizePreparationSession(input.existingSession)
+  const existingSession =
+    candidate?.provenance.entrySource === 'normal' &&
+    candidate.relations.normalSessionId === normalSessionId
+      ? candidate
+      : null
+  const metadata = input.activeSessionMetadata || {}
+  const normalizedSignals = normalizeLivePreparationSignals(input.signals)
+  const briefing = input.briefing || existingSession?.briefing || {
+    priorInteractions: [],
+  }
+  const priorInteractions = normalizePreparationInteractions(
+    briefing.priorInteractions,
+  )
+  const acceptedObjective = normalizeExplicitNormalPreparationObjective(
+    input.acceptedObjective,
+  )
+  const answeredObjective = normalizeExplicitNormalPreparationObjective(
+    latestAnsweredField(priorInteractions, 'objective'),
+  )
+  const metadataObjective = normalizeExplicitNormalPreparationObjective(
+    metadata.desiredOutcome,
+  )
+  const objective =
+    acceptedObjective ||
+    answeredObjective ||
+    metadataObjective ||
+    normalizeExplicitNormalPreparationObjective(
+      existingSession?.knowledge.objective,
+    )
+  const inferredDirection =
+    !objective && normalizedSignals.desiredOutcome
+      ? normalizedSignals.desiredOutcome
+      : ''
+  const answeredRole = cleanString(
+    latestAnsweredField(priorInteractions, 'role'),
+  )
+  const answeredAudience = cleanString(
+    latestAnsweredField(priorInteractions, 'audience'),
+  )
+  const answeredKnownContext = cleanString(
+    latestAnsweredField(priorInteractions, 'knownContext'),
+  )
+  const answeredAcceptableOutcome = cleanString(
+    latestAnsweredField(priorInteractions, 'acceptableOutcome'),
+  )
+  const answeredRoom = cleanString(
+    latestAnsweredField(priorInteractions, 'room'),
+  )
+  const role = cleanString(
+    answeredRole ||
+      normalizedSignals.role ||
+      metadata.role ||
+      metadata.responsibility ||
+      existingSession?.knowledge.role,
+  )
+  const audience = cleanString(
+    answeredAudience ||
+      normalizedSignals.counterparty ||
+      normalizedSignals.audience ||
+      metadata.targetAudience ||
+      metadata.audience ||
+      existingSession?.knowledge.audience,
+  )
+  const currentConversationContext = cleanString(
+    answeredKnownContext || normalizedSignals.conversationContext,
+  )
+  const priorPersistedContext = currentConversationContext
+    ? ''
+    : stripGeneratedNormalConversationEvidence(
+        existingSession?.knowledge.knownContext,
+      )
+  const currentSessionUserEvidence = buildPersistedNormalConversationContext(
+    input.currentConversation,
+  )
+  const knownContext = Array.from(
+    new Set(
+      [
+        currentConversationContext,
+        priorPersistedContext,
+        inferredDirection ? `Proposed outcome: ${inferredDirection}` : '',
+        currentSessionUserEvidence,
+      ]
+        .map(cleanString)
+        .filter(Boolean),
+    ),
+  ).join('\n')
+  const canonicalSignals = normalizeLivePreparationSignals({
+    ...(existingSession?.knowledge.additionalSignals || {}),
+    ...normalizedSignals,
+    ...(answeredRole ? { role: answeredRole } : {}),
+    ...(answeredAudience ? { counterparty: answeredAudience } : {}),
+    ...(answeredKnownContext
+      ? { conversationContext: answeredKnownContext }
+      : {}),
+    ...(answeredAcceptableOutcome
+      ? { acceptableOutcome: answeredAcceptableOutcome }
+      : {}),
+  })
+
+  if (objective) {
+    canonicalSignals.desiredOutcome = objective
+    delete canonicalSignals.proposedOutcome
+  } else {
+    delete canonicalSignals.desiredOutcome
+    if (inferredDirection) {
+      canonicalSignals.proposedOutcome = inferredDirection
+    }
+  }
+
+  const previousCheckpoint = existingSession?.workflow.current
+  const checkpointChanged = Boolean(
+    previousCheckpoint &&
+      JSON.stringify(previousCheckpoint) !== JSON.stringify(input.checkpoint),
+  )
+  const checkpointHistory = existingSession
+    ? [
+        ...existingSession.workflow.history,
+        ...(checkpointChanged && previousCheckpoint ? [previousCheckpoint] : []),
+      ]
+    : []
+
+  return createPreparationSession({
+    preparationSessionId: existingSession?.preparationSessionId,
+    provenance:
+      existingSession?.provenance || {
+        entrySource: 'normal',
+        restoredFrom: {
+          kind: 'normal_session',
+          id: normalSessionId,
+        },
+      },
+    createdAt: existingSession?.createdAt,
+    updatedAt: input.updatedAt,
+    knowledge: {
+      objective,
+      baselineAssumptions:
+        existingSession?.knowledge.baselineAssumptions || [],
+      name: existingSession?.knowledge.name,
+      role,
+      participants: audience
+        ? [audience]
+        : existingSession?.knowledge.participants || [],
+      audience,
+      perspectives: existingSession?.knowledge.perspectives || [],
+      conversation: {
+        id: normalSessionId,
+        title: cleanString(
+          answeredRoom ||
+            metadata.conversationType ||
+            metadata.room ||
+            existingSession?.knowledge.conversation.title,
+        ),
+        group: existingSession?.knowledge.conversation.group,
+      },
+      knownContext,
+      communicationMedium:
+        normalizedSignals.communicationMedium ||
+        existingSession?.knowledge.communicationMedium,
+      receiverEvidence: existingSession?.knowledge.receiverEvidence,
+      acceptableOutcome:
+        answeredAcceptableOutcome ||
+        normalizedSignals.acceptableOutcome ||
+        existingSession?.knowledge.acceptableOutcome,
+      secondaryOutcome:
+        normalizedSignals.secondaryOutcome ||
+        normalizedSignals.fallbackOutcome ||
+        existingSession?.knowledge.secondaryOutcome,
+      roomObjective: existingSession?.knowledge.roomObjective,
+      additionalSignals: canonicalSignals,
+      documents: existingSession?.knowledge.documents || [],
+    },
+    briefing: {
+      priorInteractions,
+      currentQuestion: briefing.currentQuestion,
+    },
+    assets: existingSession?.assets,
+    support: existingSession?.support || { overrides: {} },
+    workflow: {
+      current: input.checkpoint,
+      history: checkpointHistory,
+      ...(existingSession?.workflow.returnTo
+        ? { returnTo: existingSession.workflow.returnTo }
+        : {}),
+    },
+    relations: {
+      ...existingSession?.relations,
+      normalSessionId,
+    },
+  })
+}
+
+function preparationEvidenceLabel(
+  interaction: PreparationInteraction,
+) {
+  return (
+    cleanString(interaction.evidenceNeed) ||
+    cleanString(interaction.question) ||
+    cleanString(interaction.key)
+  )
+}
+
+/**
+ * Canonical projection from one identity-bound PreparationSessionV1 into
+ * runtime evidence. It classifies provenance; it does not choose an
+ * operational disposition or infer facts from the evidence.
+ */
+export function projectNormalPreparationEvidence(
+  input: ProjectNormalPreparationEvidenceInput,
+): NormalPreparationEvidenceProjection | null {
+  const session = normalizePreparationSession(input.session)
+  const activeNormalSessionId = cleanString(input.activeNormalSessionId)
+  const linkedPreparationSessionId = cleanString(
+    input.linkedPreparationSessionId,
+  )
+
+  if (
+    !session ||
+    !activeNormalSessionId ||
+    !linkedPreparationSessionId ||
+    session.provenance.entrySource !== 'normal' ||
+    session.preparationSessionId !== linkedPreparationSessionId ||
+    session.relations.normalSessionId !== activeNormalSessionId ||
+    (session.knowledge.conversation.id &&
+      session.knowledge.conversation.id !== activeNormalSessionId) ||
+    (session.provenance.restoredFrom?.kind === 'normal_session' &&
+      session.provenance.restoredFrom.id !== activeNormalSessionId)
+  ) {
+    return null
+  }
+
+  const priorInteractions = normalizePreparationInteractions(
+    session.briefing.priorInteractions,
+  )
+  const currentUserEvidence = currentNormalUserEvidence(
+    input.currentConversation,
+  )
+  const confirmedPreparationEvidence = priorInteractions
+    .filter(
+      (interaction) =>
+        interaction.status === 'answered' && cleanString(interaction.answer),
+    )
+    .map(
+      (interaction) =>
+        `${preparationEvidenceLabel(interaction)}: ${cleanString(
+          interaction.answer,
+        )}`,
+    )
+  const qualifiedDocumentEvidence = session.knowledge.documents
+    .map((evidenceAsset) =>
+      cleanString(
+        evidenceAsset.summary ||
+          `${evidenceAsset.name} (${evidenceAsset.kind})`,
+      ),
+    )
+    .filter(Boolean)
+  const answeredEvidenceKeys = new Set(
+    priorInteractions
+      .filter((interaction) => interaction.status === 'answered')
+      .flatMap((interaction) => [
+        normalizeEvidenceField(interaction.key),
+        normalizeEvidenceField(interaction.evidenceNeed),
+      ])
+      .filter(Boolean),
+  )
+  const structuredPreparationEvidence = [
+    session.knowledge.objective
+      ? `Persisted preparation objective: ${session.knowledge.objective}`
+      : '',
+    session.knowledge.acceptableOutcome
+      ? `Persisted acceptable outcome: ${session.knowledge.acceptableOutcome}`
+      : '',
+    session.knowledge.role
+      ? `Persisted user role: ${session.knowledge.role}`
+      : '',
+    session.knowledge.audience
+      ? `Persisted audience or counterparty: ${session.knowledge.audience}`
+      : '',
+    session.knowledge.conversation.title
+      ? `Persisted interaction context: ${session.knowledge.conversation.title}`
+      : '',
+    stripGeneratedNormalConversationEvidence(session.knowledge.knownContext)
+      ? `Persisted preparation context: ${stripGeneratedNormalConversationEvidence(
+          session.knowledge.knownContext,
+        )}`
+      : '',
+    ...Object.entries(session.knowledge.additionalSignals)
+      .filter(([key]) => {
+        const normalizedKey = normalizeEvidenceField(key)
+        return (
+          normalizedKey !== 'proposedoutcome' &&
+          !answeredEvidenceKeys.has(normalizedKey)
+        )
+      })
+      .map(([key, value]) => `Persisted preparation signal ${key}: ${value}`),
+  ]
+    .map(cleanString)
+    .filter(Boolean)
+  const provisionalPreparationEvidence = Array.from(
+    new Set(structuredPreparationEvidence),
+  )
+  const inferenceEvidence = Array.from(
+    new Set(
+      [
+        ...session.knowledge.baselineAssumptions,
+        session.knowledge.additionalSignals.proposedOutcome,
+      ]
+        .map(cleanString)
+        .filter(Boolean),
+    ),
+  )
+  const skippedEvidenceNeeds = priorInteractions
+    .filter((interaction) => interaction.status !== 'answered')
+    .map(preparationEvidenceLabel)
+    .filter(Boolean)
+  const knownEvidence = Array.from(
+    new Set([
+      ...currentUserEvidence.map((value) => `User explicitly said: ${value}`),
+      ...confirmedPreparationEvidence,
+      ...qualifiedDocumentEvidence,
+    ]),
+  )
+  const formula = session.assets.formula
+  const pendingQuestion = session.briefing.currentQuestion
+
+  return Object.freeze({
+    preparationSessionId: session.preparationSessionId,
+    normalSessionId: activeNormalSessionId,
+    entrySource: 'normal' as const,
+    preparationUpdatedAt: session.updatedAt,
+    ...(session.knowledge.objective
+      ? { objective: session.knowledge.objective }
+      : {}),
+    ...(session.knowledge.acceptableOutcome
+      ? { acceptableOutcome: session.knowledge.acceptableOutcome }
+      : {}),
+    ...(session.knowledge.role ? { role: session.knowledge.role } : {}),
+    ...(session.knowledge.audience
+      ? { audience: session.knowledge.audience }
+      : {}),
+    ...(session.knowledge.conversation.title
+      ? { room: session.knowledge.conversation.title }
+      : {}),
+    knownEvidence: Object.freeze(knownEvidence),
+    currentUserEvidence: Object.freeze(currentUserEvidence),
+    confirmedPreparationEvidence: Object.freeze(
+      confirmedPreparationEvidence,
+    ),
+    qualifiedDocumentEvidence: Object.freeze(qualifiedDocumentEvidence),
+    provisionalPreparationEvidence: Object.freeze(
+      provisionalPreparationEvidence,
+    ),
+    inferenceEvidence: Object.freeze(inferenceEvidence),
+    skippedEvidenceNeeds: Object.freeze(skippedEvidenceNeeds),
+    ...(pendingQuestion
+      ? {
+          pendingQuestion: Object.freeze({
+            key: pendingQuestion.key,
+            question: pendingQuestion.question,
+            ...(pendingQuestion.evidenceNeed
+              ? { evidenceNeed: pendingQuestion.evidenceNeed }
+              : {}),
+          }),
+        }
+      : {}),
+    priorInteractions: Object.freeze(
+      priorInteractions.map((interaction) => Object.freeze({ ...interaction })),
+    ),
+    sourcePrecedence: NORMAL_PREPARATION_EVIDENCE_PRECEDENCE,
+    evidenceSufficiency:
+      input.evidenceSufficiency === 'sufficient'
+        ? 'sufficient'
+        : 'unresolved',
+    signalAcquisitionAllowed: input.signalAcquisitionAllowed !== false,
+    ...(formula?.id && Number.isFinite(formula.version) && formula.version > 0
+      ? {
+          formula: Object.freeze({
+            id: formula.id,
+            version: formula.version,
+            source: formula.source,
+          }),
+        }
+      : {}),
+  })
+}
+
+export function preparationEvidenceNeedIsAlreadyKnown(
+  projection: NormalPreparationEvidenceProjection,
+  evidenceNeed: unknown,
+) {
+  const normalizedNeed = normalizeEvidenceRequest(evidenceNeed)
+  if (!normalizedNeed) return false
+
+  const confirmedInteraction = projection.priorInteractions.some(
+    (interaction) => {
+      if (interaction.status !== 'answered' || !cleanString(interaction.answer)) {
+        return false
+      }
+
+      return [interaction.evidenceNeed, interaction.key, interaction.question]
+        .map(normalizeEvidenceRequest)
+        .filter(Boolean)
+        .some(
+          (candidate) =>
+            candidate === normalizedNeed ||
+            candidate.includes(normalizedNeed) ||
+            normalizedNeed.includes(candidate),
+        )
+    },
+  )
+
+  if (confirmedInteraction) return true
+
+  return projection.currentUserEvidence
+    .map(normalizeEvidenceRequest)
+    .some((evidence) => evidence.includes(normalizedNeed))
 }
 
 export function normalizeLivePreparationSignals(

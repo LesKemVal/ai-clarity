@@ -1,6 +1,9 @@
+import type { OperationalJudgment } from '@/lib/george/runtime/operational-judgment'
+
 export function buildCapacityNotice(input: {
   messageCount: number
   latestUserText: string
+  operationalJudgment?: OperationalJudgment | null
 }) {
   const isDegraded = input.messageCount > 10
   const text = input.latestUserText.toLowerCase()
@@ -12,6 +15,10 @@ export function buildCapacityNotice(input: {
     /plan|step by step|full plan|walk me through|break it down|roadmap|strategy|build this|launch/i.test(text)
 
   if (isDegraded && needsMemory) {
+    if (input.operationalJudgment) {
+      return 'I may be missing earlier context, so this response is limited to the currently validated evidence.'
+    }
+
     return "I may be missing earlier context. Give me the missing piece and I’ll reconnect it."
   }
 
@@ -22,8 +29,18 @@ export function buildCapacityNotice(input: {
   return ''
 }
 
-export function buildRiskNotice(latestUserText: string) {
+export function buildRiskNotice(
+  latestUserText: string,
+  operationalJudgment?: OperationalJudgment | null
+) {
   const text = latestUserText.toLowerCase()
+
+  if (
+    operationalJudgment &&
+    operationalJudgment.action !== 'warn_and_move'
+  ) {
+    return ''
+  }
 
   const legalSubject =
     /lawsuit|sue|court|judge|appeal|petition|hearing|motion|complaint|affidavit|charged|arrested|statute|case number|contract|settlement|legal/i.test(text)
@@ -59,19 +76,28 @@ export function appendPostResponseNotices(input: {
   reply: string
   messageCount: number
   latestUserText: string
+  operationalJudgment?: OperationalJudgment | null
 }) {
+  if (input.operationalJudgment?.signalAcquisition.shouldAcquire) {
+    return input.reply
+  }
+
   let nextReply = input.reply
 
   const capacityNotice = buildCapacityNotice({
     messageCount: input.messageCount,
     latestUserText: input.latestUserText,
+    operationalJudgment: input.operationalJudgment,
   })
 
   if (capacityNotice && !nextReply.includes(capacityNotice)) {
     nextReply = `${nextReply}\n\n${capacityNotice}`
   }
 
-  const riskNotice = buildRiskNotice(input.latestUserText)
+  const riskNotice = buildRiskNotice(
+    input.latestUserText,
+    input.operationalJudgment
+  )
 
   if (riskNotice && !nextReply.includes(riskNotice)) {
     nextReply = `${nextReply}\n\n${riskNotice}`

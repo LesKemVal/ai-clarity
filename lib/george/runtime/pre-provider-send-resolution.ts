@@ -29,11 +29,6 @@ export type PreProviderSendResolution =
       systemContext: string
     })
   | (SharedResolutionFields & {
-      mode: 'direct'
-      response: string
-      authority: 'training' | 'domain'
-    })
-  | (SharedResolutionFields & {
       mode: 'return'
       response: string
       authority: 'training'
@@ -54,11 +49,14 @@ export type ResolvePreProviderSendInput = {
  * provider transport, message mutation, navigation, or UI state.
  *
  * Preserved precedence:
- * 1. Training-owned early return
- * 2. Training-owned direct override
- * 3. Domain-owned direct override
- * 4. Domain context attached to provider generation
- * 5. Ordinary provider generation
+ * 1. Training-owned deterministic evaluation
+ * 2. Domain context attached to canonical provider reasoning
+ * 3. Ordinary canonical provider reasoning
+ *
+ * Training coaching and domain advice are not response authorities. Their
+ * heuristic matches may contribute context, but operational user requests
+ * continue through semantic proposal, Operational Judgment, and governed
+ * execution.
  */
 export function resolvePreProviderSend(
   input: ResolvePreProviderSendInput
@@ -88,28 +86,6 @@ export function resolvePreProviderSend(
       mode: 'return',
       response: training.response,
       authority: 'training',
-      guidedLine,
-      systemContext,
-      metadata,
-    }
-  }
-
-  if (training.override) {
-    return {
-      mode: 'direct',
-      response: training.override,
-      authority: 'training',
-      guidedLine,
-      systemContext,
-      metadata,
-    }
-  }
-
-  if (domain.firstResponseOverride) {
-    return {
-      mode: 'direct',
-      response: domain.firstResponseOverride,
-      authority: 'domain',
       guidedLine,
       systemContext,
       metadata,

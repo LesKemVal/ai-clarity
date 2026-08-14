@@ -2,11 +2,18 @@ export type NormalGeorgeReasoningLane = 'immediate' | 'operational' | 'strategic
 
 export type NormalGeorgeProvider = 'openai' | 'groq'
 
+export type NormalGeorgeProviderTarget = Readonly<{
+  provider: NormalGeorgeProvider
+  model: string
+  reason: string
+}>
+
 export type NormalGeorgeReasoningDecision = {
   lane: NormalGeorgeReasoningLane
   provider: NormalGeorgeProvider
   model: string
   reason: string
+  fallback: NormalGeorgeProviderTarget | null
 }
 
 type NormalGeorgeReasoningInput = {
@@ -87,6 +94,7 @@ export function resolveNormalGeorgeReasoning(input: NormalGeorgeReasoningInput):
           ? latestModel
           : process.env.OPENAI_MODEL_VISION || sharedBaselineModel,
       reason: 'image input requires vision-capable reasoning',
+      fallback: null,
     }
   }
 
@@ -121,5 +129,12 @@ export function resolveNormalGeorgeReasoning(input: NormalGeorgeReasoningInput):
     reason: useGroqFastLane
       ? `${reason}; safe normal fast lane`
       : reason,
+    fallback: useGroqFastLane
+      ? Object.freeze({
+          provider: 'openai' as const,
+          model: sharedBaselineModel,
+          reason: 'Groq fast-lane realization unavailable',
+        })
+      : null,
   }
 }

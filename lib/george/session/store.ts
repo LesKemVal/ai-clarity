@@ -86,12 +86,6 @@ function rememberDeletedSessionId(id: string) {
   writeDeletedSessionIds([...readDeletedSessionIds(), id])
 }
 
-function forgetDeletedSessionId(id: string) {
-  writeDeletedSessionIds(
-    readDeletedSessionIds().filter((deletedId) => deletedId !== id)
-  )
-}
-
 async function fetchServerSessions(): Promise<GeorgeStoredSession[] | null> {
   try {
     const response = await fetch('/api/george/sessions', {
@@ -143,10 +137,6 @@ export async function hydrateSessionsFromServer() {
     [...mergedById.values()].sort((a, b) => b.updatedAt - a.updatedAt)
   )
 
-  const serverIds = new Set(sessions.map((session) => session.id))
-  writeDeletedSessionIds(
-    [...deletedIds].filter((id) => serverIds.has(id))
-  )
 }
 
 function syncSessionToServer(session: GeorgeStoredSession) {
@@ -316,6 +306,10 @@ export function normalizeSessionMode(mode: unknown): GeorgeSessionMode {
 }
 
 export function upsertSession(session: GeorgeStoredSession) {
+  if (readDeletedSessionIds().includes(session.id)) {
+    return
+  }
+
   const safeSession = {
     ...session,
     mode: normalizeSessionMode(session.mode),
@@ -604,6 +598,16 @@ export function getLatestSubscriberSession(
     .sort((a, b) => b.updatedAt - a.updatedAt)[0] || null
 }
 
+function createUniqueSessionId(now = Date.now()) {
+  const baseId = `session_${now}`
+  const existingIds = new Set(safeReadSessions().map((session) => session.id))
+  if (!existingIds.has(baseId)) return baseId
+
+  let suffix = 1
+  while (existingIds.has(`${baseId}_${suffix}`)) suffix += 1
+  return `${baseId}_${suffix}`
+}
+
 export function createSession(
   mode: GeorgeSessionMode,
   messages: GeorgeStoredMessage[],
@@ -613,7 +617,7 @@ export function createSession(
   const now = Date.now()
 
   const session: GeorgeStoredSession = {
-    id: `session_${now}`,
+    id: createUniqueSessionId(now),
     type: 'session',
     mode,
     title,
@@ -628,6 +632,17 @@ export function createSession(
   setActiveMode(mode)
 
   return session
+}
+
+export function createFreshNormalSession(
+  messages: GeorgeStoredMessage[] = [],
+  title = 'New Session',
+  metadata: GeorgeStoredSessionMetadata = {}
+) {
+  if (typeof window === 'undefined') return null
+
+  clearBrowserScopedNormalWorkspace()
+  return createSession('normal', messages, title, metadata)
 }
 
 

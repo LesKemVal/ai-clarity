@@ -22,7 +22,7 @@ import { resolveNormalGeorgeReasoning } from '${process.cwd()}/lib/george/runtim
 import { resolvePreProviderSend } from '${process.cwd()}/lib/george/runtime/pre-provider-send-resolution'
 import { resolveCoursesExpandResponse } from '${process.cwd()}/lib/george/runtime/training-runtime'
 import { buildGovernedRuntimeContext, buildNormalProviderRuntimeContext, buildProviderExecutionAuthority } from '${process.cwd()}/lib/george/runtime/runtime-context-composer'
-import { buildOperationalJudgmentNote, resolveOperationalJudgment, resolveSignalAcquisitionJudgment } from '${process.cwd()}/lib/george/runtime/operational-judgment'
+import { buildOperationalJudgmentNote, resolveOperationalJudgment, resolveProviderOperationalJudgment, resolveSignalAcquisitionJudgment } from '${process.cwd()}/lib/george/runtime/operational-judgment'
 import { buildConversationStrategyNote, resolveGeorgeConversationStrategy } from '${process.cwd()}/lib/george/runtime/conversation-strategy'
 import { buildConversationMoveDefinitionNote, listConversationMoveDefinitions, resolveConversationMoveDefinition, resolveSignalAcquisitionMoveVariant } from '${process.cwd()}/lib/george/runtime/conversation-move-library'
 import { evaluateLiveRecommendationEvidence } from '${process.cwd()}/lib/george/runtime/live-recommendation-governor'
@@ -220,6 +220,10 @@ assert(
   contextualShortQuestion.provider === 'openai',
   'short context-dependent questions must not automatically enter the Groq fast lane'
 )
+assert(
+  contextualShortQuestion.fallback === null,
+  'the OpenAI Normal path must not acquire an independent fallback decision'
+)
 
 const safeRewrite = resolveNormalGeorgeReasoning({
   userText: 'Rewrite this sentence and make it clearer.',
@@ -229,19 +233,52 @@ const safeRewrite = resolveNormalGeorgeReasoning({
 
 if (process.env.GROQ_API_KEY) {
   assert(
-    safeRewrite.provider === 'groq',
+    safeRewrite.provider === 'groq' &&
+      safeRewrite.fallback?.provider === 'openai' &&
+      safeRewrite.fallback.model === contextualShortQuestion.model,
     'safe transformations should use Groq when configured'
   )
 } else {
   assert(
-    safeRewrite.provider === 'openai',
+    safeRewrite.provider === 'openai' && safeRewrite.fallback === null,
     'Normal reasoning should remain on OpenAI when Groq is unavailable'
   )
 }
 
+const originalGroqApiKey = process.env.GROQ_API_KEY
+const originalIntelligentModel = process.env.OPENAI_MODEL_INTELLIGENT
+process.env.GROQ_API_KEY = 'provider-fallback-smoke-fixture'
+process.env.OPENAI_MODEL_INTELLIGENT = 'openai-fallback-smoke-model'
+const forcedFastLane = resolveNormalGeorgeReasoning({
+  userText: 'Rewrite this sentence and make it clearer.',
+  tier: 'smart',
+  hasImageInput: false,
+})
+if (originalGroqApiKey === undefined) {
+  delete process.env.GROQ_API_KEY
+} else {
+  process.env.GROQ_API_KEY = originalGroqApiKey
+}
+if (originalIntelligentModel === undefined) {
+  delete process.env.OPENAI_MODEL_INTELLIGENT
+} else {
+  process.env.OPENAI_MODEL_INTELLIGENT = originalIntelligentModel
+}
+
+assert(
+  forcedFastLane.provider === 'groq' &&
+    forcedFastLane.fallback?.provider === 'openai' &&
+    forcedFastLane.fallback.model === 'openai-fallback-smoke-model',
+  'the canonical Normal provider decision did not preserve the production Groq-to-OpenAI fallback target'
+)
+
 assert(
   smartStrategic.provider === 'openai',
   'strategic work must remain on OpenAI'
+)
+assert(
+  smartStrategic.fallback === null,
+  'strategic OpenAI work must not acquire a route-selected fallback'
 )
 
 const ordinarySend = resolvePreProviderSend({
@@ -278,7 +315,7 @@ assert(
   'pre-provider resolution should preserve detected domain metadata'
 )
 
-const domainDirectSend = resolvePreProviderSend({
+const governedDomainSend = resolvePreProviderSend({
   text: 'My credit cards are maxed out and I was thinking about tradelines.',
   activePromptContext: null,
   activeMemoryFolder: null,
@@ -286,13 +323,13 @@ const domainDirectSend = resolvePreProviderSend({
 })
 
 assert(
-  domainDirectSend.mode === 'direct',
-  'authoritative domain guidance should resolve as a direct response'
+  governedDomainSend.mode === 'provider_with_context',
+  'domain heuristics should remain context for canonical provider reasoning'
 )
 
 assert(
-  domainDirectSend.mode !== 'direct' || domainDirectSend.authority === 'domain',
-  'domain direct response should identify domain authority'
+  !('response' in governedDomainSend),
+  'domain heuristics must not independently author an operational response'
 )
 
 const liveRecommendationEvidence = evaluateLiveRecommendationEvidence({
@@ -589,12 +626,52 @@ assert(
 assert(
   operationalJudgment.liveSupport.posture === 'surface' &&
     operationalJudgment.liveSupport.instruction.includes(
-      'provider determines LIVE materially improves the desired outcome'
+      'Canonical Operational Judgment will validate'
     ) &&
     operationalJudgment.liveSupport.instruction.includes(
       'Never auto-route or change operating mode'
     ),
-  'operational judgment should govern LIVE presentation without recreating semantic recommendation ownership'
+  'pre-provider operational judgment should keep LIVE passive pending semantic reasoning'
+)
+
+const providerResolvedOperationalJudgment = resolveProviderOperationalJudgment({
+  judgment: operationalJudgment,
+  providerReasoning: {
+    operationalObjective: 'advance the established outcome',
+    knownEvidence: ['The consequential interaction is established.'],
+    consequentialUncertainty: null,
+    georgeResolvableWork: ['support execution against the established outcome'],
+    georgeCanAdvanceWithoutUserSignal: true,
+    disposition: 'execution_ready',
+    interaction: 'the established consequential conversation',
+    interactionUseful: true,
+    purpose: 'advance the established outcome during execution',
+    desiredResult: 'the established outcome advanced',
+    liveMateriallyImprovesExecution: true,
+    materialLiveBenefit: 'real-time support improves execution as the conversation changes',
+    strongestNextStep: 'enter LIVE when the user chooses',
+    rationale: 'LIVE materially improves execution from the established evidence.',
+    presentation: 'LIVE can materially improve execution as the conversation changes.',
+    signalAcquisition: {
+      shouldAcquire: false,
+      requestedSignal: null,
+      evidenceIsUserOwned: false,
+      consequentialToNextAction: false,
+      reason: null,
+    },
+  },
+  providerCapability: 'live',
+  capabilityExplicitlyRequested: true,
+  capabilityRecommendationMaterial: true,
+})
+
+assert(
+  providerResolvedOperationalJudgment.operationalDisposition.disposition ===
+    'execution_ready' &&
+    providerResolvedOperationalJudgment.operationalDisposition.source ===
+      'operational_judgment' &&
+    providerResolvedOperationalJudgment.liveSupport.posture === 'recommend',
+  'canonical Operational Judgment should own the provider-informed LIVE disposition'
 )
 
 const operationalJudgmentNote = buildOperationalJudgmentNote(operationalJudgment)
@@ -875,12 +952,11 @@ assert(
   'training and domain evidence should remain available in one portable result'
 )
 
-if (trainingSend.mode === 'direct') {
-  assert(
-    trainingSend.authority === 'training',
-    'training override must retain precedence over a domain override'
-  )
-}
+assert(
+  trainingSend.mode === 'provider_with_context' &&
+    !('response' in trainingSend),
+  'training intake heuristics must continue through canonical provider reasoning'
+)
 
 
 
@@ -1162,7 +1238,8 @@ const imageProviderResolution = resolveGeorgeRuntimeProvider({
 })
 assert(
   imageProviderResolution.provider === 'openai' &&
-    imageProviderResolution.lane === 'strategic',
+    imageProviderResolution.lane === 'strategic' &&
+    imageProviderResolution.fallback === null,
   'runtime pipeline should keep image requests on the vision-capable provider path'
 )
 

@@ -6,6 +6,7 @@ const read = (path) => readFileSync(path, "utf8");
 const store = read("lib/george/session/store.ts");
 const normal = read("app/george/page.tsx");
 const liveEntry = read("app/george/live-entry/LiveEntryClient.tsx");
+const entryResolution = read("lib/george/live-entry/entry-resolution.ts");
 const library = read("app/george/library/OperationalLibraryClient.tsx");
 const preparation = read("lib/george/live-runtime/live-preparation-controller.ts");
 
@@ -25,10 +26,11 @@ assert.doesNotMatch(normal, /createSession\("live"/);
 
 assert.match(preparation, /preparationSessionId: string/);
 assert.match(preparation, /normalSessionId\?: string/);
-assert.match(liveEntry, /preparationSessionId &&/);
-assert.match(liveEntry, /normalSessionId &&/);
-assert.match(liveEntry, /activeNormalSession\?\.id === normalSessionId/);
-assert.match(liveEntry, /restoredPreparationSession\.relations\.normalSessionId/);
+assert.match(liveEntry, /validateLiveEntryPreparationReturn/);
+assert.match(entryResolution, /if \(!candidate \|\| !preparationSessionId\) return null/);
+assert.match(entryResolution, /activeNormalSessionId === normalSessionId/);
+assert.match(entryResolution, /candidate\.relations\.normalSessionId === normalSessionId/);
+assert.match(entryResolution, /storedPreparation\?\.preparationSessionId/);
 assert.match(liveEntry, /georgeSessionId:/);
 assert.match(liveEntry, /preparationSessionId:/);
 

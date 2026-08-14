@@ -50,6 +50,42 @@ export function canAccessOperationalFormula(
   return formula.visibility !== "private";
 }
 
+export async function resolveSelectedOperationalFormula(
+  library: OperationalFormulaLibrary,
+  input: {
+    selection?: {
+      id: string;
+      version: number;
+    } | null;
+    userId: string;
+    organizationId?: string;
+  },
+): Promise<RetrievedOperationalFormula | null> {
+  const formulaId = String(input.selection?.id || "").trim();
+  const formulaVersion = Number(input.selection?.version);
+
+  if (!formulaId || !Number.isFinite(formulaVersion)) return null;
+
+  const formula = await library.getById(formulaId);
+
+  if (
+    !formula ||
+    formula.version !== formulaVersion ||
+    !canAccessOperationalFormula(formula, {
+      userId: input.userId,
+      organizationId: input.organizationId,
+    })
+  ) {
+    return null;
+  }
+
+  return {
+    formula,
+    score: 1,
+    reasons: ["selected_current_preparation"],
+  };
+}
+
 function includesOrUnrestricted(values: string[], value?: string) {
   return values.length === 0 || (!!value && values.includes(value));
 }

@@ -18,6 +18,7 @@ import {
 } from '@/lib/george/runtime/conversation-move-library'
 import {
   buildConversationStrategyNote,
+  resolveGeorgeConversationStrategy,
   type GeorgeConversationStrategy,
 } from '@/lib/george/runtime/conversation-strategy'
 import { resolveContextFraming, type ContextFraming } from '@/lib/george/runtime/context-framing'
@@ -35,9 +36,14 @@ import {
 } from '@/lib/george/runtime/normal-reasoning-governor'
 import type { LiveRecommendationEvidence } from '@/lib/george/runtime/live-recommendation-governor'
 import {
+  buildOperationalPreparationContextNote,
   buildOperationalJudgmentNote,
+  resolveOperationalPosture,
+  resolveProviderOperationalJudgment,
   resolveOperationalJudgment,
   type OperationalJudgment,
+  type OperationalPreparationContext,
+  type ProviderOperationalReasoning,
 } from '@/lib/george/runtime/operational-judgment'
 import {
   resolveOperationalResourceMonitor,
@@ -52,6 +58,7 @@ import type { RuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-learnin
 import type { RuntimeSignalArbitration } from '@/lib/george/runtime/runtime-signal-arbitrator'
 import {
   buildGovernedRuntimeContext,
+  buildNormalLiveOperationalJudgmentRequestNote,
   buildNormalProviderRuntimeContext,
   buildProviderExecutionAuthority,
 } from '@/lib/george/runtime/runtime-context-composer'
@@ -92,6 +99,7 @@ export type GeorgeRuntimePipeline = typeof GEORGE_RUNTIME_PIPELINE
 export type GeorgeProviderMessage = Readonly<{
   role: 'user' | 'assistant'
   content: string
+  imageDataUrls?: readonly string[]
 }>
 
 export type GeorgeProviderRequest = Readonly<{
@@ -122,6 +130,7 @@ export type GeorgeProviderPromptInput = Readonly<{
   liveDisciplineBlock: string
   dynamicRuntimeBlocks: string
   includeLiveDiscipline: boolean
+  operationalJudgmentRequest?: boolean
   recentMessages: readonly GeorgeProviderMessage[]
 }>
 
@@ -144,6 +153,7 @@ export type GeorgeRuntimePipelineInput = {
   liveRecommendationEvidence: LiveRecommendationEvidence
   operationalSignals: OperationalSignal[]
   operationalMemoryEvidence?: OperationalMemoryRuntimeEvidence | null
+  preparationContext?: OperationalPreparationContext | null
   providerPrompt: GeorgeProviderPromptInput
   onStageTiming?: (timing: GeorgeRuntimePipelineStageTiming) => void
   governedContextNotes: Readonly<{
@@ -183,6 +193,8 @@ export type GeorgeRuntimePipelineSnapshot = Readonly<{
   timing: GeorgeRuntimePipelineTiming
   notes: Readonly<{
     operationalMemoryEvidenceNote: string
+    operationalJudgmentRequestNote: string
+    preparationContextNote: string
     outcomeEvolutionNote: string
     trajectoryNote: string
     operationalJudgmentNote: string
@@ -200,6 +212,7 @@ export type GeorgeRuntimeAuthoritySnapshot = Readonly<{
   conversationStrategy: GeorgeRuntimePipelineSnapshot['conversationStrategy']
   conversationMoveDefinition: GeorgeRuntimePipelineSnapshot['conversationMoveDefinition']
   executionPolicy: GeorgeRuntimePipelineSnapshot['executionPolicy']
+  operationalResourceMonitor: GeorgeRuntimePipelineSnapshot['operationalResourceMonitor']
   source: 'runtime_pipeline'
 }>
 
@@ -211,7 +224,164 @@ export function selectGeorgeRuntimeAuthoritySnapshot(
     conversationStrategy: snapshot.conversationStrategy,
     conversationMoveDefinition: snapshot.conversationMoveDefinition,
     executionPolicy: snapshot.executionPolicy,
+    operationalResourceMonitor: snapshot.operationalResourceMonitor,
     source: snapshot.source,
+  })
+}
+
+export function selectProviderResolvedGeorgeRuntimeAuthoritySnapshot(input: {
+  snapshot: GeorgeRuntimePipelineSnapshot
+  currentRuntime: CurrentGeorgeRuntime
+  latestUserText: string
+  voiceMode: boolean
+  executionImminent: boolean
+  operationalSignals?: OperationalSignal[]
+  judgmentSurface: JudgmentSurfaceState
+  providerReasoning: ProviderOperationalReasoning | null
+  providerCapability: 'normal' | 'live' | null
+  capabilityExplicitlyRequested: boolean
+  capabilityRecommendationMaterial: boolean
+  canonicalSignalAcquisition?: boolean
+  signalAcquisitionAllowed?: boolean
+  operationalJudgmentRequest?: boolean
+  ordinaryNormalRequest?: boolean
+}): GeorgeRuntimeAuthoritySnapshot {
+  const authority = selectGeorgeRuntimeAuthoritySnapshot(input.snapshot)
+  const providerResolvedJudgment = resolveProviderOperationalJudgment({
+    judgment: authority.operationalJudgment,
+    providerReasoning: input.providerReasoning,
+    providerCapability: input.providerCapability,
+    capabilityExplicitlyRequested:
+      input.capabilityExplicitlyRequested,
+    capabilityRecommendationMaterial:
+      input.capabilityRecommendationMaterial,
+    canonicalSignalAcquisition:
+      input.canonicalSignalAcquisition,
+    signalAcquisitionAllowed: input.signalAcquisitionAllowed,
+    operationalJudgmentRequest: input.operationalJudgmentRequest,
+    ordinaryNormalRequest: input.ordinaryNormalRequest,
+  })
+
+  const providerDecisionAuthoritative = Boolean(
+    input.ordinaryNormalRequest ||
+      input.operationalJudgmentRequest === true ||
+      (
+        input.operationalJudgmentRequest === undefined &&
+        input.canonicalSignalAcquisition &&
+        !input.ordinaryNormalRequest
+      )
+  )
+
+  if (
+    input.currentRuntime !== 'normal_george' ||
+    !providerDecisionAuthoritative
+  ) {
+    return Object.freeze({
+      ...authority,
+      operationalJudgment: providerResolvedJudgment,
+    })
+  }
+
+  const conversationStrategy = resolveGeorgeConversationStrategy({
+    action: providerResolvedJudgment.action,
+    currentRuntime: input.currentRuntime,
+    latestUserText: input.latestUserText,
+    operationalSignals: input.operationalSignals,
+    judgmentSurface: input.judgmentSurface,
+    trajectory: input.snapshot.trajectoryAssessment,
+    outcomeState: providerResolvedJudgment.outcomeState,
+  })
+  const operationalPosture = resolveOperationalPosture({
+    currentRuntime: input.currentRuntime,
+    executionImminent: input.executionImminent,
+    action: providerResolvedJudgment.action,
+    conversationStrategy,
+  })
+  const operationalJudgment = Object.freeze({
+    ...providerResolvedJudgment,
+    conversationStrategy,
+    operationalPosture,
+  })
+  const operationalResourceMonitor = resolveOperationalResourceMonitor({
+    outcomeState: operationalJudgment.outcomeState,
+    conversationStrategy,
+    operationalJudgment,
+    trajectory: input.snapshot.trajectoryAssessment,
+  })
+  const executionPolicy = resolveGeorgeExecutionPolicy({
+    runtime: input.currentRuntime,
+    voiceMode: input.voiceMode,
+    strategy: conversationStrategy,
+    moveDefinition: conversationStrategy.definition,
+    operationalJudgment,
+    outcomeEvolution: input.snapshot.outcomeEvolution,
+    operationalResourceMonitor,
+    latestUserText: input.latestUserText,
+  })
+
+  return Object.freeze({
+    operationalJudgment,
+    conversationStrategy,
+    conversationMoveDefinition: conversationStrategy.definition,
+    executionPolicy,
+    operationalResourceMonitor,
+    source: authority.source,
+  })
+}
+
+export function buildProviderResolvedNormalExecutionRequest(input: {
+  authority: GeorgeRuntimeAuthoritySnapshot
+  latestUserText: string
+  hasPreparationContext?: boolean
+  prompt: GeorgeProviderPromptInput
+}): GeorgeProviderRequest {
+  const judgment = input.authority.operationalJudgment
+  const disposition = judgment.operationalDisposition
+  const executionPolicy = input.authority.executionPolicy
+  const executionAuthority = buildProviderExecutionAuthority({
+    runtime: 'normal_george',
+    action: judgment.action,
+    strategyMove: input.authority.conversationStrategy.move,
+    strategyPurpose: input.authority.conversationStrategy.purpose,
+    executionType: executionPolicy.executionType,
+    audience: executionPolicy.audience,
+    normalPosture: executionPolicy.normalPosture,
+    explanationDepth: executionPolicy.explanationDepth,
+    assumptionHandling: executionPolicy.assumptionHandling,
+    repetitionPolicy: executionPolicy.repetitionPolicy,
+    signalShouldAcquire: judgment.signalAcquisition.shouldAcquire,
+    requestedSignal: judgment.signalAcquisition.requestedSignal,
+    signalReason: judgment.signalAcquisition.reason,
+    signalAssessmentAuthority: 'governing',
+    decisionAssessmentAuthority: 'governing',
+    authoritySource: 'canonical_operational_judgment',
+    operationalDisposition: disposition.disposition,
+    operationalObjective: disposition.operationalObjective,
+    knownEvidence: disposition.knownEvidence,
+    consequentialUncertainty: disposition.consequentialUncertainty,
+    georgeResolvableWork: disposition.georgeResolvableWork,
+    georgeCanAdvanceWithoutUserSignal:
+      disposition.georgeCanAdvanceWithoutUserSignal,
+    strongestNextStep: disposition.strongestNextStep,
+    interaction: disposition.interaction,
+    interactionUseful: disposition.interactionUseful,
+    purpose: disposition.purpose,
+    desiredResult: disposition.desiredResult,
+    liveMateriallyImprovesExecution:
+      disposition.liveMateriallyImprovesExecution,
+    materialLiveBenefit: disposition.materialLiveBenefit,
+  })
+
+  return buildGeorgeProviderRequest({
+    currentRuntime: 'normal_george',
+    runtimeContextBlock: executionAuthority,
+    latestUserText: input.latestUserText,
+    hasPreparationContext: input.hasPreparationContext,
+    canonicalExecution: true,
+    prompt: {
+      ...input.prompt,
+      operationalJudgmentRequest: false,
+    },
   })
 }
 
@@ -354,6 +524,13 @@ export function resolveGeorgeRuntimePipeline(
       operationalMemoryEvidenceNote: input.operationalMemoryEvidence
         ? buildOperationalMemoryEvidenceNote(input.operationalMemoryEvidence)
         : '',
+      operationalJudgmentRequestNote:
+        input.providerPrompt.operationalJudgmentRequest
+          ? buildNormalLiveOperationalJudgmentRequestNote()
+          : '',
+      preparationContextNote: input.preparationContext
+        ? buildOperationalPreparationContextNote(input.preparationContext)
+        : '',
       outcomeEvolutionNote: buildOutcomeEvolutionNote(outcomeEvolution),
       trajectoryNote: buildTrajectoryNote(trajectoryAssessment),
       operationalJudgmentNote: buildOperationalJudgmentNote(operationalJudgment),
@@ -380,6 +557,14 @@ export function resolveGeorgeRuntimePipeline(
         requestedSignal:
           operationalJudgment.signalAcquisition.requestedSignal,
         signalReason: operationalJudgment.signalAcquisition.reason,
+        signalAssessmentAuthority:
+          input.currentRuntime === 'normal_george'
+            ? 'provisional'
+            : 'governing',
+        decisionAssessmentAuthority:
+          input.currentRuntime === 'normal_george'
+            ? 'provisional'
+            : 'governing',
         opportunityTitle: operationalResourceMonitor.opportunity?.title,
         opportunityReadiness:
           operationalResourceMonitor.opportunity?.readiness,
@@ -396,12 +581,16 @@ export function resolveGeorgeRuntimePipeline(
         ? buildNormalProviderRuntimeContext({
             providerExecutionAuthority:
               notes.providerExecutionAuthority,
+            operationalJudgmentRequestNote:
+              notes.operationalJudgmentRequestNote,
             adaptiveUserProfileNote:
               input.governedContextNotes.adaptiveUserProfileNote,
             durableBehavioralMemoryNote:
               input.governedContextNotes.durableBehavioralMemoryNote,
             operationalMemoryEvidenceNote:
               notes.operationalMemoryEvidenceNote,
+            preparationContextNote:
+              notes.preparationContextNote,
             runtimeOutcomeLearningNote:
               input.governedContextNotes.runtimeOutcomeLearningNote,
             continuityRestorationNote:
@@ -433,6 +622,7 @@ export function resolveGeorgeRuntimePipeline(
       currentRuntime: input.currentRuntime,
       runtimeContextBlock,
       latestUserText: input.latestUserText,
+      hasPreparationContext: Boolean(input.preparationContext),
       prompt: input.providerPrompt,
     })
   )
@@ -469,11 +659,15 @@ export function buildGeorgeProviderRequest(input: {
   currentRuntime: CurrentGeorgeRuntime
   runtimeContextBlock: string
   latestUserText: string
+  hasPreparationContext?: boolean
+  canonicalExecution?: boolean
   prompt: GeorgeProviderPromptInput
 }): GeorgeProviderRequest {
   const prompt = input.prompt
   const preserveNormalAmbiguity =
+    !input.canonicalExecution &&
     !prompt.includeLiveDiscipline &&
+    !input.hasPreparationContext &&
     isStandaloneAmbiguousKnowledgeQuestion(input.latestUserText)
   const liveOpening = prompt.includeLiveDiscipline
     ? prompt.universalLiveOpeningBlock
@@ -545,10 +739,19 @@ ${liveDiscipline}
 
 ${runtimeContextAfterDiscipline}`
 
-  const contextualMessages = resolveProviderConversationMessages(
-    input.latestUserText,
-    prompt.recentMessages
-  )
+  const contextualMessages = prompt.operationalJudgmentRequest
+    ? Object.freeze([
+        ...prompt.recentMessages,
+        Object.freeze({
+          role: 'user' as const,
+          content:
+            'Apply the Normal LIVE Operational Judgment request to the validated evidence now.',
+        }),
+      ])
+    : resolveProviderConversationMessages(
+        input.latestUserText,
+        prompt.recentMessages
+      )
 
   return Object.freeze({
     systemContent,
@@ -562,24 +765,32 @@ function resolveProviderConversationMessages(
   latestUserText: string,
   recentMessages: readonly GeorgeProviderMessage[]
 ): readonly GeorgeProviderMessage[] {
-  const currentUserMessage = Object.freeze({
-    role: 'user' as const,
-    content: latestUserText,
-  })
-
-  if (isStandaloneAmbiguousKnowledgeQuestion(latestUserText)) {
-    return Object.freeze([currentUserMessage])
-  }
-
   const normalizedLatestUserText = normalizeProviderMessageContent(latestUserText)
-  const matchingCurrentTurnIndex = [...recentMessages]
+  const matchingCurrentTurn = [...recentMessages]
     .map((message, index) => ({ message, index }))
     .reverse()
     .find(
       ({ message }) =>
         message.role === 'user' &&
         normalizeProviderMessageContent(message.content) === normalizedLatestUserText
-    )?.index
+    )
+  const currentUserMessage = Object.freeze({
+    role: 'user' as const,
+    content: latestUserText,
+    ...(matchingCurrentTurn?.message.imageDataUrls?.length
+      ? {
+          imageDataUrls: Object.freeze([
+            ...matchingCurrentTurn.message.imageDataUrls,
+          ]),
+        }
+      : {}),
+  })
+
+  if (isStandaloneAmbiguousKnowledgeQuestion(latestUserText)) {
+    return Object.freeze([currentUserMessage])
+  }
+
+  const matchingCurrentTurnIndex = matchingCurrentTurn?.index
 
   if (matchingCurrentTurnIndex === undefined) {
     return Object.freeze([...recentMessages, currentUserMessage])

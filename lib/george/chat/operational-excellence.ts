@@ -4,6 +4,7 @@ type Input = {
   reply: string
   presentationMode: GeorgePresentationMode
   latestUserText: string
+  canonicalExecution?: boolean
 }
 
 function normalizeWhitespace(text: string) {
@@ -88,6 +89,10 @@ Then let the response tell you what matters next. Keep the conversation natural,
 
 export function renderOperationalExcellenceOutput(input: Input) {
   if (input.presentationMode !== 'conversational') {
+    return normalizeWhitespace(input.reply)
+  }
+
+  if (input.canonicalExecution) {
     return normalizeWhitespace(input.reply)
   }
 
