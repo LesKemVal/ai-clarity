@@ -3449,6 +3449,7 @@ export default function Page({
   };
 
   const presentNormalAdaptiveQuestion = (question: PreparationQuestion) => {
+    setNormalOperationalDisposition("unresolved");
     setCurrentPreLiveQuestion(question);
     setPreLiveSignalComplete(false);
     setShowPreLiveSignalSurface(true);
@@ -3694,10 +3695,15 @@ export default function Page({
             "This answer may materially improve GEORGE's preparation.",
         ),
         example: String(payload.example || ""),
+        evidenceNeed: String(
+          payload.evidenceNeed || payload.key || "",
+        ).trim(),
+        clarificationRequired:
+          payload.clarificationRequired === true,
       };
       const questionSession = beginNormalLivePreparation({
-        signals: preparationSession.knowledge.additionalSignals,
-        explicitObjective: preparationSession.knowledge.objective,
+        signals: canonicalPreparationSession.knowledge.additionalSignals,
+        explicitObjective: canonicalObjective,
         briefing: {
           priorInteractions,
           currentQuestion: nextQuestion,
@@ -3741,6 +3747,7 @@ export default function Page({
     setShowConversationMenu(false);
     setShowNormalUtilityMenu(null);
     setActivePromptLabel("LIVE");
+    setNormalOperationalDisposition(null);
     setContextTurnCount(0);
 
     const preparationSession = beginNormalLivePreparation({
@@ -3786,6 +3793,7 @@ export default function Page({
     if (!questionSession) return;
 
     setShowPreLiveSignalSurface(true);
+    setNormalOperationalDisposition(null);
     setCurrentPreLiveQuestion(null);
     setPreLiveSignalComplete(false);
     setActivePromptContext("pre_live_signal_acquisition");
@@ -6408,6 +6416,7 @@ I’ll stay with you.`,
         question: currentPreLiveQuestion.question,
         answer: interactionStatus === "answered" ? answer : "",
         status: interactionStatus,
+        evidenceNeed: currentPreLiveQuestion.evidenceNeed,
       },
     ]);
 
@@ -6418,18 +6427,17 @@ I’ll stay with you.`,
       presentationMode: "live_preparation",
     };
 
-    setMessages((prev) => {
-      const latest = prev[prev.length - 1];
+    const latestVisibleMessage =
+      messagesRef.current[messagesRef.current.length - 1];
+    const answerAlreadyVisible =
+      latestVisibleMessage?.role === "user" &&
+      String(latestVisibleMessage.content || "").trim() === answer;
+    const messagesWithPreparationAnswer = answerAlreadyVisible
+      ? messagesRef.current
+      : [...messagesRef.current, preparationAnswerMessage];
 
-      const alreadyVisible =
-        latest?.role === "user" &&
-        String(latest.content || "").trim() === answer;
-
-      const next = alreadyVisible ? prev : [...prev, preparationAnswerMessage];
-
-      messagesRef.current = next;
-      return next;
-    });
+    messagesRef.current = messagesWithPreparationAnswer;
+    setMessages(messagesWithPreparationAnswer);
 
     setPreLiveSignals(nextSignals);
 
@@ -6444,7 +6452,6 @@ I’ll stay with you.`,
     } catch {}
 
     setInput("");
-    const shouldRequestNextQuestion = interactionStatus === "skipped";
     const nextPreparationSession = beginNormalLivePreparation({
       signals: nextSignals,
       explicitObjective: nextObjective,
