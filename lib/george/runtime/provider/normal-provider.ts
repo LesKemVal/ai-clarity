@@ -1216,6 +1216,25 @@ async function createNormalProviderCompletion(input: {
   return completion.choices?.[0]?.message?.content || null
 }
 
+function normalizeNormalCandidateIdentityText(
+  value: string
+): string {
+  return value
+    .trim()
+    .replace(/[\u2018\u2019\u201A\u201B'\u201C\u201D\u201E\u201F"]/g, '"')
+    .replace(/\s+/g, ' ')
+}
+
+function normalCandidateIdentityMatches(
+  left: string,
+  right: string
+): boolean {
+  return (
+    normalizeNormalCandidateIdentityText(left) ===
+    normalizeNormalCandidateIdentityText(right)
+  )
+}
+
 function semanticProposalPreservesDiscoveredCandidates(
   proposal: NormalProviderSemanticProposalResult,
   candidates: NormalOperationalCandidateSet
@@ -1238,14 +1257,20 @@ function semanticProposalPreservesDiscoveredCandidates(
 
   if (
     discoveredActNow &&
-    comparison.bestActionNow !== discoveredActNow
+    !normalCandidateIdentityMatches(
+      comparison.bestActionNow,
+      discoveredActNow
+    )
   ) {
     return false
   }
 
   if (
     discoveredSignal &&
-    comparison.candidateSignal !== discoveredSignal
+    !normalCandidateIdentityMatches(
+      comparison.candidateSignal,
+      discoveredSignal
+    )
   ) {
     return false
   }
