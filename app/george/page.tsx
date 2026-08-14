@@ -1640,7 +1640,6 @@ export default function Page({
   const [accessCode, setAccessCode] = useState("");
   const [accessCodeError, setAccessCodeError] = useState("");
   const [showEarbudOverlay, setShowEarbudOverlay] = useState(true);
-  const [showSessionPicker, setShowSessionPicker] = useState(false);
 
   useEffect(() => {
     function handlePointerDown(event: MouseEvent) {
@@ -1680,33 +1679,14 @@ export default function Page({
       window.localStorage.getItem("george_open_live_chooser_after_home") === "1"
     ) {
       window.localStorage.removeItem("george_open_live_chooser_after_home");
-      setShowSessionPicker(false);
       startLiveSignalAcquisition();
       return;
     }
 
-    if (window.localStorage.getItem("george_resume_live_after_home") !== "1")
-      return;
-
-    window.localStorage.removeItem("george_resume_live_after_home");
-    window.localStorage.removeItem("george_start_new_live");
-    window.localStorage.removeItem("george_fresh_live_entry");
-    window.localStorage.removeItem("GEORGE_LIVE_SETUP");
-    setShowLiveChooser(false);
-    setSessionPickerClosing(false);
-    setSessionPickerMode("live");
-    setShowSessionPicker(true);
   }, []);
 
   const [liveCadence, setLiveCadence] = useState("Balanced");
   const [liveSteeringPhrase, setLiveSteeringPhrase] = useState("hmm");
-  const [sessionPickerMode, setSessionPickerMode] = useState<
-    "live" | "campaign"
-  >("live");
-  const [sessionPickerClosing, setSessionPickerClosing] = useState(false);
-  const [pendingDeleteSessionId, setPendingDeleteSessionId] = useState<
-    string | null
-  >(null);
   const [preLiveMessages, setPreLiveMessages] = useState<Message[] | null>(
     null,
   );
@@ -3943,7 +3923,6 @@ export default function Page({
     setConversationMode(null);
     setShowConversationMenu(false);
     setConversationMenuLane("selector");
-    setShowSessionPicker(false);
     setShowCampaignMenu(false);
     setShowRecentFolders(false);
     setActivePromptContext(null);
@@ -7308,7 +7287,7 @@ I’ll stay with you.`,
                       : showMobileHero
                         ? "pt-3 md:pt-14"
                         : "pt-10 md:pt-6"
-                } ${showNormalUtilityMenu || showLiveQuickMenu || showLiveSessionDetails || showSessionPicker || showExitPopup || showUpgradeModal || showTierModal || showProLiveComingSoon || showLiveChooser ? "blur-[8px] transition-[filter] duration-200" : "blur-0 transition-[filter] duration-200"}`}
+                } ${showNormalUtilityMenu || showLiveQuickMenu || showLiveSessionDetails || showExitPopup || showUpgradeModal || showTierModal || showProLiveComingSoon || showLiveChooser ? "blur-[8px] transition-[filter] duration-200" : "blur-0 transition-[filter] duration-200"}`}
               >
                 {showMobileHero &&
                   !(forceLive || liveMode) &&
