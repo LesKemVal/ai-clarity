@@ -21,9 +21,19 @@ const activeButtons = new WeakSet<HTMLElement>();
 function getButton(target: EventTarget | null): HTMLElement | null {
   if (!(target instanceof Element)) return null;
 
-  return target.closest<HTMLElement>(
+  const button = target.closest<HTMLElement>(
     'button, [role="button"], input[type="button"], input[type="submit"], input[type="reset"], a[data-button]'
   );
+
+  if (
+    button?.matches(
+      "[data-george-button], [data-george-icon-button]"
+    )
+  ) {
+    return null;
+  }
+
+  return button;
 }
 
 function parseRgb(value: string): [number, number, number] | null {
