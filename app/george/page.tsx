@@ -2397,11 +2397,6 @@ export default function Page({
   const [greeting, setGreeting] = useState(
     "Welcome back. Pick up where we left off.",
   );
-  const accentSymbol = useMemo(() => {
-    const accents = ["♥", "🍒", "🍎", "🍇"];
-    return accents[new Date().getDate() % accents.length];
-  }, []);
-
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -4231,8 +4226,6 @@ I’ll stay with you.`,
     () => getExistingFolders(),
     [messages, activeSaveIndex, memoryVersion],
   );
-  const recentFolders = useMemo(() => availableFolders, [availableFolders]);
-
   const SpeechRecognitionCtor = useMemo(() => {
     if (typeof window === "undefined") return null;
     return window.SpeechRecognition || window.webkitSpeechRecognition || null;
@@ -4549,29 +4542,6 @@ I’ll stay with you.`,
       }
     };
   }, [homepageHeroSequence.length]);
-
-  const heroTitle = useMemo(() => {
-    const now = new Date();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-    const monthDay = `${month}-${day}`;
-    const hour = now.getHours();
-    const nameSuffix = profileName ? `, ${profileName}` : "";
-
-    if (birthdayMD && monthDay === birthdayMD) {
-      return `Happy birthday${nameSuffix}.`;
-    }
-
-    if (monthDay === "01-01") {
-      return "Happy New Year.";
-    }
-
-    if (monthDay === "12-25") {
-      return "Merry Christmas.";
-    }
-
-    return getInitialGreeting(profileName, currentTier);
-  }, [birthdayMD, profileName, currentTier]);
 
   const stopListening = useCallback(() => {
     if (liveMode) {
