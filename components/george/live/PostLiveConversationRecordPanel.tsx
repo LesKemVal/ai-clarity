@@ -229,7 +229,8 @@ export function PostLiveConversationRecordPanel({
   )
 
   return (
-    <section className="pointer-events-auto max-h-[calc(100vh-32px)] w-full max-w-[620px] overflow-y-auto rounded-[1.25rem] border border-[var(--border-subtle)] bg-[color:var(--surface-2)]/94 p-4 text-[color:var(--steel-200)]/72 shadow-[0_24px_90px_rgba(0,0,0,0.58),inset_0_1px_0_rgba(255,255,255,0.035)]">
+    <div className="fixed inset-0 z-[230] flex items-center justify-center bg-black george-motion-fade-soft/58 px-4 backdrop-blur-[14px]">
+      <section className="pointer-events-auto max-h-[calc(100vh-32px)] w-full max-w-[620px] overflow-y-auto rounded-[1.25rem] border border-[var(--border-subtle)] bg-[color:var(--surface-2)]/94 p-4 text-[color:var(--steel-200)]/72 shadow-[0_24px_90px_rgba(0,0,0,0.58),inset_0_1px_0_rgba(255,255,255,0.035)]">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#8FB6C9]/72">
@@ -537,6 +538,7 @@ export function PostLiveConversationRecordPanel({
       </div>
         </div>
       )}
-    </section>
+      </section>
+    </div>
   )
 }

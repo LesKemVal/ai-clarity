@@ -8632,14 +8632,12 @@ I’ll stay with you.`,
                         lastConversationRecord &&
                         typeof document !== "undefined" &&
                         createPortal(
-                          <div className="fixed inset-0 z-[230] flex items-center justify-center bg-black george-motion-fade-soft/58 px-4 backdrop-blur-[14px]">
-                            <PostLiveConversationRecordPanel
-                              record={lastConversationRecord}
-                              onClose={finishActiveBriefing}
-                              onAskGeorge={askWithinActiveBriefing}
-                              onNextCall={beginNextRepeatedConversation}
-                            />
-                          </div>,
+                          <PostLiveConversationRecordPanel
+                            record={lastConversationRecord}
+                            onClose={finishActiveBriefing}
+                            onAskGeorge={askWithinActiveBriefing}
+                            onNextCall={beginNextRepeatedConversation}
+                          />,
                           document.body,
                         )}
 
