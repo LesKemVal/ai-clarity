@@ -1861,43 +1861,9 @@ export default function Page({
   const [canonicalRuntimeAuthority, setCanonicalRuntimeAuthority] =
     useState<GeorgeRuntimeAuthoritySnapshot | null>(null);
 
-  const liveBarMessages = useMemo(() => {
-    const opportunity = operationalResourceMonitor?.opportunity;
-
-    if (opportunity) {
-      return opportunity.thresholdMet
-        ? [
-            opportunity.suggestion,
-            `${opportunity.title} readiness · ${opportunity.readiness}%`,
-            opportunity.tapAction === "open_execution_gateway"
-              ? opportunity.executionLabel
-              : "Tap to continue preparing in this conversation.",
-          ]
-        : [
-            `${opportunity.title} readiness · ${opportunity.readiness}%`,
-            "Keep preparing in this conversation.",
-          ];
-    }
-
-    return [
-      "Opportunity readiness",
-      "Keep working with GEORGE. I’ll surface the strongest next capability when it becomes useful.",
-    ];
-  }, [operationalResourceMonitor]);
-
   useEffect(() => {
     if (messages.length === 0) setOperationalResourceMonitor(null);
   }, [messages.length]);
-
-  const [liveBarMessageIndex, setLiveBarMessageIndex] = useState(0);
-
-  useEffect(() => {
-    if (!liveBarMessages.length) return;
-    const timer = window.setInterval(() => {
-      setLiveBarMessageIndex((prev) => (prev + 1) % liveBarMessages.length);
-    }, 5200);
-    return () => window.clearInterval(timer);
-  }, [liveBarMessages.length]);
 
   const [memoryVersion, setMemoryVersion] = useState(0);
   const [toastMessage, setToastMessage] = useState("");
