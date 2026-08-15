@@ -1090,28 +1090,8 @@ export default function Page({
                 ? "manual"
                 : "default";
 
-  const resolvedOutputStyle =
-    activeCampaign?.outputStyle ||
-    (resolvedLivePosture === "debate"
-      ? "repeatable_lines"
-      : resolvedLivePosture === "negotiation"
-        ? "say_ask_boundary_close"
-        : resolvedLivePosture === "response"
-          ? "repeatable_lines"
-          : "short_cues");
-
   const liveLastSignalRef = useRef<number>(0);
   const liveInterventionRef = useRef<number>(0);
-  const lastCueTsRef = useRef<number>(0);
-  const liveConversationStateRef = useRef({
-    objectionCount: 0,
-    dismissCount: 0,
-    pressureCount: 0,
-    lastCue: "",
-    outcomeState: "neutral",
-    activeDirection: "clarity",
-  });
-
   const [contextTurnCount, setContextTurnCount] = useState(0);
   const [reroutePrompt, setReroutePrompt] = useState<PromptSelection | null>(
     null,
@@ -1120,18 +1100,6 @@ export default function Page({
   const [currentTier, setCurrentTier] = useState<
     "smart" | "intelligent" | "brilliant"
   >("smart");
-  const [tierSignalPhase, setTierSignalPhase] = useState(0);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const timer = window.setInterval(() => {
-      setTierSignalPhase((phase) => (phase + 1) % 2);
-    }, 3800);
-
-    return () => window.clearInterval(timer);
-  }, []);
-
   const hasLiveGeorgeAccess =
     currentTier === "intelligent" || currentTier === "brilliant";
   const tierUpgradeAction =
@@ -1183,17 +1151,6 @@ export default function Page({
             href: "/activate?tier=brilliant&intent=stay-brilliant",
           };
 
-  const tierPrimarySignal =
-    currentTier === "smart"
-      ? "Go Intelligent"
-      : currentTier === "intelligent"
-        ? "Go Brilliant"
-        : "Stay Brilliant";
-  const tierSignalText =
-    hasLiveGeorgeAccess && tierSignalPhase === 1
-      ? "You have access to LIVE GEORGE"
-      : tierPrimarySignal;
-  const showLiveGeorgeFlame = hasLiveGeorgeAccess && tierSignalPhase === 1;
   const tieredStarterPrompts = useMemo<PromptSelection[]>(() => {
     if (currentTier === "brilliant") {
       return [];
@@ -1320,14 +1277,6 @@ export default function Page({
   const [assistTone, setAssistTone] = useState<
     "calm" | "direct" | "assertive" | "firm" | "warm" | "neutral"
   >("direct");
-  const resolvedAssistTone =
-    assistTone ||
-    (resolvedLivePosture === "negotiation"
-      ? "firm"
-      : resolvedLivePosture === "response"
-        ? "calm"
-        : "direct");
-
 
 
 
@@ -1450,8 +1399,6 @@ export default function Page({
   const [showLiveSteeringReference, setShowLiveSteeringReference] =
     useState(false);
   const [liveGeorgeEnabled, setLiveGeorgeEnabled] = useState(true);
-  const resolvedDeliveryMode =
-    activeCampaign?.deliveryMode || (voiceOn ? "audio" : "text");
   const [voiceSpeed, setVoiceSpeed] = useState(1.2);
   const [voiceType, setVoiceType] = useState("ash");
 
@@ -1878,24 +1825,6 @@ export default function Page({
 
 
 
-  const LIVE_SEGUES = [
-    {
-      title: "LIVE listens with you.",
-      body: "Use LIVE when the conversation is active. GEORGE helps with timing, pressure, escalation, hesitation, and next responses in real time.",
-    },
-    {
-      title: "You do not need to explain everything first.",
-      body: "LIVE is designed for movement. Interviews, negotiation, conflict, uncertainty, pressure, sales, and difficult conversations.",
-    },
-    {
-      title: "GEORGE tracks the room.",
-      body: "LIVE cues help you slow down, redirect, recover control, or sharpen the next sentence before momentum slips.",
-    },
-    {
-      title: "LIVE changes runtime behavior.",
-      body: "LIVE is optimized for timing and response delivery while conversations are actually happening.",
-    },
-  ];
   const [typedMessageIndex, setTypedMessageIndex] = useState<number | null>(
     null,
   );
@@ -4222,10 +4151,6 @@ I’ll stay with you.`,
     return () => clearInterval(interval);
   }, [windowEndsAt]);
 
-  const availableFolders = useMemo(
-    () => getExistingFolders(),
-    [messages, activeSaveIndex, memoryVersion],
-  );
   const SpeechRecognitionCtor = useMemo(() => {
     if (typeof window === "undefined") return null;
     return window.SpeechRecognition || window.webkitSpeechRecognition || null;
@@ -4467,8 +4392,6 @@ I’ll stay with you.`,
     if (currentTier === "smart") return;
     window.localStorage.setItem("george_voice_speed", String(voiceSpeed));
   }, [voiceSpeed, currentTier]);
-
-  const tagline = `I will not contradict the Holy Bible (KJV).`;
 
   const homepageHeroSequence = [
     "Build a business plan",
@@ -5833,20 +5756,6 @@ I’ll stay with you.`,
     };
   }, [SpeechRecognitionCtor, handleSend, isIOS]);
 
-  const statusText = voiceError
-    ? voiceError
-    : isSpeaking
-      ? "GEORGE is speaking..."
-      : isThinking
-        ? "GEORGE is working..."
-        : isListening
-          ? "GEORGE is listening..."
-          : isIOS
-            ? "Voice is coming later on iPhone."
-            : voiceOn
-              ? "Voice is on."
-              : "Voice is off.";
-
   const normalConversationStarted = messages.some((message) => {
     if (message.role !== "user") return false;
     return String(message.content || "").trim().length > 0;
@@ -5885,21 +5794,9 @@ I’ll stay with you.`,
     !showPreLiveSignalSurface;
 
   const showGeorgeHeroTitle = true;
-  const showGeorgeSupportCopy = !normalConversationStarted;
   const hasUserMessageForSurface = normalConversationStarted;
 
   const shouldKeepHeroVisible = !normalConversationStarted;
-
-  const showIdleGeorgeSurface =
-    showMobileHero &&
-    !(forceLive || liveMode) &&
-    !hasDraftInput &&
-    !pendingImage &&
-    (shouldKeepHeroVisible || isPreLiveSignalAcquisition);
-
-  const showDesktopOperationalSurface = !hasUserMessageForSurface;
-
-  const isRuntimeTransitioning = hasVisibleThread || liveMode;
 
   useEffect(() => {
     if (!showMobileHero || forceLive || liveMode) return;
