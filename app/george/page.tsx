@@ -1252,10 +1252,6 @@ export default function Page({
     // Campaign persistence is V2-owned. Keep local state only for the active UI session.
     return;
   }, [campaigns, activeCampaignId]);
-  const [tonePopupIndex, setTonePopupIndex] = useState<number | null>(null);
-  const [assistTone, setAssistTone] = useState<
-    "calm" | "direct" | "assertive" | "firm" | "warm" | "neutral"
-  >("direct");
 
 
 
@@ -4007,7 +4003,6 @@ export default function Page({
         setShowRecentFolders(false);
         setActiveMemoryFolder(null);
         setActiveSaveIndex(null);
-        setTonePopupIndex(null);
       }
     };
 
@@ -6944,42 +6939,6 @@ export default function Page({
                             {isLatestAssistant && liveMode && (
                               <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-[#D7DBE4]/50">
                                 <div className="relative bx-command-shimmer">
-                                  {tonePopupIndex === i && (
-                                    <div
-                                      className={`absolute left-0 z-[80] w-48 rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 text-[11px] text-[#D7DBE4]/66 shadow-[0_22px_70px_rgba(0,0,0,0.48)]  transition duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] bottom-[34px]`}
-                                    >
-                                      <div className="border-b border-white/[0.05] px-3 py-2 text-[10px] tracking-[0.16em] text-[#D7DBE4]/36">
-                                        STYLE
-                                      </div>
-
-                                      <div className="p-1.5">
-                                        {(
-                                          [
-                                            "assertive",
-                                            "respectful",
-                                            "concise",
-                                            "direct",
-                                            "warm",
-                                            "firm",
-                                          ] as const
-                                        ).map((tone) => (
-                                          <button
-                                            key={tone}
-                                            onClick={() => {
-                                              setAssistTone(tone as any);
-                                              setTonePopupIndex(null);
-                                              setToastMessage(`Style: ${tone}`);
-                                              setShowToast(true);
-                                            }}
-                                            className="block w-full rounded-lg px-1.5 py-1.5 text-left text-[11px] text-[#D7DBE4]/70 transition hover:bg-white/[0.022] hover:text-[#D7DBE4]/92"
-                                          >
-                                            More {tone}
-                                          </button>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-
                                   <div className="flex flex-wrap items-center gap-1.5">
                                     {getLiveResponseServingTags(m, null).map(
                                       (tag) => (
