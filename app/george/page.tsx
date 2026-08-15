@@ -1440,7 +1440,6 @@ export default function Page({
     return email ? { subscriberEmail: email } : { localOnly: true };
   }, [subscriberEmail]);
 
-  const [birthdayMD, setBirthdayMD] = useState("");
   const [showPromptMenu, setShowPromptMenu] = useState(false);
   const [showLiveQuickMenu, setShowLiveQuickMenu] = useState(false);
   const [showLiveSessionDetails, setShowLiveSessionDetails] = useState(false);
@@ -1727,7 +1726,6 @@ export default function Page({
     if (messages.length === 0) setOperationalResourceMonitor(null);
   }, [messages.length]);
 
-  const [memoryVersion, setMemoryVersion] = useState(0);
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
 
@@ -3842,7 +3840,6 @@ export default function Page({
 
     window.localStorage.setItem("GEORGE_WORKSPACE", JSON.stringify(existing));
     window.localStorage.setItem("GEORGE_LAST_FOLDER", "Goals");
-    setMemoryVersion((prev) => prev + 1);
     setToastMessage("Kept in chamber");
     setShowToast(true);
     setActiveSaveIndex(null);
@@ -3887,7 +3884,6 @@ export default function Page({
 
     window.localStorage.setItem("GEORGE_WORKSPACE", JSON.stringify(existing));
     window.localStorage.setItem("GEORGE_LAST_FOLDER", chosenFolder);
-    setMemoryVersion((prev) => prev + 1);
     setToastMessage(`Saved to ${chosenFolder}`);
     setShowToast(true);
     setActiveSaveIndex(null);
@@ -4113,8 +4109,6 @@ export default function Page({
     setIsAndroid(/Android/i.test(ua));
 
     const storedName = window.localStorage.getItem("george_name") || "";
-    const storedBirthdayMD =
-      window.localStorage.getItem("george_birthday_md") || "";
     const storedVoiceSpeed = Number(
       window.localStorage.getItem("george_voice_speed") || "1.4",
     );
@@ -4152,8 +4146,6 @@ export default function Page({
     if (personalized && ["ash", "coral"].includes(storedVoiceType)) {
       setVoiceType(storedVoiceType);
     }
-
-    setBirthdayMD(storedBirthdayMD);
 
     if ([0.8, 1, 1.2, 1.4].includes(storedVoiceSpeed)) {
       setVoiceSpeed(storedVoiceSpeed);
