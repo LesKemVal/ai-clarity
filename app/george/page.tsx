@@ -1385,7 +1385,6 @@ export default function Page({
     );
   };
 
-  const [forceClose, setForceClose] = useState(false);
 
   const [suggestedSignal, setSuggestedSignal] = useState(0);
   const [voiceSupported, setVoiceSupported] = useState(false);
@@ -4819,7 +4818,6 @@ I’ll stay with you.`,
         ? JSON.stringify({ text: speechText })
         : JSON.stringify({
             mode: activeCampaign ? "campaign" : "normal",
-            forceClose,
             input: speechText,
             speed: liveMode
               ? determineLiveVoiceSpeed({
