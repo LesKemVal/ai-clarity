@@ -153,7 +153,6 @@ import {
   getReroutePrompt,
   getSuggestedPromptsFromMessages,
 } from "@/lib/george/prompts/suggested-prompts";
-import { applyRuntimeOverlayFromCode } from "@/lib/george/operator/load-runtime-overlay";
 import type { LivePrepSetup } from "@/lib/george/live-runtime/prep-runtime";
 import { buildGeorgeCoreInterpretation } from "@/lib/george/core/build-interpretation";
 import { tryLiveFastPath } from "@/lib/george/live-runtime/live-fast-path";
@@ -1329,37 +1328,6 @@ export default function Page({
         ? "calm"
         : "direct");
 
-  const replaceLastLiveGuidance = (guidance: string) => {
-    const existingMessages = [...messagesRef.current];
-    const lastMessage = existingMessages[existingMessages.length - 1];
-
-    const shouldReplaceLastGuidance =
-      lastMessage?.role === "assistant" &&
-      typeof lastMessage?.content === "string" &&
-      (lastMessage.content.includes("reduce leakage") ||
-        lastMessage.content.includes("without overexplaining"));
-
-    const nextMessages = shouldReplaceLastGuidance
-      ? [
-          ...existingMessages.slice(0, -1),
-          {
-            role: "assistant" as const,
-            content: guidance,
-          },
-        ]
-      : [
-          ...existingMessages,
-          {
-            role: "assistant" as const,
-            content: guidance,
-          },
-        ];
-
-    window.setTimeout(() => {
-      setMessages(nextMessages);
-      messagesRef.current = nextMessages;
-    }, 220);
-  };
 
 
 
@@ -1552,7 +1520,6 @@ export default function Page({
   const [showLiveQuickMenu, setShowLiveQuickMenu] = useState(false);
   const [showLiveSessionDetails, setShowLiveSessionDetails] = useState(false);
 
-  const [accessCode, setAccessCode] = useState("");
 
   const [showProLiveComingSoon, setShowProLiveComingSoon] = useState(false);
   const [showLiveChooser, setShowLiveChooser] = useState(false);
@@ -1909,40 +1876,7 @@ export default function Page({
     exitLiveMode();
   };
 
-  const ACCESS_CODES: Record<string, "intelligent" | "brilliant"> = {
-    ...Object.fromEntries(
-      Array.from({ length: 100 }, (_, index) => [
-        `INTEL-FOUNDER-${String(index + 1).padStart(3, "0")}`,
-        "intelligent" as const,
-      ]),
-    ),
-    "BRILLIANT-FOUNDERS": "brilliant",
-  };
 
-  const redeemAccessCode = () => {
-    const normalized = accessCode.trim().toUpperCase();
-
-    const runtimeOverlay = applyRuntimeOverlayFromCode(normalized);
-    const tier = runtimeOverlay?.tier || ACCESS_CODES[normalized];
-
-    if (!tier) {
-      return;
-    }
-
-    setCurrentTier(tier);
-
-    if (typeof window !== "undefined") {
-      localStorage.setItem("george_tier", tier);
-    }
-
-    setToastMessage(
-      runtimeOverlay
-        ? `${runtimeOverlay.overlay.title} loaded.`
-        : `${tier === "brilliant" ? "Brilliant" : "Intelligent"} access loaded.`,
-    );
-    setShowToast(true);
-    setAccessCode("");
-  };
 
   const LIVE_SEGUES = [
     {
