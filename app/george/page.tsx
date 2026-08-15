@@ -1361,29 +1361,7 @@ export default function Page({
     }, 220);
   };
 
-  const activateNegotiationPosture = () => {
-    setActivePromptContext("live_negotiation");
-    setConversationMode("live_negotiation");
-    setLiveDeliveryStyle("line");
 
-    setToastMessage("Negotiation guidance active.");
-    setShowToast(true);
-    replaceLastLiveGuidance(
-      "Good. I’ll help you stay composed, reduce leakage, and move toward leverage.",
-    );
-  };
-
-  const activateResponsePosture = () => {
-    setActivePromptContext("live_response");
-    setConversationMode("live_response");
-    setLiveDeliveryStyle("response");
-
-    setToastMessage("Response handling active.");
-    setShowToast(true);
-    replaceLastLiveGuidance(
-      "Good. I’ll help you answer pressure, objections, or confusion without overexplaining.",
-    );
-  };
 
 
   const [suggestedSignal, setSuggestedSignal] = useState(0);
@@ -1573,11 +1551,6 @@ export default function Page({
   const [showPromptMenu, setShowPromptMenu] = useState(false);
   const [showLiveQuickMenu, setShowLiveQuickMenu] = useState(false);
   const [showLiveSessionDetails, setShowLiveSessionDetails] = useState(false);
-
-  useEffect(() => {
-    // LIVE route ownership now belongs exclusively to /george/live
-    // Keep disabled to prevent modal/state hydration conflicts.
-  }, []);
 
   const [accessCode, setAccessCode] = useState("");
 
@@ -2973,16 +2946,6 @@ export default function Page({
     stopLiveAudioRuntimeDirect,
   ]);
 
-  const interruptAndListen = () => {
-    try {
-      stopSpeechRef.current = true;
-      window.speechSynthesis.cancel();
-    } catch {}
-
-    setVoiceOn(true);
-    setInteractionMode("speech");
-    setTimeout(() => startListening(), 80);
-  };
 
   const messagesRef = useRef<Message[]>([
     { role: "assistant", content: "GEORGE" },
@@ -5083,13 +5046,6 @@ I’ll stay with you.`,
   );
 
   // DEV: ACTIVATE FULL MODE (2 HOURS)
-  const activateFullMode = () => {
-    const twoHours = 2 * 60 * 60 * 1000;
-    const end = Date.now() + twoHours;
-
-    setWindowEndsAt(end);
-    window.localStorage.setItem("george_full_until", String(end));
-  };
 
   const handleSend = useCallback(
     async (
