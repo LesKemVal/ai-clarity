@@ -8913,25 +8913,6 @@ I’ll stay with you.`,
                     </>
                   )}
 
-                <style jsx global>{`
-  @keyframes tierSignalPrimary {
-    0%, 40% { opacity: 1; transform: translateY(0); }
-    48%, 100% { opacity: 1; transform: translateY(-22px); }
-  }
-
-  @keyframes tierSignalSecondary {
-    0%, 40% { opacity: 1; transform: translateY(22px); }
-    48%, 88% { opacity: 1; transform: translateY(0); }
-    96%, 100% { opacity: 1; transform: translateY(-22px); }
-  }
-    51%, 96% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(-8px); }
-  }
-    50%, 94% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(-9px); }
-  }
-`}</style>
-
                 {!liveMode && (isThinking || isSpeaking || bridgeThinking) && (
                   <div
                     className={`${forceLive || liveMode ? "hidden" : "fixed"} bottom-[96px] left-0 right-0 z-[140] flex justify-center pointer-events-none`}
