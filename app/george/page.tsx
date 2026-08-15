@@ -1069,29 +1069,8 @@ export default function Page({
 
   const activeCampaign =
     campaigns.find((campaign) => campaign.id === activeCampaignId) || null;
-  const resolvedLivePosture =
-    conversationMode === "live_debate" || activePromptContext === "live_debate"
-      ? "debate"
-      : activeCampaign?.assistMode === "negotiation"
-        ? "negotiation"
-        : activeCampaign?.assistMode === "objection_handling"
-          ? "response"
-          : conversationMode === "live_negotiation" ||
-              activePromptContext === "live_negotiation" ||
-              conversationMode === "professional_negotiation" ||
-              activePromptContext === "professional_negotiation"
-            ? "negotiation"
-            : conversationMode === "live_response" ||
-                activePromptContext === "live_response" ||
-                conversationMode === "professional_objection_handling" ||
-                activePromptContext === "professional_objection_handling"
-              ? "response"
-              : isManualLive
-                ? "manual"
-                : "default";
 
   const liveLastSignalRef = useRef<number>(0);
-  const liveInterventionRef = useRef<number>(0);
   const [contextTurnCount, setContextTurnCount] = useState(0);
   const [reroutePrompt, setReroutePrompt] = useState<PromptSelection | null>(
     null,
@@ -3619,109 +3598,6 @@ export default function Page({
   const askWithinActiveBriefing = () => {
     setShowConversationRecord(false);
     window.setTimeout(() => textareaRef.current?.focus(), 0);
-  };
-  const startNewGeorgeSession = (
-    openingMessage: Message,
-    sessionLabel = "GEORGE Session",
-  ) => {
-    // A new workspace must begin in a clean normal-GEORGE state.
-    // LIVE preparation cannot survive into the new workspace.
-    setShowPreLiveSignalSurface(false);
-    setNormalPreparationSession(null);
-    setCurrentPreLiveQuestion(null);
-    setPreLiveSignals({});
-    setPreLiveSignalComplete(false);
-    setActivePromptContext(null);
-    setActivePromptLabel(null);
-    setConversationMode(null);
-    setTypedMessageIndex(null);
-    setTypedMessageContent("");
-
-    if (typeof window !== "undefined") {
-      window.localStorage.removeItem("GEORGE_PRE_LIVE_FROM_MESSAGE");
-      window.localStorage.removeItem("GEORGE_LIVE_INTENT_STAGE");
-      clearLivePreparationPreviewReady();
-      window.localStorage.removeItem("GEORGE_PRE_LIVE_SOURCE_CONTEXT");
-      window.localStorage.removeItem("GEORGE_PENDING_LIVE_SIGNAL_ACQUISITION");
-      window.localStorage.removeItem("george_start_new_live");
-      window.localStorage.removeItem("george_fresh_live_entry");
-    }
-    if (typeof window !== "undefined" && messagesRef.current.length > 1) {
-      try {
-        const parentSessionId =
-          preLiveSessionIdRef.current || getActiveSessionIdForMode("normal");
-        const preparationSession = loadPreparationSession();
-        saveSessionToV2({
-          mode: liveMode ? "live" : "normal",
-          title: liveMode
-            ? getActiveLiveDesiredOutcomeTitle(sessionLabel)
-            : deriveNormalSessionTitleFromMessages(
-                messagesRef.current,
-                sessionLabel,
-              ),
-          messages: messagesRef.current,
-          summary: liveMode
-            ? "LIVE Conversation saved before starting a new session."
-            : "GEORGE session saved before starting a new session.",
-          userGoal: activePromptLabel || "Not set",
-          lastKnownState: "Saved after user interaction.",
-          suggestedRestart: liveMode
-            ? "Resume this LIVE Conversation naturally."
-            : "Resume this GEORGE session from the clearest next step.",
-          metadata: liveMode
-            ? {
-                normalSessionId: parentSessionId,
-                preparationSessionId: preparationSession?.preparationSessionId,
-                surface: "live",
-              }
-            : undefined,
-        });
-      } catch {}
-    }
-
-    if (conversationMode === "manual_live") {
-      // initialize LIVE surface
-      setMessages([]);
-      messagesRef.current = [];
-      const liveIntro: Message = {
-        role: "assistant",
-        content: `I’m listening.
-
-You don’t have to explain everything up front.
-As you speak, I’ll pick up the room.
-
-If you need help, just say things like:
-“hold on…”
-“how do I say this?”
-“what’s the word I’m looking for?”
-“let me put that another way…”
-“help me here”
-
-I’ll stay with you.`,
-      };
-
-      const subscriberMetadata = getSubscriberSessionMetadata();
-      if (subscriberMetadata) {
-        liveSessionWriteReadyRef.current = true;
-      }
-      setMessages([liveIntro]);
-      messagesRef.current = [liveIntro];
-    } else {
-      const subscriberMetadataForOpening = getSubscriberSessionMetadata();
-      if (subscriberMetadataForOpening) {
-        liveSessionWriteReadyRef.current = true;
-      }
-      setMessages([openingMessage]);
-      messagesRef.current = [openingMessage];
-    }
-    setInput("");
-    setInterimTranscript("");
-    setVoiceError("");
-    setSuggestedPrompts([]);
-    setSuggestedSignal(0);
-    setReroutePrompt(null);
-    setRerouteSignal(0);
-    setContextTurnCount(0);
   };
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
