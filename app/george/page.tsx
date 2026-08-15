@@ -1076,7 +1076,6 @@ export default function Page({
     conversationMode === "manual_live" || activePromptContext === "manual_live";
   const [campaigns, setCampaigns] = useState<GeorgeCampaign[]>([]);
   const [activeCampaignId, setActiveCampaignId] = useState<string | null>(null);
-  const [showCampaignMenu, setShowCampaignMenu] = useState(false);
   const [language, setLanguage] = useState("English");
 
   const activeCampaign =
@@ -1615,7 +1614,6 @@ export default function Page({
 
   const [birthdayMD, setBirthdayMD] = useState("");
   const [showPromptMenu, setShowPromptMenu] = useState(false);
-  const [showConversationMenu, setShowConversationMenu] = useState(false);
   const [showLiveQuickMenu, setShowLiveQuickMenu] = useState(false);
   const [showLiveSessionDetails, setShowLiveSessionDetails] = useState(false);
 
@@ -1625,10 +1623,8 @@ export default function Page({
   }, []);
 
   const [liveSegueIndex, setLiveSegueIndex] = useState(0);
-  const [showAccessCodeEntry, setShowAccessCodeEntry] = useState(false);
   const [accessCode, setAccessCode] = useState("");
   const [accessCodeError, setAccessCodeError] = useState("");
-  const [showEarbudOverlay, setShowEarbudOverlay] = useState(true);
 
   const [showProLiveComingSoon, setShowProLiveComingSoon] = useState(false);
   const [showLiveChooser, setShowLiveChooser] = useState(false);
@@ -1810,7 +1806,6 @@ export default function Page({
   const [lastConversationRecord, setLastConversationRecord] = useState<
     any | null
   >(null);
-  const [showSaveNaming, setShowSaveNaming] = useState(false);
   const [pendingSessionTitle, setPendingSessionTitle] = useState("");
   const [conversationMenuLane, setConversationMenuLane] = useState<
     "selector" | "personal" | "professional"
@@ -2080,7 +2075,6 @@ export default function Page({
     setShowToast(true);
     setAccessCode("");
     setAccessCodeError("");
-    setShowAccessCodeEntry(false);
   };
 
   const LIVE_SEGUES = [
@@ -2296,8 +2290,6 @@ export default function Page({
 
       setVoiceOn(true);
       setInteractionMode("speech");
-      setShowEarbudOverlay(true);
-      window.setTimeout(() => setShowEarbudOverlay(false), 5200);
 
       return;
     }
@@ -3312,7 +3304,6 @@ export default function Page({
     } catch {}
 
     setShowSidebar(false);
-    setShowConversationMenu(false);
     setShowPromptMenu(false);
     setActivePromptLabel("LIVE");
     setActivePromptContext("live_message_bar_setup");
@@ -3633,7 +3624,6 @@ export default function Page({
 
     setShowSidebar(false);
     setShowLiveChooser(false);
-    setShowConversationMenu(false);
     setActivePromptLabel("LIVE");
     setNormalOperationalDisposition(null);
     setContextTurnCount(0);
@@ -3885,9 +3875,7 @@ export default function Page({
     setVoiceOn(false);
     setInteractionMode("text");
     setConversationMode(null);
-    setShowConversationMenu(false);
     setConversationMenuLane("selector");
-    setShowCampaignMenu(false);
     setShowRecentFolders(false);
     setActivePromptContext(null);
     setActivePromptLabel(null);
@@ -8449,7 +8437,6 @@ I’ll stay with you.`,
                           setActiveSaveIndex(null);
                           setShowRecentFolders(false);
                           setShowPromptMenu((prev) => !prev);
-                          setShowConversationMenu(false);
                         }}
                         className="relative flex h-7 w-7 items-center justify-center text-[#D7DBE4]/85 transition hover:text-[#D7DBE4]"
                         aria-label="Make a better move"
@@ -8532,18 +8519,6 @@ I’ll stay with you.`,
                               Voice replies {voiceOn ? "ON" : "OFF"}
                             </button>
 
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (currentTier !== "brilliant") {
-                                  setShowToast(true);
-                                  return;
-                                }
-                                setShowPromptMenu(false);
-                                setShowConversationMenu(true);
-                              }}
-                              className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-[#D7DBE4]"
-                            ></button>
 
                             <button
                               type="button"
