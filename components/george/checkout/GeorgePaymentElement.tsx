@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 
-type CheckoutTier = 'intelligent' | 'brilliant' | 'brilliant_day'
+export type CheckoutTier = 'intelligent' | 'brilliant' | 'brilliant_day'
 type IntentType = 'payment' | 'setup'
 
 type GeorgePaymentElementProps = {

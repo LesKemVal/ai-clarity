@@ -115,7 +115,7 @@ import { ShareIcon } from "@/components/icons/ShareIcon";
 import ContinuityCapsule from "@/components/george/ContinuityCapsule";
 import MemoryContinuityPanel from "@/components/george/settings/MemoryContinuityPanel";
 import DesktopOperationalSurface from "@/components/george/DesktopOperationalSurface";
-import GeorgePaymentElement from "@/components/george/checkout/GeorgePaymentElement";
+import { GeorgeCheckoutPanel } from "@/components/george/checkout/GeorgeCheckoutPanel";
 import HeadsetOperatorIcon from "@/components/george/HeadsetOperatorIcon";
 import LiveChooser from "@/components/george/LiveChooser";
 import { LiveCapabilitySurface } from "@/components/george/LiveCapabilitySurface";
@@ -9605,50 +9605,37 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
         {activeCheckout &&
           typeof document !== "undefined" &&
           createPortal(
-            <>
-              <button
-                type="button"
-                aria-label="Close activation"
-                onClick={() => setActiveCheckout(null)}
-                className="fixed inset-0 z-[240] bg-black george-motion-fade-soft/68 -[10px]"
-              />
+            <GeorgeCheckoutPanel
+              tier={activeCheckout}
+              onClose={() => setActiveCheckout(null)}
+              onLegacyCheckout={async (tier) => {
+                try {
+                  const response = await fetch("/api/subscribe", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      tier,
+                      email: subscriberEmail || undefined,
+                    }),
+                  });
 
-              <div className="fixed inset-0 z-[141] flex items-center justify-center px-4 py-6">
-                <div className="w-full max-w-[430px]">
-                  <GeorgePaymentElement
-                    tier={activeCheckout}
-                    onClose={() => setActiveCheckout(null)}
-                    onLegacyCheckout={async (tier) => {
-                      try {
-                        const response = await fetch("/api/subscribe", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({
-                            tier,
-                            email: subscriberEmail || undefined,
-                          }),
-                        });
+                  const data = await response.json();
 
-                        const data = await response.json();
+                  if (data?.url) {
+                    window.location.href = data.url;
+                    return;
+                  }
 
-                        if (data?.url) {
-                          window.location.href = data.url;
-                          return;
-                        }
-
-                        setToastMessage(
-                          data?.error || "Unable to open checkout.",
-                        );
-                        setShowToast(true);
-                      } catch {
-                        setToastMessage("Unable to open checkout.");
-                        setShowToast(true);
-                      }
-                    }}
-                  />
-                </div>
-              </div>
-            </>,
+                  setToastMessage(
+                    data?.error || "Unable to open checkout.",
+                  );
+                  setShowToast(true);
+                } catch {
+                  setToastMessage("Unable to open checkout.");
+                  setShowToast(true);
+                }
+              }}
+            />,
             document.body,
           )}
 
