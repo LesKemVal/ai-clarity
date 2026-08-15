@@ -1905,8 +1905,6 @@ export default function Page({
       setConversationMode("manual_live");
       setActivePromptContext("manual_live");
 
-      const activeLiveSession = getActiveSessionForMode("live");
-
       // do not auto-restore LIVE session by default
       // user can resume later via sessions if needed
 
@@ -1951,14 +1949,6 @@ export default function Page({
           JSON.stringify(liveSetup),
         );
 
-        const contextSummary = [
-          liveSetup.room ? `Room: ${liveSetup.room}` : null,
-          liveSetup.objective ? `BRANESx: ${liveSetup.objective}` : null,
-          liveSetup.cadence ? `Cadence: ${liveSetup.cadence}` : null,
-          liveSetup.liveAssistMode ? `Mode: ${liveSetup.liveAssistMode}` : null,
-        ]
-          .filter(Boolean)
-          .join(" · ");
       } else {
         window.localStorage.removeItem("george_live_setup_active");
       }
@@ -1969,14 +1959,6 @@ export default function Page({
         setConversationMode("live_debate");
         setActivePromptContext("live_debate");
       }
-      const liveRoom = String(liveSetup?.room || "").trim();
-      const liveBRANESx = String(liveSetup?.objective || "").trim();
-      const liveContext = String(
-        (liveSetup as any)?.observedReality ||
-          (liveSetup as any)?.knownContext ||
-          "",
-      ).trim();
-      const liveChair = String((liveSetup as any)?.chair || "").trim();
       const liveExecutionScript = liveSetup?.customizedScript ?? null;
 
       if (liveExecutionScript) {
@@ -2032,14 +2014,6 @@ export default function Page({
     // Internal site navigation can restore last known workspace.
     setLiveEntryBriefing(null);
     setActiveMode("normal");
-
-    const browserReload =
-      typeof window !== "undefined" &&
-      performance
-        .getEntriesByType("navigation")
-        .some(
-          (entry) => (entry as PerformanceNavigationTiming).type === "reload",
-        );
 
     const newBrowserInstance = ensureGeorgeBrowserInstanceScope();
 
@@ -2158,19 +2132,6 @@ export default function Page({
       liveRuntimeSupport?.knownContext ||
       liveRuntimeSupport?.purview?.body ||
       "";
-
-    const objectiveKnown = Boolean(
-      input.trim() ||
-      activeCampaign?.desiredOutcome ||
-      activeCampaign?.currentGoal ||
-      liveRuntimeSupport?.knownContext ||
-      liveRuntimeSupport?.purview?.body ||
-      liveRuntimeSupport?.purview?.line,
-    );
-
-    const knownContextAvailable = Boolean(
-      knownContext || interimTranscript.trim() || stableLiveGuidance?.signal,
-    );
 
     const desiredOutcome =
       activeCampaign?.desiredOutcome ||
@@ -5689,25 +5650,11 @@ I’ll stay with you.`,
 
           if (delta < 2500) return;
 
-          const lower = livePrompt.toLowerCase();
-
-          const strongSignal =
-            lower.includes("not interested") ||
-            lower.includes("too expensive") ||
-            lower.includes("i don’t know") ||
-            lower.includes("i dont know") ||
-            lower.includes("maybe") ||
-            lower.includes("what do you think");
-
           const text = liveTranscript || "";
           const friction = detectLiveFriction(text);
           const score = scoreLiveFriction(text);
 
           if (!friction) return;
-
-          const interventionNow = Date.now();
-          const canIntervene =
-            interventionNow - liveInterventionRef.current > 8000;
 
           if (score < 3) return;
 
@@ -5794,8 +5741,6 @@ I’ll stay with you.`,
     !showPreLiveSignalSurface;
 
   const showGeorgeHeroTitle = true;
-  const hasUserMessageForSurface = normalConversationStarted;
-
   const shouldKeepHeroVisible = !normalConversationStarted;
 
   useEffect(() => {
@@ -7013,16 +6958,10 @@ I’ll stay with you.`,
                     const latestAssistantIndex = visibleMessages
                       .map((msg) => msg.role)
                       .lastIndexOf("assistant");
-                    const firstAssistantIndex = visibleMessages.findIndex(
-                      (msg) => msg.role === "assistant",
-                    );
                     const isLatestAssistant =
                       m.role === "assistant" && i === latestAssistantIndex;
                     const isLatestVisibleMessage =
                       i === visibleMessages.length - 1;
-                    const isWelcomeAssistant =
-                      m.role === "assistant" && i === firstAssistantIndex;
-
                     return (
                       <div
                         key={i}
