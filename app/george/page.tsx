@@ -1332,10 +1332,6 @@ export default function Page({
   const [tonePopupIndex, setTonePopupIndex] = useState<number | null>(null);
   const [tonePopupUpward, setTonePopupUpward] = useState(true);
   const [rewordPopupIndex, setRewordPopupIndex] = useState<number | null>(null);
-  const [recommendedControl, setRecommendedControl] = useState<string | null>(
-    null,
-  );
-  const [rewordPopupUpward, setRewordPopupUpward] = useState(true);
   const [assistTone, setAssistTone] = useState<
     "calm" | "direct" | "assertive" | "firm" | "warm" | "neutral"
   >("direct");
@@ -1463,29 +1459,10 @@ export default function Page({
     );
   };
 
-  type LiveViewMode = "controls" | "reading";
-
-  const getInitialLiveViewMode = (): LiveViewMode => {
-    try {
-      return (
-        (window.localStorage.getItem(
-          "GEORGE_LIVE_VIEW_MODE",
-        ) as LiveViewMode) ||
-        (getInitialLiveReceiverProfile() === "audio_only"
-          ? "controls"
-          : "reading")
-      );
-    } catch {
-      return "controls";
-    }
-  };
 
   const [liveReceiverProfile, setLiveReceiverProfile] =
     useState<GeorgeLiveReceiverProfile>(getInitialLiveReceiverProfile);
 
-  const [liveViewMode, setLiveViewMode] = useState<LiveViewMode>(
-    getInitialLiveViewMode,
-  );
 
   const getActiveLiveCommunicationStyle = () => {
     try {
@@ -1588,7 +1565,6 @@ export default function Page({
   const [conversationSignal, setConversationSignal] = useState<string | null>(
     null,
   );
-  const [signalTimestamp, setSignalTimestamp] = useState(0);
 
   const [adaptiveCueLabel, setAdaptiveCueLabel] = useState<string | null>(null);
 
@@ -1622,13 +1598,11 @@ export default function Page({
     // Keep disabled to prevent modal/state hydration conflicts.
   }, []);
 
-  const [liveSegueIndex, setLiveSegueIndex] = useState(0);
   const [accessCode, setAccessCode] = useState("");
   const [accessCodeError, setAccessCodeError] = useState("");
 
   const [showProLiveComingSoon, setShowProLiveComingSoon] = useState(false);
   const [showLiveChooser, setShowLiveChooser] = useState(false);
-  const [liveEntryBlinking, setLiveEntryBlinking] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1806,7 +1780,6 @@ export default function Page({
   const [lastConversationRecord, setLastConversationRecord] = useState<
     any | null
   >(null);
-  const [pendingSessionTitle, setPendingSessionTitle] = useState("");
   const [conversationMenuLane, setConversationMenuLane] = useState<
     "selector" | "personal" | "professional"
   >("selector");
@@ -2095,7 +2068,6 @@ export default function Page({
       body: "LIVE is optimized for timing and response delivery while conversations are actually happening.",
     },
   ];
-  const [isSharingGeorgeLink, setIsSharingGeorgeLink] = useState(false);
   const [typedMessageIndex, setTypedMessageIndex] = useState<number | null>(
     null,
   );
