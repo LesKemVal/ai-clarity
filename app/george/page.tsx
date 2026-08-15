@@ -116,6 +116,7 @@ import ContinuityCapsule from "@/components/george/ContinuityCapsule";
 import MemoryContinuityPanel from "@/components/george/settings/MemoryContinuityPanel";
 import DesktopOperationalSurface from "@/components/george/DesktopOperationalSurface";
 import { GeorgeCheckoutPanel } from "@/components/george/checkout/GeorgeCheckoutPanel";
+import { RuntimeWalkthroughPanel } from "@/components/george/runtime/RuntimeWalkthroughPanel";
 import HeadsetOperatorIcon from "@/components/george/HeadsetOperatorIcon";
 import LiveChooser from "@/components/george/LiveChooser";
 import { LiveCapabilitySurface } from "@/components/george/LiveCapabilitySurface";
@@ -9346,61 +9347,17 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
         </div>
 
         {showWalkthrough && (
-          <div className="fixed inset-0 z-[95] bg-black george-motion-fade-soft/72 -[10px]  flex items-center justify-center px-4 ">
-            <div className="w-full max-w-sm rounded-[1.65rem] border border-white/[0.07] bg-[#05080D]/88  p-5 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
-              <p className="text-sm uppercase tracking-[0.18em] text-[#D7DBE4]/72 mb-2">
-                Runtime
-              </p>
-
-              {walkthroughStep === 1 && (
-                <p className="text-[#D7DBE4] text-sm leading-7">
-                  Focus menu sets the room. Choose negotiation, interview,
-                  debate, speech, study, or everyday pressure.
-                </p>
-              )}
-              {walkthroughStep === 2 && (
-                <p className="text-[#D7DBE4] text-sm leading-7">
-                  Voice speed controls how fast GEORGE responds in your ear.
-                </p>
-              )}
-              {walkthroughStep === 3 && (
-                <p className="text-[#D7DBE4] text-sm leading-7">
-                  Mic button lets GEORGE listen while you stay in motion.
-                </p>
-              )}
-              {walkthroughStep === 4 && (
-                <p className="text-[#D7DBE4] text-sm leading-7">
-                  LIVE cues give fast lines, warnings, and framing in real time.
-                </p>
-              )}
-
-              <div className="mt-5">
-                {walkthroughStep < 4 ? (
-                  <button
-                    type="button"
-                    onClick={() => setWalkthroughStep((s) => s + 1)}
-                    className="w-full rounded-[1rem] max-w-full bg-white px-5 py-4 text-sm font-medium text-black"
-                  >
-                    Next
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      window.localStorage.setItem(
-                        "george_walkthrough_seen",
-                        "1",
-                      );
-                      setShowWalkthrough(false);
-                    }}
-                    className="w-full rounded-[1rem] max-w-full bg-white px-5 py-4 text-sm font-medium text-black"
-                  >
-                    End
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
+          <RuntimeWalkthroughPanel
+            step={walkthroughStep}
+            onNext={() => setWalkthroughStep((step) => step + 1)}
+            onComplete={() => {
+              window.localStorage.setItem(
+                "george_walkthrough_seen",
+                "1",
+              );
+              setShowWalkthrough(false);
+            }}
+          />
         )}
 
         {showPersonalizeModal && (
