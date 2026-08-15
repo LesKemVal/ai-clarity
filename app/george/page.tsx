@@ -1927,8 +1927,6 @@ export default function Page({
       // LIVE auto-restore is disabled for now.
       // A new LIVE route must boot cleanly and must not reattach stale "hold/resume" room state.
       // Resume will return later only after it is scoped to verified LIVE sessions.
-      const existingLive = null;
-
       const liveSetup: LivePrepSetup | null =
         consumePreparedLiveSetup() ||
         (() => {
@@ -2420,8 +2418,6 @@ export default function Page({
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-
-    const savedContext = window.localStorage.getItem("george_active_context");
     const savedLabel = window.localStorage.getItem("george_active_label");
     const savedVoice = window.localStorage.getItem("george_voice");
 
@@ -4250,13 +4246,7 @@ I’ll stay with you.`,
       window.localStorage.getItem("george_voice_speed") || "1.4",
     );
     const storedVoiceType =
-      window.localStorage.getItem("george_voice_type") || "ash";
-    const nameLocked =
-      window.localStorage.getItem("george_name_locked") === "true";
-    const voiceLocked =
-      window.localStorage.getItem("george_voice_locked") === "true";
-
-    const storedWindowEnd = window.localStorage.getItem("george_full_until");
+      window.localStorage.getItem("george_voice_type") || "ash";    const storedWindowEnd = window.localStorage.getItem("george_full_until");
     if (storedWindowEnd) {
       const end = Number(storedWindowEnd);
       if (Date.now() < end) {
