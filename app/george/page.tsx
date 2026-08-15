@@ -686,7 +686,6 @@ export default function Page({
 }: { forceLive?: boolean } = {}) {
   const router = useRouter();
   const [input, setInput] = useState("");
-  const [preparationTaglineIndex, setPreparationTaglineIndex] = useState(0);
   const [hasSentFirstNormalMessage, setHasSentFirstNormalMessage] =
     useState(false);
   const [composerPlaceholder, setComposerPlaceholder] =
@@ -5536,25 +5535,6 @@ export default function Page({
   });
 
   const hasVisibleThread = normalConversationStarted;
-
-  useEffect(() => {
-    if (hasSentFirstNormalMessage) return;
-
-    const timer = window.setInterval(() => {
-      setPreparationTaglineIndex(
-        (index) => (index + 1) % GEORGE_PREPARATION_TAGLINES.length,
-      );
-    }, 180000);
-
-    return () => window.clearInterval(timer);
-  }, [hasSentFirstNormalMessage]);
-
-  useEffect(() => {
-    if (hasSentFirstNormalMessage) {
-      return;
-    }
-
-  }, [hasSentFirstNormalMessage, preparationTaglineIndex]);
 
   const hasDraftInput = input.trim().length > 0;
   const isPreLiveSignalAcquisition =
