@@ -113,7 +113,6 @@ import ContinuityCapsule from "@/components/george/ContinuityCapsule";
 import { GeorgePersonalizationPanel } from "@/components/george/settings/GeorgePersonalizationPanel";
 import DesktopOperationalSurface from "@/components/george/DesktopOperationalSurface";
 import { GeorgeCheckoutPanel } from "@/components/george/checkout/GeorgeCheckoutPanel";
-import { RuntimeWalkthroughPanel } from "@/components/george/runtime/RuntimeWalkthroughPanel";
 import { GeorgeToast } from "@/components/george/runtime/GeorgeToast";
 import HeadsetOperatorIcon from "@/components/george/HeadsetOperatorIcon";
 import LiveChooser from "@/components/george/LiveChooser";
@@ -848,8 +847,6 @@ export default function Page({
   const [dismissedTrajectoryIds, setDismissedTrajectoryIds] = useState<
     string[]
   >([]);
-  const [showWalkthrough, setShowWalkthrough] = useState(false);
-  const [walkthroughStep, setWalkthroughStep] = useState(1);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -8411,20 +8408,6 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
             </div>
           </div>
         </div>
-
-        {showWalkthrough && (
-          <RuntimeWalkthroughPanel
-            step={walkthroughStep}
-            onNext={() => setWalkthroughStep((step) => step + 1)}
-            onComplete={() => {
-              window.localStorage.setItem(
-                "george_walkthrough_seen",
-                "1",
-              );
-              setShowWalkthrough(false);
-            }}
-          />
-        )}
 
         {showPersonalizeModal && (
           <GeorgePersonalizationPanel
