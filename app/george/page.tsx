@@ -47,7 +47,6 @@ import {
   clearPreparationSession,
   clearLivePreparationPreviewReady,
   clearLivePreparationSignals,
-  isLivePreparationPreviewReady,
   loadPreparationSession,
   loadLivePreparationSignals,
   savePreparationSession,
@@ -61,7 +60,6 @@ import {
   type PreparationQuestion,
   type PreparationSessionV1,
 } from "@/lib/george/live-runtime/live-preparation-controller";
-import { buildOpportunitySignalAcquisitionMessage } from "@/lib/george/runtime/conversation-strategy";
 
 import {
   markLiveTtsAudioReceived,
@@ -109,7 +107,6 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
-import { operationalMotion } from "@/lib/george/ui/operational-motion";
 import Sidebar from "@/components/Sidebar";
 import { ShareIcon } from "@/components/icons/ShareIcon";
 import ContinuityCapsule from "@/components/george/ContinuityCapsule";
@@ -130,7 +127,6 @@ import {
   createFreshNormalSession,
   createSession,
   ensureGeorgeBrowserInstanceScope,
-  getActiveMode,
   getActiveSessionForMode,
   getActiveSessionIdForMode,
   setActiveSessionIdForMode,
@@ -139,7 +135,6 @@ import {
   updateSessionLinkage,
   getCampaignSessions,
   getSessionsForMode,
-  deleteSession,
   hasMeaningfulUserMessage,
   hydrateSessionsFromServer,
 } from "@/lib/george/session/store";
@@ -151,15 +146,12 @@ import {
 } from "@/lib/george/session-authority";
 import { detectLiveOutcomeSignal } from "@/lib/george/live-runtime/live-outcome-observation";
 import {
-  appendFollowUp,
   buildTrainingIntakeOverride,
-  trainingNeedsJurisdiction,
 } from "@/lib/george/training/training-helpers";
 import {
   getPostResponseSuggestedPrompts,
   getReroutePrompt,
   getSuggestedPromptsFromMessages,
-  samePromptSet,
 } from "@/lib/george/prompts/suggested-prompts";
 import { applyRuntimeOverlayFromCode } from "@/lib/george/operator/load-runtime-overlay";
 import type { LivePrepSetup } from "@/lib/george/live-runtime/prep-runtime";
