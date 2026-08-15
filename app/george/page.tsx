@@ -113,7 +113,6 @@ import { operationalMotion } from "@/lib/george/ui/operational-motion";
 import Sidebar from "@/components/Sidebar";
 import { ShareIcon } from "@/components/icons/ShareIcon";
 import ContinuityCapsule from "@/components/george/ContinuityCapsule";
-import MemoryContinuityPanel from "@/components/george/settings/MemoryContinuityPanel";
 import { GeorgePersonalizationPanel } from "@/components/george/settings/GeorgePersonalizationPanel";
 import DesktopOperationalSurface from "@/components/george/DesktopOperationalSurface";
 import { GeorgeCheckoutPanel } from "@/components/george/checkout/GeorgeCheckoutPanel";
@@ -1078,15 +1077,6 @@ export default function Page({
   const [activeCampaignId, setActiveCampaignId] = useState<string | null>(null);
   const [showCampaignMenu, setShowCampaignMenu] = useState(false);
   const [language, setLanguage] = useState("English");
-  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
-  const languageOptions = [
-    "English",
-    "Español",
-    "Français",
-    "العربية",
-    "中文",
-    "日本語",
-  ];
 
   const activeCampaign =
     campaigns.find((campaign) => campaign.id === activeCampaignId) || null;
@@ -1142,15 +1132,6 @@ export default function Page({
     "smart" | "intelligent" | "brilliant"
   >("smart");
   const [tierSignalPhase, setTierSignalPhase] = useState(0);
-  const [showNormalUtilityMenu, setShowNormalUtilityMenu] = useState<
-    "help" | "language" | null
-  >(null);
-  const [showMemoryContinuityPanel, setShowMemoryContinuityPanel] =
-    useState(false);
-  const normalUtilityMenuRef = useRef<HTMLDivElement | null>(null);
-  const [activeHelpTopic, setActiveHelpTopic] = useState<
-    "live" | "continuity" | "memory" | "images" | "signal"
-  >("live");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1647,23 +1628,6 @@ export default function Page({
   const [accessCode, setAccessCode] = useState("");
   const [accessCodeError, setAccessCodeError] = useState("");
   const [showEarbudOverlay, setShowEarbudOverlay] = useState(true);
-
-  useEffect(() => {
-    function handlePointerDown(event: MouseEvent) {
-      if (
-        normalUtilityMenuRef.current &&
-        !normalUtilityMenuRef.current.contains(event.target as Node)
-      ) {
-        setShowNormalUtilityMenu(null);
-      }
-    }
-
-    document.addEventListener("mousedown", handlePointerDown);
-
-    return () => {
-      document.removeEventListener("mousedown", handlePointerDown);
-    };
-  }, []);
 
   const [showProLiveComingSoon, setShowProLiveComingSoon] = useState(false);
   const [showLiveChooser, setShowLiveChooser] = useState(false);
@@ -3348,7 +3312,6 @@ export default function Page({
 
     setShowSidebar(false);
     setShowConversationMenu(false);
-    setShowNormalUtilityMenu(null);
     setShowPromptMenu(false);
     setActivePromptLabel("LIVE");
     setActivePromptContext("live_message_bar_setup");
@@ -3670,7 +3633,6 @@ export default function Page({
     setShowSidebar(false);
     setShowLiveChooser(false);
     setShowConversationMenu(false);
-    setShowNormalUtilityMenu(null);
     setActivePromptLabel("LIVE");
     setNormalOperationalDisposition(null);
     setContextTurnCount(0);
@@ -4545,7 +4507,6 @@ I’ll stay with you.`,
         !insidePromptMenu &&
         !insideLanguageMenu
       ) {
-        setShowLanguageMenu(false);
         setShowPromptMenu(false);
         setShowRecentFolders(false);
         setActiveMemoryFolder(null);
@@ -4564,7 +4525,6 @@ I’ll stay with you.`,
 
       if (event.key === "Escape") {
         setShowPromptMenu(false);
-        setShowLanguageMenu(false);
       }
 
       if (typing && event.key !== "ArrowDown" && event.key !== "ArrowUp")
@@ -7152,8 +7112,7 @@ I’ll stay with you.`,
                           return true;
                         }}
                         onExitLive={() => {
-                          setShowNormalUtilityMenu(null);
-                          requestExitLiveMode();
+                                                requestExitLiveMode();
                         }}
                         onRoomToggle={() => {
                           const nextEnabled = !liveGeorgeEnabled;
@@ -7288,7 +7247,7 @@ I’ll stay with you.`,
                       : showMobileHero
                         ? "pt-3 md:pt-14"
                         : "pt-10 md:pt-6"
-                } ${showNormalUtilityMenu || showLiveQuickMenu || showLiveSessionDetails || showExitPopup || showUpgradeModal || showTierModal || showProLiveComingSoon || showLiveChooser ? "blur-[8px] transition-[filter] duration-200" : "blur-0 transition-[filter] duration-200"}`}
+                } ${showLiveQuickMenu || showLiveSessionDetails || showExitPopup || showUpgradeModal || showTierModal || showProLiveComingSoon || showLiveChooser ? "blur-[8px] transition-[filter] duration-200" : "blur-0 transition-[filter] duration-200"}`}
               >
                 {showMobileHero &&
                   !(forceLive || liveMode) &&
@@ -8275,182 +8234,6 @@ I’ll stay with you.`,
               <div
                 className={`${(forceLive || liveMode) && !showLiveEntrySequence ? "contents" : "relative w-full flex-col bg-transparent flex transition duration-200 z-20"}`}
               >
-                <div className="hidden">
-                  {showNormalUtilityMenu && (
-                    <button
-                      type="button"
-                      aria-label="Close GEORGE popup"
-                      onClick={() => setShowNormalUtilityMenu(null)}
-                      className="fixed inset-0 z-[300] cursor-default bg-transparent [backdrop-filter:blur(14px)] [-webkit-backdrop-filter:blur(14px)] transition-opacity duration-200"
-                    />
-                  )}
-
-                  {showNormalUtilityMenu && (
-                    <>
-                      <button
-                        type="button"
-                        aria-label="Close GEORGE utility menu"
-                        onClick={() => setShowNormalUtilityMenu(null)}
-                        className="fixed inset-0 z-[300] cursor-default bg-transparent [backdrop-filter:blur(14px)] [-webkit-backdrop-filter:blur(14px)] transition-opacity duration-200"
-                      />
-                      <div
-                        ref={normalUtilityMenuRef}
-                        className={`fixed bottom-[112px] left-1/2 z-[320] flex max-w-[calc(100vw-32px)] -translate-x-1/2 gap-2 ${operationalMotion.surface}`}
-                      >
-                        {showNormalUtilityMenu === "help" && (
-                          <>
-                            <div
-                              className={`w-[136px] px-3 py-2.5 md:w-[160px] md:px-5 md:py-4 ${operationalMotion.anchorPanel}`}
-                            >
-                              <div className="mb-2 flex items-center justify-between">
-                                <div className="text-[9px] uppercase tracking-[0.22em] text-white/24">
-                                  Help
-                                </div>
-
-                                <button
-                                  type="button"
-                                  onClick={() => setShowNormalUtilityMenu(null)}
-                                  className="text-[13px] text-white/28 transition hover:text-white/72"
-                                >
-                                  ×
-                                </button>
-                              </div>
-
-                              <div className="space-y-1">
-                                {[
-                                  ["live", "LIVE"],
-                                  ["continuity", "ACCESS"],
-                                  ["memory", "WORKSPACE"],
-                                  ["images", "IMAGES"],
-                                  ["signal", "HELP"],
-                                ].map(([id, label]) => (
-                                  <button
-                                    key={id}
-                                    type="button"
-                                    onClick={() =>
-                                      setActiveHelpTopic(id as any)
-                                    }
-                                    className={`block w-full py-1 text-left text-[13px] uppercase tracking-[0.16em] transition ${
-                                      activeHelpTopic === id
-                                        ? "text-white/82"
-                                        : "text-white/38 hover:text-white/72"
-                                    }`}
-                                  >
-                                    {label}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-
-                            <div
-                              className={`w-[190px] px-3 py-2.5 md:w-[220px] md:px-5 md:py-4 ${operationalMotion.anchorPanel}`}
-                            >
-                              <div className="mb-2 text-[9px] uppercase tracking-[0.22em] text-white/24">
-                                {activeHelpTopic === "live" && "LIVE"}
-                                {activeHelpTopic === "continuity" && "ACCESS"}
-                                {activeHelpTopic === "memory" && "WORKSPACE"}
-                                {activeHelpTopic === "images" && "IMAGES"}
-                                {activeHelpTopic === "signal" && "HELP"}
-                              </div>
-
-                              <p className="text-[13px] leading-5 text-white/48">
-                                {activeHelpTopic === "live" &&
-                                  "LIVE helps you operate during real conversations where timing, pressure, and delivery matter."}
-                                {activeHelpTopic === "continuity" &&
-                                  "Access restores recognition, continuity, tier access, and LIVE eligibility across sessions."}
-                                {activeHelpTopic === "memory" &&
-                                  "Workspace keeps useful context available so GEORGE can continue work without starting over."}
-                                {activeHelpTopic === "images" &&
-                                  "Images help GEORGE understand visual context, references, screenshots, and creative direction."}
-                                {activeHelpTopic === "signal" &&
-                                  "Help opens supporting information without interrupting the work."}
-                              </p>
-
-                              {activeHelpTopic === "signal" && (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setShowNormalUtilityMenu(null);
-                                    window.location.href = "/signal";
-                                  }}
-                                  className="mt-3 block py-1 text-[13px] uppercase tracking-[0.16em] text-white/36 transition hover:text-white"
-                                >
-                                  Open Help
-                                </button>
-                              )}
-
-                              {activeHelpTopic === "memory" && (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setShowMemoryContinuityPanel(true);
-                                    setShowNormalUtilityMenu(null);
-                                  }}
-                                  className="mt-3 block py-1 text-[13px] uppercase tracking-[0.16em] text-white/36 transition hover:text-white"
-                                >
-                                  Continuity
-                                </button>
-                              )}
-
-                              <a
-                                href="/help"
-                                className="mt-3 block py-1 text-[13px] uppercase tracking-[0.16em] text-white/36 transition hover:text-white"
-                              >
-                                Help
-                              </a>
-                            </div>
-                          </>
-                        )}
-
-                        {showNormalUtilityMenu === "language" && (
-                          <div
-                            className={`w-[190px] px-3 py-2.5 md:w-[220px] md:px-5 md:py-4 ${operationalMotion.anchorPanel}`}
-                          >
-                            <div className="mb-2 flex items-center justify-between">
-                              <div className="text-[9px] uppercase tracking-[0.22em] text-white/24">
-                                Language
-                              </div>
-
-                              <button
-                                type="button"
-                                onClick={() => setShowNormalUtilityMenu(null)}
-                                className="text-[11px] text-white/28 transition hover:text-white/72"
-                              >
-                                ×
-                              </button>
-                            </div>
-                            <div className="grid grid-cols-2 gap-x-3 gap-y-1">
-                              {languageOptions.map((option) => (
-                                <button
-                                  key={option}
-                                  type="button"
-                                  onClick={() => {
-                                    setLanguage(option);
-                                    window.localStorage.setItem(
-                                      "george_language",
-                                      option,
-                                    );
-                                    setToastMessage(`Language set: ${option}`);
-                                    setShowToast(true);
-                                    setShowNormalUtilityMenu(null);
-                                  }}
-                                  className={`py-1 text-left text-[10px] uppercase tracking-[0.12em] transition active:scale-[0.98] ${
-                                    language === option
-                                      ? "text-white/82"
-                                      : "text-white/34 hover:text-white/68"
-                                  }`}
-                                >
-                                  {option}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
-
                 <div className="hidden">
                   <div className="flex items-center gap-4 py-3 text-[#D7DBE4]/80 text-[13px]">
                     <div className="relative flex items-center gap-2">
