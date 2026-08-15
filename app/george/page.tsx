@@ -8425,7 +8425,6 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
               window.localStorage.setItem("george_personalized", "true");
               window.localStorage.setItem("george_name_locked", "false");
               window.localStorage.setItem("george_voice_locked", "false");
-              window.localStorage.setItem("george_walkthrough_seen", "1");
               setShowPersonalizeModal(false);
               setToastMessage("GEORGE is yours now.");
               setShowToast(true);
@@ -8436,7 +8435,6 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
               window.localStorage.setItem("george_personalized", "true");
               window.localStorage.setItem("george_name_locked", "false");
               window.localStorage.setItem("george_voice_locked", "false");
-              window.localStorage.setItem("george_walkthrough_seen", "1");
               setShowPersonalizeModal(false);
               setToastMessage(
                 "Defaults kept. You can personalize later.",
