@@ -1417,7 +1417,6 @@ export default function Page({
   } | null>(null);
   const [isThinking, setIsThinking] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [bridgeThinking, setBridgeThinking] = useState(false);
 
   const [adaptiveCueLabel, setAdaptiveCueLabel] = useState<string | null>(null);
 
@@ -2261,9 +2260,7 @@ export default function Page({
   const [windowEndsAt, setWindowEndsAt] = useState<number | null>(null);
 
   // Dynamic greeting
-  const [greeting, setGreeting] = useState(
-    "Welcome back. Pick up where we left off.",
-  );
+  const greeting = "Welcome back. Pick up where we left off.";
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -3624,7 +3621,7 @@ export default function Page({
       window.removeEventListener("scroll", checkScroll);
       window.removeEventListener("resize", checkScroll);
     };
-  }, [isThinking, bridgeThinking]);
+  }, [isThinking]);
 
   const scrollHostRef = useRef<HTMLDivElement | null>(null);
 
@@ -6785,11 +6782,6 @@ export default function Page({
                     </div>
                   )}
 
-                {bridgeThinking && (
-                  <div className="text-sm leading-7 text-[#D7DBE4]/70">
-                    GEORGE is working
-                  </div>
-                )}
                 {(forceLive || liveMode
                   ? messages.filter((message) => {
                       const clean = (message.content || "").trim();
@@ -8086,7 +8078,7 @@ export default function Page({
                     </>
                   )}
 
-                {!liveMode && (isThinking || isSpeaking || bridgeThinking) && (
+                {!liveMode && (isThinking || isSpeaking) && (
                   <div
                     className={`${forceLive || liveMode ? "hidden" : "fixed"} bottom-[96px] left-0 right-0 z-[140] flex justify-center pointer-events-none`}
                   >
