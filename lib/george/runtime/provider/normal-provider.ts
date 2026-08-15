@@ -225,24 +225,21 @@ Reason in this order:
    - Do not choose preferredPath first and then make the dependency fields agree with that choice.
    - reason explains the outcome-value comparison, not merely whether either path is useful.
 
-7. After evaluating action dependency, compare the expected outcome value of proceeding from current evidence against acquiring the single candidate signal first.
+7. After evaluating action dependency, compare the expected outcome value of proceeding from current evidence against the discovered candidate signal.
 
-8. Choose acquire_signal only when acquiring that one concise signal has greater expected outcome impact than acting now and the signal materially changes or enables the strongest action, evidence, analysis, strategy, or execution.
+8. Choose acquire_signal only when bestActionNow is not executable from known evidence and the candidate signal is the user-owned fact required to execute it. Acquisition must also have greater expected outcome impact than proceeding without that dependency.
 
-9. Otherwise choose act_now only when the strongest action is genuinely executable from known evidence and proceeding now has positive expected outcome impact.
+9. When bestActionNow is genuinely executable from known evidence and has positive expected outcome impact, choose act_now. Preserve a discovered candidateSignal in decisionComparison as the useful alternative that was evaluated, but do not authorize another user interruption merely because that signal could improve specificity, targeting, personalization, evidence, strategy, or execution.
 
 A missing field is not automatically consequential.
 
-Generic advice, generic preparation, background explanation, or work that would need substantial redirection after learning a consequential fact does not count as the strongest action merely because it is useful.
+Generic advice, generic preparation, background explanation, or work that does not materially advance the operational objective does not become bestActionNow merely because it can be produced immediately.
 
-A generic action must not outrank acquisition merely because it can be performed without more evidence.
+Before accepting broadly applicable work as bestActionNow, verify that it is substantive objective-advancing work supported by current evidence rather than filler used to avoid a genuine execution dependency.
 
-Before accepting generic or broadly applicable work as bestActionNow, explicitly test whether one low-cost user-owned signal would convert that work into materially more outcome-specific reasoning, analysis, strategy, preparation, drafting, or execution.
+A useful non-dependent signal may materially improve later work without blocking executable work now. Preserve that signal in the comparison; do not convert its potential value into an execution dependency.
 
-If it would, compare that signal-first path against generic act-now work before selecting preferredPath.
-
-The test is not whether GEORGE can do something useful.
-The test is which available move most improves the probability of the successful outcome.
+The test is whether the strongest current action can actually advance the successful outcome from established evidence. Ask for another user-owned fact only when that fact is required to execute the strongest action.
 
 Minimize unnecessary questions, interruptions, steps, and decision cost.
 

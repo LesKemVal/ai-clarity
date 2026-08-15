@@ -1257,6 +1257,62 @@ const ordinarySelfExecutionInstruction = buildNormalExecutionInstruction(
   ordinarySelfExecutable,
 )
 
+const ordinaryExecutableWithUsefulSignal =
+  resolveProviderOperationalJudgment({
+    judgment: base,
+    providerReasoning: reasoning({
+      operationalObjective:
+        'improve retail peanut sales through available retail channels',
+      knownEvidence: [
+        'The user wants to sell peanuts through retail channels.',
+      ],
+      consequentialUncertainty: null,
+      georgeResolvableWork: [
+        'identify practical retail channel options from the established objective',
+        'outline immediate retail sales steps that do not depend on a specific demographic',
+      ],
+      georgeCanAdvanceWithoutUserSignal: true,
+      disposition: 'continue_normal',
+      purpose:
+        'advance the retail sales objective from the evidence already established',
+      desiredResult:
+        'a practical first retail sales move the user can act on now',
+      strongestNextStep:
+        'identify practical retail channels and initial sales steps',
+      rationale:
+        'Target demographic or location could improve targeting later, but it is not required to begin the identified retail sales work.',
+      decisionComparison: {
+        bestActionNow:
+          'identify practical retail channels and initial sales steps',
+        candidateSignal:
+          'the target demographic or location for selling the peanuts',
+        actNowOutcomeImpact: 'high',
+        acquireSignalOutcomeImpact: 'medium',
+        signalInteractionCost: 'low',
+        preferredPath: 'act_now',
+        bestActionNowExecutableFromKnownEvidence: true,
+        bestActionNowMissingDependency: null,
+        reason:
+          'The additional signal could materially improve targeting, but the strongest current action remains executable and higher-impact without another interruption.',
+      },
+      signalAcquisition: {
+        shouldAcquire: false,
+        requestedSignal: null,
+        evidenceIsUserOwned: false,
+        consequentialToNextAction: false,
+        reason:
+          'The useful targeting signal is not an execution dependency for the accepted act-now work.',
+      },
+    }),
+    providerCapability: 'normal',
+    capabilityExplicitlyRequested: false,
+    capabilityRecommendationMaterial: false,
+    canonicalSignalAcquisition: true,
+    signalAcquisitionAllowed: true,
+    ordinaryNormalRequest: true,
+    operationalJudgmentRequest: false,
+  })
+
 const ordinaryMissingSignal = resolveProviderOperationalJudgment({
   judgment: base,
   providerReasoning: reasoning({
@@ -1771,6 +1827,19 @@ assert(
       'unresolved' &&
     !incoherentZeroImpactSignalFirst.signalAcquisition.shouldAcquire,
   'zero-impact or evidence-dependent act-now comparison escaped canonical Operational Judgment',
+)
+
+assert(
+  ordinaryExecutableWithUsefulSignal.operationalDisposition.disposition ===
+    'continue_normal' &&
+    ordinaryExecutableWithUsefulSignal.action === 'advance_outcome' &&
+    !ordinaryExecutableWithUsefulSignal.signalAcquisition.shouldAcquire &&
+    ordinaryExecutableWithUsefulSignal.operationalDisposition
+      .georgeCanAdvanceWithoutUserSignal &&
+    ordinaryExecutableWithUsefulSignal.operationalDisposition
+      .strongestNextStep ===
+      'identify practical retail channels and initial sales steps',
+  'a materially useful non-dependent signal incorrectly blocked executable Normal work',
 )
 
 assert(
