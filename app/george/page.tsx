@@ -1318,7 +1318,6 @@ export default function Page({
     return;
   }, [campaigns, activeCampaignId]);
   const [tonePopupIndex, setTonePopupIndex] = useState<number | null>(null);
-  const [tonePopupUpward, setTonePopupUpward] = useState(true);
   const [assistTone, setAssistTone] = useState<
     "calm" | "direct" | "assertive" | "firm" | "warm" | "neutral"
   >("direct");
@@ -1848,7 +1847,6 @@ export default function Page({
   }, []);
 
   const [activeSaveIndex, setActiveSaveIndex] = useState<number | null>(null);
-  const [savePopupUpward, setSavePopupUpward] = useState(true);
   const [newFolderName, setNewFolderName] = useState("");
   const [showRecentFolders, setShowRecentFolders] = useState(false);
   const [activeMemoryFolder, setActiveMemoryFolder] = useState<string | null>(
@@ -7404,11 +7402,7 @@ I’ll stay with you.`,
                                 <div className="relative bx-command-shimmer">
                                   {tonePopupIndex === i && (
                                     <div
-                                      className={`absolute left-0 z-[80] w-48 rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 text-[11px] text-[#D7DBE4]/66 shadow-[0_22px_70px_rgba(0,0,0,0.48)]  transition duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                                        tonePopupUpward
-                                          ? "bottom-[34px]"
-                                          : "top-[30px]"
-                                      }`}
+                                      className={`absolute left-0 z-[80] w-48 rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 text-[11px] text-[#D7DBE4]/66 shadow-[0_22px_70px_rgba(0,0,0,0.48)]  transition duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] bottom-[34px]`}
                                     >
                                       <div className="border-b border-white/[0.05] px-3 py-2 text-[10px] tracking-[0.16em] text-[#D7DBE4]/36">
                                         STYLE
@@ -7784,7 +7778,7 @@ I’ll stay with you.`,
                             {activeSaveIndex === i && (
                               <div
                                 ref={savePickerRef}
-                                className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 p-2 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${savePopupUpward ? "bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom" : "top-full left-1/2 -translate-x-1/2 mt-2 origin-top"}`}
+                                className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 p-2 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom`}
                               >
                                 <div className="space-y-1.5">
                                   <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/48">
