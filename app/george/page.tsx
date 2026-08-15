@@ -688,7 +688,6 @@ export default function Page({
   const router = useRouter();
   const [input, setInput] = useState("");
   const [preparationTaglineIndex, setPreparationTaglineIndex] = useState(0);
-  const [typedPreparationTagline, setTypedPreparationTagline] = useState("");
   const [hasSentFirstNormalMessage, setHasSentFirstNormalMessage] =
     useState(false);
   const [composerPlaceholder, setComposerPlaceholder] =
@@ -697,7 +696,6 @@ export default function Page({
   const [composerSendFeedback, setComposerSendFeedback] = useState(false);
   const [composerSendFeedbackSignal, setComposerSendFeedbackSignal] =
     useState(0);
-  const [lastGuidedLine, setLastGuidedLine] = useState("");
   const [liveMode, setLiveMode] = useState(false);
 
   function getVisitCount() {
@@ -1287,7 +1285,6 @@ export default function Page({
 
     const savedCadence = window.localStorage.getItem("george_live_cadence");
     if (savedCadence) {
-      setLiveCadence(savedCadence);
     }
 
     try {
@@ -1303,7 +1300,6 @@ export default function Page({
             .filter(Boolean)[0];
 
           if (firstPhrase) {
-            setLiveSteeringPhrase(firstPhrase);
           }
         }
       }
@@ -1323,7 +1319,6 @@ export default function Page({
   }, [campaigns, activeCampaignId]);
   const [tonePopupIndex, setTonePopupIndex] = useState<number | null>(null);
   const [tonePopupUpward, setTonePopupUpward] = useState(true);
-  const [rewordPopupIndex, setRewordPopupIndex] = useState<number | null>(null);
   const [assistTone, setAssistTone] = useState<
     "calm" | "direct" | "assertive" | "firm" | "warm" | "neutral"
   >("direct");
@@ -1552,11 +1547,7 @@ export default function Page({
   } | null>(null);
   const [isThinking, setIsThinking] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [thinkingDots, setThinkingDots] = useState(1);
   const [bridgeThinking, setBridgeThinking] = useState(false);
-  const [conversationSignal, setConversationSignal] = useState<string | null>(
-    null,
-  );
 
   const [adaptiveCueLabel, setAdaptiveCueLabel] = useState<string | null>(null);
 
@@ -1591,7 +1582,6 @@ export default function Page({
   }, []);
 
   const [accessCode, setAccessCode] = useState("");
-  const [accessCodeError, setAccessCodeError] = useState("");
 
   const [showProLiveComingSoon, setShowProLiveComingSoon] = useState(false);
   const [showLiveChooser, setShowLiveChooser] = useState(false);
@@ -1619,8 +1609,6 @@ export default function Page({
 
   }, []);
 
-  const [liveCadence, setLiveCadence] = useState("Balanced");
-  const [liveSteeringPhrase, setLiveSteeringPhrase] = useState("hmm");
   const [preLiveMessages, setPreLiveMessages] = useState<Message[] | null>(
     null,
   );
@@ -1772,9 +1760,6 @@ export default function Page({
   const [lastConversationRecord, setLastConversationRecord] = useState<
     any | null
   >(null);
-  const [conversationMenuLane, setConversationMenuLane] = useState<
-    "selector" | "personal" | "professional"
-  >("selector");
   const [showSidebar, setShowSidebar] = useState(false);
 
   useEffect(() => {
@@ -1908,7 +1893,6 @@ export default function Page({
   }, [messages.length]);
 
   const [liveBarMessageIndex, setLiveBarMessageIndex] = useState(0);
-  const [liveBarTypedText, setLiveBarTypedText] = useState("");
 
   useEffect(() => {
     if (!liveBarMessages.length) return;
@@ -1917,19 +1901,6 @@ export default function Page({
     }, 5200);
     return () => window.clearInterval(timer);
   }, [liveBarMessages.length]);
-
-  useEffect(() => {
-    const message =
-      liveBarMessages[liveBarMessageIndex % liveBarMessages.length] || "";
-    setLiveBarTypedText("");
-    let i = 0;
-    const timer = window.setInterval(() => {
-      i += 1;
-      setLiveBarTypedText(message.slice(0, i));
-      if (i >= message.length) window.clearInterval(timer);
-    }, 28);
-    return () => window.clearInterval(timer);
-  }, [liveBarMessageIndex, liveBarMessages]);
 
   const [memoryVersion, setMemoryVersion] = useState(0);
   const [toastMessage, setToastMessage] = useState("");
@@ -2022,7 +1993,6 @@ export default function Page({
     const tier = runtimeOverlay?.tier || ACCESS_CODES[normalized];
 
     if (!tier) {
-      setAccessCodeError("Invalid access code.");
       return;
     }
 
@@ -2039,7 +2009,6 @@ export default function Page({
     );
     setShowToast(true);
     setAccessCode("");
-    setAccessCodeError("");
   };
 
   const LIVE_SEGUES = [
@@ -2550,28 +2519,11 @@ export default function Page({
     }
   };
 
-  const [upgradeCtaWord, setUpgradeCtaWord] = useState<
-    "Intelligent" | "Brilliant"
-  >("Intelligent");
 
-  useEffect(() => {
-    if (currentTier === "brilliant") return;
-
-    setUpgradeCtaWord(currentTier === "smart" ? "Intelligent" : "Brilliant");
-
-    const timer = window.setInterval(() => {
-      setUpgradeCtaWord((word) =>
-        word === "Intelligent" ? "Brilliant" : "Intelligent",
-      );
-    }, 2600);
-
-    return () => window.clearInterval(timer);
-  }, [currentTier]);
   const [showPersonalizeModal, setShowPersonalizeModal] = useState(false);
   const [draftProfileName, setDraftProfileName] = useState("");
 
   // FULL GEORGE WINDOW SYSTEM
-  const [isFullMode, setIsFullMode] = useState(false);
   const [windowEndsAt, setWindowEndsAt] = useState<number | null>(null);
 
   // Dynamic greeting
@@ -3839,7 +3791,6 @@ export default function Page({
     setVoiceOn(false);
     setInteractionMode("text");
     setConversationMode(null);
-    setConversationMenuLane("selector");
     setShowRecentFolders(false);
     setActivePromptContext(null);
     setActivePromptLabel(null);
@@ -4407,19 +4358,10 @@ I’ll stay with you.`,
   }, [messages, isThinking]);
 
   useEffect(() => {
-    if (!isThinking) return;
-    const interval = setInterval(() => {
-      setThinkingDots((d) => (d % 3) + 1);
-    }, 400);
-    return () => clearInterval(interval);
-  }, [isThinking]);
-
-  useEffect(() => {
     if (!windowEndsAt) return;
 
     const interval = setInterval(() => {
       if (Date.now() >= windowEndsAt) {
-        setIsFullMode(false);
         setWindowEndsAt(null);
         window.localStorage.removeItem("george_full_until");
       }
@@ -4464,7 +4406,6 @@ I’ll stay with you.`,
         setShowRecentFolders(false);
         setActiveMemoryFolder(null);
         setActiveSaveIndex(null);
-        setRewordPopupIndex(null);
         setTonePopupIndex(null);
       }
     };
@@ -4583,7 +4524,6 @@ I’ll stay with you.`,
     if (storedWindowEnd) {
       const end = Number(storedWindowEnd);
       if (Date.now() < end) {
-        setIsFullMode(true);
         setWindowEndsAt(end);
       } else {
         window.localStorage.removeItem("george_full_until");
@@ -5188,7 +5128,6 @@ I’ll stay with you.`,
     const twoHours = 2 * 60 * 60 * 1000;
     const end = Date.now() + twoHours;
 
-    setIsFullMode(true);
     setWindowEndsAt(end);
     window.localStorage.setItem("george_full_until", String(end));
   };
@@ -5243,8 +5182,7 @@ I’ll stay with you.`,
       }
 
       if (preProviderResolution.guidedLine) {
-        setLastGuidedLine(preProviderResolution.guidedLine);
-      }
+          }
 
       if (
         !options?.preparationContext &&
@@ -5278,7 +5216,6 @@ I’ll stay with you.`,
         setPendingImage(null);
         setInterimTranscript("");
         setVoiceError("");
-        setConversationSignal("LIVE identity");
         setIsThinking(false);
         void speakText(assistantMessage.content);
         return;
@@ -6112,13 +6049,9 @@ I’ll stay with you.`,
 
   useEffect(() => {
     if (hasSentFirstNormalMessage) {
-      setTypedPreparationTagline("");
       return;
     }
 
-    setTypedPreparationTagline(
-      `Start here because ${GEORGE_PREPARATION_TAGLINES[preparationTaglineIndex]}`,
-    );
   }, [hasSentFirstNormalMessage, preparationTaglineIndex]);
 
   const hasDraftInput = input.trim().length > 0;
