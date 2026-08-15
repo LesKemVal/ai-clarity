@@ -1847,9 +1847,6 @@ export default function Page({
     }
   }, []);
 
-  useEffect(() => {
-    setShowSidebar(false);
-  }, []);
   const [activeSaveIndex, setActiveSaveIndex] = useState<number | null>(null);
   const [savePopupUpward, setSavePopupUpward] = useState(true);
   const [newFolderName, setNewFolderName] = useState("");
