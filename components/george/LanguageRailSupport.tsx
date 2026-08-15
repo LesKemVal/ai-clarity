@@ -14,12 +14,12 @@ export default function LanguageRailSupport() {
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement | null
-      const button = target?.closest('button') as HTMLButtonElement | null
-      if (!button) return
-      if (!window.location.pathname.startsWith('/george')) return
+      const trigger = target?.closest(
+        '[data-george-language-trigger]',
+      ) as HTMLElement | null
 
-      const label = (button.textContent || '').trim()
-      if (!LANGUAGE_OPTIONS.includes(label)) return
+      if (!trigger) return
+      if (!window.location.pathname.startsWith('/george')) return
 
       setOpen((value) => !value)
     }

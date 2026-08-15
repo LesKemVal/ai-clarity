@@ -9204,11 +9204,9 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
                         <button
                           type="button"
+                          data-george-language-trigger
                           onClick={(e) => {
                             e.stopPropagation();
-                            setShowNormalUtilityMenu((value) =>
-                              value === "language" ? null : "language",
-                            );
                           }}
                           className="rounded-full border border-[#3657A8]/48 bg-[#172347] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-[#5579D7]/70 hover:text-white/72"
                         >
