@@ -1018,7 +1018,6 @@ export default function Page({
 
   const [interimTranscript, setInterimTranscript] = useState("");
   const [liveHubShadowTranscript, setLiveHubShadowTranscript] = useState("");
-  const [voiceError, setVoiceError] = useState("");
   const [interactionMode, setInteractionMode] = useState<"text" | "speech">(
     "text",
   );
@@ -2472,7 +2471,6 @@ export default function Page({
   const liveAwarenessBufferRef = useRef<LiveAwarenessFragment[]>([]);
 
   const processLivePartialTranscript = useCallback((text: string) => {
-    setVoiceError("");
     setInterimTranscript(text);
     liveLastSignalRef.current = Date.now();
     lastSpeechTsRef.current = Date.now();
@@ -2584,7 +2582,6 @@ export default function Page({
 
   const processLiveAudioError = useCallback((error: unknown) => {
     console.warn("[GEORGE LIVE AUDIO]", error);
-    setVoiceError("LIVE speech connection failed.");
     setIsListening(false);
   }, []);
 
@@ -2986,7 +2983,6 @@ export default function Page({
 
     setInput("");
     setInterimTranscript("");
-    setVoiceError("");
     setSuggestedPrompts([]);
     setSuggestedSignal(Date.now());
     setRerouteSignal(0);
@@ -3504,7 +3500,6 @@ export default function Page({
     setActivePromptLabel(null);
     setStableLiveGuidance(null);
     setInterimTranscript("");
-    setVoiceError("");
 
     const parentSessionId =
       preLiveSessionIdRef.current || getActiveSessionIdForMode("normal");
@@ -4292,7 +4287,6 @@ export default function Page({
     if (liveMode) {
       if (isListening || isThinking || speakingRef.current) return;
 
-      setVoiceError("");
       setInterimTranscript("");
       setIsListening(true);
 
@@ -4302,25 +4296,21 @@ export default function Page({
         void Promise.resolve(startResult).catch((error) => {
           console.warn("[GEORGE LIVE AUDIO][START]", error);
           setIsListening(false);
-          setVoiceError("LIVE microphone connection failed.");
         });
       } catch (error) {
         console.warn("[GEORGE LIVE AUDIO][START]", error);
         setIsListening(false);
-        setVoiceError("LIVE microphone connection failed.");
       }
 
       return;
     }
 
     if (!recognitionRef.current || isIOS) {
-      setVoiceError("Voice input is not available on this device yet.");
       return;
     }
 
     if (isListening || isThinking || speakingRef.current) return;
 
-    setVoiceError("");
     setInterimTranscript("");
 
     try {
@@ -4622,7 +4612,6 @@ export default function Page({
       }
 
       try {
-        setVoiceError("");
         await stopSpeech();
         const playbackGeneration = speechPlaybackGenerationRef.current;
 
@@ -4677,7 +4666,6 @@ export default function Page({
         speakingRef.current = false;
         isSpeakingRef.current = false;
         setIsSpeaking(false);
-        setVoiceError("Voice reply failed.");
       }
     },
     [interactionMode, isIOS, voiceOn, voiceSpeed, currentTier, liveMode],
@@ -4768,14 +4756,12 @@ export default function Page({
         setInput("");
         setPendingImage(null);
         setInterimTranscript("");
-        setVoiceError("");
         setIsThinking(false);
         void speakText(assistantMessage.content);
         return;
       }
 
       if (!text && !pendingImage) {
-        setVoiceError("Type a message first.");
         return;
       }
 
@@ -4995,7 +4981,6 @@ export default function Page({
       setInput("");
       setPendingImage(null);
       setInterimTranscript("");
-      setVoiceError("");
       setIsThinking(true);
       startBridgeSpeech();
 
@@ -5247,7 +5232,6 @@ export default function Page({
       } catch (err) {
         console.error("handleSend failed", err);
         stopBridgeSpeech();
-        setVoiceError(err instanceof Error ? err.message : "Response failed.");
       } finally {
         setIsThinking(false);
 
@@ -5423,11 +5407,6 @@ export default function Page({
     setVoiceSupported(supported);
 
     if (!supported) {
-      setVoiceError(
-        isIOS
-          ? "Enhanced voice support is still expanding."
-          : "Voice input is not available in this browser session.",
-      );
       return;
     }
 
@@ -5440,7 +5419,6 @@ export default function Page({
     recognition.maxAlternatives = 1;
 
     recognition.onstart = () => {
-      setVoiceError("");
       setIsListening(true);
     };
 
@@ -5526,7 +5504,6 @@ export default function Page({
               : "Voice input failed.";
 
       if (message) {
-        setVoiceError(message);
       }
 
       setIsListening(false);
@@ -6112,7 +6089,6 @@ export default function Page({
               });
               setInput("");
               setInterimTranscript("");
-              setVoiceError("");
               setActivePromptLabel(null);
               setActivePromptContext(null);
               setContextTurnCount(0);
@@ -6140,7 +6116,6 @@ export default function Page({
               setActivePromptLabel(prompt.label);
               setActivePromptContext(prompt.context);
               setContextTurnCount(0);
-              setVoiceError("");
 
               if (prompt.context === "bible_decision_lens") {
                 setShowSidebar(false);
@@ -6167,7 +6142,6 @@ export default function Page({
 
                 setShowSidebar(false);
                 setInput("");
-                setVoiceError("");
 
                 const nextMessages: Message[] = [
                   ...messagesRef.current,
@@ -6195,7 +6169,6 @@ export default function Page({
               if (prompt.context === "courses_expand") {
                 setShowSidebar(false);
                 setInput("");
-                setVoiceError("");
 
                 const nextMessages: Message[] = [
                   ...messagesRef.current,
