@@ -66,6 +66,26 @@ assert.match(
   /comparison\.signalInteractionCost !== discoveredSignalCost/,
 );
 
+assert.match(
+  provider,
+  /Choosing preferredPath acquire_signal does not permit bestActionNow to become null/,
+);
+
+assert.match(
+  provider,
+  /Choosing preferredPath act_now does not permit candidateSignal to become null/,
+);
+
+assert.match(
+  provider,
+  /"preferredPath": "acquire_signal",[\s\S]*?"signalAcquisition": \{[\s\S]*?"shouldAcquire": true,[\s\S]*?"requestedSignal": "The exact same discovered signalCandidate\.userOwnedFact/,
+);
+
+assert.doesNotMatch(
+  provider,
+  /"preferredPath": "acquire_signal",[\s\S]{0,700}?"signalAcquisition": \{[\s\S]{0,180}?"shouldAcquire": false/,
+);
+
 assert.doesNotMatch(
   provider,
   /toLowerCase\(\)/,
@@ -78,6 +98,9 @@ console.log(
       whitespaceEquivalent: true,
       semanticSubstitutionRejected: true,
       signalCostRemainsExact: true,
+      acquireSignalPreservesActNowCandidate: true,
+      actNowPreservesSignalCandidate: true,
+      acquireSignalExampleInternallyConsistent: true,
       fuzzyMatchingIntroduced: false,
       result: "PASS",
     },

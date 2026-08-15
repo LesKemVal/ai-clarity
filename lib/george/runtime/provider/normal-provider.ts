@@ -510,8 +510,8 @@ Return one valid JSON object and nothing else:
       "rationale": "A concise evidence-based reason for this disposition, or null.",
       "presentation": "A concise user-facing realization only when stating the judgment itself completes the action, or null.",
       "decisionComparison": {
-        "bestActionNow": "The strongest candidate objective-advancing action if GEORGE proceeds from current evidence, or null.",
-        "candidateSignal": "The one consequential user-owned fact worth comparing against proceeding now, or null.",
+        "bestActionNow": "The discovered actNowCandidate.action when one is supplied; otherwise the strongest candidate objective-advancing action available from current evidence.",
+        "candidateSignal": "The discovered signalCandidate.userOwnedFact when one is supplied; otherwise the one consequential user-owned fact worth comparing against proceeding now, or null.",
         "actNowOutcomeImpact": "medium",
         "acquireSignalOutcomeImpact": "high",
         "signalInteractionCost": "low",
@@ -521,11 +521,11 @@ Return one valid JSON object and nothing else:
         "reason": "Why this path has the greater expected outcome value."
       },
       "signalAcquisition": {
-        "shouldAcquire": false,
-        "requestedSignal": null,
-        "evidenceIsUserOwned": false,
-        "consequentialToNextAction": false,
-        "reason": null
+        "shouldAcquire": true,
+        "requestedSignal": "The exact same discovered signalCandidate.userOwnedFact carried by decisionComparison.candidateSignal.",
+        "evidenceIsUserOwned": true,
+        "consequentialToNextAction": true,
+        "reason": "Why acquiring this exact signal has greater expected outcome value than proceeding immediately."
       }
     }
   }
@@ -538,6 +538,8 @@ ${NORMAL_OPERATIONAL_REASONING_RULES}
 - When a GEORGE GOVERNED CANDIDATE SET is supplied, candidate discovery is already complete.
 - Treat the discovered candidate identities as fixed comparison inputs, not suggestions to regenerate.
 - decisionComparison.bestActionNow must exactly preserve actNowCandidate.action when that discovered action is non-null.
+- Choosing preferredPath acquire_signal does not permit bestActionNow to become null; the discovered act-now candidate must remain present as the alternative being compared.
+- Choosing preferredPath act_now does not permit candidateSignal to become null; the discovered signal candidate must remain present as the alternative being compared.
 - decisionComparison.candidateSignal must exactly preserve signalCandidate.userOwnedFact when that discovered signal is non-null.
 - decisionComparison.signalInteractionCost must exactly preserve signalCandidate.interactionCost when that discovered signal is non-null.
 - decisionComparison is mandatory and complete: actNowOutcomeImpact, acquireSignalOutcomeImpact, signalInteractionCost, and preferredPath must never be null when governed candidates are supplied.
