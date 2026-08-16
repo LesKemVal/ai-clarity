@@ -856,7 +856,7 @@ return (
                 setPendingNormalDestination(null)
                 completeNormalNavigation(destination)
               }}
-              className="rounded-[1rem] border border-[#4E7CFF]/30 bg-[#4E7CFF]/[0.10] px-4 py-3 text-left text-[13px] text-white/84 transition hover:bg-[#4E7CFF]/[0.16]"
+              className="george-primary-action rounded-[1rem] px-4 py-3 text-left text-[13px]"
             >
               Save LIVE and open workspace
             </button>
@@ -868,7 +868,7 @@ return (
                 setPendingNormalDestination(null)
                 completeNormalNavigation(destination)
               }}
-              className="rounded-[1rem] border border-white/[0.07] bg-white/[0.02] px-4 py-3 text-left text-[13px] text-white/66 transition hover:bg-white/[0.04]"
+              className="george-secondary-action rounded-[1rem] px-4 py-3 text-left text-[13px]"
             >
               Open without saving
             </button>
@@ -876,7 +876,7 @@ return (
             <button
               type="button"
               onClick={() => setPendingNormalDestination(null)}
-              className="rounded-[1rem] px-4 py-3 text-left text-[13px] text-white/40 transition hover:bg-white/[0.025] hover:text-white/62"
+              className="george-quiet-action rounded-[1rem] px-4 py-3 text-left text-[13px]"
             >
               Stay in LIVE
             </button>
