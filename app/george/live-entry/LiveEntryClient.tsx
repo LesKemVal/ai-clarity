@@ -964,9 +964,9 @@ export default function LiveEntryClient() {
   const [scriptBrowserFormula, setScriptBrowserFormula] =
     useState<OperationalFormula | null>(null);
   const [scriptBrowserOpen, setScriptBrowserOpen] = useState(false);
-  const [scriptBrowserLoading] = useState(false);
-  const [formulaScripts] = useState<OperationalScript[]>([]);
-  const [scriptBrowserError] = useState("");
+  const [scriptBrowserLoading, setScriptBrowserLoading] = useState(false);
+  const [formulaScripts, setFormulaScripts] = useState<OperationalScript[]>([]);
+  const [scriptBrowserError, setScriptBrowserError] = useState("");
   const [, setRecommendationError] = useState("");
 
   const [optionalSignalAnswers, setOptionalSignalAnswers] = useState<
@@ -4246,6 +4246,73 @@ export default function LiveEntryClient() {
 
     window.location.href = "/george/library?asset=formulas&source=live-prep";
   };
+
+  useEffect(() => {
+    if (!scriptBrowserOpen || !scriptBrowserFormula) {
+      setScriptBrowserLoading(false);
+      setFormulaScripts([]);
+      setScriptBrowserError("");
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadFormulaScripts = async () => {
+      setScriptBrowserLoading(true);
+      setFormulaScripts([]);
+      setScriptBrowserError("");
+
+      try {
+        const params = new URLSearchParams({
+          formulaId: scriptBrowserFormula.id,
+          formulaVersion: String(scriptBrowserFormula.version),
+        });
+
+        const response = await fetch(
+          `/api/george/operational-memory/scripts?${params.toString()}`,
+          { cache: "no-store" },
+        );
+        const payload = (await response.json()) as {
+          ok?: boolean;
+          scripts?: OperationalScript[];
+          error?: string;
+        };
+
+        if (!response.ok || !payload.ok) {
+          throw new Error(payload.error || "Unable to load operational scripts");
+        }
+
+        if (!cancelled) {
+          setFormulaScripts(
+            Array.isArray(payload.scripts) ? payload.scripts : [],
+          );
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setFormulaScripts([]);
+          setScriptBrowserError(
+            error instanceof Error
+              ? error.message
+              : "Unable to load operational scripts",
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setScriptBrowserLoading(false);
+        }
+      }
+    };
+
+    void loadFormulaScripts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    scriptBrowserOpen,
+    scriptBrowserFormula?.id,
+    scriptBrowserFormula?.version,
+  ]);
 
   const selectFormulaScript = (script: OperationalScript) => {
     const workingCopy: OperationalScript = {
