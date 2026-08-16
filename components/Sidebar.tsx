@@ -15,6 +15,7 @@ import {
   type GeorgeStoredSession,
 } from '@/lib/george/session/store'
 import { fetchGeorgeSessionAuthority, clearCachedGeorgeSessionAuthority, type GeorgeSessionTier } from '@/lib/george/session-authority'
+import { IconButton } from '@/components/ui/IconButton'
 
 export type PromptItem = {
   label: string
@@ -563,18 +564,19 @@ return (
                       </span>
                     </button>
 
-                    <button
-                      type="button"
+                    <IconButton
+                      variant="quiet"
+                      size="sm"
                       onClick={(event) => {
                         event.stopPropagation()
                         setPendingDeleteSessionId(null)
                         setSessionMenuId(sessionMenuId === session.id ? null : session.id)
                       }}
-                      className="absolute right-1 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-white/28 transition hover:bg-white/[0.035] hover:text-white/72"
+                      className="absolute right-1 top-1/2 h-6 w-6 -translate-y-1/2 text-white/28"
                       aria-label="Session options"
                     >
                       ⋯
-                    </button>
+                    </IconButton>
 
                     {sessionMenuId === session.id && (
                       <div className="absolute right-1 top-8 z-20 w-36 rounded-xl border border-white/[0.07] bg-[#0B0D12]/96 p-1 shadow-[0_18px_48px_rgba(0,0,0,0.42)]">
@@ -663,18 +665,19 @@ return (
                       </span>
                     </button>
 
-                    <button
-                      type="button"
+                    <IconButton
+                      variant="quiet"
+                      size="sm"
                       onClick={(event) => {
                         event.stopPropagation()
                         setPendingDeleteSessionId(null)
                         setSessionMenuId(sessionMenuId === session.id ? null : session.id)
                       }}
-                      className="absolute right-1 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-white/28 transition hover:bg-white/[0.035] hover:text-white/72"
+                      className="absolute right-1 top-1/2 h-6 w-6 -translate-y-1/2 text-white/28"
                       aria-label="LIVE conversation options"
                     >
                       ⋯
-                    </button>
+                    </IconButton>
 
                     {sessionMenuId === session.id && (
                       <div className="absolute right-1 top-8 z-20 w-36 rounded-xl border border-white/[0.07] bg-[#0B0D12]/96 p-1 shadow-[0_18px_48px_rgba(0,0,0,0.42)]">
