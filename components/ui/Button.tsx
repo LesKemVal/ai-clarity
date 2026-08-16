@@ -43,20 +43,14 @@ const variantClassNames: Record<GeorgeButtonVariant, string> = {
   ].join(" "),
 
   secondary: [
-    "border",
-    "border-white/[0.12]",
-    "bg-transparent",
-    "text-white/62",
-    "hover:border-white/28",
-    "hover:text-white",
+    "george-secondary-action",
   ].join(" "),
 
   quiet: [
+    "george-quiet-action",
     "border",
     "border-transparent",
     "bg-transparent",
-    "text-white/46",
-    "hover:text-white/76",
   ].join(" "),
 
   danger: [
