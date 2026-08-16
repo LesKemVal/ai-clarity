@@ -104,6 +104,12 @@ type RunNormalSemanticProposalInput = Omit<
   'strategyRequest'
 >
 
+type NormalProviderStructuredContract = Readonly<{
+  name: 'operational_candidates' | 'semantic_proposal' | 'execution'
+  accepts: (content: string | null) => boolean
+  repairInstruction: string
+}>
+
 type RunNormalExecutionCompletionInput = Omit<
   RunNormalTextCompletionInput,
   'strategyRequest'
@@ -1149,15 +1155,17 @@ async function createNormalProviderCompletion(input: {
   systemContent: string
   messages: readonly NormalProviderMessage[]
   instruction: string
-  jsonMode?: boolean
+  structuredContract?: NormalProviderStructuredContract
 }) {
   const client = getProviderClient(input.provider)
   if (!client) return null
 
-  const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+  const createMessages = (
+    instruction: string
+  ): OpenAI.Chat.Completions.ChatCompletionMessageParam[] => [
     {
       role: 'system',
-      content: `${input.systemContent}\n\n${input.instruction}`,
+      content: `${input.systemContent}\n\n${instruction}`,
     },
     ...input.messages.map(
       (
@@ -1195,24 +1203,86 @@ async function createNormalProviderCompletion(input: {
     ),
   ]
 
-  const completion = await client.chat.completions.create({
+  const requestCompletion = async (instruction: string) => {
+    const completion = await client.chat.completions.create({
+      model: input.model,
+      messages: createMessages(instruction),
+      ...(input.model.startsWith('gpt-5')
+        ? {
+            max_completion_tokens: 4096,
+          }
+        : {}),
+      ...(input.structuredContract
+        ? {
+            response_format: {
+              type: 'json_object' as const,
+            },
+          }
+        : {}),
+    })
+
+    return completion.choices?.[0]?.message?.content || null
+  }
+
+  const firstContent = await requestCompletion(input.instruction)
+  const contract = input.structuredContract
+
+  if (!contract) {
+    return firstContent
+  }
+
+  if (contract.accepts(firstContent)) {
+    return firstContent
+  }
+
+  console.warn('[GEORGE][NORMAL_PROVIDER][STRUCTURED_RETRY]', {
+    provider: input.provider,
     model: input.model,
-    messages,
-    ...(input.model.startsWith('gpt-5')
-      ? {
-          max_completion_tokens: 4096,
-        }
-      : {}),
-    ...(input.jsonMode
-      ? {
-          response_format: {
-            type: 'json_object' as const,
-          },
-        }
-      : {}),
+    contract: contract.name,
+    contentPresent: Boolean(firstContent?.trim()),
   })
 
-  return completion.choices?.[0]?.message?.content || null
+  const repairedContent = await requestCompletion(
+    `${input.instruction}
+
+GEORGE STRUCTURED OUTPUT REPAIR
+
+The previous response did not satisfy the canonical ${contract.name} contract.
+
+This is a schema repair, not a new reasoning turn.
+
+Requirements:
+- preserve the reasoning task and all established evidence;
+- do not answer the user directly unless the requested contract itself contains execution text;
+- do not substitute a conversational acknowledgement for structured output;
+- do not substitute a question for structured output;
+- do not invent unnamed, empty, shorthand, or alternate top-level keys;
+- return exactly one JSON object;
+- return JSON only;
+- satisfy the canonical contract below.
+
+${contract.repairInstruction}`
+  )
+
+  if (contract.accepts(repairedContent)) {
+    console.log('[GEORGE][NORMAL_PROVIDER][STRUCTURED_RECOVERED]', {
+      provider: input.provider,
+      model: input.model,
+      contract: contract.name,
+    })
+
+    return repairedContent
+  }
+
+  console.error('[GEORGE][NORMAL_PROVIDER][STRUCTURED_REJECTED]', {
+    provider: input.provider,
+    model: input.model,
+    contract: contract.name,
+    contentPresent: Boolean(repairedContent?.trim()),
+    rawContent: repairedContent,
+  })
+
+  return null
 }
 
 function normalizeNormalCandidateIdentityText(
@@ -1296,7 +1366,35 @@ export async function runNormalSemanticProposal(
   const candidateContent = await createNormalProviderCompletion({
     ...input,
     instruction: OPERATIONAL_CANDIDATE_DISCOVERY_INSTRUCTION,
-    jsonMode: true,
+    structuredContract: {
+      name: 'operational_candidates',
+      accepts: (content) =>
+        Boolean(parseNormalOperationalCandidateSet(content)),
+      repairInstruction: `
+Required top-level keys:
+- operationalObjective
+- knownEvidence
+- actNowCandidate
+- signalCandidate
+- otherCandidate
+
+Do not return ack, q, answer, question, text, or any alternate shorthand object.
+
+actNowCandidate must contain:
+- action
+- expectedOutcomeContribution
+
+signalCandidate must contain:
+- userOwnedFact
+- whatItChanges
+- expectedOutcomeContribution
+- interactionCost
+
+otherCandidate must contain:
+- action
+- expectedOutcomeContribution
+`.trim(),
+    },
   })
 
   const candidates =
@@ -1332,7 +1430,56 @@ export async function runNormalSemanticProposal(
     ...input,
     systemContent: `${input.systemContent}${candidateContext}`,
     instruction: SEMANTIC_PROPOSAL_INSTRUCTION,
-    jsonMode: true,
+    structuredContract: {
+      name: 'semantic_proposal',
+      accepts: (content) => {
+        const parsed = parseNormalSemanticProposalResult(content)
+
+        return Boolean(
+          parsed &&
+            semanticProposalPreservesDiscoveredCandidates(
+              parsed,
+              candidates
+            )
+        )
+      },
+      repairInstruction: `
+Required top-level keys:
+- semanticIntent
+- semanticJudgment
+
+semanticJudgment must contain the complete canonical semantic judgment, including operationalReasoning.
+
+operationalReasoning must contain the complete canonical reasoning structure, including:
+- operationalObjective
+- knownEvidence
+- consequentialUncertainty
+- georgeResolvableWork
+- georgeCanAdvanceWithoutUserSignal
+- disposition
+- interaction
+- interactionUseful
+- purpose
+- desiredResult
+- liveMateriallyImprovesExecution
+- materialLiveBenefit
+- strongestNextStep
+- rationale
+- presentation
+- decisionComparison
+- signalAcquisition
+
+Preserve the governed candidate identities exactly.
+
+Do not return:
+- ack
+- q
+- a user-facing answer
+- a user-facing question
+- an empty or unnamed key
+- an alternate shorthand schema
+`.trim(),
+    },
   })
 
   const parsed = parseNormalSemanticProposalResult(content)
@@ -1384,7 +1531,29 @@ export async function runNormalExecutionCompletion(
       input.acceptedJudgment,
       input.acceptedExecutionPolicy
     ),
-    jsonMode: true,
+    structuredContract: {
+      name: 'execution',
+      accepts: (content) =>
+        Boolean(
+          parseNormalExecutionResult(
+            content,
+            input.acceptedJudgment,
+            input.acceptedExecutionPolicy
+          )
+        ),
+      repairInstruction: `
+Required top-level key:
+- text
+
+text must be a non-empty string containing the execution response authorized by the accepted judgment and execution policy.
+
+Do not return:
+- ack
+- q
+- an alternate object shape
+- an empty text value
+`.trim(),
+    },
   })
 
   const parsed = parseNormalExecutionResult(
