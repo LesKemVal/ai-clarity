@@ -6061,7 +6061,7 @@ export default function LiveEntryClient() {
 
                 <span
                   aria-hidden="true"
-                  className={`shrink-0 text-[13px] text-white/36 transition-transform duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)] ${
+                  className={`shrink-0 text-[13px] text-white/36 transition-transform duration-[var(--george-motion-fast)] ease-[var(--george-motion-ease)] ${
                     liveBriefingSignalsExpanded ? "rotate-45" : ""
                   }`}
                 >
@@ -6070,7 +6070,7 @@ export default function LiveEntryClient() {
               </button>
 
               <div
-                className={`grid transition-[grid-template-rows,opacity,transform] duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)] ${
+                className={`grid transition-[grid-template-rows,opacity,transform] duration-[var(--george-motion-deliberate)] ease-[var(--george-motion-ease)] ${
                   liveBriefingSignalsExpanded
                     ? "grid-rows-[1fr] translate-y-0 opacity-100"
                     : "pointer-events-none grid-rows-[0fr] -translate-y-2 opacity-0"
@@ -6107,7 +6107,7 @@ export default function LiveEntryClient() {
                     </button>
 
                     <div
-                      className={`grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)] ${
+                      className={`grid transition-[grid-template-rows,opacity] duration-[var(--george-motion-deliberate)] ease-[var(--george-motion-ease)] ${
                         open
                           ? "grid-rows-[1fr] opacity-100"
                           : "grid-rows-[0fr] opacity-0"
@@ -6270,7 +6270,7 @@ export default function LiveEntryClient() {
           </div>
 
           <label
-            className={`mt-4 flex cursor-pointer items-start gap-3 rounded-[1rem] border px-4 py-3 transition-[background-color,border-color,box-shadow] duration-500 ${
+            className={`mt-4 flex cursor-pointer items-start gap-3 rounded-[1rem] border px-4 py-3 transition-[background-color,border-color,box-shadow] duration-[var(--george-motion-standard)] ease-[var(--george-motion-ease)] ${
               liveBriefingToaAccepted
                 ? "border-[#D7DCFF]/70 bg-[#4E7CFF]/[0.12] shadow-[0_0_34px_rgba(174,182,255,0.20)]"
                 : "border-[#4E7CFF]/28 bg-[#4E7CFF]/[0.028]"
@@ -6392,7 +6392,7 @@ export default function LiveEntryClient() {
               })}
 
               <div
-                className={`grid transition-[grid-template-rows,opacity,transform,margin] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                className={`grid transition-[grid-template-rows,opacity,transform,margin] duration-[var(--george-motion-deliberate)] ease-[var(--george-motion-ease)] ${
                   liveBriefingOpenMechanicsPanel === "support"
                     ? "mt-2 grid-rows-[1fr] translate-y-0 opacity-100"
                     : "mt-0 grid-rows-[0fr] -translate-y-1 opacity-0"
@@ -6436,7 +6436,7 @@ export default function LiveEntryClient() {
               })}
 
               <div
-                className={`grid transition-[grid-template-rows,opacity,transform,margin] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                className={`grid transition-[grid-template-rows,opacity,transform,margin] duration-[var(--george-motion-deliberate)] ease-[var(--george-motion-ease)] ${
                   liveBriefingOpenMechanicsPanel === "receiver"
                     ? "mt-2 grid-rows-[1fr] translate-y-0 opacity-100"
                     : "mt-0 grid-rows-[0fr] -translate-y-1 opacity-0"
@@ -6480,7 +6480,7 @@ export default function LiveEntryClient() {
               })}
 
               <div
-                className={`grid transition-[grid-template-rows,opacity,transform,margin] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                className={`grid transition-[grid-template-rows,opacity,transform,margin] duration-[var(--george-motion-deliberate)] ease-[var(--george-motion-ease)] ${
                   liveBriefingOpenMechanicsPanel === "speaking"
                     ? "mt-2 grid-rows-[1fr] translate-y-0 opacity-100"
                     : "mt-0 grid-rows-[0fr] -translate-y-1 opacity-0"
@@ -6578,7 +6578,7 @@ export default function LiveEntryClient() {
               </label>
 
               <div
-                className={`grid transition-[grid-template-rows,opacity,transform,margin] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                className={`grid transition-[grid-template-rows,opacity,transform,margin] duration-[var(--george-motion-deliberate)] ease-[var(--george-motion-ease)] ${
                   liveRecoveryAcknowledgementOpen &&
                   !liveRecoveryAcknowledged
                     ? "mt-2 grid-rows-[1fr] translate-y-0 opacity-100"
