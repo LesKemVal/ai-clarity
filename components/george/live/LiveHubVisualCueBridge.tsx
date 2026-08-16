@@ -262,12 +262,8 @@ export function LiveHubVisualCueBridge({
         visualCue &&
         receiverProfile !== 'audio_only' && (
           <div className="pointer-events-none fixed bottom-[236px] left-6 right-6 z-[9999] md:left-8 md:right-auto md:w-[440px]">
-            <div className="rounded-2xl border border-[#8FB6C9]/20 bg-[color:var(--surface-4)]/96 px-5 py-4 shadow-2xl shadow-[#8FB6C9]/20 backdrop-blur-xl">
-              <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--steel-300)]/42">
-                GEORGE
-              </div>
-
-              <div className="whitespace-pre-line break-words text-sm leading-snug text-[color:var(--steel-100)]/90">
+            <div className="border-l border-[color:var(--steel-300)]/22 bg-[#070A0F]/92 px-4 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.24)]">
+              <div className="whitespace-pre-line break-words text-[15px] font-medium leading-[1.45] text-[color:var(--steel-100)]/94">
                 {visualCue.text}
               </div>
             </div>
