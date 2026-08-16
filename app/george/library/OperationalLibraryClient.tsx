@@ -1199,7 +1199,7 @@ export default function OperationalLibraryClient() {
               <button
                 type="button"
                 onClick={() => viewMarketplaceFormula(recommendedFormula.id)}
-                className="min-h-12 rounded-[12px] border border-white/16 px-6 py-3 text-sm font-medium text-white/75 transition hover:border-white/32 hover:text-white active:translate-y-px"
+                className="george-secondary-action min-h-12 rounded-[12px] px-6 py-3 text-sm font-medium"
               >
                 View Formula
               </button>
@@ -1293,7 +1293,7 @@ export default function OperationalLibraryClient() {
                   <button
                     type="button"
                     onClick={() => viewMarketplaceFormula(formula.id)}
-                    className="rounded-[9px] border border-white/14 px-4 py-2 text-xs text-white/66 transition hover:border-white/28 hover:text-white"
+                    className="george-secondary-action rounded-[9px] px-4 py-2 text-xs"
                   >
                     View Formula
                   </button>
