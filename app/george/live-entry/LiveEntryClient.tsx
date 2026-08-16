@@ -967,7 +967,6 @@ export default function LiveEntryClient() {
   const [scriptBrowserLoading, setScriptBrowserLoading] = useState(false);
   const [formulaScripts, setFormulaScripts] = useState<OperationalScript[]>([]);
   const [scriptBrowserError, setScriptBrowserError] = useState("");
-  const [, setRecommendationError] = useState("");
 
   const [optionalSignalAnswers, setOptionalSignalAnswers] = useState<
     Record<string, string>
@@ -4137,7 +4136,6 @@ export default function LiveEntryClient() {
 
   const loadOperationalRecommendation = async () => {
     setRecommendationLoading(true);
-    setRecommendationError("");
 
     try {
       const response = await fetch(
@@ -4167,11 +4165,6 @@ export default function LiveEntryClient() {
       setOperationalRecommendation(payload.recommendation);
     } catch (error) {
       setOperationalRecommendation(null);
-      setRecommendationError(
-        error instanceof Error
-          ? error.message
-          : "Operational recommendation failed",
-      );
     } finally {
       setRecommendationLoading(false);
     }
