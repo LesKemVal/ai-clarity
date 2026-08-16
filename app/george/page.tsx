@@ -7375,12 +7375,12 @@ export default function Page({
                                   key={action.label}
                                   type="button"
                                   onClick={action.action}
-                                  className={`inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-[0.5rem] px-2.5 py-1.5 text-[9px] font-semibold uppercase tracking-[0.15em] transition active:scale-[0.97] ${
+                                  className={`inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-[0.5rem] px-2.5 py-1.5 text-[9px] font-semibold uppercase tracking-[0.15em] ${
                                     action.emphasis === "primary"
-                                      ? "border border-[#7EA1FF]/48 bg-[#172347] text-white hover:border-[#AEB6FF]/75 hover:bg-[#203268]"
+                                      ? "border border-[#7EA1FF]/48 bg-[#172347] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] active:scale-[0.97]"
                                       : action.emphasis === "secondary"
-                                        ? "border border-white/[0.14] bg-white/[0.025] text-white/78 hover:border-white/30 hover:text-white"
-                                        : "border border-white/[0.08] bg-transparent text-[#D7DBE4]/52 hover:border-white/[0.2] hover:text-[#D7DBE4]/88"
+                                        ? "george-secondary-action"
+                                        : "george-quiet-action"
                                   }`}
                                 >
                                   {action.label}
