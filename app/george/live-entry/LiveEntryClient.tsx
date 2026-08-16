@@ -361,15 +361,6 @@ const DEFAULT_ROOM_PHRASES = [
   "Can we unpack that?",
 ];
 
-function getRoomPhraseExamples(_role: string) {
-  return [
-    "E.g. Let me think about that.",
-    "E.g. Help me understand that.",
-    "E.g. Can we slow down for a second?",
-    "E.g. What am I missing?",
-  ];
-}
-
 const POSITION_OPTIONS: SelectOption[] = [
   { label: "Seeking", helper: "trying to obtain an outcome" },
   { label: "Evaluating", helper: "assessing people or opportunities" },
@@ -676,10 +667,8 @@ export default function LiveEntryClient() {
   const [controlWords, setControlWords] = useState(
     DEFAULT_ROOM_PHRASES.join(", "),
   );
-  const [useRoomPhrases, setUseRoomPhrases] = useState(true);
-  const [customRoomPhrases, setCustomRoomPhrases] = useState("");
-  const [roomPhraseFocused, setRoomPhraseFocused] = useState(false);
-  const [typedRoomPhraseExample, setTypedRoomPhraseExample] = useState("");
+  const useRoomPhrases = true;
+  const customRoomPhrases = "";
   const [showResumeConversationList, setShowResumeConversationList] =
     useState(false);
   const [showLiveBriefingRoom, setShowLiveBriefingRoom] = useState(false);
@@ -1210,7 +1199,6 @@ export default function LiveEntryClient() {
     traditionalBriefingExampleIndex,
     setTraditionalBriefingExampleIndex,
   ] = useState(0);
-  const [exampleIndex, setExampleIndex] = useState(0);
   const [preLivePreviewReady, setPreLivePreviewReady] = useState(false);
   const [liveEntryReadyMessageVisible, setLiveEntryReadyMessageVisible] =
     useState(false);
@@ -1259,12 +1247,6 @@ export default function LiveEntryClient() {
       item === "Other" && customChair.trim() ? customChair.trim() : item,
     )
     .join(" + ");
-
-  const roomPhraseExamples = getRoomPhraseExamples(
-    chair || String(preLiveSignals.role || ""),
-  );
-  const currentRoomPhraseExample =
-    roomPhraseExamples[exampleIndex % roomPhraseExamples.length];
 
   useEffect(() => {
     if (!showOpenAISignalSurface) {
@@ -1348,31 +1330,6 @@ export default function LiveEntryClient() {
       clearTimers();
     };
   }, [showOpenAISignalSurface]);
-
-  useEffect(() => {
-    if (!useRoomPhrases || customRoomPhrases.trim() || roomPhraseFocused) {
-      setTypedRoomPhraseExample("");
-      return;
-    }
-
-    setTypedRoomPhraseExample("");
-    let index = 0;
-    const timer = window.setInterval(() => {
-      index += 1;
-      setTypedRoomPhraseExample(currentRoomPhraseExample.slice(0, index));
-
-      if (index >= currentRoomPhraseExample.length) {
-        window.clearInterval(timer);
-      }
-    }, 18);
-
-    return () => window.clearInterval(timer);
-  }, [
-    currentRoomPhraseExample,
-    customRoomPhrases,
-    roomPhraseFocused,
-    useRoomPhrases,
-  ]);
 
   useEffect(() => {
     if (showLiveBriefingRoom && liveBriefingStep === 3) {
