@@ -1226,112 +1226,6 @@ textarea:not([data-george-textarea]):focus {
   }
 }
 
-/* conversation surface overhaul */
-
-.message-assistant {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-}
-
-.message-assistant p {
-  max-width: 78ch;
-}
-
-.message-assistant h1,
-.message-assistant h2,
-.message-assistant h3 {
-  color: rgba(255, 255, 255, 0.95);
-}
-
-.message-assistant {
-  color: rgba(255, 255, 255, 0.82);
-}
-
-.message-assistant strong {
-  color: white;
-}
-
-.message-assistant ul {
-  opacity: 0.92;
-}
-
-.message-assistant blockquote {
-  border-left: 2px solid rgba(174, 182, 255, 0.35);
-  padding-left: 16px;
-  color: rgba(255, 255, 255, 0.72);
-}
-
-.message-assistant + .message-assistant {
-  margin-top: 18px;
-}
-
-/* conversation surface overhaul */
-
-.message-assistant {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-}
-
-.message-assistant p {
-  max-width: 78ch;
-}
-
-.message-assistant h1,
-.message-assistant h2,
-.message-assistant h3 {
-  color: rgba(255, 255, 255, 0.95);
-}
-
-.message-assistant {
-  color: rgba(255, 255, 255, 0.82);
-}
-
-.message-assistant strong {
-  color: white;
-}
-
-.message-assistant ul {
-  opacity: 0.92;
-}
-
-.message-assistant blockquote {
-  border-left: 2px solid rgba(174, 182, 255, 0.35);
-  padding-left: 16px;
-  color: rgba(255, 255, 255, 0.72);
-}
-
-.message-assistant + .message-assistant {
-  margin-top: 18px;
-}
-
-.message-assistant {
-  border: none;
-  background: transparent;
-  box-shadow: none;
-}
-
-.message-assistant p {
-  max-width: 76ch;
-}
-
-.message-assistant ul,
-.message-assistant ol {
-  max-width: 76ch;
-}
-
-.message-assistant strong {
-  color: #fff;
-}
-
-.message-assistant h1,
-.message-assistant h2,
-.message-assistant h3 {
-  margin-top: 1.2rem;
-  margin-bottom: 0.65rem;
-}
-
 .george-utility-kicker::after {
   display: none;
 }
@@ -1462,10 +1356,6 @@ textarea:not([data-george-textarea])::placeholder {
   border-color: rgba(255, 255, 255, 0.14);
 }
 
-.message-assistant {
-  padding-left: 6px;
-}
-
 .george-command-surface {
   border-radius: 1.25rem;
 }
@@ -1477,24 +1367,6 @@ textarea:not([data-george-textarea])::placeholder {
 
 .george-command-surface textarea::placeholder {
   color: rgba(255, 255, 255, 0.16) !important;
-}
-
-.message-assistant {
-  max-width: 920px;
-}
-
-.message-assistant p,
-.message-assistant ul,
-.message-assistant ol {
-  max-width: 80ch;
-}
-
-.message-assistant {
-  color: rgba(255, 255, 255, 0.84);
-}
-
-.message-assistant strong {
-  font-weight: 650;
 }
 
 .george-footer-surface {
@@ -1554,27 +1426,6 @@ textarea:not([data-george-textarea])::placeholder {
   transform: translateY(-1px);
 }
 
-.message-assistant {
-  background: transparent !important;
-}
-
-.message-assistant p {
-  line-height: 1.85;
-}
-
-.message-assistant li {
-  margin-top: 0.55rem;
-}
-
-.message-assistant a {
-  color: rgba(210, 216, 255, 0.86);
-  text-decoration: none;
-}
-
-.message-assistant a:hover {
-  color: white;
-}
-
 [data-george-normal-hero] {
   will-change: transform, opacity;
 }
@@ -1619,10 +1470,6 @@ textarea:not([data-george-textarea])::placeholder {
   margin: 0 auto;
 }
 
-.message-assistant {
-  padding-top: 0.15rem;
-}
-
 /* GEORGE workspace convergence */
 
 [data-george-normal-hero] {
@@ -1642,23 +1489,6 @@ textarea:not([data-george-textarea])::placeholder {
 
 .george-composer-shell {
   border-radius: 1.18rem !important;
-}
-
-.message-assistant {
-  font-size: 15.8px;
-}
-
-.message-assistant p {
-  margin-bottom: 0.85rem;
-}
-
-.message-assistant ol,
-.message-assistant ul {
-  padding-left: 1.15rem;
-}
-
-.message-assistant li::marker {
-  color: rgba(174, 182, 255, 0.62);
 }
 
 /* GEORGE homepage atmospheric depth */
@@ -1732,18 +1562,34 @@ select {
 }
 
 /* GEORGE response readability */
+
 .message-assistant {
+  max-width: 920px;
+  padding-top: 0.15rem;
+  padding-left: 6px;
+  border: none;
+  background: transparent !important;
+  box-shadow: none;
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 15.8px;
   line-height: 1.82 !important;
 }
 
 .message-assistant p {
+  max-width: 80ch;
   margin-bottom: 1rem !important;
+  line-height: 1.85;
 }
 
 .message-assistant ul,
 .message-assistant ol {
+  max-width: 80ch;
   margin: 0.85rem 0 1.05rem 1.1rem !important;
   padding-left: 0.9rem !important;
+}
+
+.message-assistant ul {
+  opacity: 0.92;
 }
 
 .message-assistant li {
@@ -1751,9 +1597,40 @@ select {
   padding-left: 0.1rem !important;
 }
 
+.message-assistant li::marker {
+  color: rgba(174, 182, 255, 0.62);
+}
+
 .message-assistant strong {
   color: rgba(255, 255, 255, 0.92) !important;
   font-weight: 640 !important;
+}
+
+.message-assistant h1,
+.message-assistant h2,
+.message-assistant h3 {
+  margin-top: 1.2rem;
+  margin-bottom: 0.65rem;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.message-assistant blockquote {
+  border-left: 2px solid rgba(174, 182, 255, 0.35);
+  padding-left: 16px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.message-assistant a {
+  color: rgba(210, 216, 255, 0.86);
+  text-decoration: none;
+}
+
+.message-assistant a:hover {
+  color: white;
+}
+
+.message-assistant + .message-assistant {
+  margin-top: 18px;
 }
 
 @media (max-width: 640px) {
