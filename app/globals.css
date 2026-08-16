@@ -1511,10 +1511,6 @@ textarea:not([data-george-textarea])::placeholder {
   opacity: 1;
 }
 
-.george-composer-shell {
-  box-shadow: none !important;
-}
-
 .george-composer-shell::before,
 .george-composer-shell::after {
   display: none !important;
@@ -1544,15 +1540,6 @@ textarea:not([data-george-textarea])::placeholder {
 
 .george-footer-surface button:hover {
   color: rgba(255, 255, 255, 0.82) !important;
-}
-
-.george-composer-shell {
-  background: linear-gradient(
-    180deg,
-    rgba(11, 18, 29, 0.92),
-    rgba(7, 12, 20, 0.86)
-  ) !important;
-  border-color: rgba(143, 182, 201, 0.14) !important;
 }
 
 .george-composer-shell button {
@@ -1727,13 +1714,6 @@ input,
 textarea,
 select {
   font-family: inherit;
-}
-
-/* GEORGE mobile composer surface separation */
-.george-composer-shell {
-  background: rgba(7, 12, 20, 0.94) !important;
-  border-color: rgba(255, 255, 255, 0.07) !important;
-  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.34) !important;
 }
 
 .george-composer-shell::before,
