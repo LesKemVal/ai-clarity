@@ -638,7 +638,6 @@ export default function LiveEntryClient() {
   const [relatedSessionId, setRelatedSessionId] = useState("not_related");
   const [relatedSessions, setRelatedSessions] =
     useState<GeorgeStoredSession[]>([]);
-  const [liveToaAccepted, setLiveToaAccepted] = useState(false);
   const [liveBriefingReadyToContinue, setLiveBriefingReadyToContinue] =
     useState(false);
   const liveBriefingTermsPreviouslyAcceptedRef = useRef(false);
@@ -668,9 +667,6 @@ export default function LiveEntryClient() {
     audienceType: "",
     knownContext: "",
   });
-  const [contextSectionCollapsed, setContextSectionCollapsed] = useState(true);
-  const [chairSectionCollapsed, setChairSectionCollapsed] = useState(true);
-  const [roomSectionCollapsed, setRoomSectionCollapsed] = useState(false);
   const [prepDocument, setPrepDocument] = useState<{
     name: string;
     summary: string;
@@ -684,7 +680,6 @@ export default function LiveEntryClient() {
   const [customRoomPhrases, setCustomRoomPhrases] = useState("");
   const [roomPhraseFocused, setRoomPhraseFocused] = useState(false);
   const [typedRoomPhraseExample, setTypedRoomPhraseExample] = useState("");
-  const [hasLiveSession, setHasLiveSession] = useState(false);
   const [showResumeConversationList, setShowResumeConversationList] =
     useState(false);
   const [showLiveBriefingRoom, setShowLiveBriefingRoom] = useState(false);
@@ -857,8 +852,6 @@ export default function LiveEntryClient() {
   const [liveBriefingToaAccepted, setLiveBriefingToaAccepted] = useState(false);
   const [liveBriefingSupportAccepted, setLiveBriefingSupportAccepted] =
     useState(false);
-  const [supportAssessmentExplanationOpen, setSupportAssessmentExplanationOpen] =
-    useState(false);
   const [liveRecoveryOptions, setLiveRecoveryOptions] = useState<
     LiveRecoveryOptionId[]
   >(DEFAULT_LIVE_RECOVERY_SELECTION);
@@ -934,8 +927,6 @@ export default function LiveEntryClient() {
     LiveRoomObjectiveOptionId | ""
   >("");
   const [customLiveRoomObjective, setCustomLiveRoomObjective] = useState("");
-  const [liveBriefingProofReply, setLiveBriefingProofReply] = useState("");
-  const [liveBriefingSttError, setLiveBriefingSttError] = useState("");
   const [editableResources, setEditableResources] = useState<string[]>([]);
   const [runtimeMotionContext, setRuntimeMotionContext] = useState<unknown>(null);
   const [
@@ -1223,16 +1214,12 @@ export default function LiveEntryClient() {
   const [preLivePreviewReady, setPreLivePreviewReady] = useState(false);
   const [liveEntryReadyMessageVisible, setLiveEntryReadyMessageVisible] =
     useState(false);
-  const [founderAccessReady, setFounderAccessReady] = useState(false);
 
   const [proofTranscript, setProofTranscript] = useState<
     Array<{ speaker: "george" | "user"; text: string }>
   >([{ speaker: "george", text: "Are you satisfied?" }]);
   const [proofInProgress, setProofInProgress] = useState(false);
   const [proofComplete, setProofComplete] = useState(false);
-  const [spokenLiveBriefingStep, setSpokenLiveBriefingStep] = useState<
-    1 | 2 | 3 | null
-  >(null);
   const [liveEntryReasoning, setLiveEntryReasoning] = useState({
     roomObservation: "",
     supportSummary: "",
@@ -2946,25 +2933,11 @@ export default function LiveEntryClient() {
     const cached = readCachedGeorgeSessionAuthority();
     setTier(cached.tier);
     setSessionEmail(cached.email || "");
-    setFounderAccessReady(
-      Boolean(
-        cached.authenticated &&
-        cached.liveAccess &&
-        cached.source === "founder",
-      ),
-    );
 
     fetchGeorgeSessionAuthority()
       .then((authority) => {
         setTier(authority.tier);
         setSessionEmail(authority.email || "");
-        setFounderAccessReady(
-          Boolean(
-            authority.authenticated &&
-            authority.liveAccess &&
-            authority.source === "founder",
-          ),
-        );
       })
       .catch(() => {});
 
@@ -3424,7 +3397,6 @@ export default function LiveEntryClient() {
               .supportAssessmentAgreed,
           ),
         );
-        setSupportAssessmentExplanationOpen(false);
 
         window.localStorage.setItem(
           "GEORGE_LIVE_SUPPORT_STYLE",
@@ -3604,7 +3576,6 @@ export default function LiveEntryClient() {
         setLiveBriefingStep(3);
         setLiveBriefingToaAccepted(true);
         setLiveBriefingSupportAccepted(false);
-        setSupportAssessmentExplanationOpen(false);
         setLiveBriefingCommunicationConfirmed(true);
         setLiveRecoveryAcknowledged(true);
         setLiveReadyAccepted(false);
@@ -3703,11 +3674,6 @@ export default function LiveEntryClient() {
       setRelatedSessionId("not_related");
     }
 
-    setHasLiveSession(!!getActiveSessionForMode("live"));
-    setContextSectionCollapsed(false);
-    setChairSectionCollapsed(false);
-    setRoomSectionCollapsed(false);
-    setRoomSectionCollapsed(false);
     setReady(true);
   }, []);
 
@@ -4393,9 +4359,6 @@ export default function LiveEntryClient() {
     setLiveBriefingCommunicationConfirmed(false);
     setLiveRecoveryAcknowledged(false);
     setLiveReadyAccepted(false);
-    setLiveBriefingProofReply("");
-    setLiveBriefingSttError("");
-    setSpokenLiveBriefingStep(null);
     setShowOpenAISignalSurface(!restoredHasOperationalSignal);
     setShowLiveBriefingRoom(restoredHasOperationalSignal);
   };
@@ -4870,12 +4833,9 @@ export default function LiveEntryClient() {
       setLiveBriefingSupportAccepted(false);
       setLiveRecoveryAcknowledged(false);
       setLiveReadyAccepted(false);
-      setLiveBriefingProofReply("");
-      setLiveBriefingSttError("");
-      if (typeof window !== "undefined")
+          if (typeof window !== "undefined")
         window.sessionStorage.removeItem("george_panel3_proof_started");
-      setSpokenLiveBriefingStep(null);
-      setShowLiveBriefingRoom(true);
+        setShowLiveBriefingRoom(true);
       return;
     }
 
@@ -4931,9 +4891,6 @@ export default function LiveEntryClient() {
     setObjective("");
     setKnownContext("");
     setPrepDocument(null);
-    setLiveToaAccepted(false);
-    setContextSectionCollapsed(false);
-    setChairSectionCollapsed(false);
 
     window.localStorage.setItem("george_live_prep_inputs_cleared", "1");
 
@@ -4973,9 +4930,6 @@ export default function LiveEntryClient() {
     const listenOnce = (timeoutMs = 3200) =>
       new Promise<string>((resolve) => {
         if (!SpeechRecognition) {
-          setLiveBriefingSttError(
-            "Voice capture is unavailable in this browser. Continuing.",
-          );
           window.setTimeout(() => resolve(""), timeoutMs);
           return;
         }
@@ -5001,7 +4955,6 @@ export default function LiveEntryClient() {
         };
 
         recognition.onerror = () => {
-          setLiveBriefingSttError("I could not hear that clearly. Continuing.");
           window.clearTimeout(timer);
           resolve("");
         };
@@ -5767,7 +5720,6 @@ export default function LiveEntryClient() {
     setLiveBriefingActiveSupportStyle(panelId);
     setSelectedSupportStyle(normalizeLiveSupportStyle(runtimeStyle));
     setLiveBriefingSupportAccepted(false);
-    setSupportAssessmentExplanationOpen(false);
     setLiveRecoveryAcknowledged(false);
     setLiveRecoveryAcknowledgementOpen(false);
     setLiveBriefingCapabilitiesConfirmed(false);
@@ -5796,7 +5748,6 @@ export default function LiveEntryClient() {
     setSelectedReceiverProfile(profile);
     setReceiverProfileConfirmed(true);
     setLiveBriefingSupportAccepted(false);
-    setSupportAssessmentExplanationOpen(false);
     setLiveRecoveryAcknowledged(false);
     setLiveRecoveryAcknowledgementOpen(false);
     setLiveBriefingCapabilitiesConfirmed(false);
@@ -5840,7 +5791,6 @@ export default function LiveEntryClient() {
     setCommunicationStyle(style);
     setLiveBriefingCommunicationConfirmed(true);
     setLiveBriefingSupportAccepted(false);
-    setSupportAssessmentExplanationOpen(false);
     setLiveRecoveryAcknowledged(false);
     setLiveRecoveryAcknowledgementOpen(false);
     setLiveBriefingCapabilitiesConfirmed(false);
