@@ -8008,7 +8008,7 @@ export default function Page({
                 >
                   <div
                     aria-hidden="true"
-                    className="pointer-events-none mb-2 select-none text-center font-mono text-[8px] font-semibold uppercase tracking-[0.34em] text-white/22"
+                    className="pointer-events-none mb-2 select-none text-center font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-white/38"
                   >
                     GEORGE can make mistakes. Check important information.
                   </div>
