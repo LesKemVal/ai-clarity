@@ -7989,8 +7989,22 @@ export default function Page({
                   <div
                     className={`${forceLive || liveMode ? "hidden" : "fixed"} bottom-[96px] left-0 right-0 z-[140] flex justify-center pointer-events-none`}
                   >
-                    <div className="text-[10px] text-[#D7DBE4]/24 tracking-[0.16em]">
-                      <span className="inline-flex items-center gap-[5px]"></span>
+                    <div
+                      role="status"
+                      aria-live="polite"
+                      className="inline-flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.16em] text-[#D7DBE4]/34"
+                    >
+                      {isThinking && (
+                        <span
+                          aria-hidden="true"
+                          className="george-thinking-dots inline-flex items-center gap-[5px]"
+                        >
+                          <span />
+                          <span />
+                          <span />
+                        </span>
+                      )}
+                      <span>{isThinking ? "Working" : "Speaking"}</span>
                     </div>
                   </div>
                 )}
