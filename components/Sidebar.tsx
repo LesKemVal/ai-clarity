@@ -437,23 +437,19 @@ return (
               onClick={() => requestNormalNavigation('new')}
               className="block w-full rounded-[0.7rem] border border-white/[0.05] bg-white/[0.016] px-3 py-2.5 text-left transition-[background-color,border-color,transform] duration-300 hover:border-white/[0.08] hover:bg-white/[0.03] active:scale-[0.99]"
             >
-              <span className="block text-[11px] font-semibold uppercase tracking-[0.13em] text-white/68">
-                New Normal Workspace
+              <span className="block text-[13px] font-medium text-white/72">
+                New Workspace
               </span>
-              <span className="mt-1 block text-[10px] leading-4 text-white/30">
+              <span className="mt-1 block text-[11px] leading-4 text-white/34">
                 {isLiveRoute
-                  ? 'Leave LIVE and begin in Normal GEORGE.'
-                  : 'Begin a new Normal GEORGE session.'}
+                  ? 'Leave LIVE and begin a new GEORGE session.'
+                  : 'Begin a new GEORGE session.'}
               </span>
             </button>
           </section>
 
           <section>
-            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/30">
-              WORKSPACE
-            </div>
-
-            <div className="mt-2 space-y-0.5">
+            <div className="space-y-0.5">
               <button
                 type="button"
                 onClick={() => {
@@ -476,7 +472,7 @@ return (
               className="flex w-full items-center justify-between px-3 text-left"
             >
               <span className="text-[10px] uppercase tracking-[0.22em] text-white/34">
-                Objectives
+                Focus
               </span>
               <span className="text-[11px] text-white/26">
                 {openGroups['Progress'] ? '▾' : '▸'}
@@ -490,7 +486,7 @@ return (
                   onClick={createGoalCheck}
                   className="block w-full rounded-[0.55rem] px-3 py-2 text-left text-[13px] text-white/62 transition hover:bg-white/[0.014] hover:text-white/78"
                 >
-                  + New Objective
+                  + New Focus
                 </button>
 
                 {goalChecks.length === 0 ? (
@@ -507,7 +503,7 @@ return (
                         {item.title}
                       </span>
                       <span className="mt-1 block truncate text-[11px] text-white/28">
-                        Objective
+                        Focus
                       </span>
                     </button>
                   ))
@@ -518,10 +514,11 @@ return (
           )}
 
           <section className="border-t border-white/[0.035] pt-4">
-            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/26">
-              Workspace
-            </div>
-            <a href="/george/library" onClick={() => setShowSidebar?.(false)} className="mt-2 block rounded-[0.55rem] px-3 py-2 text-[13px] text-white/52 transition hover:bg-white/[0.016] hover:text-white/78">
+            <a
+              href="/george/library"
+              onClick={() => setShowSidebar?.(false)}
+              className="block rounded-[0.55rem] px-3 py-2 text-[13px] font-medium text-white/56 transition hover:bg-white/[0.016] hover:text-white/78"
+            >
               Library
             </a>
           </section>
@@ -803,7 +800,7 @@ return (
             <div className="space-y-2.5">
               <button
                 onClick={() => currentGoalCheck && addTodo(currentGoalCheck)}
-                className="w-full rounded-[0.55rem] px-4 py-2 text-[13px] text-white/66 transition hover:bg-white/[0.014] hover:text-white/82"
+                className="george-secondary-action w-full rounded-[0.55rem] px-4 py-2 text-[13px]"
               >
                 + Add Step
               </button>
@@ -824,7 +821,7 @@ return (
                     context: 'goal_check'
                   })
                 }}
-                className="w-full rounded-[0.55rem] border border-white/[0.05] bg-white/[0.018] px-4 py-2 text-[13px] text-white/72 transition hover:bg-white/[0.032] hover:text-white/88"
+                className="george-primary-action w-full rounded-[0.55rem] px-4 py-2 text-[13px]"
               >
                 Open with GEORGE
               </button>
@@ -847,7 +844,7 @@ return (
             Leave LIVE?
           </div>
           <p className="mt-2 text-[13px] leading-5 text-white/46">
-            This opens a Normal GEORGE workspace. Save the current LIVE conversation first?
+            This opens a GEORGE workspace. Save the current LIVE conversation first?
           </p>
 
           <div className="mt-5 grid gap-2">

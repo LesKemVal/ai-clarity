@@ -3584,9 +3584,6 @@ export default function Page({
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const [showScrollHint, setShowScrollHint] = useState(false);
-  const [responseActionMenuIndex, setResponseActionMenuIndex] = useState<
-    number | null
-  >(null);
 
   useEffect(() => {
     const checkScroll = () => {
@@ -4197,23 +4194,23 @@ export default function Page({
 
   const homepageHeroSequence = [
     "Build a business plan",
-    "Help me think it through",
+    "Help me think something through",
     "Create a pitch deck",
-    "Review this document",
+    "Review a document",
     "Build a stronger strategy",
-    "Analyze this opportunity",
+    "Analyze an opportunity",
     "Compare my options",
-    "Plan the next steps",
-    "Solve this problem",
-    "Strengthen this proposal",
-    "Prepare for the interview",
-    "Improve this presentation",
-    "Review this contract",
+    "Plan my next steps",
+    "Solve a problem",
+    "Strengthen a proposal",
+    "Prepare for an interview",
+    "Improve a presentation",
+    "Review a contract",
     "Write a better response",
     "Organize my thinking",
-    "Research this topic",
-    "Turn ideas into action",
-    "Make this decision easier",
+    "Research a topic",
+    "Turn my idea into action",
+    "Make my decision easier",
   ];
   const [homepageHeroFlip, setHomepageHeroFlip] = useState({
     front: 0,
@@ -6624,7 +6621,47 @@ export default function Page({
                                   Ask GEORGE
                                 </h1>
 
-                                <div className="[perspective:1600px]">
+                                <div
+                                  className="pointer-events-auto cursor-pointer [perspective:1600px]"
+                                  role="button"
+                                  tabIndex={0}
+                                  aria-label={`Ask GEORGE: ${
+                                    homepageHeroSequence[
+                                      homepageHeroFlip.flipped
+                                        ? homepageHeroFlip.back
+                                        : homepageHeroFlip.front
+                                    ]
+                                  }`}
+                                  onClick={() => {
+                                    const signal =
+                                      homepageHeroSequence[
+                                        homepageHeroFlip.flipped
+                                          ? homepageHeroFlip.back
+                                          : homepageHeroFlip.front
+                                      ];
+
+                                    void handleSend(signal);
+                                  }}
+                                  onKeyDown={(event) => {
+                                    if (
+                                      event.key !== "Enter" &&
+                                      event.key !== " "
+                                    ) {
+                                      return;
+                                    }
+
+                                    event.preventDefault();
+
+                                    const signal =
+                                      homepageHeroSequence[
+                                        homepageHeroFlip.flipped
+                                          ? homepageHeroFlip.back
+                                          : homepageHeroFlip.front
+                                      ];
+
+                                    void handleSend(signal);
+                                  }}
+                                >
                                   <div
                                     className={`relative grid w-fit [transform-style:preserve-3d] ${
                                       homepageHeroFlip.transitionEnabled
@@ -7059,102 +7096,57 @@ export default function Page({
                                       </>
                                     )}
 
-                                    <div className="relative ml-1 shrink-0 border-l border-white/[0.07] pl-2">
+                                    <div className="ml-1 flex shrink-0 items-center gap-1 border-l border-white/[0.07] pl-2">
                                       <button
                                         type="button"
-                                        onClick={() => {
-                                          setResponseActionMenuIndex(
-                                            responseActionMenuIndex === i
-                                              ? null
-                                              : i,
-                                          );
+                                        onClick={async () => {
+                                          try {
+                                            await navigator.clipboard?.writeText(
+                                              m.content,
+                                            );
+                                            setToastMessage("Copied");
+                                            setShowToast(true);
+                                          } catch {}
                                         }}
-                                        aria-label="More response actions"
-                                        title="More"
-                                        className="george-quiet-action inline-flex h-7 w-7 items-center justify-center rounded-[0.5rem] transition hover:bg-white/[0.035]"
+                                        className="george-quiet-action inline-flex h-7 items-center justify-center rounded-[0.5rem] px-2 text-[9px] font-semibold tracking-[0.13em]"
+                                        aria-label="Copy response"
+                                        title="Copy"
                                       >
-                                        <svg
-                                          viewBox="0 0 24 24"
-                                          className="h-4 w-4"
-                                          fill="currentColor"
-                                          aria-hidden="true"
-                                        >
-                                          <circle cx="12" cy="5" r="1.45" />
-                                          <circle cx="12" cy="12" r="1.45" />
-                                          <circle cx="12" cy="19" r="1.45" />
-                                        </svg>
+                                        COPY
                                       </button>
 
-                                      {responseActionMenuIndex === i && (
-                                        <>
-                                          <button
-                                            type="button"
-                                            aria-label="Close response actions"
-                                            onClick={() =>
-                                              setResponseActionMenuIndex(null)
+                                      <button
+                                        type="button"
+                                        onClick={async () => {
+                                          const shareText = m.content;
+
+                                          try {
+                                            if (navigator.share) {
+                                              await navigator.share({
+                                                title:
+                                                  "GEORGE by BRANESx",
+                                                text: `GEORGE\n\n${shareText}`,
+                                                url:
+                                                  window.location.origin +
+                                                  "/",
+                                              });
+                                            } else if (
+                                              navigator.clipboard?.writeText
+                                            ) {
+                                              await navigator.clipboard.writeText(
+                                                shareText,
+                                              );
+                                              setToastMessage("Copied");
+                                              setShowToast(true);
                                             }
-                                            className="fixed inset-0 z-[79] cursor-default bg-transparent"
-                                          />
-
-                                          <div className="absolute bottom-[34px] right-0 z-[80] min-w-[116px] overflow-hidden rounded-[0.75rem] border border-white/[0.075] bg-[#080B11]/96 p-1 shadow-[0_18px_54px_rgba(0,0,0,0.46)] backdrop-blur-xl">
-                                            <button
-                                              type="button"
-                                              onClick={async () => {
-                                                try {
-                                                  await navigator.clipboard?.writeText(
-                                                    m.content,
-                                                  );
-                                                  setToastMessage("Copied");
-                                                  setShowToast(true);
-                                                } catch {}
-
-                                                setResponseActionMenuIndex(
-                                                  null,
-                                                );
-                                              }}
-                                              className="block w-full rounded-[0.5rem] px-3 py-2 text-left text-[11px] text-[#D7DBE4]/68 transition hover:bg-white/[0.045] hover:text-white"
-                                            >
-                                              Copy
-                                            </button>
-
-                                            <button
-                                              type="button"
-                                              onClick={async () => {
-                                                const shareText = m.content;
-
-                                                try {
-                                                  if (navigator.share) {
-                                                    await navigator.share({
-                                                      title:
-                                                        "GEORGE by BRANESx",
-                                                      text: `GEORGE\n\n${shareText}`,
-                                                      url:
-                                                        window.location.origin +
-                                                        "/",
-                                                    });
-                                                  } else if (
-                                                    navigator.clipboard
-                                                      ?.writeText
-                                                  ) {
-                                                    await navigator.clipboard.writeText(
-                                                      shareText,
-                                                    );
-                                                    setToastMessage("Copied");
-                                                    setShowToast(true);
-                                                  }
-                                                } catch {}
-
-                                                setResponseActionMenuIndex(
-                                                  null,
-                                                );
-                                              }}
-                                              className="block w-full rounded-[0.5rem] px-3 py-2 text-left text-[11px] text-[#D7DBE4]/68 transition hover:bg-white/[0.045] hover:text-white"
-                                            >
-                                              Share
-                                            </button>
-                                          </div>
-                                        </>
-                                      )}
+                                          } catch {}
+                                        }}
+                                        className="george-quiet-action inline-flex h-7 items-center justify-center rounded-[0.5rem] px-2 text-[9px] font-semibold tracking-[0.13em]"
+                                        aria-label="Share response"
+                                        title="Share"
+                                      >
+                                        SHARE
+                                      </button>
                                     </div>
                                   </>
                                 }
