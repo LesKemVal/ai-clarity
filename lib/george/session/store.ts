@@ -207,6 +207,25 @@ export function setActiveSessionIdForMode(mode: GeorgeSessionMode, id: string) {
   window.sessionStorage.setItem(GEORGE_ACTIVE_SESSION_ID_KEY, id)
 }
 
+export const GEORGE_SESSION_ACTIVATION_EVENT =
+  'george-session-activation-requested'
+
+export function requestSessionActivation(
+  mode: GeorgeSessionMode,
+  id: string
+) {
+  if (typeof window === 'undefined') return
+
+  setActiveSessionIdForMode(mode, id)
+  setActiveMode(mode)
+
+  window.dispatchEvent(
+    new CustomEvent(GEORGE_SESSION_ACTIVATION_EVENT, {
+      detail: { mode, id },
+    })
+  )
+}
+
 export function getActiveSessionId() {
   if (typeof window === 'undefined') return null
   return window.sessionStorage.getItem(GEORGE_ACTIVE_SESSION_ID_KEY)

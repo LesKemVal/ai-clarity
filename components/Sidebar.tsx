@@ -9,6 +9,7 @@ import {
   hasMeaningfulUserMessage,
   renameSession,
   safeReadSessions,
+  requestSessionActivation,
   setActiveMode,
   setActiveSessionIdForMode,
   upsertSession,
@@ -179,9 +180,15 @@ export default function Sidebar({
       return
     }
 
+    setShowSidebar?.(false)
+
+    if (pathname === '/george') {
+      requestSessionActivation('normal', destination.id)
+      return
+    }
+
     setActiveSessionIdForMode('normal', destination.id)
     setActiveMode('normal')
-    setShowSidebar?.(false)
     router.push('/george')
   }
 

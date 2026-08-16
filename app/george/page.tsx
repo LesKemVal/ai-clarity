@@ -123,6 +123,7 @@ import {
 } from "@/lib/george/live-runtime/live-guidance";
 import {
   consumeFreshNormalBrowserSessionRequest,
+  GEORGE_SESSION_ACTIVATION_EVENT,
   createFreshNormalSession,
   createSession,
   ensureGeorgeBrowserInstanceScope,
@@ -2070,6 +2071,98 @@ export default function Page({
     activePromptContext,
     forceLive,
   ]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleSessionActivation = (event: Event) => {
+      const detail = (
+        event as CustomEvent<{
+          mode?: string;
+          id?: string;
+        }>
+      ).detail;
+
+      if (detail?.mode !== "normal" || !detail.id) return;
+      if (forceLive || liveMode || isManualLive) return;
+
+      const activeSession = getActiveSessionForMode("normal");
+
+      if (!activeSession || activeSession.id !== detail.id) {
+        return;
+      }
+
+      const storedPreparationSession = loadPreparationSession();
+
+      setNormalPreparationSession(
+        storedPreparationSession?.provenance.entrySource === "normal" &&
+          storedPreparationSession.relations.normalSessionId ===
+            activeSession.id
+          ? storedPreparationSession
+          : null,
+      );
+
+      const sessionRestoreState =
+        buildGeorgeSessionRestoreState(activeSession);
+
+      if (!sessionRestoreState.restored) {
+        return;
+      }
+
+      const restoredMessages =
+        sessionRestoreState.messages as Message[];
+
+      skipNextTypewriterRef.current = true;
+      restoredMessagesSignatureRef.current =
+        getMessagesSignature(restoredMessages);
+
+      window.sessionStorage.removeItem(
+        GEORGE_LAST_NORMAL_DRAFT,
+      );
+
+      setMessages(restoredMessages);
+      messagesRef.current = restoredMessages;
+
+      setHasSentFirstNormalMessage(
+        restoredMessages.some(
+          (message) => message.role === "user",
+        ),
+      );
+
+      setInput("");
+      setInterimTranscript("");
+      setActivePromptLabel(null);
+      setActivePromptContext(null);
+      setContextTurnCount(0);
+      setReroutePrompt(null);
+      setRerouteSignal(0);
+      setSuggestedPrompts([]);
+      setSuggestedSignal(0);
+      setShowScrollHint(false);
+
+      normalSessionWriteReadyRef.current = true;
+
+      window.requestAnimationFrame(() => {
+        scrollHostRef.current?.scrollTo({
+          top: 0,
+          behavior: "auto",
+        });
+        textareaRef.current?.focus();
+      });
+    };
+
+    window.addEventListener(
+      GEORGE_SESSION_ACTIVATION_EVENT,
+      handleSessionActivation,
+    );
+
+    return () => {
+      window.removeEventListener(
+        GEORGE_SESSION_ACTIVATION_EVENT,
+        handleSessionActivation,
+      );
+    };
+  }, [forceLive, liveMode, isManualLive]);
 
   useEffect(() => {
     // Session bootstrap is now handled by the normal session store effect above.
