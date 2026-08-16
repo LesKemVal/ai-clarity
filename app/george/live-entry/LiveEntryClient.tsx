@@ -854,7 +854,6 @@ export default function LiveEntryClient() {
   >(null);
   const [liveBriefingSignalsExpanded, setLiveBriefingSignalsExpanded] =
     useState(false);
-  const [liveRoomMoreOpen, setLiveRoomMoreOpen] = useState(false);
   const [liveBriefingToaAccepted, setLiveBriefingToaAccepted] = useState(false);
   const [liveBriefingSupportAccepted, setLiveBriefingSupportAccepted] =
     useState(false);
@@ -930,11 +929,6 @@ export default function LiveEntryClient() {
   const quickLiveSpeakingStyle =
     quickLiveSpeakingOverride || quickLiveRecommendation.speakingStyle;
   const [liveReadyAccepted, setLiveReadyAccepted] = useState(false);
-  const [liveControlsOrientationSeen, setLiveControlsOrientationSeen] =
-    useState(false);
-  const [liveControlsEntryReady, setLiveControlsEntryReady] = useState(false);
-  const [liveApproachConfirmed, setLiveApproachConfirmed] = useState(false);
-  const [liveApproachEditing, setLiveApproachEditing] = useState(true);
   const [liveReadinessComplete, setLiveReadinessComplete] = useState(false);
   const [liveRoomObjectiveOption, setLiveRoomObjectiveOption] = useState<
     LiveRoomObjectiveOptionId | ""
