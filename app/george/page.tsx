@@ -8198,11 +8198,11 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                     </button>
 
                     {(forceLive || liveMode) && !showLiveEntrySequence && (
-                      <div className="absolute right-2 bottom-full george-motion-collapse-up mb-2 flex items-center gap-2">
+                      <div className="absolute right-2 bottom-full george-motion-collapse-up mb-2 flex items-center gap-0.5 rounded-[0.78rem] border border-white/[0.07] bg-[#070C14]/94 p-1 shadow-[0_10px_28px_rgba(0,0,0,0.28)]">
                         <button
                           type="button"
                           onClick={cycleLiveReceiverProfile}
-                          className="rounded-full border border-[#3657A8]/48 bg-[#172347] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-[#5579D7]/70 hover:text-[#D7DCFF]/78 active:scale-[0.98]"
+                          className="george-quiet-action rounded-[0.55rem] px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition hover:bg-white/[0.04] active:scale-[0.98]"
                         >
                           {activeLiveReceiverProfileLabel}
                         </button>
@@ -8213,7 +8213,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                             onClick={() =>
                               setShowLiveSteeringReference((value) => !value)
                             }
-                            className="rounded-full border border-[#3657A8]/48 bg-[#172347] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-[#5579D7]/70 hover:text-[#D7DCFF]/78"
+                            className="george-quiet-action rounded-[0.55rem] px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition hover:bg-white/[0.04]"
                           >
                             Steering
                           </button>
@@ -8272,7 +8272,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                           onClick={(e) => {
                             e.stopPropagation();
                           }}
-                          className="rounded-full border border-[#3657A8]/48 bg-[#172347] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-[#5579D7]/70 hover:text-white/72"
+                          className="george-quiet-action rounded-[0.55rem] px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition hover:bg-white/[0.04]"
                         >
                           {language === "English"
                             ? "EN"
@@ -8294,9 +8294,9 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                           onClick={requestExitLiveMode}
                           aria-label="Leave LIVE"
                           title="Leave LIVE"
-                          className="inline-flex items-center gap-1.5 rounded-full border border-red-300/25 bg-red-950/35 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-red-100/78 shadow-[0_0_18px_rgba(248,113,113,0.10)] backdrop-blur-xl transition hover:border-red-200/45 hover:bg-red-950/50 hover:text-red-50 active:scale-[0.98]"
+                          className="ml-0.5 inline-flex items-center gap-1.5 rounded-[0.55rem] border-l border-white/[0.07] px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-red-100/62 transition hover:bg-red-300/[0.06] hover:text-red-50 active:scale-[0.98]"
                         >
-                          <span className="h-1.5 w-1.5 rounded-full bg-red-300/70 shadow-[0_0_8px_rgba(252,165,165,0.45)]" />
+                          <span className="h-1.5 w-1.5 rounded-full bg-red-300/58" />
                           Exit
                         </button>
                       </div>
