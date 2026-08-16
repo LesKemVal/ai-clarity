@@ -2297,6 +2297,71 @@ button:active,
 
 /* GEORGE PRIMARY ACTION MATERIAL — END */
 
+/* GEORGE SUPPORTING ACTION MATERIAL — START */
+
+.george-secondary-action {
+  box-sizing: border-box;
+  border: 1px solid rgba(216, 222, 232, 0.14);
+  background: rgba(255, 255, 255, 0.025);
+  color: rgba(232, 236, 244, 0.72);
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    transform 120ms ease;
+}
+
+.george-secondary-action:hover,
+.george-secondary-action:focus-visible {
+  border-color: rgba(216, 222, 232, 0.28);
+  background: rgba(255, 255, 255, 0.045);
+  color: rgba(255, 255, 255, 0.94);
+}
+
+.george-secondary-action:active {
+  transform: translateY(1px) scale(0.992);
+}
+
+.george-secondary-action:disabled,
+.george-secondary-action[aria-disabled="true"] {
+  border-color: rgba(255, 255, 255, 0.055);
+  background: rgba(255, 255, 255, 0.018);
+  color: rgba(255, 255, 255, 0.26);
+}
+
+.george-quiet-action {
+  color: rgba(216, 222, 232, 0.42);
+  transition:
+    color 140ms ease,
+    opacity 140ms ease;
+}
+
+.george-quiet-action:hover,
+.george-quiet-action:focus-visible {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.george-quiet-action:disabled,
+.george-quiet-action[aria-disabled="true"] {
+  color: rgba(255, 255, 255, 0.22);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .george-secondary-action {
+    transition:
+      background-color 140ms ease,
+      border-color 140ms ease,
+      color 140ms ease;
+  }
+
+  .george-secondary-action:active {
+    transform: none;
+  }
+}
+
+/* GEORGE SUPPORTING ACTION MATERIAL — END */
+
+
 
 /* GEORGE EDIT UTILITY GLEAM — START */
 

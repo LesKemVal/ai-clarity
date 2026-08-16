@@ -118,7 +118,7 @@ export function RecommendedStrategyCard({
           <button
             type="button"
             onClick={onChooseAnother}
-            className="inline-flex h-9 items-center justify-center rounded-[9px] border border-[#7898FF]/[0.24] bg-[#4E7CFF]/[0.08] px-4 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-[#D4DCFF]/72 transition hover:border-[#7898FF]/45 hover:text-white"
+            className="george-secondary-action inline-flex h-9 items-center justify-center rounded-[9px] px-4 font-mono text-[8px] font-semibold uppercase tracking-[0.15em]"
           >
             Choose another
           </button>
@@ -171,7 +171,7 @@ export function RecommendedStrategyCard({
           <button
             type="button"
             onClick={closeExplanation}
-            className="shrink-0 font-mono text-[7px] font-semibold uppercase tracking-[0.14em] text-white/34 transition hover:text-white/70"
+            className="george-quiet-action shrink-0 font-mono text-[7px] font-semibold uppercase tracking-[0.14em]"
           >
             Close
           </button>
@@ -234,7 +234,7 @@ export function RecommendedStrategyCard({
         <button
           type="button"
           onClick={openExplanation}
-          className="shrink-0 font-mono text-[7px] font-semibold uppercase tracking-[0.14em] text-white/34 transition hover:text-white/70"
+          className="george-quiet-action shrink-0 font-mono text-[7px] font-semibold uppercase tracking-[0.14em]"
         >
           View
         </button>
@@ -246,7 +246,7 @@ export function RecommendedStrategyCard({
             <button
               type="button"
               onClick={() => onUseFormula(formula)}
-              className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-[#AFC0FF]/66 transition hover:text-white"
+              className="george-secondary-action inline-flex min-h-8 items-center justify-center rounded-[8px] px-3 font-mono text-[8px] font-semibold uppercase tracking-[0.16em]"
             >
               Continue with this formula
             </button>
@@ -256,7 +256,7 @@ export function RecommendedStrategyCard({
             <button
               type="button"
               onClick={() => onViewScripts(formula)}
-              className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-white/34 transition hover:text-white/70"
+              className="george-quiet-action font-mono text-[8px] font-semibold uppercase tracking-[0.16em]"
             >
               View scripts
             </button>

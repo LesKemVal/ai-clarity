@@ -58,7 +58,7 @@ export function ScriptCustomizationPanel({
         <button
           type="button"
           onClick={onClose}
-          className="font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/42 transition hover:text-white"
+          className="george-quiet-action font-mono text-[8px] font-semibold uppercase tracking-[0.15em]"
         >
           Close
         </button>
@@ -105,7 +105,7 @@ export function ScriptCustomizationPanel({
           <button
             type="button"
             onClick={onReset}
-            className="font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/38 transition hover:text-white"
+            className="george-quiet-action font-mono text-[8px] font-semibold uppercase tracking-[0.15em]"
           >
             Reset session edits
           </button>
@@ -113,7 +113,7 @@ export function ScriptCustomizationPanel({
           <button
             type="button"
             onClick={onDone}
-            className="inline-flex h-9 items-center justify-center rounded-[8px] border border-[#7898FF]/[0.24] bg-[#4E7CFF]/[0.09] px-4 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-[#D8E0FF]/72 transition hover:border-[#7898FF]/[0.4] hover:text-white"
+            className="george-secondary-action inline-flex h-9 items-center justify-center rounded-[8px] px-4 font-mono text-[8px] font-semibold uppercase tracking-[0.15em]"
           >
             Use customized script
           </button>
