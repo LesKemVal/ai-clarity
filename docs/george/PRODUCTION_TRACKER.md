@@ -2162,3 +2162,41 @@ Synchronize all four production authorities when behavior, ownership, qualificat
 Codex must not redesign GEORGE, create another runtime, create another reasoning authority, flatten route choreography, move reasoning into rendering, or treat file decomposition as permission to move semantic ownership.
 
 The target is a launch-grade product whose operational intelligence remains stable while presentation, branding, premium surfaces, receivers, and future hardware integrations become easier to manipulate and extend.
+
+<!-- GEORGE_DESIRED_OUTCOME_EXECUTION_REINFORCEMENT -->
+## Desired-Outcome Execution Doctrine Reinforcement
+
+Audit result:
+
+The current runtime already contains the execution machinery required to advance the user's desired outcome:
+
+- operational judgment;
+- `georgeCanAdvanceWithoutUserSignal`;
+- strongest-next-step reasoning;
+- bounded signal acquisition;
+- execution policy;
+- Normal provider execution.
+
+No new runtime architecture is required.
+
+The governing interpretation is now explicit:
+
+**The desired outcome remains primary. GEORGE advances that desired outcome by preparing the user to execute, executing with the user, or, when expressly permitted, executing on the user's behalf.**
+
+This is a reinforcement of existing desired-outcome doctrine, not a new execution system.
+
+Do not introduce:
+
+- an execution-orientation runtime;
+- another disposition;
+- another reasoning stage;
+- another execution owner;
+- a parallel desired-outcome authority.
+
+Signal acquisition remains subordinate to operational judgment and is justified only when the missing signal is consequential to the next executable move.
+
+Analysis, explanation, research, planning, advice, writing, and reflection remain valid when they advance the desired outcome. They are means to operational progress rather than independent endpoints.
+
+Execution on the user's behalf requires the user's expressed permission for the action or delegated scope.
+
+Current implementation behavior was audited before this documentation reinforcement. No runtime patch was warranted.
