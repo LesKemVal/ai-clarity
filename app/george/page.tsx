@@ -6998,6 +6998,7 @@ export default function Page({
                                 {
                                   <>
                                     {isLatestAssistant &&
+                                      typedMessageIndex !== i &&
                                       !isNormalPreparationBriefingActive && (
                                       <>
                                         {hasClosedNormalBriefing ? (
