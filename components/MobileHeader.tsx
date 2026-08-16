@@ -1,6 +1,6 @@
 'use client'
 
-import Brand from '@/components/Brand'
+import { IconButton } from '@/components/ui/IconButton'
 
 type MobileHeaderProps = {
   title?: string
@@ -18,10 +18,11 @@ export default function MobileHeader({
   return (
     <div className="sticky top-0 z-40 border-b border-white/[0.045] bg-black/90 xl:hidden">
       <div className="flex items-center justify-between px-4 py-3">
-        <button
-          type="button"
+        <IconButton
+          variant="quiet"
+          size="lg"
           onClick={onMenuClick}
-          className="flex h-9 w-9 items-center justify-center text-white/72"
+          className="text-white/72"
           aria-label="Open menu"
         >
           <span className="flex flex-col gap-[3px]">
@@ -29,7 +30,7 @@ export default function MobileHeader({
             <span className="block h-[1.5px] w-4 rounded-full bg-current" />
             <span className="block h-[1.5px] w-4 rounded-full bg-current" />
           </span>
-        </button>
+        </IconButton>
 
         <div className="text-sm tracking-[0.24em] text-white">
           BRANESx
