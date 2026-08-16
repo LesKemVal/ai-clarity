@@ -6045,7 +6045,7 @@ export default function Page({
               type="button"
               aria-label="Close GEORGE sidebar"
               onClick={() => setShowSidebar(false)}
-              className="fixed inset-0 z-[220] cursor-default bg-black george-motion-fade-soft/[0.18] backdrop-blur-[7px] transition-[opacity,background-color,backdrop-filter] duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)] xl:hidden"
+              className="fixed inset-0 z-[220] cursor-default bg-black/[0.18] george-motion-fade-soft backdrop-blur-[7px] transition-[opacity,background-color,backdrop-filter] duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)] xl:hidden"
             />
           )}
 
@@ -8114,9 +8114,9 @@ export default function Page({
                 >
                   <div
                     aria-hidden="true"
-                    className="pointer-events-none mb-2 select-none text-center font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-white/38"
+                    className="pointer-events-none mb-2 select-none text-center text-[11px] font-normal tracking-normal text-white/38"
                   >
-                    GEORGE can make mistakes. Check important information.
+                    GEORGE can make mistakes. Check important info.
                   </div>
 
                   <div
