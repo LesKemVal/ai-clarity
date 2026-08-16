@@ -6786,7 +6786,7 @@ export default function Page({
                           data-george-message-presentation={
                             m.presentationMode || undefined
                           }
-                          className={`relative whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-[15.5px] md:text-[15.8px] landscape:text-[18px] ${forceLive || liveMode ? "leading-[1.72]" : "leading-[1.68]"} landscape:leading-8 tracking-[0.002em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[#D7DBE4]/88 ${
+                          className={`relative whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-[15.5px] md:text-[15.8px] landscape:text-[18px] ${forceLive || liveMode ? "leading-[1.72]" : ""} landscape:leading-8 tracking-[0.002em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[#D7DBE4]/88 ${
                             m.role === "user"
                               ? liveMode
                                 ? "ml-auto self-end w-fit max-w-[72%] text-left rounded-[0.6rem] border-0 bg-[#F7F8FA] px-2.5 py-1.5 text-[#171717] shadow-[0_6px_16px_rgba(3,8,14,0.14)]"
