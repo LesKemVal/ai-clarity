@@ -94,6 +94,42 @@ export default function Sidebar({
   const [activeGoalCheck, setActiveGoalCheck] = useState<GoalCheckItem | null>(null)
   const [sessionMenuId, setSessionMenuId] = useState<string | null>(null)
   const [pendingDeleteSessionId, setPendingDeleteSessionId] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!sessionMenuId) return
+
+    const dismissSessionMenu = () => {
+      setSessionMenuId(null)
+      setPendingDeleteSessionId(null)
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target
+
+      if (
+        target instanceof Element &&
+        target.closest('[data-george-session-menu]')
+      ) {
+        return
+      }
+
+      dismissSessionMenu()
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        dismissSessionMenu()
+      }
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [sessionMenuId])
   const [pendingNormalDestination, setPendingNormalDestination] = useState<
     GeorgeStoredSession | 'new' | null
   >(null)
@@ -557,7 +593,13 @@ return (
 
             <div className="mt-3 space-y-1">
                 {normalSessions.map((session) => (
-                  <div key={session.id} className="group relative flex items-center rounded-[0.55rem] hover:bg-white/[0.014]">
+                  <div
+                    key={session.id}
+                    data-george-session-menu={
+                      sessionMenuId === session.id ? '' : undefined
+                    }
+                    className="group relative flex items-center rounded-[0.55rem] hover:bg-white/[0.014]"
+                  >
                     <button
                       type="button"
                       onClick={() => openNormalSession(session)}
@@ -658,7 +700,13 @@ return (
             {openGroups['Conversations'] && liveSessions.length > 0 && (
               <div className="mt-3 space-y-1">
                 {liveSessions.map((session) => (
-                  <div key={session.id} className="group relative flex items-center rounded-[0.55rem] hover:bg-white/[0.014]">
+                  <div
+                    key={session.id}
+                    data-george-session-menu={
+                      sessionMenuId === session.id ? '' : undefined
+                    }
+                    className="group relative flex items-center rounded-[0.55rem] hover:bg-white/[0.014]"
+                  >
                     <button
                       type="button"
                       onClick={() => openLiveSession(session)}
