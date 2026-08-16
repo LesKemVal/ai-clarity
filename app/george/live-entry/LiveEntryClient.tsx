@@ -6731,7 +6731,7 @@ export default function LiveEntryClient() {
       );
 
       const className =
-        "flex w-full -translate-y-1 items-center justify-between gap-4 rounded-[11px] border border-white/[0.09] bg-white/[0.025] px-4 py-3 text-left transition-all duration-300";
+        "flex w-full items-center justify-between gap-4 rounded-[11px] border border-white/[0.09] bg-white/[0.025] px-4 py-3 text-left transition-[border-color,background-color,color] duration-[var(--george-motion-fast)] ease-out";
 
       if (!onClick) {
         return <div className={className}>{content}</div>;
@@ -6741,7 +6741,7 @@ export default function LiveEntryClient() {
         <button
           type="button"
           onClick={onClick}
-          className={`${className} hover:-translate-y-1.5 hover:border-[#8FAEFF]/32`}
+          className={`${className} hover:border-[#8FAEFF]/32 hover:bg-white/[0.035]`}
         >
           {content}
         </button>
@@ -7006,7 +7006,7 @@ export default function LiveEntryClient() {
             </div>
 
             <section
-              className={`grid transition-all duration-500 ease-out ${
+              className={`grid transition-[grid-template-rows,opacity,transform,margin] duration-[var(--george-motion-deliberate)] ease-[var(--george-motion-ease)] ${
                 liveEntryRoute === "homepage" && livePrepOpenSection === "support"
                   ? "mt-5 grid-rows-[1fr] translate-y-0 opacity-100"
                   : "pointer-events-none grid-rows-[0fr] -translate-y-5 opacity-0"
@@ -7080,7 +7080,7 @@ export default function LiveEntryClient() {
             </section>
 
             <section
-              className={`grid transition-all duration-500 ease-out ${
+              className={`grid transition-[grid-template-rows,opacity,transform,margin] duration-[var(--george-motion-deliberate)] ease-[var(--george-motion-ease)] ${
                 liveEntryRoute === "homepage" && livePrepOpenSection === "formula"
                   ? "mt-5 grid-rows-[1fr] translate-y-0 opacity-100"
                   : "pointer-events-none grid-rows-[0fr] -translate-y-5 opacity-0"
@@ -7123,7 +7123,7 @@ export default function LiveEntryClient() {
             </section>
 
             <section
-              className={`grid transition-all duration-500 ease-out ${
+              className={`grid transition-[grid-template-rows,opacity,transform,margin] duration-[var(--george-motion-deliberate)] ease-[var(--george-motion-ease)] ${
                 liveEntryRoute !== "homepage" || livePrepOpenSection === "ready"
                   ? "mt-5 grid-rows-[1fr] translate-y-0 opacity-100"
                   : "pointer-events-none grid-rows-[0fr] -translate-y-5 opacity-0"
@@ -7131,7 +7131,7 @@ export default function LiveEntryClient() {
             >
               <div className="overflow-hidden">
                 <div
-                  className={`transition-all duration-500 ${
+                  className={`transition-opacity duration-[var(--george-motion-standard)] ease-[var(--george-motion-ease)] ${
                     readyRoomPromptComplete
                       ? "opacity-100"
                       : "opacity-30"
