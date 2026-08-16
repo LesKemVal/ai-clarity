@@ -6831,7 +6831,7 @@ export default function Page({
                                 setToastMessage("Saved");
                                 setShowToast(true);
                               }}
-                              className={`relative flex items-center justify-center transition duration-150 ${
+                              className={`george-quiet-action relative flex items-center justify-center transition duration-150 ${
                                 feedback[i] === "up"
                                   ? "text-[#D7DBE4]/82"
                                   : "text-[#D7DBE4]/50 hover:text-[#D7DBE4]/80"
@@ -6862,7 +6862,7 @@ export default function Page({
                                 setToastMessage("Saved");
                                 setShowToast(true);
                               }}
-                              className={`relative flex items-center justify-center transition duration-150 ${
+                              className={`george-quiet-action relative flex items-center justify-center transition duration-150 ${
                                 feedback[i] === "down"
                                   ? "text-red-100/82"
                                   : "text-[#D7DBE4]/50 hover:text-[#D7DBE4]/80"
@@ -6993,7 +6993,7 @@ export default function Page({
                               </div>
                             )}
 
-                            {!liveMode && !liveMode && (
+                            {!liveMode && (
                               <div className="relative flex max-w-full items-center gap-2 overflow-x-auto whitespace-nowrap text-[11px] text-[#D7DBE4]/50 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                                 {
                                   <>
@@ -7049,7 +7049,7 @@ export default function Page({
                                                 },
                                               );
                                             }}
-                                            className="inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-[0.55rem] border border-white/[0.07] bg-white/[0.018] px-2.5 py-1.5 text-[10px] font-semibold tracking-[0.17em] text-[#D7DBE4]/54 transition hover:border-[#75A4FF]/28 hover:bg-[#172347]/38 hover:text-[#E4EBFF]/88 active:scale-[0.97]"
+                                            className="george-secondary-action inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-[0.55rem] px-2.5 py-1.5 text-[10px] font-semibold tracking-[0.14em]"
                                             aria-label={`Use GEORGE to ${capability.label.toLowerCase()}`}
                                           >
                                             {capability.label}
@@ -7058,7 +7058,7 @@ export default function Page({
                                       </>
                                     )}
 
-                                    <div className="relative shrink-0">
+                                    <div className="relative ml-1 shrink-0 border-l border-white/[0.07] pl-2">
                                       <button
                                         type="button"
                                         onClick={() => {
@@ -7070,7 +7070,7 @@ export default function Page({
                                         }}
                                         aria-label="More response actions"
                                         title="More"
-                                        className="inline-flex h-7 w-7 items-center justify-center rounded-[0.5rem] text-[#D7DBE4]/48 transition hover:bg-white/[0.035] hover:text-[#D7DBE4]/82"
+                                        className="george-quiet-action inline-flex h-7 w-7 items-center justify-center rounded-[0.5rem] transition hover:bg-white/[0.035]"
                                       >
                                         <svg
                                           viewBox="0 0 24 24"
