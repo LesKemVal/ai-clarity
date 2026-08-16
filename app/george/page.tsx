@@ -8035,7 +8035,13 @@ export default function Page({
                   </div>
 
                   <div
-                    className={`george-composer-shell relative z-[191] isolate flex-1 overflow-hidden rounded-[1.5rem] border pointer-events-auto touch-manipulation ${!(forceLive || liveMode) ? "border-[#4668B8]/65 !bg-[#101A36] shadow-[0_12px_38px_rgba(4,10,28,0.46),0_0_34px_rgba(8,18,48,0.48)]" : "border-white/[0.09] bg-[#070B12]/96 shadow-[0_10px_28px_rgba(0,0,0,0.28)]"}`}
+                    className={`george-composer-shell relative z-[191] isolate flex-1 overflow-hidden rounded-[1.5rem] border pointer-events-auto touch-manipulation ${
+                      forceLive || liveMode
+                        ? "border-white/[0.09] bg-[#070B12]/96 shadow-[0_10px_28px_rgba(0,0,0,0.28)]"
+                        : isNormalPreparationBriefingActive
+                          ? "border-[#4668B8]/65 !bg-[#101A36] shadow-[0_12px_38px_rgba(4,10,28,0.46),0_0_34px_rgba(8,18,48,0.48)]"
+                          : "border-white/[0.09] !bg-[#0B0F17] shadow-[0_10px_30px_rgba(0,0,0,0.34)]"
+                    }`}
                   >
                     {composerSendFeedback && (
                       <>
