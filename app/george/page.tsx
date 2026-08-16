@@ -6760,7 +6760,13 @@ export default function Page({
                     return (
                       <div
                         key={i}
-                        className={`w-full max-w-full min-w-0 space-y-1 flex flex-col md:mx-auto md:max-w-[760px] ${
+                        className={`w-full max-w-full min-w-0 space-y-1 flex flex-col md:mx-auto ${
+                          !(forceLive || liveMode) &&
+                          m.role === "assistant" &&
+                          m.presentationMode !== "live_preparation"
+                            ? "md:max-w-[920px]"
+                            : "md:max-w-[760px]"
+                        } ${
                           m.role === "user" ? "items-end" : "items-start"
                         }`}
                       >
