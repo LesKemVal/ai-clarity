@@ -11,6 +11,7 @@ type RecommendedStrategyCardProps = {
   selectedFormula: OperationalFormula | null;
   onChooseAnother: () => void;
   onUseFormula?: (formula: OperationalFormula) => void;
+  onViewScripts?: (formula: OperationalFormula) => void;
 };
 
 const EXPLANATION_STORAGE_KEY =
@@ -23,6 +24,7 @@ export function RecommendedStrategyCard({
   selectedFormula,
   onChooseAnother,
   onUseFormula,
+  onViewScripts,
 }: RecommendedStrategyCardProps) {
   const [explanationOpen, setExplanationOpen] = useState(false);
   const [formulaDetailsOpen, setFormulaDetailsOpen] = useState(false);
@@ -238,15 +240,27 @@ export function RecommendedStrategyCard({
         </button>
       </div>
 
-      {onUseFormula && (
-        <div className="mt-3 border-t border-white/[0.055] pt-3">
-          <button
-            type="button"
-            onClick={() => onUseFormula(formula)}
-            className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-[#AFC0FF]/66 transition hover:text-white"
-          >
-            Use formula
-          </button>
+      {(onUseFormula || onViewScripts) && (
+        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-white/[0.055] pt-3">
+          {onUseFormula && (
+            <button
+              type="button"
+              onClick={() => onUseFormula(formula)}
+              className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-[#AFC0FF]/66 transition hover:text-white"
+            >
+              Use formula
+            </button>
+          )}
+
+          {onViewScripts && (
+            <button
+              type="button"
+              onClick={() => onViewScripts(formula)}
+              className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-white/34 transition hover:text-white/70"
+            >
+              View scripts
+            </button>
+          )}
         </div>
       )}
     </section>

@@ -6789,6 +6789,13 @@ export default function LiveEntryClient() {
       .filter(Boolean)
       .slice(0, 4);
 
+    const viewFormulaScripts = (
+      formula: OperationalFormula,
+    ) => {
+      setScriptBrowserFormula(formula);
+      setScriptBrowserOpen(true);
+    };
+
     const useRecommendedFormulaInReadyRoom = (
       formula: OperationalFormula,
     ) => {
@@ -7196,6 +7203,7 @@ export default function LiveEntryClient() {
                   selectedFormula={selectedFormula}
                   onChooseAnother={beginFormulaSelection}
                   onUseFormula={useRecommendedFormulaInReadyRoom}
+                  onViewScripts={viewFormulaScripts}
                 />
 
                 <FormulaScriptBrowserPanel
