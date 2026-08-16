@@ -120,7 +120,7 @@ export function RecommendedStrategyCard({
             onClick={onChooseAnother}
             className="inline-flex h-9 items-center justify-center rounded-[9px] border border-[#7898FF]/[0.24] bg-[#4E7CFF]/[0.08] px-4 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-[#D4DCFF]/72 transition hover:border-[#7898FF]/45 hover:text-white"
           >
-            Browse Formula Library
+            Choose another
           </button>
         </div>
       </section>
@@ -248,7 +248,7 @@ export function RecommendedStrategyCard({
               onClick={() => onUseFormula(formula)}
               className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-[#AFC0FF]/66 transition hover:text-white"
             >
-              Use formula
+              Continue with this formula
             </button>
           )}
 

@@ -1423,7 +1423,7 @@ export default function LiveEntryClient() {
           : "Your completed mechanics carry forward into this room."
         : livePrepOpenSection === "formula"
           ? preparationResumeMessage ||
-            "The formula gives me an operational path for this room. Choose the one you want me to use."
+            "Based on your briefing, I recommend this formula for the room."
           : livePrepOpenSection === "ready"
             ? activeFormula
               ? `I will use ${formulaName} as the operational reference for this room.`
