@@ -2,7 +2,7 @@
 
 ## Authority
 
-`GEORGE_DOCUMENTATION_SYNC: 2026-08-05-preparation-session-routing`
+`GEORGE_DOCUMENTATION_SYNC: 2026-08-15-formula-script-refinement`
 
 `IMPLEMENTATION_AUTHORITY: Implementation is authoritative; these documents are authoritative only while synchronized with the validated local implementation.`
 
@@ -20,9 +20,9 @@ Inspect the local implementation before changing anything. This handoff records 
 ## Current Repository State
 
 - Current branch: `conversation-summary-runtime`
-- Current HEAD: `2df3d23d Correct live transcript packet qualification`
+- Current implementation HEAD: `0deaca7e Expose optional Formula scripts`
 - Ahead/behind `origin/conversation-summary-runtime`: ahead 65, behind 0 at synchronization start
-- Production build status: PASS at the current refinement checkpoint after the full post-synchronization production regression/build chain; focused behavior, ownership, portability, interface-freeze, resilience, and qualification regression guards also PASS
+- Production build status: PASS for the implementation through `0deaca7e` before this authority synchronization; the synchronized four-document authority state must be qualified again before commit
 - Worktree status: clean at synchronization start
 - Commit status: stopped before documentation synchronization commit
 
@@ -77,6 +77,16 @@ Preparation is objective-first and conversational: required operational signals 
 
 Continue **product refinement** from the established production runtime.
 
+Current synchronized implementation checkpoint for this authority pass:
+
+- branch: `conversation-summary-runtime`;
+- implementation HEAD before documentation synchronization commit: `0deaca7e`;
+- Formula Script browser wiring checkpoint: `aca649da`;
+- optional Formula Script affordance checkpoint: `0deaca7e`;
+- all four production authorities are being synchronized together;
+- final production/documentation qualification must pass before the synchronization commit.
+
+
 Recent validated refinement includes:
 
 - explicit working Formula synthesis after a genuine recommendation miss;
@@ -88,6 +98,11 @@ Recent validated refinement includes:
 - correction of optional-signal state ordering;
 - contextual-ambiguity qualification aligned with the established classifier contract without changing its runtime owner;
 - LIVE transcript-packet qualification aligned with current queued delivery-style ownership without changing its runtime owner;
+- `aca649da` wired the LIVE Formula Script browser to the existing canonical Script API using exact Formula ID/version;
+- `0deaca7e` exposed optional `View scripts` progressive disclosure from the recommended Formula presentation;
+- direct `Use formula` → Ready Room behavior remains preserved;
+- Script selection remains optional and downstream rather than becoming a preparation gate;
+- existing Formula, Script, customization, preparation, and recommendation ownership remains unchanged;
 - Formula/session identity, execution/learning, Marketplace/publication, LIVE reasoning, provider degradation, reconnect ownership, runtime interface freeze, portability, and duplicate-ownership regression guards passing in the refinement review.
 
 Current refinement discipline:
@@ -218,7 +233,7 @@ Validated commit:
 
 The next thread begins with inspection of the synchronized authorities and current repository state, not architectural redesign.
 
-Current synchronized implementation checkpoint:
+Historical synchronized implementation checkpoint — 2026-08-11:
 
 - branch: conversation-summary-runtime;
 - implementation HEAD before documentation synchronization commit: cf261fa4;

@@ -14,7 +14,7 @@ const authorityPaths = [
   'docs/george/NEXT_THREAD_HANDOFF.md',
 ]
 const syncMarker =
-  'GEORGE_DOCUMENTATION_SYNC: 2026-08-05-preparation-session-routing'
+  'GEORGE_DOCUMENTATION_SYNC: 2026-08-15-formula-script-refinement'
 const implementationAuthority =
   'IMPLEMENTATION_AUTHORITY: Implementation is authoritative; these documents are authoritative only while synchronized with the validated local implementation.'
 const readOrder =

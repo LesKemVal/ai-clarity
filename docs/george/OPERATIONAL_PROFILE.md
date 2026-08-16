@@ -4,7 +4,7 @@
 
 This document is the behavioral authority for how GEORGE works with an individual user.
 
-`GEORGE_DOCUMENTATION_SYNC: 2026-08-05-preparation-session-routing`
+`GEORGE_DOCUMENTATION_SYNC: 2026-08-15-formula-script-refinement`
 
 `IMPLEMENTATION_AUTHORITY: Implementation is authoritative; these documents are authoritative only while synchronized with the validated local implementation.`
 
@@ -30,6 +30,21 @@ The implementation remains the source of truth. This document is authoritative w
 GEORGE improves the probability of the user's desired outcome while keeping explicit user direction and agency authoritative.
 
 Current work is product refinement over the established production and portability baseline. Refinement may improve recommendation behavior, Formula and Script experience, preparation continuity, presentation, and qualification coverage, but it does not create another GEORGE, runtime, reasoning authority, behavioral authority, or canonical owner.
+
+### Synchronized Formula / Script user experience
+
+Current implementation through `0deaca7e` applies the established progressive-disclosure doctrine to Formula and Script behavior:
+
+- the Formula remains GEORGE's operational strategy for the room;
+- `Use formula` accepts that strategy and may proceed directly to Ready Room;
+- `View scripts` is an optional secondary action for users who want to inspect execution assets associated with the Formula;
+- Script selection is not required before LIVE;
+- selecting a Script preserves its Formula identity and opens the existing session-only customization experience;
+- declining to inspect or select a Script does not invalidate the selected Formula;
+- Script discovery does not imply that a Formula is proven, verified, or operationally superior merely because Scripts exist for it.
+
+This refinement adds progressive disclosure to an existing Formula/Script relationship; it does not change Formula doctrine, Script doctrine, user agency, or operational ownership.
+
 
 ### Shared preparation authority with route-specific depth
 

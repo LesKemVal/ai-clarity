@@ -4,7 +4,7 @@
 
 This document is the primary production authority for the current GEORGE implementation.
 
-`GEORGE_DOCUMENTATION_SYNC: 2026-08-05-preparation-session-routing`
+`GEORGE_DOCUMENTATION_SYNC: 2026-08-15-formula-script-refinement`
 
 `IMPLEMENTATION_AUTHORITY: Implementation is authoritative; these documents are authoritative only while synchronized with the validated local implementation.`
 
@@ -56,7 +56,7 @@ The local implementation has one GEORGE intelligence, one runtime, and one reaso
 - `lib/george/live-delivery/visual-presentation-policy.ts` plans evidence-first visual stages from existing operational assessment, and `components/george/live/LiveHubVisualCueBridge.tsx` executes those plans without becoming a reasoning owner;
 - staged visual execution is cancellable, lifecycle-safe, and build-qualified by `scripts/george-live-delivery-policy-smoke.mjs`.
 
-Current qualification status: **PASS** at `2df3d23d` after `git diff --check`, `george:documentation:qualify`, the complete production qualification chain, TypeScript, and the Next.js production build. Legacy preparation keys remain read-compatible while route migrations are incomplete.
+Current synchronized implementation checkpoint: `0deaca7e` (`Expose optional Formula scripts`). The preceding refinement at `aca649da` wired LIVE Formula Script browsing to the existing canonical Script API by Formula ID/version. `0deaca7e` then exposed optional `View scripts` progressive disclosure from the recommended Formula while preserving direct `Use formula` → Ready Room behavior. Script selection remains a separate downstream concern and optional execution asset rather than a preparation gate. Final authority-set qualification is required after this synchronization patch. Legacy preparation keys remain read-compatible while route migrations are incomplete.
 
 ### Route migration status
 
@@ -1311,6 +1311,20 @@ These documents are authoritative while synchronized with implementation.
 7. preserve staged visual presentation and documentation synchronization through build-gated qualification.
 
 Do not use product refinement as an opportunity to redesign runtime architecture.
+
+### Current Formula / Script refinement checkpoint
+
+Validated implementation through `0deaca7e` preserves the established Formula/Script relationship while completing the user-facing downstream Script path:
+
+- `aca649da` wires the existing LIVE Formula Script browser to `/api/george/operational-memory/scripts` using exact Formula ID and version;
+- existing Script selection and session-only customization ownership remains unchanged;
+- `0deaca7e` exposes optional `View scripts` from the recommended Formula presentation;
+- `Use formula` continues directly to Ready Room;
+- Script selection remains optional and downstream of Formula selection rather than becoming a new preparation step;
+- Formula remains the operational strategy;
+- Script remains an execution asset built on that Formula;
+- no new Script API, runtime, Formula owner, Script owner, recommendation owner, or preparation authority was introduced.
+
 
 ## Real-Room LIVE Acceptance Scenarios
 

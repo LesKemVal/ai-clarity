@@ -4,7 +4,7 @@
 
 This document is the architectural authority for the current GEORGE implementation.
 
-`GEORGE_DOCUMENTATION_SYNC: 2026-08-05-preparation-session-routing`
+`GEORGE_DOCUMENTATION_SYNC: 2026-08-15-formula-script-refinement`
 
 `IMPLEMENTATION_AUTHORITY: Implementation is authoritative; these documents are authoritative only while synchronized with the validated local implementation.`
 
@@ -36,6 +36,22 @@ Production Completion — product refinement over the established production and
 The runtime architecture is frozen unless current implementation evidence proves a genuine architectural defect.
 
 Current work is product refinement over the established production runtime and portability boundary. Preparation Session lifecycle work and Operational Formula Experience remain product layers over the existing runtime and operational-memory/formula-intelligence architecture. Refinement must not create another runtime, reasoning authority, retrieval path, learning owner, conversation-type registry, or page-level intelligence.
+
+### Synchronized Formula / Script refinement checkpoint
+
+Current implementation through `0deaca7e` preserves the existing architectural ownership:
+
+- Formula selection remains preparation strategy state owned by the established preparation and operational-memory boundaries;
+- Script retrieval remains owned by the canonical Operational Script library and existing `/api/george/operational-memory/scripts` adapter;
+- LIVE Entry now retrieves Scripts for the exact Formula ID/version selected for browsing;
+- `RecommendedStrategyCard` may request optional Script exploration, while `LiveEntryClient` owns the resulting preparation-state transition;
+- `FormulaScriptBrowserPanel` presents available Scripts but does not own retrieval, Formula selection, or Script persistence;
+- `ScriptCustomizationPanel` continues to operate on the existing session-only customized Script path;
+- direct `Use formula` → Ready Room remains valid;
+- Script exploration remains optional and does not create another preparation checkpoint, runtime, or reasoning authority.
+
+No architectural ownership changed in this refinement.
+
 
 Known Normal GEORGE and Resume lifecycle work remains valid, but it does not redefine the current phase as a production/portability build-out.
 
