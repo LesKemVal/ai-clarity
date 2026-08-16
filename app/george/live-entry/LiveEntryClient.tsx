@@ -7137,20 +7137,11 @@ export default function LiveEntryClient() {
                       : "opacity-30"
                   }`}
                 >
-                  <button
-                    type="button"
-                    disabled={!readyRoomPromptComplete}
-                    onClick={continueBriefingFromReadyRoom}
-                    className="mt-8 w-full rounded-[1rem] border border-white/[0.10] px-4 py-2.5 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-white/58 transition hover:border-white/24 hover:text-white disabled:cursor-default disabled:opacity-30"
-                  >
-                    CONTINUE BRIEFING <span className="ml-1 text-white/34">?</span>
-                  </button>
-
                   <div
                     className={
                       readyRoomPromptComplete
-                        ? "george-live-primary-shimmer relative mt-6 overflow-hidden rounded-[1rem]"
-                        : "mt-6"
+                        ? "george-live-primary-shimmer relative mt-8 overflow-hidden rounded-[1rem]"
+                        : "mt-8"
                     }
                   >
                     <AwakeButton
@@ -7160,6 +7151,15 @@ export default function LiveEntryClient() {
                       ENTER LIVE
                     </AwakeButton>
                   </div>
+
+                  <button
+                    type="button"
+                    disabled={!readyRoomPromptComplete}
+                    onClick={continueBriefingFromReadyRoom}
+                    className="mt-4 w-full text-center font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/34 transition hover:text-white/62 disabled:cursor-default disabled:opacity-30"
+                  >
+                    ADD MORE CONTEXT
+                  </button>
                 </div>
 
                 <p className="mt-3 text-center text-[9px] uppercase tracking-[0.15em] text-white/26">
