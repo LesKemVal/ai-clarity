@@ -451,45 +451,100 @@ function PanelShell({
   onBack?: () => void;
   children: React.ReactNode;
 }) {
-  const stageGlow =
-    stage === 1
-      ? "rgba(78,124,255,0.08)"
-      : stage === 2
-        ? "rgba(78,124,255,0.12)"
-        : "rgba(174,182,255,0.16)";
-
-  const stageBorder =
-    stage === 1
-      ? "border-white/[0.055]"
-      : stage === 2
-        ? "border-[#4E7CFF]/[0.12]"
-        : "border-[#AEB6FF]/[0.18]";
-
   return (
-    <main className="relative flex min-h-[100dvh] items-start justify-center overflow-y-auto bg-black px-4 py-4 text-white sm:py-5">
-      <div className="relative z-10 w-full max-w-[620px]">
-        <div className="flex items-center gap-4">
-          <BxPageHeader backLabel="BACK" onBack={onBack} />
+    <main className="relative min-h-[100dvh] overflow-y-auto bg-black px-5 py-10 text-white sm:px-8 sm:py-14">
+      <div className="relative z-10 mx-auto w-full max-w-[760px]">
+        <div className="flex items-center">
+          <BxPageHeader
+            backLabel="BACK"
+            onBack={onBack}
+            backClassName={stage === 1 ? "george-motion-fade" : ""}
+            backTone={stage === 3 ? "silver" : "blue"}
+          />
         </div>
 
-        <section className="george-motion-fade relative mt-2.5 w-full overflow-hidden rounded-[20px] border border-white/[0.045] bg-[#050505] px-4 py-4 sm:px-5 sm:py-5">
-          <div className="flex items-center justify-between gap-4">
-            <div className="text-[8px] font-semibold uppercase tracking-[0.25em] text-[#D7DBE4]/46">
-              {label}
-            </div>
-
-            <div className="font-mono text-[8px] uppercase tracking-[0.16em] text-white/24">
-              {stage}/3
-            </div>
+        <div className="mt-14 sm:mt-20">
+          <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/34">
+            {label}
           </div>
 
-          <h1 className="mt-3 max-w-[540px] text-[24px] font-semibold leading-[1.08] tracking-[-0.035em] text-white/92 sm:text-[28px]">
+          <h1 className="mt-3 max-w-[680px] font-mono text-[25px] leading-[1.55] tracking-[-0.025em] text-white/92 sm:text-[30px]">
             {title}
           </h1>
 
           {children}
-        </section>
+        </div>
       </div>
+
+      <style jsx global>{`
+        @keyframes georgePopupGlideIn {
+          from {
+            transform: translateY(8px);
+            opacity: 0;
+          }
+
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+
+        .george-popup-glide-in {
+          animation: georgePopupGlideIn 180ms
+            var(--george-motion-ease) both;
+        }
+
+        @keyframes georgePopupSettle {
+          0% {
+            transform: translateY(9px);
+            opacity: 0;
+            box-shadow: 0 0 0 rgba(175, 192, 255, 0);
+          }
+
+          28% {
+            transform: translateY(0);
+            opacity: 1;
+            box-shadow: 0 0 0 rgba(175, 192, 255, 0);
+          }
+
+          43% {
+            box-shadow:
+              0 0 0 1px rgba(175, 192, 255, 0.18),
+              0 0 18px rgba(175, 192, 255, 0.11);
+          }
+
+          55% {
+            box-shadow: 0 0 0 rgba(175, 192, 255, 0);
+          }
+
+          69% {
+            box-shadow:
+              0 0 0 1px rgba(175, 192, 255, 0.14),
+              0 0 15px rgba(175, 192, 255, 0.08);
+          }
+
+          82%,
+          100% {
+            transform: translateY(0);
+            opacity: 1;
+            box-shadow: 0 0 0 rgba(175, 192, 255, 0);
+          }
+        }
+
+        .george-popup-settle {
+          animation: georgePopupSettle 520ms
+            var(--george-motion-ease) both;
+          will-change: transform, opacity, box-shadow;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .george-popup-glide-in,
+          .george-popup-settle {
+            animation: none !important;
+            will-change: auto;
+          }
+        }
+      `}</style>
     </main>
   );
 }
@@ -685,6 +740,56 @@ export default function LiveEntryClient() {
   const [readyRoomTypedPrompt, setReadyRoomTypedPrompt] = useState("");
   const [readyRoomPromptComplete, setReadyRoomPromptComplete] =
     useState(false);
+
+  type ReadyRoomSequenceStep =
+    | "room"
+    | "formula"
+    | "authority"
+    | "complete";
+
+  const [readyRoomSequenceStep, setReadyRoomSequenceStep] =
+    useState<ReadyRoomSequenceStep>("room");
+
+  const [readyRoomCompletedSteps, setReadyRoomCompletedSteps] = useState<
+    ReadyRoomSequenceStep[]
+  >([]);
+
+  const completeReadyRoomSequenceStep = (
+    step: ReadyRoomSequenceStep,
+    next: ReadyRoomSequenceStep,
+  ) => {
+    setReadyRoomCompletedSteps((current) =>
+      current.includes(step) ? current : [...current, step],
+    );
+
+    window.setTimeout(() => {
+      setReadyRoomSequenceStep(next);
+    }, 190);
+  };
+
+  const reopenReadyRoomSequenceStep = (step: ReadyRoomSequenceStep) => {
+    const order: ReadyRoomSequenceStep[] = [
+      "room",
+      "formula",
+      "authority",
+    ];
+
+    const index = order.indexOf(step);
+
+    setReadyRoomCompletedSteps((current) =>
+      current.filter((candidate) => {
+        const candidateIndex = order.indexOf(candidate);
+        return candidateIndex >= 0 && candidateIndex < index;
+      }),
+    );
+
+    if (step === "authority") {
+      setLiveRecoveryAcknowledged(false);
+    }
+
+    setReadyRoomPromptComplete(false);
+    setReadyRoomSequenceStep(step);
+  };
   const [preparationResumeMessage, setPreparationResumeMessage] =
     useState("");
   type LivePreparationWorkflowState =
@@ -1535,7 +1640,7 @@ export default function LiveEntryClient() {
     {
       key: "clarify_desiredOutcome",
       label: "Goal",
-      question: "What are you looking to gain with Intelligent communication?",
+      question: "What are you looking to gain from intelligent communication?",
     },
     {
       key: "clarify_role",
@@ -3531,10 +3636,13 @@ export default function LiveEntryClient() {
          */
         livePreparationHistoryRef.current = ["brief_review"];
         setLiveBriefingStep(3);
+        setReadyRoomCompletedSteps([]);
+        setReadyRoomSequenceStep("room");
+        setReadyRoomPromptComplete(false);
         setLiveBriefingToaAccepted(true);
         setLiveBriefingSupportAccepted(false);
         setLiveBriefingCommunicationConfirmed(true);
-        setLiveRecoveryAcknowledged(true);
+        setLiveRecoveryAcknowledged(false);
         setLiveReadyAccepted(false);
         setLiveReadinessComplete(false);
         setShowLiveBriefingRoom(true);
@@ -5820,32 +5928,35 @@ export default function LiveEntryClient() {
       onChange: () => void;
       recommended?: boolean;
     }) => (
-      <div className="rounded-[0.72rem] border border-white/[0.07] bg-[#080A10]/[0.62] px-3.5 py-2.5">
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2 text-[9px] uppercase tracking-[0.22em] text-white/34">
-              <span>{label}</span>
-              {recommended && (
-                <span className="rounded-full border border-[#7EA1FF]/24 bg-[#4E7CFF]/[0.08] px-2 py-0.5 text-[7px] text-[#D7DCFF]/64">
-                  Recommended
-                </span>
-              )}
-            </div>
-            <div className="mt-1 text-[12.5px] font-semibold text-[#F2F4FF]/88">
-              ✓ {value}
-            </div>
-            <div className="mt-0.5 text-[9.5px] leading-4 text-[#D7DBE4]/44">
-              {summary}
-            </div>
+      <div className="george-popup-settle flex items-start gap-3 rounded-[10px] border border-white/[0.07] bg-white/[0.018] px-3 py-2.5 font-mono text-[11px] leading-6 text-white/50">
+        <span className="mt-[1px] shrink-0 text-[#AFC0FF]/80">✓</span>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="uppercase tracking-[0.16em] text-white/34">
+              {label}
+            </span>
+            <span className="text-white/66">{value}</span>
+
+            {recommended && (
+              <span className="text-[8px] uppercase tracking-[0.14em] text-[#AFC0FF]/54">
+                Recommended
+              </span>
+            )}
           </div>
-          <button
-            type="button"
-            onClick={onChange}
-            className="george-edit-gleam relative shrink-0 overflow-hidden rounded-[0.55rem] border border-white/[0.12] bg-white/[0.012] px-2.5 py-1 text-[8px] uppercase tracking-[0.15em] text-white/46 transition hover:border-white/[0.22] hover:text-white/72"
-          >
-            Edit
-          </button>
+
+          <div className="mt-0.5 text-[9.5px] leading-4 text-white/30">
+            {summary}
+          </div>
         </div>
+
+        <button
+          type="button"
+          onClick={onChange}
+          className="george-edit-gleam relative shrink-0 overflow-hidden px-1 py-0.5 text-[8px] uppercase tracking-[0.15em] text-white/38 transition hover:text-white/72"
+        >
+          Edit
+        </button>
       </div>
     );
 
@@ -6019,21 +6130,35 @@ export default function LiveEntryClient() {
           stage={1}
           onBack={goToPreviousLivePreparationState}
         >
-          <div className="mt-3 rounded-[14px] border border-white/[0.055] bg-[#07090D]/72 p-3 sm:p-3.5">
-            <div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/34">
-                Operational briefing
-              </div>
-              <p className="mt-2 max-w-[650px] text-[12px] leading-5 text-[#D7DBE4]/50">
-                {priorPreparationExplicitlyRestored
-                  ? "Has anything changed?"
-                  : isFreshTraditionalPreparation
-                    ? "Review the briefing. Open one section at a time to add or edit it."
-                    : "Review everything GEORGE learned about the conversation. Open one section at a time to edit it."}
-              </p>
+          <div className="mt-10">
+            <div className="grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-2">
+              {briefingRows.map((row) => (
+                <div
+                  key={`briefing-signal-${row.id}`}
+                  className="george-popup-settle flex items-start gap-3 rounded-[10px] border border-white/[0.07] bg-white/[0.018] px-3 py-2.5 font-mono text-[11px] leading-6 text-white/50"
+                >
+                  <span className="mt-[1px] shrink-0 text-[#AFC0FF]/80">✓</span>
+                  <span className="min-w-0">
+                    <span className="uppercase tracking-[0.16em] text-white/34">
+                      {row.label}
+                    </span>
+                    <span className="ml-3 text-white/66">
+                      {row.summary}
+                    </span>
+                  </span>
+                </div>
+              ))}
             </div>
 
-            <div className="mt-3 overflow-hidden rounded-[12px] border border-white/[0.06] bg-[#090B0E]">
+            <p className="mt-6 max-w-[650px] text-[12px] leading-5 text-[#D7DBE4]/50">
+              {priorPreparationExplicitlyRestored
+                ? "Has anything changed?"
+                : isFreshTraditionalPreparation
+                  ? "Review the briefing. Open one section at a time to add or edit it."
+                  : "Review everything GEORGE learned about the conversation. Open one section at a time to edit it."}
+            </p>
+
+            <div className="mt-4 overflow-hidden border-y border-white/[0.06]">
               <button
                 type="button"
                 aria-expanded={liveBriefingSignalsExpanded}
@@ -6048,7 +6173,7 @@ export default function LiveEntryClient() {
                     return next;
                   });
                 }}
-                className="relative flex w-full items-center justify-between gap-4 overflow-hidden px-3.5 py-3 text-left transition hover:bg-white/[0.018]"
+                className="relative flex w-full items-center justify-between gap-4 overflow-hidden py-3 text-left transition hover:text-white"
               >
                 <span className="min-w-0">
                   <span className="block text-[9px] font-semibold uppercase tracking-[0.2em] text-white/38">
@@ -6244,7 +6369,7 @@ export default function LiveEntryClient() {
             {(briefingUnderstandingSignals.length > 0 ||
               briefingPreparation?.opportunities?.[0] ||
               briefingPreparation?.risks?.[0]) && (
-              <div className="mt-3 rounded-[1rem] border border-white/[0.055] bg-white/[0.014] px-3.5 py-3">
+              <div className="mt-8 border-t border-white/[0.06] pt-6">
                 <div className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/28">
                   What I will carry into LIVE
                 </div>
@@ -6379,7 +6504,7 @@ export default function LiveEntryClient() {
           stage={2}
           onBack={goBackFromMechanics}
         >
-          <div className="mt-3 space-y-3">
+          <div className="mt-10 grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2">
             <div>
               {compactMechanicsChoice({
                 label: "GEORGE's support",
@@ -6515,119 +6640,25 @@ export default function LiveEntryClient() {
               </div>
             </div>
 
-            <div
-              className={`rounded-[0.72rem] border px-3.5 py-2.5 transition ${
-                liveRecoveryAcknowledged
-                  ? "border-[#D7DCFF]/18 bg-[#D7DCFF]/[0.035]"
-                  : "border-white/[0.07] bg-[#080A10]/[0.52]"
-              }`}
-            >
-              <label
-                className={`flex items-start gap-3 ${
-                  mechanicsSelectionsComplete
-                    ? "cursor-pointer"
-                    : "cursor-default"
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  disabled={!mechanicsSelectionsComplete}
-                  checked={liveRecoveryAcknowledged}
-                  onChange={(event) => {
-                    if (!mechanicsSelectionsComplete) return;
-
-                    if (!liveRecoveryAcknowledgementOpen) {
-                      setLiveRecoveryAcknowledgementOpen(true);
-                      setLiveRecoveryAcknowledged(false);
-                      setLiveBriefingCapabilitiesConfirmed(false);
-                      return;
-                    }
-
-                    if (event.target.checked) {
-                      confirmPrivacyAndContinue();
-                      return;
-                    }
-
-                    setLiveRecoveryAcknowledged(false);
-                    setLiveBriefingCapabilitiesConfirmed(false);
-                  }}
-                  className="mt-0.5 h-3.5 w-3.5 shrink-0 accent-[#D7DCFF]"
-                />
-
-                <span className="min-w-0">
-                  <span className="block text-[9px] uppercase tracking-[0.22em] text-white/34">
-                    Mechanics acknowledgement
-                  </span>
-
-                  <span className="mt-1 block text-[12.5px] font-semibold text-[#F2F4FF]/88">
-                    {liveRecoveryAcknowledged
-                      ? "✓ Final authority acknowledged"
-                      : "Final authority"}
-                  </span>
-
-                  <span className="mt-0.5 block text-[9.5px] leading-4 text-[#D7DBE4]/46">
-                    {liveRecoveryAcknowledged
-                      ? "You remain the final authority in LIVE."
-                      : liveRecoveryAcknowledgementOpen
-                        ? "Review the acknowledgement below, then check again."
-                        : mechanicsSelectionsComplete
-                          ? "GEORGE complements your judgment, communication style, and effort."
-                          : "Choose support, delivery, and speaking style first."}
-                  </span>
-                </span>
-              </label>
-
-              <div
-                className={`grid transition-[grid-template-rows,opacity,transform,margin] duration-[var(--george-motion-deliberate)] ease-[var(--george-motion-ease)] ${
-                  liveRecoveryAcknowledgementOpen &&
-                  !liveRecoveryAcknowledged
-                    ? "mt-2 grid-rows-[1fr] translate-y-0 opacity-100"
-                    : "mt-0 grid-rows-[0fr] -translate-y-1 opacity-0"
-                }`}
-              >
-                <div className="overflow-hidden">
-                  <div className="border-l border-[#D7DCFF]/18 pl-3 text-[10px] leading-5 text-[#D7DBE4]/58">
-                    I understand that GEORGE is {liveTierLabel}, but I remain
-                    the final authority. GEORGE supports me by adapting how it
-                    listens, responds, and delivers help based on the mechanics
-                    I choose. If GEORGE&apos;s support does not fit the
-                    conversation, I may ignore it, revise it, or take another
-                    approach. GEORGE complements my effort; it does not replace
-                    my responsibility.{" "}
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        event.preventDefault();
-                        window.open("/privacy", "_blank");
-                      }}
-                      className="text-[#D7DCFF]/72 underline underline-offset-4"
-                    >
-                      Privacy
-                    </button>
-                  </div>
-
-                  <div className="mt-2 text-[9px] uppercase tracking-[0.16em] text-[#D7DBE4]/42">
-                    Check again to acknowledge.
-                  </div>
-                </div>
-              </div>
-            </div>
-
             <div className="grid gap-2 sm:grid-cols-2">
               <button
                 type="button"
-                disabled={
-                  !mechanicsSelectionsComplete || !liveRecoveryAcknowledged
-                }
+                disabled={!mechanicsSelectionsComplete}
                 onClick={() => {
+                  setReadyRoomCompletedSteps([]);
+                  setReadyRoomSequenceStep("room");
+                  setReadyRoomPromptComplete(false);
+                  setLiveRecoveryAcknowledged(false);
+
                   transitionToLivePreparationState({
                     previousState: "mechanics",
                     nextStep: 3,
                   });
+
                   void loadOperationalRecommendation();
                 }}
                 className={`rounded-[0.75rem] border px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] transition ${
-                  mechanicsSelectionsComplete && liveRecoveryAcknowledged
+                  mechanicsSelectionsComplete
                     ? "george-live-primary-shimmer border-[#D8DEE8]/70 bg-[#4E7CFF] text-white shadow-[0_10px_28px_rgba(78,124,255,0.26)] hover:border-[#EEF1F6]/80 hover:bg-[#5B86FF]"
                     : "cursor-default border-white/[0.05] bg-transparent text-white/20"
                 }`}
@@ -6714,40 +6745,63 @@ export default function LiveEntryClient() {
       goToPreviousLivePreparationState();
     };
 
-    const compactChoice = (
-      label: string,
-      value: string,
-      onClick?: () => void,
-    ) => {
-      const content = (
-        <>
-          <span className="text-[12px] font-semibold text-white/82">
-            ✓ {value}
+    const readyRoomStepComplete = (step: ReadyRoomSequenceStep) =>
+      readyRoomCompletedSteps.includes(step);
+
+    const roomSummary =
+      `${supportLabel} · ${activeReceiverPanel.label} · ${communicationStyle}`;
+
+    const readyRoomCompletedBox = ({
+      step,
+      label,
+      value,
+    }: {
+      step: ReadyRoomSequenceStep;
+      label: string;
+      value: string;
+    }) => (
+      <div className="george-popup-settle">
+        <div className="flex w-full items-start gap-3 rounded-[10px] border border-white/[0.07] bg-white/[0.018] px-3 py-2.5 font-mono text-[11px] leading-6 text-white/50">
+          <span className="mt-[1px] shrink-0 text-[#AFC0FF]/80">
+            ✓
           </span>
-          <span className="text-right font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-white/34">
-            {label}
-          </span>
-        </>
-      );
 
-      const className =
-        "flex w-full items-center justify-between gap-4 rounded-[11px] border border-white/[0.09] bg-white/[0.025] px-4 py-3 text-left transition-[border-color,background-color,color] duration-[var(--george-motion-fast)] ease-out";
+          <div className="min-w-0 flex-1">
+            <span className="uppercase tracking-[0.16em] text-white/34">
+              {label}
+            </span>
 
-      if (!onClick) {
-        return <div className={className}>{content}</div>;
-      }
+            <span className="ml-3 text-white/68">
+              {value}
+            </span>
+          </div>
 
-      return (
-        <button
-          type="button"
-          onClick={onClick}
-          className={`${className} hover:border-[#8FAEFF]/32 hover:bg-white/[0.035]`}
-        >
-          {content}
-        </button>
-      );
-    };
+          <button
+            type="button"
+            onClick={() => reopenReadyRoomSequenceStep(step)}
+            className="group george-edit-gleam shrink-0 px-1 py-0.5 text-[8px] uppercase tracking-[0.15em] text-white/38 transition hover:text-white/72"
+          >
+            <span>Edit</span>
+            <span
+              aria-hidden="true"
+              className="ml-1.5 inline-block text-[7px] text-white/28 transition-transform duration-150 group-hover:translate-x-px group-hover:-translate-y-px"
+            >
+              ↗
+            </span>
+          </button>
+        </div>
+      </div>
+    );
 
+    const activeReadyRoomSurface = (
+      step: ReadyRoomSequenceStep,
+      children: React.ReactNode,
+    ) =>
+      readyRoomSequenceStep === step ? (
+        <div className="george-popup-glide-in mt-5 border-l border-white/[0.08] pl-4">
+          {children}
+        </div>
+      ) : null;
 
     return (
       <PanelShell
@@ -6756,341 +6810,101 @@ export default function LiveEntryClient() {
         stage={3}
         onBack={goToPreviousPrepSection}
       >
-        <div className="mt-5">
-          <div className="mt-4 overflow-hidden rounded-[16px] border border-white/[0.075] bg-[#07090D] px-5 py-5">
-            <div className="space-y-3">
-              {liveEntryRoute === "homepage" ? (
-                <>
-                  {livePrepOpenSection !== "support" &&
-                    compactChoice(
-                      "Support",
-                      supportLabel,
-                      () => setLivePrepOpenSection("support"),
-                    )}
+        <div className="mt-10 space-y-4">
 
-                  {livePrepOpenSection === "ready" &&
-                    compactChoice(
-                      "Formula",
-                      activeFormulaLabel,
-                      () => setLivePrepOpenSection("formula"),
-                    )}
-                </>
-              ) : (
-                <>
-                  {traditionalMechanicsCollapsed ? (
-                    <div className="flex w-full items-center justify-between gap-4 rounded-[11px] border border-white/[0.09] bg-white/[0.025] px-4 py-3.5">
-                      <div className="min-w-0">
-                        <div className="text-[12px] font-semibold text-white/82">
-                          ✓ Mechanics
-                        </div>
-                        <div className="mt-1 truncate font-mono text-[8px] tracking-[0.08em] text-white/30">
-                          {supportLabel} · {activeReceiverPanel.label} · {communicationStyle}
-                        </div>
-                      </div>
+          {/* =================================================
+              1. READY FOR THE ROOM
+              Popup 1 + Popup 2 synthesized.
+             ================================================= */}
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setTraditionalMechanicsCollapsed(false);
-                          setTraditionalFormulaDetailsOpen(false);
-                          setTraditionalResourcesOpen(false);
-                          setLivePrepOpenSection("ready");
-                          setLiveBriefingOpenMechanicsPanel(null);
-                        }}
-                        className="george-edit-gleam relative shrink-0 overflow-hidden rounded-[0.5rem] border border-white/[0.10] bg-white/[0.012] px-2.5 py-1 font-mono text-[7px] font-semibold uppercase tracking-[0.15em] text-white/42 transition hover:border-white/[0.22] hover:text-white/72"
-                      >
-                        Edit
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      {compactChoice(
-                        "Support",
-                        supportLabel,
-                        () =>
-                          setLiveBriefingOpenMechanicsPanel((current) =>
-                            current === "support" ? null : "support",
-                          ),
-                      )}
+          {readyRoomStepComplete("room") &&
+            readyRoomCompletedBox({
+              step: "room",
+              label: "Ready for the room",
+              value: roomSummary,
+            })}
 
-                      {liveBriefingOpenMechanicsPanel === "support" && (
-                        <div className="rounded-[11px] border border-white/[0.07] bg-white/[0.012] p-3">
-                          <LiveAdaptiveSupportPanel
-                            activePanel={activeAdaptiveSupportPanel}
-                            open={true}
-                            panels={LIVE_SUPPORT_PANELS}
-                            onToggle={() =>
-                              setLiveBriefingOpenMechanicsPanel(null)
-                            }
-                            onSelect={(id) => {
-                              setActiveAdaptiveSupport(id);
-                              setLiveBriefingSupportAccepted(true);
-                              setLiveRecoveryAcknowledged(true);
-                              setLiveBriefingCapabilitiesConfirmed(true);
-                            }}
-                          />
-                        </div>
-                      )}
-
-                      {compactChoice(
-                        "Delivery",
-                        activeReceiverPanel.label,
-                      )}
-
-                      {compactChoice(
-                        "Tone",
-                        communicationStyle,
-                        () =>
-                          setLiveBriefingOpenMechanicsPanel((current) =>
-                            current === "speaking" ? null : "speaking",
-                          ),
-                      )}
-
-                      {liveBriefingOpenMechanicsPanel === "speaking" && (
-                        <div className="rounded-[11px] border border-white/[0.07] bg-white/[0.012] p-3">
-                          <LiveSpeakingStylePanel
-                            confirmed={true}
-                            open={true}
-                            selectedStyle={communicationStyle}
-                            onEdit={() =>
-                              setLiveBriefingOpenMechanicsPanel("speaking")
-                            }
-                            onOpen={() =>
-                              setLiveBriefingOpenMechanicsPanel("speaking")
-                            }
-                            onSelect={(style) => {
-                              setActiveCommunicationStyle(style);
-                              setLiveBriefingSupportAccepted(true);
-                              setLiveRecoveryAcknowledged(true);
-                              setLiveBriefingCapabilitiesConfirmed(true);
-                            }}
-                          />
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  {compactChoice(
-                    "Resources",
-                    prepDocument
-                      ? prepDocument.name
-                      : `${documentationRecommendations.length} suggested`,
-                    () => {
-                      setTraditionalResourcesOpen((current) => !current);
-                      setTraditionalFormulaDetailsOpen(false);
-                      setLiveBriefingOpenMechanicsPanel(null);
-                      setTraditionalMechanicsCollapsed(true);
-                      setLivePrepOpenSection("ready");
-                    },
-                  )}
-
-                  {traditionalResourcesOpen && (
-                    <div className="rounded-[11px] border border-white/[0.07] bg-white/[0.012] px-4 py-4">
-                      <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-white/34">
-                        What would help me
-                      </div>
-
-                      <p className="mt-3 max-w-[620px] text-[12px] leading-6 text-white/58">
-                        Based on your briefing, these materials could sharpen
-                        my understanding before we enter the room. Add only
-                        what is useful.
-                      </p>
-
-                      <div className="mt-4">
-                        <RelevantDocumentationPanel
-                          recommendations={documentationRecommendations}
-                          document={prepDocument}
-                          reading={prepDocumentReading}
-                          onUpload={(file) =>
-                            void handlePrepDocumentUpload(file)
-                          }
-                          onRemove={() => setPrepDocument(null)}
-                        />
-                      </div>
-
-                      <p className="mt-3 font-mono text-[8px] leading-4 tracking-[0.04em] text-white/28">
-                        No document is required to enter LIVE.
-                      </p>
-                    </div>
-                  )}
-
-                  {compactChoice(
-                    "Formula",
-                    activeFormulaLabel,
-                    () => {
-                      setTraditionalResourcesOpen(false);
-                      setTraditionalFormulaDetailsOpen(false);
-                      setLiveBriefingOpenMechanicsPanel(null);
-                      setTraditionalMechanicsCollapsed(true);
-                      setLivePrepOpenSection((current) =>
-                        current === "formula" ? "ready" : "formula",
-                      );
-                    },
-                  )}
-
-                  {livePrepOpenSection === "formula" && (
-                    <div className="rounded-[11px] border border-white/[0.07] bg-white/[0.012] px-4 py-4">
-                      <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-white/34">
-                        How I&apos;ll use this strategy
-                      </div>
-
-                      <div className="mt-3 space-y-3 text-[12px] leading-6 text-white/62">
-                        {readyRoomGoal && (
-                          <p>
-                            I understand your goal is {readyRoomGoal}
-                            {readyRoomAudience
-                              ? `, and you&apos;re speaking with ${readyRoomAudience}.`
-                              : "."}
-                          </p>
-                        )}
-
-                        <p>
-                          I&apos;ll use {activeFormulaLabel} as my operational
-                          reference for this conversation. I&apos;ll use the
-                          briefing to decide what matters most, then adapt as I
-                          pick up new signals in the room.
-                        </p>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setTraditionalFormulaDetailsOpen((current) => !current)
-                        }
-                        className="mt-4 font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-[#AFC0FF]/68 transition hover:text-white"
-                      >
-                        {traditionalFormulaDetailsOpen
-                          ? "Hide strategy"
-                          : "View strategy"}
-                      </button>
-
-                      {traditionalFormulaDetailsOpen && (
-                        <div className="mt-4 border-t border-white/[0.055] pt-4">
-                          <div className="font-mono text-[7px] font-semibold uppercase tracking-[0.17em] text-white/28">
-                            What I&apos;ll be working from
-                          </div>
-
-                          {formulaOperatingMoves.length > 0 && (
-                            <div className="mt-3 space-y-2">
-                              {formulaOperatingMoves.map((move, index) => (
-                                <div
-                                  key={`${activeFormula?.id || "formula"}-ready-${index}`}
-                                  className="flex items-start gap-2 text-[11px] leading-5 text-white/52"
-                                >
-                                  <span className="mt-[8px] h-1 w-1 shrink-0 rounded-full bg-[#8FAEFF]/68" />
-                                  <span>{move}</span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-
-                          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-white/[0.055] pt-3">
-                            <button
-                              type="button"
-                              onClick={beginFormulaSelection}
-                              className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-[#AFC0FF]/68 transition hover:text-white"
-                            >
-                              Browse Library
-                            </button>
-
-                            <span className="text-[9px] leading-4 text-white/28">
-                              You can replace this strategy before LIVE.
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-
-            <section
-              className={`grid transition-[grid-template-rows,opacity,transform,margin] duration-[var(--george-motion-deliberate)] ease-[var(--george-motion-ease)] ${
-                liveEntryRoute === "homepage" && livePrepOpenSection === "support"
-                  ? "mt-5 grid-rows-[1fr] translate-y-0 opacity-100"
-                  : "pointer-events-none grid-rows-[0fr] -translate-y-5 opacity-0"
-              }`}
-            >
-              <div className="overflow-hidden">
-                <h2 className="min-h-[70px] max-w-[560px] font-mono text-[19px] leading-8 tracking-[-0.025em] text-white sm:text-[23px]">
-                  {readyRoomTypedPrompt}
-                </h2>
-
-                {liveEntryRoute === "homepage" ? (
-                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                    {(["advice", "response"] as const).map((id) => {
-                      const selected =
-                        liveBriefingSupportAccepted &&
-                        activeSupportPanelId === id;
-
-                      return (
-                        <button
-                          key={id}
-                          type="button"
-                          onClick={() => {
-                            setActiveAdaptiveSupport(id);
-                            setLiveBriefingSupportAccepted(true);
-
-                            window.setTimeout(() => {
-                              setLivePrepOpenSection("formula");
-                            }, 360);
-                          }}
-                          className={`flex items-start gap-3 rounded-[12px] border px-4 py-4 text-left transition-all duration-300 ${
-                            selected
-                              ? "border-[#8FAEFF]/55 bg-[#101A31] -translate-y-0.5"
-                              : "border-white/[0.09] bg-white/[0.02] hover:-translate-y-0.5 hover:border-white/22"
-                          }`}
-                        >
-                          <span
-                            className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-[4px] border text-[10px] transition ${
-                              selected
-                                ? "border-[#8FAEFF]/70 bg-[#4E7CFF] text-white"
-                                : "border-white/22 text-transparent"
-                            }`}
-                          >
-                            ✓
-                          </span>
-                          <span>
-                            <span className="block text-[13px] font-semibold text-white/86">
-                              {id === "advice"
-                                ? "Adaptive cues"
-                                : "Adaptive response"}
-                            </span>
-                            <span className="mt-1 block text-[11px] leading-5 text-white/42">
-                              {id === "advice"
-                                ? "Brief support at the right moment."
-                                : "A complete response when the room requires one."}
-                            </span>
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="mt-5">
-                    {compactChoice(
-                      "Support",
-                      supportLabel,
-                    )}
-                  </div>
-                )}
-
+          {activeReadyRoomSurface(
+            "room",
+            <>
+              <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/34">
+                Ready for the room
               </div>
-            </section>
 
-            <section
-              className={`grid transition-[grid-template-rows,opacity,transform,margin] duration-[var(--george-motion-deliberate)] ease-[var(--george-motion-ease)] ${
-                liveEntryRoute === "homepage" && livePrepOpenSection === "formula"
-                  ? "mt-5 grid-rows-[1fr] translate-y-0 opacity-100"
-                  : "pointer-events-none grid-rows-[0fr] -translate-y-5 opacity-0"
-              }`}
-            >
-              <div className="overflow-hidden">
-                <h2 className="min-h-[70px] max-w-[580px] font-mono text-[19px] leading-8 tracking-[-0.025em] text-white sm:text-[23px]">
-                  {readyRoomTypedPrompt}
-                </h2>
+              <div className="mt-3 flex items-start gap-3 font-mono text-[12px] leading-6 text-white/58">
+                <span className="mt-[1px] text-[#AFC0FF]/76">✓</span>
+                <span>{roomSummary}</span>
+              </div>
 
+              <div className="mt-5 flex flex-wrap gap-6">
+                <button
+                  type="button"
+                  onClick={() =>
+                    completeReadyRoomSequenceStep(
+                      "room",
+                      "formula",
+                    )
+                  }
+                  className="group font-mono text-[9px] font-semibold uppercase tracking-[0.17em] text-[#AFC0FF]/76 transition hover:text-white"
+                >
+                  <span>Continue</span>
+                  <span
+                    aria-hidden="true"
+                    className="ml-2 inline-block text-[8px] transition-transform duration-150 group-hover:translate-x-0.5"
+                  >
+                    →
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    pushLivePreparationState("prep");
+                    setLiveBriefingStep(2);
+                  }}
+                  className="group font-mono text-[9px] uppercase tracking-[0.17em] text-white/34 transition hover:text-white/68"
+                >
+                  <span>Edit</span>
+                  <span
+                    aria-hidden="true"
+                    className="ml-2 inline-block text-[7px] transition-transform duration-150 group-hover:translate-x-px group-hover:-translate-y-px"
+                  >
+                    ↗
+                  </span>
+                </button>
+              </div>
+            </>,
+          )}
+
+
+          {/* =================================================
+              2. FORMULA FOR OUTCOME
+             ================================================= */}
+
+          {readyRoomStepComplete("formula") &&
+            readyRoomCompletedBox({
+              step: "formula",
+              label: "Formula for outcome",
+              value: activeFormulaLabel,
+            })}
+
+          {activeReadyRoomSurface(
+            "formula",
+            <>
+              <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/34">
+                Formula for outcome
+              </div>
+
+              <h2 className="mt-2 max-w-[620px] font-mono text-[18px] leading-7 text-white/86">
+                {activeFormulaLabel}
+              </h2>
+
+              <p className="mt-2 max-w-[610px] text-[11px] leading-5 text-white/42">
+                This is the operational strategy GEORGE will use to move the
+                conversation toward your outcome.
+              </p>
+
+              <div className="mt-5 border-t border-white/[0.06] pt-5">
                 <RecommendedStrategyCard
                   recommendation={operationalRecommendation}
                   loading={recommendationLoading}
@@ -7120,54 +6934,113 @@ export default function LiveEntryClient() {
                   onClose={() => setScriptCustomizationOpen(false)}
                 />
               </div>
-            </section>
 
-            <section
-              className={`grid transition-[grid-template-rows,opacity,transform,margin] duration-[var(--george-motion-deliberate)] ease-[var(--george-motion-ease)] ${
-                liveEntryRoute !== "homepage" || livePrepOpenSection === "ready"
-                  ? "mt-5 grid-rows-[1fr] translate-y-0 opacity-100"
-                  : "pointer-events-none grid-rows-[0fr] -translate-y-5 opacity-0"
-              }`}
-            >
-              <div className="overflow-hidden">
-                <div
-                  className={`transition-opacity duration-[var(--george-motion-standard)] ease-[var(--george-motion-ease)] ${
-                    readyRoomPromptComplete
-                      ? "opacity-100"
-                      : "opacity-30"
-                  }`}
+              {activeFormula && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    completeReadyRoomSequenceStep(
+                      "formula",
+                      "authority",
+                    )
+                  }
+                  className="group mt-5 font-mono text-[9px] font-semibold uppercase tracking-[0.17em] text-[#AFC0FF]/76 transition hover:text-white"
                 >
-                  <div
-                    className={
-                      readyRoomPromptComplete
-                        ? "george-live-primary-shimmer relative mt-8 overflow-hidden rounded-[1rem]"
-                        : "mt-8"
-                    }
+                  <span>Use {activeFormulaLabel}</span>
+                  <span
+                    aria-hidden="true"
+                    className="ml-2 inline-block text-[8px] transition-transform duration-150 group-hover:translate-x-0.5"
                   >
-                    <AwakeButton
-                      active={readyRoomPromptComplete}
-                      onClick={() => startLive(false, editableResources, true)}
-                    >
-                      ENTER LIVE
-                    </AwakeButton>
-                  </div>
+                    →
+                  </span>
+                </button>
+              )}
+            </>,
+          )}
 
-                  <button
-                    type="button"
-                    disabled={!readyRoomPromptComplete}
-                    onClick={continueBriefingFromReadyRoom}
-                    className="mt-4 w-full text-center font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/34 transition hover:text-white/62 disabled:cursor-default disabled:opacity-30"
-                  >
-                    ADD MORE CONTEXT
-                  </button>
-                </div>
 
-                <p className="mt-3 text-center text-[9px] uppercase tracking-[0.15em] text-white/26">
-                  Your voice I know. The room I understand.
-                </p>
+          {/* =================================================
+              3. FINAL AUTHORITY
+             ================================================= */}
+
+          {readyRoomStepComplete("authority") &&
+            readyRoomCompletedBox({
+              step: "authority",
+              label: "Final authority",
+              value: "Acknowledged",
+            })}
+
+          {activeReadyRoomSurface(
+            "authority",
+            <>
+              <label className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={liveRecoveryAcknowledged}
+                  onChange={(event) => {
+                    const checked = event.target.checked;
+
+                    setLiveRecoveryAcknowledged(checked);
+
+                    if (!checked) return;
+
+                    setReadyRoomPromptComplete(true);
+
+                    completeReadyRoomSequenceStep(
+                      "authority",
+                      "complete",
+                    );
+                  }}
+                  className="mt-1 h-3.5 w-3.5 shrink-0 accent-[#D7DCFF]"
+                />
+
+                <span>
+                  <span className="block font-mono text-[9px] uppercase tracking-[0.18em] text-white/34">
+                    Final authority
+                  </span>
+
+                  <span className="mt-2 block max-w-[620px] text-[11px] leading-5 text-white/58">
+                    I retain final judgment, responsibility, and control over
+                    what I say and do in the room.
+                  </span>
+                </span>
+              </label>
+            </>,
+          )}
+
+
+          {/* =================================================
+              FINAL STATE
+             ================================================= */}
+
+          {readyRoomSequenceStep === "complete" && (
+            <div className="george-popup-glide-in pt-5">
+              <div className="george-live-primary-shimmer relative overflow-hidden rounded-[1rem]">
+                <AwakeButton
+                  active={true}
+                  onClick={() =>
+                    startLive(false, editableResources, true)
+                  }
+                >
+                  ENTER LIVE
+                </AwakeButton>
               </div>
-            </section>
-          </div>
+
+              <button
+                type="button"
+                onClick={continueBriefingFromReadyRoom}
+                className="group mt-4 w-full text-center font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/34 transition hover:text-white/62"
+              >
+                <span>Add more context</span>
+                <span
+                  aria-hidden="true"
+                  className="ml-2 inline-block text-[7px] transition-transform duration-150 group-hover:translate-x-px group-hover:-translate-y-px"
+                >
+                  ↗
+                </span>
+              </button>
+            </div>
+          )}
         </div>
       </PanelShell>
     );
@@ -7499,7 +7372,7 @@ export default function LiveEntryClient() {
   }
 
   return (
-    <main className="relative min-h-[100dvh] overflow-y-auto overflow-x-hidden bg-[#F2F0EA] text-white">
+    <main className="relative min-h-[100dvh] overflow-y-auto overflow-x-hidden bg-black text-white">
       {liveEntryRoute !== "direct" && (
         <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
           <HomeHeroConversationTicker />
@@ -7510,221 +7383,122 @@ export default function LiveEntryClient() {
         <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
       )}
 
-      <div className="absolute left-6 top-5 z-50 sm:left-10 sm:top-7">
-        <img
-          src="/george/live-orientation/bx-live-orientation.png"
-          alt="BRANESX"
-          className="h-[108px] w-auto object-contain sm:h-[132px] lg:h-[142px]"
-        />
-      </div>
-
       <div className="relative z-10 w-full">
-        <section className="george-live-orientation relative min-h-[100dvh] w-full overflow-hidden text-[#111214]">
+        <div className="pointer-events-none fixed inset-x-0 top-0 z-50">
+          <div className="mx-auto w-full max-w-[1180px] px-6 pt-5 sm:px-10 sm:pt-7 lg:px-16 xl:px-20">
+            <a
+              href="/"
+              aria-label="Go to BRANESx home"
+              className="pointer-events-auto inline-flex"
+            >
+              <img
+                src="/logofav.png"
+                alt="Bx"
+                className="h-[72px] w-[72px] object-contain opacity-[0.96] sm:h-[82px] sm:w-[82px]"
+              />
+            </a>
+          </div>
+        </div>
+        <section className="george-live-orientation relative min-h-[100dvh] w-full overflow-hidden bg-black text-white">
 
           <div className="relative z-10">
-            {/* HERO */}
-            <div className="mx-auto grid min-h-[100dvh] w-full max-w-[1680px] gap-10 px-6 pb-16 pt-[185px] sm:px-10 sm:pb-20 sm:pt-[210px] lg:grid-cols-[0.96fr_1.04fr] lg:items-center lg:gap-16 lg:px-16 lg:pt-[190px] xl:px-20">
-              <div className="max-w-[610px]">
-                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.32em] text-black/40">
-                  BRANESX · GEORGE LIVE
-                </div>
-
-                <h1 className="mt-5 max-w-[760px] text-[44px] font-semibold leading-[0.91] tracking-[-0.065em] text-black sm:text-[62px] lg:text-[76px]">
-                  Better communication should not belong only to people who
-                  already have every advantage.
-                </h1>
-
-                <p className="mt-7 max-w-[600px] text-[15px] leading-7 text-black/60 sm:text-[17px] sm:leading-8">
-                  GEORGE helps you prepare, communicate, and adapt around the
-                  outcome you&apos;re trying to achieve.
-                </p>
-
-                <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-black/38">
-                  <span>Prepare</span>
-                  <span aria-hidden="true" className="text-black/18">•</span>
-                  <span>Strategize</span>
-                  <span aria-hidden="true" className="text-black/18">•</span>
-                  <span>Adapt</span>
-                </div>
-
-
-              </div>
-
-              {/* CODE-BUILT FOAM CHARACTER / RECEIVER STORY */}
-              <div className="relative mx-auto flex min-h-[420px] w-full max-w-[540px] items-center justify-center sm:min-h-[500px]">
-                <div className="george-foam-stage">
-                  <div className="george-foam-shadow" />
-
-                  <div className="george-foam-person">
-                    <div className="george-foam-head">
-                      <div className="george-foam-face-dot george-foam-face-dot-left" />
-                      <div className="george-foam-face-dot george-foam-face-dot-right" />
-
-                      <div className="george-foam-earpiece">
-                        <span className="george-foam-earpiece-core" />
-                      </div>
-                    </div>
-
-                    <div className="george-foam-neck" />
-                    <div className="george-foam-body" />
-
-                    <div className="george-foam-screen">
-                      <div className="george-foam-screen-top">
-                        <span />
-                        <span />
-                        <span />
-                      </div>
-                      <div className="george-foam-screen-line george-foam-screen-line-1" />
-                      <div className="george-foam-screen-line george-foam-screen-line-2" />
-                      <div className="george-foam-screen-line george-foam-screen-line-3" />
-                    </div>
-                  </div>
-
-                  <div className="george-foam-signal george-foam-signal-audio">
-                    <span className="bg-[#D9544F]" />
-                    AUDIO
-                  </div>
-
-                  <div className="george-foam-signal george-foam-signal-visual">
-                    <span className="bg-[#3B9C69]" />
-                    VISUAL
-                  </div>
-
-                  <div className="george-foam-pulse george-foam-pulse-one" />
-                  <div className="george-foam-pulse george-foam-pulse-two" />
-                </div>
+            {/* LIVE ENTRY ORIENTATION */}
+            <div className="mx-auto w-full max-w-[760px] px-5 pb-4 pt-32 sm:px-8 sm:pb-5 sm:pt-36">
+              <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.28em] text-white/32">
+                GEORGE LIVE · CHOOSE YOUR ROUTE
               </div>
             </div>
 
-            {/* PRACTICAL VALUE */}
-            <section className="border-t border-black/[0.08] bg-white/38 px-6 py-14 sm:px-10 sm:py-18 lg:px-16 lg:py-20 xl:px-20">
-              <div className="mx-auto w-full max-w-[1440px]">
-                <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16">
-                  <div>
-                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.28em] text-black/36">
-                      PRACTICAL VALUE
-                    </div>
+            {/* PREPARATION ROUTES */}
+            <section className="mx-auto w-full max-w-[760px] px-5 pb-20 sm:px-8 sm:pb-24">
+              <div className="border-t border-white/[0.08]">
 
-                    <h2 className="mt-4 max-w-[480px] text-[36px] font-semibold leading-[0.96] tracking-[-0.055em] text-black sm:text-[48px]">
-                      What can we get done?
-                    </h2>
+                <div className="border-b border-white/[0.07] py-7 sm:py-8">
+                  <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-white/30">
+                    ROLE FIRST / CONVERSATION SETUP
                   </div>
 
-                  <div className="max-w-[760px]">
-                    <p className="text-[18px] font-medium leading-8 tracking-[-0.025em] text-black/76 sm:text-[22px] sm:leading-9">
-                      Prepare an interview. Negotiate a sale. Defend a proposal.
-                      Ask for capital. Handle an objection. Explain a difficult
-                      idea. Lead a meeting. Recover when the conversation changes.
-                    </p>
+                  <h1 className="mt-3 max-w-[620px] font-mono text-[23px] font-medium leading-[1.16] tracking-[-0.025em] text-white/90 sm:text-[27px]">
+                    Start with the conversation before choosing how GEORGE supports it.
+                  </h1>
 
-                    <p className="mt-6 max-w-[650px] text-[14px] leading-7 text-black/48">
-                      The objective is yours. GEORGE helps you prepare the
-                      strategy, recognize what matters in the conversation, and
-                      decide what may move you closer to it.
-                    </p>
+                  <p className="mt-3 max-w-[600px] text-[13px] leading-[1.75] text-white/44">
+                    Choose your role and the kind of conversation you are preparing for.
+                    GEORGE uses that setup to establish the room before you decide how to enter LIVE.
+                  </p>
 
-                    <div className="mt-8 inline-flex items-center gap-3 rounded-full border border-black/[0.08] bg-white/54 px-4 py-2.5">
-                      <span className="h-2 w-2 rounded-full bg-[#3B9C69]" />
-                      <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-black/42">
-                        Make the next conversation better than the last
-                      </span>
-                    </div>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.location.href = "/#conversation-setup";
+                    }}
+                    className="group mt-5 inline-flex items-center font-mono text-[10px] font-semibold uppercase tracking-[0.17em] text-white/56 transition-colors hover:text-white"
+                  >
+                    ROLE / CONVERSATION SETUP
+                    <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">→</span>
+                  </button>
                 </div>
-              </div>
-            </section>
 
-            {/* NORMAL + LIVE */}
-            <section className="border-t border-black/[0.08] bg-[#181A19] px-6 py-14 text-white sm:px-10 sm:py-18 lg:px-16 lg:py-20 xl:px-20">
-              <div className="mx-auto grid w-full max-w-[1440px] gap-10 lg:grid-cols-[0.84fr_1.16fr] lg:items-start lg:gap-20">
-                <div>
-                  <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.28em] text-white/34">
-                    ONE GEORGE
+
+                <div className="border-b border-white/[0.07] py-7 sm:py-8">
+                  <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-white/48">
+                    TRADITIONAL LIVE
                   </div>
 
-                  <h2 className="mt-4 max-w-[560px] text-[38px] font-semibold leading-[0.96] tracking-[-0.055em] text-white sm:text-[52px]">
-                    Think before the room. Adapt inside it.
+                  <h2 className="mt-3 max-w-[620px] font-mono text-[23px] font-medium leading-[1.16] tracking-[-0.025em] text-white sm:text-[27px]">
+                    Brief GEORGE directly, step by step.
                   </h2>
+
+                  <p className="mt-3 max-w-[600px] text-[13px] leading-[1.75] text-white/48">
+                    Traditional LIVE walks you through the desired outcome, participants,
+                    known context, support mechanics, and final readiness before entering the room.
+                    Use it when you want the full briefing process before LIVE begins.
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.localStorage.setItem("george_start_new_live", "1");
+                      window.location.href = "/george/live-entry?source=start";
+                    }}
+                    className="group mt-5 inline-flex items-center font-mono text-[10px] font-semibold uppercase tracking-[0.17em] text-white/78 transition-colors hover:text-white"
+                  >
+                    BEGIN TRADITIONAL LIVE
+                    <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">→</span>
+                  </button>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="rounded-[1.15rem] border border-white/[0.08] bg-white/[0.035] p-5">
-                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-white/38">
-                      NORMAL
-                    </div>
 
-                    <div className="mt-6 text-[21px] font-semibold tracking-[-0.035em] text-white/90">
-                      Prepare the work.
-                    </div>
-
-                    <p className="mt-3 text-[13px] leading-6 text-white/48">
-                      Think, research, build, decide, write, prepare, and develop
-                      strategy before the conversation begins.
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        window.location.href = "/george";
-                      }}
-                      className="mt-7 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 transition hover:text-white/76"
-                    >
-                      OPEN NORMAL GEORGE →
-                    </button>
+                <div className="py-7 sm:py-8">
+                  <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-white/30">
+                    NORMAL GEORGE
                   </div>
 
-                  <div className="rounded-[1.15rem] border border-white/[0.08] bg-white/[0.035] p-5">
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-white/38">
-                        LIVE
-                      </div>
+                  <h2 className="mt-3 max-w-[620px] font-mono text-[23px] font-medium leading-[1.16] tracking-[-0.025em] text-white/90 sm:text-[27px]">
+                    Work with GEORGE first, then move into LIVE.
+                  </h2>
 
-                      <div className="inline-flex items-center gap-1.5">
-                        <span className="h-2 w-2 rounded-full bg-[#D9544F]" />
-                        <span className="h-2 w-2 rounded-full bg-[#3B9C69]" />
-                      </div>
-                    </div>
+                  <p className="mt-3 max-w-[600px] text-[13px] leading-[1.75] text-white/44">
+                    Use Normal GEORGE to think, prepare, decide, write, or work through the situation.
+                    When you move into LIVE, the relevant objective and preparation carry forward.
+                  </p>
 
-                    <div className="mt-6 text-[21px] font-semibold tracking-[-0.035em] text-white/90">
-                      Carry the intelligence with you.
-                    </div>
-
-                    <p className="mt-3 text-[13px] leading-6 text-white/48">
-                      GEORGE follows the conversation and adapts support as the
-                      room, resistance, opportunity, evidence, or objective
-                      changes.
-                    </p>
-
-                    <div className="mt-7 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/30">
-                      Audio · Visual · Both
-                    </div>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.location.href = "/george";
+                    }}
+                    className="group mt-5 inline-flex items-center font-mono text-[10px] font-semibold uppercase tracking-[0.17em] text-white/56 transition-colors hover:text-white"
+                  >
+                    OPEN NORMAL GEORGE
+                    <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">→</span>
+                  </button>
                 </div>
+
               </div>
             </section>
           </div>
 
-          {/* PERSISTENT LIVE ACCESS */}
-          <div className="pointer-events-none fixed right-4 top-[max(1rem,env(safe-area-inset-top))] z-[80] sm:right-7 sm:top-7">
-            <button
-              type="button"
-              onClick={() => {
-                window.localStorage.setItem("george_start_new_live", "1");
-                window.location.href = "/george/live-entry?source=start";
-              }}
-              className="pointer-events-auto inline-flex min-h-[48px] items-center gap-4 rounded-[0.95rem] border border-black/[0.10] bg-black px-4 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white shadow-[0_12px_32px_rgba(0,0,0,0.18)] transition hover:bg-[#171717] active:scale-[0.99] sm:min-h-[52px] sm:px-5 sm:text-[10px]"
-              aria-label="Prepare for LIVE"
-            >
-              <span>PREPARE FOR LIVE</span>
-
-              <span
-                aria-hidden="true"
-                className="george-live-cta-arrow inline-block text-[17px] leading-none"
-              >
-                →
-              </span>
-            </button>
-          </div>
         </section>
 
         {tier === "smart" && (

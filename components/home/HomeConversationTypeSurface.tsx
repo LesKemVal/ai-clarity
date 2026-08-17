@@ -2023,19 +2023,12 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
         {phase === "selection" ? (
           <div className="animate-[fadeIn_420ms_ease-out]">
             <div className="max-w-6xl">
-              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-white/88">
-                BRANESX
-              </p>
-              <h1 className="mt-4 max-w-6xl font-mono text-[34px] font-black uppercase leading-[0.98] tracking-[-0.06em] sm:text-[54px]">
-                What is your Role in the conversation?
-              </h1>
-              <p className="mt-6 max-w-3xl text-[16px] leading-8 text-white/68">
-                Start from your role... then define your objective.
-              </p>
-
-              <div className="mt-10">
+              <div
+                id="conversation-setup"
+                className="mt-1 scroll-mt-28 sm:mt-3"
+              >
                 <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-white/46">
-                  Conversation starters
+                  Role first / conversation setup
                 </div>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {FEATURED_HOMEPAGE_ROLES.map((role) => (

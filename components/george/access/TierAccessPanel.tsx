@@ -74,7 +74,7 @@ export function TierAccessPanel({
           <button
             type="button"
             onClick={onUpgrade}
-            className="mt-4 w-full rounded-full border border-white/[0.07] bg-[#D7DBE4]/88 px-4 py-2.5 text-[12px] font-medium tracking-[0.06em] text-[#05070B] transition hover:bg-white active:scale-[0.985]"
+            className="george-access-action mt-4 w-full rounded-full px-4 py-2.5 text-[12px] font-medium tracking-[0.06em]"
           >
             {cta}
           </button>

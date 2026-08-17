@@ -21,7 +21,7 @@ export function GeorgeCheckoutPanel({
         type="button"
         aria-label="Close activation"
         onClick={onClose}
-        className="fixed inset-0 z-[240] bg-black george-motion-fade-soft/68 -[10px]"
+        className="george-motion-fade-soft fixed inset-0 z-[140] bg-black/68 backdrop-blur-[10px]"
       />
 
       <div className="fixed inset-0 z-[141] flex items-center justify-center px-4 py-6">

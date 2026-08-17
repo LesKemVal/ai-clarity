@@ -50,8 +50,8 @@ export default function ResetGeorgePage() {
   }, [])
 
   return (
-    <main className="flex min-h-[100dvh] items-center justify-center bg-[#050608] px-6 text-white">
-      <div className="w-full max-w-[460px] rounded-[1.2rem] border border-white/[0.08] bg-[#111620] p-6 text-center shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
+    <main className="flex min-h-[100dvh] items-center justify-center bg-black px-6 text-white">
+      <div className="w-full max-w-[460px] border-t border-white/[0.08] pt-6 text-center">
         <div className="text-[11px] uppercase tracking-[0.3em] text-white/36">BRANESx</div>
 
         <h1 className="mt-4 text-[30px] font-semibold leading-[1.0] tracking-[-0.045em] text-white/92">
@@ -63,7 +63,7 @@ export default function ResetGeorgePage() {
         <button
           type="button"
           onClick={resetDevice}
-          className="mt-5 w-full rounded-[0.9rem] border border-[#AAB4FF]/20 bg-[#AAB4FF]/[0.09] px-4 py-3 text-sm font-semibold text-[#D7DCFF]"
+          className="george-secondary-action mt-5 w-full rounded-[0.75rem] px-4 py-3 text-sm font-semibold"
         >
           Clear This Device Again
         </button>

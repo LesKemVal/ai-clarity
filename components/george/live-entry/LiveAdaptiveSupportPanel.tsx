@@ -30,7 +30,7 @@ export function LiveAdaptiveSupportPanel({
   }
 
   return (
-    <div className="rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-4">
+    <div className="border-l border-white/[0.08] pl-4">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="text-[9px] uppercase tracking-[0.24em] text-white/34">
@@ -55,9 +55,9 @@ export function LiveAdaptiveSupportPanel({
           onClick={onToggle}
           aria-expanded={open}
           aria-controls={SUPPORT_OPTIONS_ID}
-          className="shrink-0 rounded-[0.65rem] border border-white/[0.08] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/46 transition hover:border-white/[0.16] hover:text-white/72"
+          className="shrink-0 px-1 py-1 font-mono text-[8px] uppercase tracking-[0.16em] text-white/38 transition hover:text-white/72"
         >
-          {open ? 'Close' : 'Change'}
+          {open ? 'Done' : 'Edit'}
         </button>
       </div>
 
@@ -70,7 +70,7 @@ export function LiveAdaptiveSupportPanel({
         }`}
       >
         <div className="min-h-0 overflow-hidden">
-          <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="GEORGE support preference">
+          <div className="space-y-2" role="radiogroup" aria-label="GEORGE support preference">
             {panels.map((panel) => {
               const active = activePanel.id === panel.id
 
@@ -81,10 +81,10 @@ export function LiveAdaptiveSupportPanel({
                   role="radio"
                   aria-checked={active}
                   onClick={() => selectPanel(panel.id)}
-                  className={`rounded-[0.72rem] border px-3 py-3 text-left transition ${
+                  className={`block w-full border-l px-4 py-2.5 text-left transition ${
                     active
-                      ? 'border-[#4E7CFF]/35 bg-[#4E7CFF]/[0.075]'
-                      : 'border-white/[0.06] bg-white/[0.018] hover:border-white/[0.14] hover:bg-white/[0.035]'
+                      ? 'border-[#7EA1FF]/70 bg-[#4E7CFF]/[0.045]'
+                      : 'border-white/[0.08] hover:border-white/20 hover:bg-white/[0.018]'
                   }`}
                 >
                   <span className="block text-[11px] font-semibold text-[#F2F4FF]/82">

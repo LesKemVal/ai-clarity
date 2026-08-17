@@ -112,7 +112,7 @@ export function ContinuityRestorePanel({
                 type="button"
                 disabled={sending}
                 onClick={onSendLink}
-                className="w-full rounded-full border border-white/[0.07] bg-[#D7DBE4]/88 px-4 py-2.5 text-[12px] font-medium tracking-[0.06em] text-[#05070B] transition hover:bg-white disabled:opacity-45"
+                className="george-access-action w-full rounded-full px-4 py-2.5 text-[12px] font-medium tracking-[0.06em]"
               >
                 {sending ? "Sending…" : "Send secure link"}
               </button>

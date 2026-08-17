@@ -31,7 +31,7 @@ export default function SuccessPage() {
           <button
             type="button"
             onClick={() => (window.location.href = '/george')}
-            className="rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition button-press hover:opacity-90"
+            className="george-access-action rounded-full px-6 py-3 text-sm font-medium"
           >
             Continue with GEORGE
           </button>
@@ -39,7 +39,7 @@ export default function SuccessPage() {
           <button
             type="button"
             onClick={() => (window.location.href = '/george?intent=make-george-yours')}
-            className="rounded-full border border-neutral-700 px-6 py-3 text-sm font-medium text-neutral-200 transition button-press hover:border-white/[0.18] hover:text-white"
+            className="george-secondary-action rounded-full px-6 py-3 text-sm font-medium"
           >
             Shape GEORGE
           </button>

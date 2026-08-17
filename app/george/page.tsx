@@ -6282,7 +6282,7 @@ export default function Page({
                       if (!showSidebar) setShowSidebar(true);
                     }}
                     disabled={showSidebar}
-                    className={`group inline-flex h-11 w-11 items-center justify-center rounded-[15px] bg-white/[0.045] shadow-[0_14px_44px_rgba(0,0,0,0.34)] ring-1 ring-white/[0.06] backdrop-blur-xl transition-[transform,opacity,background-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)] hover:bg-white/[0.075] hover:shadow-[0_16px_48px_rgba(0,0,0,0.42),0_0_20px_rgba(54,87,168,0.12)] active:scale-[0.96] xl:inline-flex ${
+                    className={`group inline-flex h-11 w-11 items-center justify-center rounded-[15px] bg-transparent ring-1 ring-white/[0.045] transition-[transform,opacity,color,background-color] duration-300 hover:bg-white/[0.035] active:scale-[0.96] xl:inline-flex ${
                       showSidebar
                         ? "pointer-events-none opacity-0"
                         : "opacity-100"
@@ -6336,7 +6336,7 @@ export default function Page({
                     <button
                       type="button"
                       onClick={handleShareGeorge}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-[14px] bg-white/[0.025] text-[#D7DBE4]/52 ring-1 ring-white/[0.045] transition-[transform,background-color,color] duration-300 hover:bg-white/[0.055] hover:text-white active:scale-[0.97]"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-[14px] bg-transparent text-[#D7DBE4]/48 ring-1 ring-white/[0.04] transition-[transform,background-color,color] duration-300 hover:bg-white/[0.035] hover:text-[#D7DBE4]/88 active:scale-[0.97]"
                       aria-label="Share GEORGE context"
                       title="Share GEORGE context"
                     >
@@ -6346,7 +6346,7 @@ export default function Page({
                     <button
                       type="button"
                       onClick={() => setShowIdentityMenu((value) => !value)}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-[14px] bg-white/[0.035] text-[20px] leading-none text-[#D7DBE4]/58 shadow-[0_12px_34px_rgba(0,0,0,0.28)] ring-1 ring-white/[0.05] transition hover:bg-white/[0.065] hover:text-white"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-[14px] bg-transparent text-[20px] leading-none text-[#D7DBE4]/52 ring-1 ring-white/[0.04] transition-[background-color,color] duration-300 hover:bg-white/[0.035] hover:text-[#D7DBE4]/88"
                       aria-label="Identity menu"
                       title="Identity"
                     >
@@ -6767,11 +6767,11 @@ export default function Page({
                                         : "rotateX(0deg)",
                                     }}
                                   >
-                                    <div className="col-start-1 row-start-1 inline-flex w-fit max-w-[calc(100vw-40px)] rounded-[22px] border border-[#3657A8]/55 bg-[#172347] px-6 py-4 text-[26px] font-medium leading-8 tracking-[-0.03em] text-[#F4F8FF] shadow-[0_18px_60px_rgba(12,27,68,0.48)] [backface-visibility:hidden] sm:px-8 sm:py-5 sm:text-[34px]">
+                                    <div className="relative col-start-1 row-start-1 inline-flex w-fit max-w-[calc(100vw-40px)] overflow-hidden rounded-[18px] border border-white/[0.11] bg-[linear-gradient(135deg,rgba(19,24,35,0.96),rgba(7,9,14,0.98))] px-6 py-[15px] text-[25px] font-normal leading-8 tracking-[-0.025em] text-[#E8EAF0] shadow-[0_16px_46px_rgba(0,0,0,0.34),inset_0_1px_0_rgba(255,255,255,0.035)] [backface-visibility:hidden] before:pointer-events-none before:absolute before:inset-y-0 before:left-0 before:w-[2px] before:bg-[#8192D8]/55 sm:px-8 sm:py-[18px] sm:text-[32px]">
                                       {`${homepageHeroSequence[homepageHeroFlip.front]}?`}
                                     </div>
 
-                                    <div className="col-start-1 row-start-1 inline-flex w-fit max-w-[calc(100vw-40px)] rounded-[22px] border border-[#3657A8]/55 bg-[#172347] px-6 py-4 text-[26px] font-medium leading-8 tracking-[-0.03em] text-[#F4F8FF] shadow-[0_18px_60px_rgba(12,27,68,0.48)] [backface-visibility:hidden] [transform:rotateX(180deg)] sm:px-8 sm:py-5 sm:text-[34px]">
+                                    <div className="relative col-start-1 row-start-1 inline-flex w-fit max-w-[calc(100vw-40px)] overflow-hidden rounded-[18px] border border-white/[0.11] bg-[linear-gradient(135deg,rgba(19,24,35,0.96),rgba(7,9,14,0.98))] px-6 py-[15px] text-[25px] font-normal leading-8 tracking-[-0.025em] text-[#E8EAF0] shadow-[0_16px_46px_rgba(0,0,0,0.34),inset_0_1px_0_rgba(255,255,255,0.035)] [backface-visibility:hidden] [transform:rotateX(180deg)] before:pointer-events-none before:absolute before:inset-y-0 before:left-0 before:w-[2px] before:bg-[#8192D8]/55 sm:px-8 sm:py-[18px] sm:text-[32px]">
                                       {`${homepageHeroSequence[homepageHeroFlip.back]}?`}
                                     </div>
                                   </div>
@@ -7137,7 +7137,7 @@ export default function Page({
                                             onClick={
                                               resumeNormalPreparationBriefing
                                             }
-                                            className="inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-[0.55rem] border border-[#5678C8]/28 bg-[#172347]/54 px-2.5 py-1.5 text-[10px] font-semibold tracking-[0.17em] text-[#B9C9F3]/74 transition hover:border-[#6F91DE]/44 hover:text-[#E4EBFF]/90 active:scale-[0.97]"
+                                            className="george-secondary-action inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-[0.55rem] px-2.5 py-1.5 text-[10px] font-semibold tracking-[0.17em]"
                                           >
                                             PREPARING LIVE
                                           </button>
@@ -7462,7 +7462,7 @@ export default function Page({
                                   onClick={action.action}
                                   className={`inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-[0.5rem] px-2.5 py-1.5 text-[9px] font-semibold uppercase tracking-[0.15em] ${
                                     action.emphasis === "primary"
-                                      ? "border border-[#7EA1FF]/48 bg-[#172347] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] active:scale-[0.97]"
+                                      ? "george-secondary-action"
                                       : action.emphasis === "secondary"
                                         ? "george-secondary-action"
                                         : "george-quiet-action"
@@ -8060,7 +8060,7 @@ export default function Page({
                 </div>
 
                 {liveMode && showLiveQuickMenu && (
-                  <div className="pointer-events-none fixed inset-0 z-[71] bg-black george-motion-fade-soft/68 -[10px]" />
+                  <div className="george-motion-fade-soft pointer-events-none fixed inset-0 z-[71] bg-black/68 backdrop-blur-[10px]" />
                 )}
 
                 {!(forceLive || liveMode) &&

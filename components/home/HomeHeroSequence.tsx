@@ -122,10 +122,15 @@ export function HomeHeroSequence() {
 
   return (
     <section className="relative min-h-[100dvh] overflow-hidden bg-black text-white">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-x-0 top-0 z-30 h-[19vh] bg-gradient-to-b from-black from-0% via-black via-78% to-transparent to-100% sm:hidden"
+      />
+
       <button
         type="button"
         onClick={startNormal}
-        className="absolute left-5 top-5 z-40 flex h-[86px] w-[86px] items-center justify-center sm:h-[104px] sm:w-[104px]"
+        className="fixed left-5 top-5 z-40 flex h-[86px] w-[86px] items-center justify-center sm:absolute sm:h-[104px] sm:w-[104px]"
         aria-label="Open GEORGE"
       >
         <img
@@ -165,10 +170,10 @@ export function HomeHeroSequence() {
               </span>
             </span>
           </h1>
-          <div className="mt-8 min-h-[12rem] max-w-4xl sm:mt-10 sm:min-h-[14rem]">
+          <div className="mt-4 min-h-[12rem] max-w-4xl sm:mt-5 sm:min-h-[14rem]">
             <div
               aria-live="polite"
-              className={`george-motion-fade-soft min-h-[12rem] px-1 py-2 text-white/80 transition-opacity duration-700 motion-reduce:transition-none sm:min-h-[14rem] sm:px-2 sm:py-4 ${
+              className={`george-motion-fade-soft min-h-[12rem] px-1 py-1 text-white/80 transition-opacity duration-700 motion-reduce:transition-none sm:min-h-[14rem] sm:px-2 sm:py-1 ${
                 messageVisible ? "opacity-100" : "opacity-0"
               }`}
             >

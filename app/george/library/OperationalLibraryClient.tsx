@@ -314,6 +314,9 @@ function createMetadataDraft(
   };
 }
 
+const marketplacePrimaryActionClassName =
+  "inline-flex items-center justify-center bg-white font-semibold text-black transition hover:bg-white/88 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-45";
+
 const inputClassName =
   "mt-2 w-full rounded-lg border border-white/10 bg-black px-3 py-2 text-sm text-white outline-none transition focus:border-white/30";
 
@@ -1185,7 +1188,7 @@ export default function OperationalLibraryClient() {
                 <button
                   type="button"
                   onClick={() => void useMarketplaceFormula(recommendedFormula)}
-                  className="min-h-12 rounded-[12px] bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-white/88 active:translate-y-px"
+                  className={`${marketplacePrimaryActionClassName} min-h-12 rounded-[12px] px-6 py-3 text-sm`}
                 >
                   Use Strategy
                 </button>
@@ -1279,7 +1282,7 @@ export default function OperationalLibraryClient() {
                     <button
                       type="button"
                       onClick={() => void useMarketplaceFormula(formula)}
-                      className="rounded-[9px] bg-white px-4 py-2 text-xs font-semibold text-black transition hover:bg-white/88"
+                      className={`${marketplacePrimaryActionClassName} rounded-[9px] px-4 py-2 text-xs`}
                     >
                       Try Strategy
                     </button>
@@ -1414,7 +1417,7 @@ export default function OperationalLibraryClient() {
           <button
             type="button"
             onClick={returnToLivePrep}
-            className="rounded-[10px] bg-white px-4 py-2.5 text-sm font-semibold text-black transition hover:bg-white/88"
+            className={`${marketplacePrimaryActionClassName} rounded-[10px] px-4 py-2.5 text-sm`}
           >
             Continue to Ready Room
           </button>
@@ -1771,7 +1774,7 @@ export default function OperationalLibraryClient() {
                           type="button"
                           onClick={() => void saveFormulaMetadata(formula)}
                           disabled={isMetadataSaving}
-                          className="rounded-lg border border-white/20 bg-white px-4 py-2 text-xs font-medium text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-40"
+                          className={`${marketplacePrimaryActionClassName} rounded-lg border border-white/20 px-4 py-2 text-xs font-medium disabled:opacity-40`}
                         >
                           {isMetadataSaving ? "Saving…" : "Save metadata"}
                         </button>
@@ -2073,7 +2076,7 @@ export default function OperationalLibraryClient() {
                           type="button"
                           onClick={() => void deriveFormula(formula)}
                           disabled={isDeriving}
-                          className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
+                          className={`${marketplacePrimaryActionClassName} rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50`}
                         >
                           {isDeriving
                             ? "Creating derived formula…"

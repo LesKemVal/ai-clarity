@@ -1,5 +1,3 @@
-'use client'
-
 import PageShell from '@/components/layout/PageShell'
 
 const sections = [

@@ -2222,6 +2222,50 @@ button:active,
 
 /* GEORGE SUPPORTING ACTION MATERIAL — END */
 
+/* GEORGE ACCESS ACTION MATERIAL — START */
+
+.george-access-action {
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(215, 219, 228, 0.88);
+  color: #05070b;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    transform 120ms ease;
+}
+
+.george-access-action:hover,
+.george-access-action:focus-visible {
+  background: #ffffff;
+}
+
+.george-access-action:active {
+  transform: translateY(1px) scale(0.985);
+}
+
+.george-access-action:disabled,
+.george-access-action[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.45;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .george-access-action {
+    transition:
+      background-color 140ms ease,
+      border-color 140ms ease;
+  }
+
+  .george-access-action:active {
+    transform: none;
+  }
+}
+
+/* GEORGE ACCESS ACTION MATERIAL — END */
+
+
+
 
 
 /* GEORGE EDIT UTILITY GLEAM — START */
@@ -2481,7 +2525,7 @@ button:active,
    --------------------------------------------------------- */
 
 .george-live-orientation {
-  background: #f2f0ea;
+  background: #000;
 }
 
 /* Original foam-like LIVE character */
