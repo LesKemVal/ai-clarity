@@ -445,11 +445,11 @@ return (
         Reuse this overlay pattern across future GEORGE pages. */}
     <aside
       data-george-sidebar-overlay="true"
-      className={`fixed left-0 top-0 z-[230] flex h-[100dvh] max-h-[100dvh] w-[258px] flex-col overflow-y-auto overflow-x-hidden overscroll-contain border-r border-white/[0.035] bg-[#07080B]/90 transition-transform duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)] ${
+      className={`fixed left-0 top-0 z-[230] flex h-[100dvh] max-h-[100dvh] w-[258px] flex-col overflow-y-auto overflow-x-hidden overscroll-contain border-r border-white/[0.025] bg-[#07080B]/94 backdrop-blur-xl transition-transform duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)] ${
         showSidebar ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'
       } xl:fixed xl:top-0 xl:z-[230] xl:flex`}
     >
-      <div className="border-b border-white/[0.035] px-4 pb-4 pt-3">
+      <div className="border-b border-white/[0.025] px-4 pb-3.5 pt-3">
         <div className="relative flex items-start justify-between opacity-90">
           <div className="min-w-0 flex-1">
             <button
@@ -478,7 +478,7 @@ return (
             <button
               type="button"
               onClick={() => requestNormalNavigation('new')}
-              className="block w-full rounded-[0.7rem] border border-white/[0.05] bg-white/[0.016] px-3 py-2.5 text-left transition-[background-color,border-color,transform] duration-300 hover:border-white/[0.08] hover:bg-white/[0.03] active:scale-[0.99]"
+              className="block w-full rounded-[0.7rem] border border-white/[0.04] bg-white/[0.012] px-3 py-2.5 text-left transition-[background-color,border-color,transform] duration-200 hover:border-white/[0.065] hover:bg-white/[0.022] active:scale-[0.99]"
             >
               <span className="block text-[13px] font-medium text-white/72">
                 New Workspace
@@ -499,7 +499,7 @@ return (
                   setShowSidebar?.(false)
                   onOpenLiveGate()
                 }}
-                className="inline-flex rounded-[0.7rem] border border-[#4E7CFF]/45 bg-[#4E7CFF]/[0.18] px-5 py-2 text-[13px] font-medium uppercase tracking-[0.18em] text-[#E4E9FF]/92 shadow-[0_0_28px_rgba(78,124,255,0.18)] transition hover:border-[#4E7CFF]/65 hover:bg-[#4E7CFF]/[0.26] hover:text-white active:scale-[0.98]"
+                className="inline-flex rounded-[0.65rem] border border-[#4E7CFF]/32 bg-[#4E7CFF]/[0.11] px-4 py-1.5 text-[12px] font-medium uppercase tracking-[0.18em] text-[#E4E9FF]/78 shadow-[0_0_20px_rgba(78,124,255,0.10)] transition hover:border-[#4E7CFF]/48 hover:bg-[#4E7CFF]/[0.17] hover:text-[#F2F5FF] active:scale-[0.98]"
               >
                 LIVE
               </button>
@@ -523,11 +523,11 @@ return (
             </button>
 
             {openGroups['Progress'] && (
-              <div className="mt-4 space-y-2">
+              <div className="mt-2.5 space-y-1">
                 <button
                   type="button"
                   onClick={createGoalCheck}
-                  className="block w-full rounded-[0.55rem] px-3 py-2 text-left text-[13px] text-white/62 transition hover:bg-white/[0.014] hover:text-white/78"
+                  className="block w-full rounded-[0.6rem] px-3 py-1.5 text-left text-[12px] text-white/48 transition hover:bg-white/[0.016] hover:text-white/72"
                 >
                   + New Focus
                 </button>
@@ -560,26 +560,26 @@ return (
             <a
               href="/george/library"
               onClick={() => setShowSidebar?.(false)}
-              className="block rounded-[0.55rem] px-3 py-2 text-[13px] font-medium text-white/56 transition hover:bg-white/[0.016] hover:text-white/78"
+              className="block rounded-[0.6rem] px-3 py-1.5 text-[13px] font-medium text-white/52 transition hover:bg-white/[0.018] hover:text-white/76"
             >
               Library
             </a>
           </section>
 
           <section className="border-t border-white/[0.035] pt-4">
-            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/22">
+            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/18">
               Support
             </div>
 
-            <div className="mt-2 space-y-0.5">
+            <div className="mt-1.5 space-y-0.5">
               <a
                 href="/help"
                 onClick={() => setShowSidebar?.(false)}
-                className="block rounded-[0.55rem] px-3 py-2 text-[12px] text-white/34 transition hover:bg-white/[0.016] hover:text-white/58"
+                className="block rounded-[0.6rem] px-3 py-1.5 text-[12px] text-white/28 transition hover:bg-white/[0.014] hover:text-white/56"
               >
                 Help
               </a>
-              <a href="/legal/toa" className="block rounded-[0.55rem] px-3 py-2 text-[12px] text-white/34 transition hover:bg-white/[0.016] hover:text-white/58">
+              <a href="/legal/toa" className="block rounded-[0.6rem] px-3 py-1.5 text-[12px] text-white/28 transition hover:bg-white/[0.014] hover:text-white/56">
                 Terms
               </a>
             </div>
@@ -598,14 +598,14 @@ return (
                     data-george-session-menu={
                       sessionMenuId === session.id ? '' : undefined
                     }
-                    className="group relative flex items-center rounded-[0.55rem] hover:bg-white/[0.014]"
+                    className="group relative flex items-center rounded-[0.65rem] border border-transparent transition-[background-color,border-color] duration-150 hover:border-white/[0.025] hover:bg-white/[0.018]"
                   >
                     <button
                       type="button"
                       onClick={() => openNormalSession(session)}
-                      className="flex min-w-0 flex-1 items-center justify-between gap-2 rounded-[0.45rem] py-1 pl-2 pr-8 text-left transition"
+                      className="flex min-w-0 flex-1 items-center justify-between gap-2 rounded-[0.55rem] py-1.5 pl-2.5 pr-8 text-left transition"
                     >
-                      <span className="min-w-0 flex-1 truncate text-[13px] leading-5 text-white/56 group-hover:text-white/68">
+                      <span className="min-w-0 flex-1 truncate text-[13px] leading-5 text-white/52 transition-colors duration-150 group-hover:text-white/72">
                         {getSessionTitle(session)}
                       </span>
                     </button>
@@ -618,19 +618,19 @@ return (
                         setPendingDeleteSessionId(null)
                         setSessionMenuId(sessionMenuId === session.id ? null : session.id)
                       }}
-                      className="absolute right-1 top-1/2 h-6 w-6 -translate-y-1/2 text-white/28"
+                      className="absolute right-1 top-1/2 h-6 w-6 -translate-y-1/2 text-white/20 opacity-70 transition-[color,opacity] duration-150 group-hover:text-white/38 group-hover:opacity-100"
                       aria-label="Session options"
                     >
                       ⋯
                     </IconButton>
 
                     {sessionMenuId === session.id && (
-                      <div className="absolute right-1 top-8 z-20 w-36 rounded-xl border border-white/[0.07] bg-[#0B0D12]/96 p-1 shadow-[0_18px_48px_rgba(0,0,0,0.42)]">
+                      <div className="absolute right-1 top-8 z-20 w-36 rounded-[0.8rem] border border-white/[0.055] bg-[#090B0F]/98 p-1 shadow-[0_16px_42px_rgba(0,0,0,0.38)] backdrop-blur-xl">
                         {pendingDeleteSessionId === session.id ? (
                           <button
                             type="button"
                             onClick={() => deleteNormalSession(session.id)}
-                            className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-red-100/82 transition hover:bg-red-400/[0.06]"
+                            className="block w-full rounded-[0.55rem] px-2.5 py-1.5 text-left text-[11px] text-red-100/76 transition hover:bg-red-400/[0.055] hover:text-red-100/92"
                           >
                             Confirm delete
                           </button>
@@ -645,7 +645,7 @@ return (
                                 setSessionMenuId(null)
                                 loadNormalSessions()
                               }}
-                              className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/62 transition hover:bg-white/[0.035] hover:text-white/86"
+                              className="block w-full rounded-[0.55rem] px-2.5 py-1.5 text-left text-[11px] text-white/54 transition hover:bg-white/[0.028] hover:text-white/82"
                             >
                               Rename
                             </button>
@@ -657,7 +657,7 @@ return (
                                 setSessionMenuId(null)
                                 loadNormalSessions()
                               }}
-                              className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/52 transition hover:bg-white/[0.035] hover:text-white/80"
+                              className="block w-full rounded-[0.55rem] px-2.5 py-1.5 text-left text-[11px] text-white/44 transition hover:bg-white/[0.028] hover:text-white/72"
                             >
                               Archive
                             </button>
@@ -665,7 +665,7 @@ return (
                             <button
                               type="button"
                               onClick={() => setPendingDeleteSessionId(session.id)}
-                              className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-red-100/60 transition hover:bg-white/[0.035] hover:text-red-100/86"
+                              className="block w-full rounded-[0.55rem] px-2.5 py-1.5 text-left text-[11px] text-red-100/48 transition hover:bg-red-400/[0.035] hover:text-red-100/78"
                             >
                               Delete
                             </button>
@@ -705,14 +705,14 @@ return (
                     data-george-session-menu={
                       sessionMenuId === session.id ? '' : undefined
                     }
-                    className="group relative flex items-center rounded-[0.55rem] hover:bg-white/[0.014]"
+                    className="group relative flex items-center rounded-[0.65rem] border border-transparent transition-[background-color,border-color] duration-150 hover:border-white/[0.025] hover:bg-white/[0.018]"
                   >
                     <button
                       type="button"
                       onClick={() => openLiveSession(session)}
-                      className="flex min-w-0 flex-1 items-center justify-between gap-2 rounded-[0.45rem] py-1 pl-2 pr-8 text-left transition"
+                      className="flex min-w-0 flex-1 items-center justify-between gap-2 rounded-[0.55rem] py-1.5 pl-2.5 pr-8 text-left transition"
                     >
-                      <span className="min-w-0 flex-1 truncate text-[13px] leading-5 text-white/56 group-hover:text-white/68">
+                      <span className="min-w-0 flex-1 truncate text-[13px] leading-5 text-white/52 transition-colors duration-150 group-hover:text-white/72">
                         {getSessionTitle(session)}
                       </span>
                     </button>
@@ -725,19 +725,19 @@ return (
                         setPendingDeleteSessionId(null)
                         setSessionMenuId(sessionMenuId === session.id ? null : session.id)
                       }}
-                      className="absolute right-1 top-1/2 h-6 w-6 -translate-y-1/2 text-white/28"
+                      className="absolute right-1 top-1/2 h-6 w-6 -translate-y-1/2 text-white/20 opacity-70 transition-[color,opacity] duration-150 group-hover:text-white/38 group-hover:opacity-100"
                       aria-label="LIVE conversation options"
                     >
                       ⋯
                     </IconButton>
 
                     {sessionMenuId === session.id && (
-                      <div className="absolute right-1 top-8 z-20 w-36 rounded-xl border border-white/[0.07] bg-[#0B0D12]/96 p-1 shadow-[0_18px_48px_rgba(0,0,0,0.42)]">
+                      <div className="absolute right-1 top-8 z-20 w-36 rounded-[0.8rem] border border-white/[0.055] bg-[#090B0F]/98 p-1 shadow-[0_16px_42px_rgba(0,0,0,0.38)] backdrop-blur-xl">
                         {pendingDeleteSessionId === session.id ? (
                           <button
                             type="button"
                             onClick={() => deleteLiveSession(session.id)}
-                            className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-red-100/82 transition hover:bg-red-400/[0.06]"
+                            className="block w-full rounded-[0.55rem] px-2.5 py-1.5 text-left text-[11px] text-red-100/76 transition hover:bg-red-400/[0.055] hover:text-red-100/92"
                           >
                             Confirm delete
                           </button>
@@ -752,7 +752,7 @@ return (
                                 setSessionMenuId(null)
                                 loadNormalSessions()
                               }}
-                              className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/62 transition hover:bg-white/[0.035] hover:text-white/86"
+                              className="block w-full rounded-[0.55rem] px-2.5 py-1.5 text-left text-[11px] text-white/54 transition hover:bg-white/[0.028] hover:text-white/82"
                             >
                               Rename
                             </button>
@@ -764,7 +764,7 @@ return (
                                 setSessionMenuId(null)
                                 loadNormalSessions()
                               }}
-                              className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/52 transition hover:bg-white/[0.035] hover:text-white/80"
+                              className="block w-full rounded-[0.55rem] px-2.5 py-1.5 text-left text-[11px] text-white/44 transition hover:bg-white/[0.028] hover:text-white/72"
                             >
                               Archive
                             </button>
@@ -772,7 +772,7 @@ return (
                             <button
                               type="button"
                               onClick={() => setPendingDeleteSessionId(session.id)}
-                              className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-red-100/60 transition hover:bg-white/[0.035] hover:text-red-100/86"
+                              className="block w-full rounded-[0.55rem] px-2.5 py-1.5 text-left text-[11px] text-red-100/48 transition hover:bg-red-400/[0.035] hover:text-red-100/78"
                             >
                               Delete
                             </button>
@@ -793,56 +793,56 @@ return (
 
       {currentGoalCheck && (
         <div
-          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/76"
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/68 backdrop-blur-[6px]"
           onClick={() => setActiveGoalCheck(null)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-sm rounded-[0.9rem] border border-white/[0.055] bg-[#07080B] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.72)]"
+            className="w-full max-w-sm rounded-[1.1rem] border border-white/[0.06] bg-[#080A0E]/98 p-5 shadow-[0_22px_72px_rgba(0,0,0,0.54)]"
           >
-            <div className="mb-4 text-[16px] font-semibold text-white/88">
+            <div className="mb-4 text-[15px] font-medium tracking-[0.005em] text-white/84">
               {currentGoalCheck.title}
             </div>
 
-            <div className="mb-5 max-h-52 overflow-y-auto space-y-2">
+            <div className="mb-5 max-h-56 space-y-1 overflow-y-auto pr-0.5">
               {(!(currentGoalCheck?.todos?.length)) ? (
-                <p className="text-xs text-white/34">No steps yet.</p>
+                <p className="px-1 py-2 text-[12px] text-white/28">No steps yet.</p>
               ) : (
                 (currentGoalCheck?.todos || []).map((todo) => (
                   <div
                     key={todo.id}
-                    className="rounded-[0.55rem] border border-white/[0.055] bg-white/[0.018] px-3 py-1.5 text-[12px] transition hover:bg-white/[0.02]"
+                    className="rounded-[0.65rem] border border-transparent px-2.5 py-2 text-[12px] transition-[background-color,border-color] duration-150 hover:border-white/[0.025] hover:bg-white/[0.014]"
                   >
                     <button
                       type="button"
                       onClick={() => currentGoalCheck && toggleTodo(currentGoalCheck, todo.id)}
-                      className="flex w-full items-start gap-2 text-left"
+                      className="flex w-full items-start gap-2.5 text-left"
                     >
-                      <span className={`mt-0.5 h-4 w-4 shrink-0 rounded-[0.25rem] border ${todo.done ? 'border-white/70 bg-white/80' : 'border-white/24'}`} />
+                      <span className={`mt-0.5 h-3.5 w-3.5 shrink-0 rounded-[0.22rem] border transition-colors ${todo.done ? 'border-white/52 bg-white/68' : 'border-white/18'}`} />
                       <span className="min-w-0">
-                        <span className={todo.done ? 'block line-through text-white/34' : 'block text-white/82'}>
+                        <span className={todo.done ? 'block line-through text-white/30' : 'block leading-5 text-white/76'}>
                           {todo.text}
                         </span>
                         {todo.done && todo.completionNote && (
-                          <span className="mt-1 block text-[13px] leading-5 text-white/32">
+                          <span className="mt-1 block text-[11px] leading-4 text-white/26">
                             Proof: {todo.completionNote}
                           </span>
                         )}
                       </span>
                     </button>
 
-                    <div className="mt-2 flex gap-2 pl-6">
+                    <div className="mt-1 flex gap-2 pl-6">
                       <button
                         type="button"
                         onClick={() => currentGoalCheck && editTodo(currentGoalCheck, todo.id)}
-                        className="text-[11px] text-white/36 transition hover:text-white/62"
+                        className="text-[10px] text-white/26 transition hover:text-white/56"
                       >
                         Edit
                       </button>
                       <button
                         type="button"
                         onClick={() => currentGoalCheck && deleteTodo(currentGoalCheck, todo.id)}
-                        className="text-[11px] text-red-300/54 transition hover:text-red-200/72"
+                        className="text-[10px] text-red-200/34 transition hover:text-red-100/64"
                       >
                         Delete
                       </button>
@@ -852,10 +852,10 @@ return (
               )}
             </div>
 
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               <button
                 onClick={() => currentGoalCheck && addTodo(currentGoalCheck)}
-                className="george-secondary-action w-full rounded-[0.55rem] px-4 py-2 text-[13px]"
+                className="george-secondary-action w-full rounded-[0.7rem] px-4 py-2 text-[12px]"
               >
                 + Add Step
               </button>
@@ -876,7 +876,7 @@ return (
                     context: 'goal_check'
                   })
                 }}
-                className="george-primary-action w-full rounded-[0.55rem] px-4 py-2 text-[13px]"
+                className="george-primary-action w-full rounded-[0.7rem] px-4 py-2.5 text-[13px] font-medium"
               >
                 Open with GEORGE
               </button>
@@ -891,18 +891,18 @@ return (
           type="button"
           aria-label="Stay in LIVE"
           onClick={() => setPendingNormalDestination(null)}
-          className="absolute inset-0 bg-black/62 backdrop-blur-[12px]"
+          className="absolute inset-0 bg-black/66 backdrop-blur-[6px]"
         />
 
-        <div className="relative z-10 w-full max-w-[420px] rounded-[1.75rem] border border-white/[0.08] bg-[#080A0F]/98 p-5 shadow-[0_28px_90px_rgba(0,0,0,0.68)]">
-          <div className="text-[17px] font-semibold text-white/90">
+        <div className="relative z-10 w-full max-w-[400px] rounded-[1.1rem] border border-white/[0.06] bg-[#080A0E]/98 p-5 shadow-[0_22px_72px_rgba(0,0,0,0.54)]">
+          <div className="text-[15px] font-medium tracking-[0.005em] text-white/86">
             Leave LIVE?
           </div>
-          <p className="mt-2 text-[13px] leading-5 text-white/46">
+          <p className="mt-2 max-w-[34ch] text-[12px] leading-[1.65] text-white/42">
             This opens a GEORGE workspace. Save the current LIVE conversation first?
           </p>
 
-          <div className="mt-5 grid gap-2">
+          <div className="mt-5 grid gap-1.5">
             <button
               type="button"
               onClick={() => {
@@ -911,7 +911,7 @@ return (
                 setPendingNormalDestination(null)
                 completeNormalNavigation(destination)
               }}
-              className="george-primary-action rounded-[1rem] px-4 py-3 text-left text-[13px]"
+              className="george-primary-action rounded-[0.7rem] px-4 py-2.5 text-left text-[13px] font-medium"
             >
               Save LIVE and open workspace
             </button>
@@ -923,7 +923,7 @@ return (
                 setPendingNormalDestination(null)
                 completeNormalNavigation(destination)
               }}
-              className="george-secondary-action rounded-[1rem] px-4 py-3 text-left text-[13px]"
+              className="george-secondary-action rounded-[0.7rem] px-4 py-2.5 text-left text-[12px]"
             >
               Open without saving
             </button>
@@ -931,7 +931,7 @@ return (
             <button
               type="button"
               onClick={() => setPendingNormalDestination(null)}
-              className="george-quiet-action rounded-[1rem] px-4 py-3 text-left text-[13px]"
+              className="george-quiet-action rounded-[0.7rem] px-4 py-2 text-left text-[12px]"
             >
               Stay in LIVE
             </button>

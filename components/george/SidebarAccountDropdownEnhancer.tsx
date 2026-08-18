@@ -127,20 +127,20 @@ export default function SidebarAccountDropdownEnhancer() {
   const label = authenticated ? 'Account Details' : 'Guest access'
 
   const actionRow =
-    'block w-full rounded-[0.78rem] px-3 py-2.5 text-left text-[13px] text-white/76 transition hover:bg-white/[0.06] hover:text-white'
+    'block w-full rounded-[0.65rem] px-3 py-2 text-left text-[12px] text-white/58 transition hover:bg-white/[0.025] hover:text-white/82'
 
   return createPortal(
     <div
       data-bx-account-dropdown
-      className="fixed z-[260] rounded-[1rem] border border-white/[0.075] bg-[#07090E]/95 p-2 shadow-[0_24px_72px_rgba(0,0,0,0.58)] backdrop-blur-[18px]"
+      className="fixed z-[260] rounded-[1rem] border border-white/[0.055] bg-[#080A0E]/98 p-2 shadow-[0_18px_52px_rgba(0,0,0,0.44)] backdrop-blur-xl"
       style={{ top, left, width }}
     >
-      <div className="rounded-[0.85rem] border border-white/[0.05] bg-white/[0.025] px-3 py-3">
-        <div className="truncate text-[13px] font-semibold tracking-[-0.02em] text-white/90">{label}</div>
-        <div className="mt-1 text-[10px] uppercase tracking-[0.16em] text-white/38">{tier} access</div>
+      <div className="rounded-[0.75rem] border border-white/[0.035] bg-white/[0.015] px-3 py-2.5">
+        <div className="truncate text-[13px] font-medium tracking-[-0.01em] text-white/82">{label}</div>
+        <div className="mt-1 text-[9px] uppercase tracking-[0.18em] text-white/28">{tier} access</div>
       </div>
 
-      <div className="mt-2 space-y-1">
+      <div className="mt-1.5 space-y-0.5">
         <a href="/runtime" className={actionRow}>Dashboard / System</a>
         <a href="/top-up" className={actionRow}>Upgrade</a>
         <button
@@ -157,11 +157,11 @@ export default function SidebarAccountDropdownEnhancer() {
         <a href="/help" className={actionRow}>Help</a>
       </div>
 
-      <div className="mt-2 border-t border-white/[0.07] pt-2">
+      <div className="mt-1.5 border-t border-white/[0.045] pt-1.5">
         {authenticated ? (
           <button
             type="button"
-            className={`${actionRow} text-white/58 hover:text-white`}
+            className={`${actionRow} text-white/42 hover:text-white/74`}
             onClick={() => {
               setOpen(false)
               if (!clickExistingAccountAction(/exit|log\s*out|logout/i)) {
@@ -174,7 +174,7 @@ export default function SidebarAccountDropdownEnhancer() {
         ) : (
           <button
             type="button"
-            className={`${actionRow} text-white/58 hover:text-white`}
+            className={`${actionRow} text-white/42 hover:text-white/74`}
             onClick={() => {
               setOpen(false)
               if (!clickExistingAccountAction(/continue|sign\s*in|login/i)) {

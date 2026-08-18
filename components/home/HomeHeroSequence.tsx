@@ -151,7 +151,7 @@ export function HomeHeroSequence() {
                     COMMUNICATION_LEVELS[
                       sectionIndex % COMMUNICATION_LEVELS.length
                     ] === "BRILLIANT"
-                      ? "text-[#9fb7ff] [text-shadow:0_0_10px_rgba(126,156,255,0.75),0_0_24px_rgba(78,124,255,0.55)]"
+                      ? "text-[#9fb7ff]"
                       : COMMUNICATION_LEVELS[
                             sectionIndex % COMMUNICATION_LEVELS.length
                           ] === "INTELLIGENT"

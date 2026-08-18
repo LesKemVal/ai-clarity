@@ -43,6 +43,8 @@ const GEORGE_LIVE_VISUAL_COMPOSER_STYLE = `
   }
 `;
 
+import GeorgeAssistantMessage from "@/components/george/GeorgeAssistantMessage";
+import type { GeorgeMessage } from "@/lib/george/chat/message-types";
 import {
   clearPreparationSession,
   clearLivePreparationPreviewReady,
@@ -199,6 +201,7 @@ import {
 } from "@/lib/george/live-runtime/live-friction";
 import type { OperationalResourceMonitorState } from "@/lib/george/runtime/operational-resource-monitor";
 import type { GeorgeRuntimeAuthoritySnapshot } from "@/lib/george/runtime/runtime-pipeline";
+import { resolveMomentAssessmentFromOperationalJudgment } from "@/lib/george/chat/moment-assessment-from-operational-judgment";
 import {
   NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST,
   type GeorgeOperationalDisposition,
@@ -402,21 +405,7 @@ function getLiveResponseServingTags(
 }
 
 
-type Message = {
-  role: "assistant" | "user" | "system";
-  content: string;
-  constrained?: boolean;
-  imageDataUrl?: string | null;
-  simplifiedFromIndex?: number;
-  source?:
-    | "user_input"
-    | "sidebar_prompt"
-    | "live_transcript"
-    | "third_party_speech"
-    | "system_override";
-  servingTags?: string[];
-  presentationMode?: "live_preparation";
-};
+type Message = GeorgeMessage;
 
 function buildNormalPreparationQuestionContent(question: PreparationQuestion) {
   const questionText = String(question.question || "").trim();
@@ -547,101 +536,6 @@ declare global {
   }
 }
 
-
-function renderAssistantContent(text: string, liveMode: boolean) {
-  const cleaned = String(text || "")
-    .replace(/\*\*(.*?)\*\*/g, "$1")
-    .replace(/^###\s+/gm, "")
-    .replace(/^##\s+/gm, "")
-    .replace(/^#\s+/gm, "")
-    .trim();
-
-  const paragraphs = cleaned
-    .split(/\n\s*\n/)
-    .map((p) => p.trim())
-    .filter(Boolean);
-
-  return (
-    <div className={`flex flex-col ${liveMode ? "gap-7" : "gap-5"}`}>
-      {paragraphs.map((paragraph, index) => {
-        const lines = paragraph
-          .split("\n")
-          .map((line) => line.trim())
-          .filter(Boolean);
-
-        const bulletLines = lines.filter((line) => /^[-•*]\s+/.test(line));
-
-        const numberedLines = lines.filter((line) => /^\d+[.)]\s+/.test(line));
-
-        if (
-          lines.length > 1 &&
-          (bulletLines.length === lines.length ||
-            numberedLines.length === lines.length)
-        ) {
-          return (
-            <div key={index}>
-              {bulletLines.length === lines.length ? (
-                <ul className="space-y-3">
-                  {lines.map((line, i) => (
-                    <li key={i}>{line.replace(/^[-•*]\s+/, "• ")}</li>
-                  ))}
-                </ul>
-              ) : (
-                <ol className="space-y-3">
-                  {lines.map((line, i) => (
-                    <li key={i}>{line}</li>
-                  ))}
-                </ol>
-              )}
-            </div>
-          );
-        }
-
-        return (
-          <div key={index} className="flex flex-col gap-3">
-            {lines.map((line, lineIndex) => {
-              if (/^[-•*]\s+/.test(line)) {
-                return (
-                  <div key={lineIndex} className="pl-5 -indent-5">
-                    {line.replace(/^[-•*]\s+/, "• ")}
-                  </div>
-                );
-              }
-
-              if (/^\d+[.)]\s+/.test(line)) {
-                return (
-                  <div key={lineIndex} className="pl-5 -indent-5">
-                    {line}
-                  </div>
-                );
-              }
-
-              const routeLink = line.match(
-                /^\[([^\]]+)\]\((\/[^)]+)\)$/,
-              );
-
-              if (routeLink) {
-                return (
-                  <div key={lineIndex}>
-                    <a
-                      href={routeLink[2]}
-                      className="inline-flex items-center gap-1.5 border-b border-[#8FAEFF]/34 pb-[1px] font-medium text-[#AFC0FF]/82 transition hover:border-[#AFC0FF]/72 hover:text-[#DCE5FF]"
-                    >
-                      {routeLink[1]}
-                      <span aria-hidden="true">→</span>
-                    </a>
-                  </div>
-                );
-              }
-
-              return <div key={lineIndex}>{line}</div>;
-            })}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
 
 const georgeAmbientPulseStyles = `
 @keyframes georgeGhostDrift {
@@ -3077,7 +2971,11 @@ export default function Page({
     setRerouteSignal(0);
   };
 
-  const presentNormalOperationalJudgmentResponse = (content: string) => {
+  const presentNormalOperationalJudgmentResponse = (
+    content: string,
+    operationalJudgment:
+      NormalLiveOperationalJudgmentResult["operationalJudgment"],
+  ) => {
     const normalizedContent = String(content || "").trim();
     if (!normalizedContent) return;
 
@@ -3092,6 +2990,10 @@ export default function Page({
     const assistantMessage: Message = {
       role: "assistant",
       content: normalizedContent,
+      momentAssessment:
+        resolveMomentAssessmentFromOperationalJudgment(
+          operationalJudgment,
+        ),
     };
 
     setMessages((previous) => {
@@ -3142,6 +3044,7 @@ export default function Page({
     );
     presentNormalOperationalJudgmentResponse(
       judgmentResult.operationalJudgmentResult.message || "",
+      operationalJudgment,
     );
 
     return decisionSession || preparationSession;
@@ -5265,6 +5168,10 @@ export default function Page({
           role: "assistant",
           content: finalContent,
           constrained: false,
+          momentAssessment:
+            resolveMomentAssessmentFromOperationalJudgment(
+              runtimeAuthoritySnapshot?.operationalJudgment,
+            ),
         };
         assistantRevealedRef.current = false;
 
@@ -6336,7 +6243,7 @@ export default function Page({
                     <button
                       type="button"
                       onClick={handleShareGeorge}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-[14px] bg-transparent text-[#D7DBE4]/48 ring-1 ring-white/[0.04] transition-[transform,background-color,color] duration-300 hover:bg-white/[0.035] hover:text-[#D7DBE4]/88 active:scale-[0.97]"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-[14px] bg-transparent text-[#D7DBE4]/44 ring-1 ring-white/[0.035] transition-[transform,background-color,color] duration-300 hover:bg-white/[0.028] hover:text-[#D7DBE4]/78 active:scale-[0.97]"
                       aria-label="Share GEORGE context"
                       title="Share GEORGE context"
                     >
@@ -6346,7 +6253,7 @@ export default function Page({
                     <button
                       type="button"
                       onClick={() => setShowIdentityMenu((value) => !value)}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-[14px] bg-transparent text-[20px] leading-none text-[#D7DBE4]/52 ring-1 ring-white/[0.04] transition-[background-color,color] duration-300 hover:bg-white/[0.035] hover:text-[#D7DBE4]/88"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-[14px] bg-transparent text-[20px] leading-none text-[#D7DBE4]/46 ring-1 ring-white/[0.035] transition-[background-color,color] duration-300 hover:bg-white/[0.028] hover:text-[#D7DBE4]/78"
                       aria-label="Identity menu"
                       title="Identity"
                     >
@@ -6680,7 +6587,7 @@ export default function Page({
                   (forceLive || liveMode) && !showLiveEntrySequence
                     ? ""
                     : hasVisibleThread && !isPreLiveSignalAcquisition
-                      ? "pt-[132px] md:pt-6"
+                      ? "pt-[132px] md:pt-[42px]"
                       : showMobileHero
                         ? "pt-3 md:pt-14"
                         : "pt-10 md:pt-6"
@@ -6890,7 +6797,7 @@ export default function Page({
                     return (
                       <div
                         key={i}
-                        className={`w-full max-w-full min-w-0 space-y-1 flex flex-col md:mx-auto ${
+                        className={`w-full max-w-full min-w-0 space-y-1.5 flex flex-col md:mx-auto ${
                           !(forceLive || liveMode) &&
                           m.role === "assistant" &&
                           m.presentationMode !== "live_preparation"
@@ -6900,60 +6807,46 @@ export default function Page({
                           m.role === "user" ? "items-end" : "items-start"
                         }`}
                       >
-                        <div
-                          style={
-                            m.role === "assistant" &&
-                            !liveMode &&
-                            m.presentationMode === "live_preparation"
-                              ? {
-                                  background:
-                                    "linear-gradient(180deg, rgba(24,42,86,0.82), rgba(14,27,58,0.76))",
-                                  borderColor: "rgba(69,105,188,0.32)",
-                                  boxShadow: "0 12px 34px rgba(4,12,32,0.22)",
-                                }
-                              : undefined
-                          }
-                          data-george-message-presentation={
-                            m.presentationMode || undefined
-                          }
-                          className={`relative whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-[15.5px] md:text-[15.8px] landscape:text-[18px] ${forceLive || liveMode ? "leading-[1.72]" : ""} landscape:leading-8 tracking-[0.002em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[#D7DBE4]/88 ${
-                            m.role === "user"
-                              ? liveMode
-                                ? "ml-auto self-end w-fit max-w-[72%] text-left rounded-[0.6rem] border-0 bg-[#F7F8FA] px-2.5 py-1.5 text-[#171717] shadow-[0_6px_16px_rgba(3,8,14,0.14)]"
-                                : "message-user ml-auto self-end max-w-[min(82%,34rem)] text-left rounded-[1.05rem] border-0 bg-[#F7F8FA] px-3.5 py-2.5 text-[#171717] shadow-[0_12px_30px_rgba(0,0,0,0.16)]"
-                              : liveMode
-                                ? "w-fit max-w-[82%] text-left rounded-[0.6rem] border border-[#8FB6C9]/[0.045] bg-[linear-gradient(180deg,rgba(10,18,28,0.42),rgba(6,10,16,0.22))] px-3 py-2 shadow-[0_8px_18px_rgba(0,0,0,0.12)]"
-                                : m.presentationMode === "live_preparation"
-                                  ? "w-fit max-w-[min(92%,42rem)] self-start rounded-[0.95rem] border px-4 py-3 text-left"
-                                  : "message-assistant max-w-full text-left px-1 py-2"
-                          }`}
-                        >
-                          {m.role === "assistant" ? (
-                            renderAssistantContent(
+                        {m.role === "assistant" ? (
+                          <GeorgeAssistantMessage
+                            message={m}
+                            content={
                               typedMessageIndex === i
                                 ? typedMessageContent || m.content
-                                : m.content,
-                              liveMode,
-                            )
-                          ) : (
-                            <>
-                              {m.imageDataUrl && (
-                                <img
-                                  src={m.imageDataUrl}
-                                  alt="Uploaded image"
-                                  className="mb-2 max-h-40 w-full rounded-[1rem] max-w-full border border-white/[0.05] object-cover"
-                                />
-                              )}
-                              <span className="block max-w-full break-words [overflow-wrap:anywhere] text-[#171717] opacity-100">
-                                {m.content}
-                              </span>
-                            </>
-                          )}
-                        </div>
+                                : m.content
+                            }
+                            liveMode={liveMode}
+                            forceLive={forceLive}
+                          />
+                        ) : (
+                          <div
+                            data-george-message-presentation={
+                              m.presentationMode || undefined
+                            }
+                            className={`relative whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-[15.5px] md:text-[15.8px] landscape:text-[18px] ${
+                              forceLive || liveMode ? "leading-[1.72]" : ""
+                            } landscape:leading-8 tracking-[0.002em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[#D7DBE4]/88 ${
+                              liveMode
+                                ? "ml-auto self-end w-fit max-w-[72%] text-left rounded-[0.6rem] border-0 bg-[#F7F8FA] px-2.5 py-1.5 text-[#171717] shadow-[0_6px_16px_rgba(3,8,14,0.14)]"
+                                : "message-user ml-auto self-end max-w-[min(80%,34rem)] text-left rounded-[1rem] border border-black/[0.035] bg-[#F7F8FA] px-3.5 py-2.5 text-[#171717] shadow-[0_8px_24px_rgba(0,0,0,0.13)]"
+                            }`}
+                          >
+                            {m.imageDataUrl && (
+                              <img
+                                src={m.imageDataUrl}
+                                alt="Uploaded image"
+                                className="mb-2 max-h-40 w-full rounded-[1rem] max-w-full border border-white/[0.05] object-cover"
+                              />
+                            )}
+                            <span className="block max-w-full break-words [overflow-wrap:anywhere] text-[#171717] opacity-100">
+                              {m.content}
+                            </span>
+                          </div>
+                        )}
 
 
                         {m.role === "user" && !liveMode && (
-                          <div className="mt-2 flex items-center gap-1.5 pr-1 text-[#D7DBE4]/72">
+                          <div className="mt-1 flex items-center gap-1 pr-1 text-[#D7DBE4]/56">
                             <button
                               type="button"
                               onClick={() => {
@@ -7124,7 +7017,7 @@ export default function Page({
                             )}
 
                             {!liveMode && (
-                              <div className="relative flex max-w-full items-center gap-2 overflow-x-auto whitespace-nowrap text-[11px] text-[#D7DBE4]/50 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                              <div className="relative mt-0.5 flex max-w-full items-center gap-1.5 overflow-x-auto whitespace-nowrap text-[11px] text-[#D7DBE4]/44 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                                 {
                                   <>
                                     {isLatestAssistant &&
@@ -7189,7 +7082,7 @@ export default function Page({
                                       </>
                                     )}
 
-                                    <div className="ml-1 flex shrink-0 items-center gap-1 border-l border-white/[0.07] pl-2">
+                                    <div className="ml-0.5 flex shrink-0 items-center gap-0.5 border-l border-white/[0.055] pl-1.5">
                                       <button
                                         type="button"
                                         onClick={async () => {
@@ -7201,7 +7094,7 @@ export default function Page({
                                             setShowToast(true);
                                           } catch {}
                                         }}
-                                        className="george-quiet-action inline-flex h-7 items-center justify-center rounded-[0.5rem] px-2 text-[9px] font-semibold tracking-[0.13em]"
+                                        className="george-quiet-action inline-flex h-7 items-center justify-center rounded-[0.5rem] px-1.5 text-[9px] font-medium tracking-[0.11em]"
                                         aria-label="Copy response"
                                         title="Copy"
                                       >
@@ -7234,7 +7127,7 @@ export default function Page({
                                             }
                                           } catch {}
                                         }}
-                                        className="george-quiet-action inline-flex h-7 items-center justify-center rounded-[0.5rem] px-2 text-[9px] font-semibold tracking-[0.13em]"
+                                        className="george-quiet-action inline-flex h-7 items-center justify-center rounded-[0.5rem] px-1.5 text-[9px] font-medium tracking-[0.11em]"
                                         aria-label="Share response"
                                         title="Share"
                                       >
@@ -7454,13 +7347,13 @@ export default function Page({
                         {isLatestVisibleMessage &&
                           normalBriefingActionState &&
                           normalPreparationActions.length > 0 && (
-                            <div className="mt-1.5 flex w-fit max-w-[min(92%,42rem)] flex-wrap items-center gap-1.5 self-start rounded-[0.75rem] border border-[#5678C8]/18 bg-[#0B1225]/54 p-1.5">
+                            <div className="mt-1 flex w-fit max-w-[min(92%,42rem)] flex-wrap items-center gap-1 self-start">
                               {normalPreparationActions.map((action) => (
                                 <button
                                   key={action.label}
                                   type="button"
                                   onClick={action.action}
-                                  className={`inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-[0.5rem] px-2.5 py-1.5 text-[9px] font-semibold uppercase tracking-[0.15em] ${
+                                  className={`inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-[0.55rem] px-2.5 py-1.5 text-[9px] font-medium uppercase tracking-[0.13em] ${
                                     action.emphasis === "primary"
                                       ? "george-secondary-action"
                                       : action.emphasis === "secondary"
@@ -7614,7 +7507,7 @@ export default function Page({
                       ? "h-[300px] md:h-[320px]"
                       : isNormalPreparationBriefingActive
                         ? "h-[294px] md:h-[320px]"
-                      : "h-[24px] md:h-[32px]"
+                      : "h-[38px] md:h-[48px]"
                   }`}
                 />
               </div>
@@ -8114,7 +8007,7 @@ export default function Page({
                 >
                   <div
                     aria-hidden="true"
-                    className="pointer-events-none mb-2 select-none text-center text-[11px] font-normal tracking-normal text-white/38"
+                    className="pointer-events-none mb-2.5 select-none text-center text-[10px] font-normal tracking-[0.015em] text-white/28"
                   >
                     GEORGE can make mistakes. Check important info.
                   </div>
@@ -8125,7 +8018,7 @@ export default function Page({
                         ? "border-white/[0.09] bg-[#070B12]/96 shadow-[0_10px_28px_rgba(0,0,0,0.28)]"
                         : isNormalPreparationBriefingActive
                           ? "border-[#4668B8]/65 !bg-[#101A36] shadow-[0_12px_38px_rgba(4,10,28,0.46),0_0_34px_rgba(8,18,48,0.48)]"
-                          : "border-white/[0.09] !bg-[#0B0F17] shadow-[0_10px_30px_rgba(0,0,0,0.34)]"
+                          : "border-white/[0.105] !bg-[#0A0E15] shadow-[0_14px_38px_rgba(0,0,0,0.38),inset_0_1px_0_rgba(255,255,255,0.025)]"
                     }`}
                   >
                     {composerSendFeedback && (
@@ -8293,7 +8186,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className={`${forceLive || liveMode ? "hidden" : "absolute left-1 top-1/2 z-[2] flex"} h-10 w-10 -translate-y-1/2 items-center justify-center border-0 bg-transparent text-[#D7DBE4]/44 transition hover:text-[#D7DBE4]/82 md:h-8 md:w-8`}
+                      className={`${forceLive || liveMode ? "hidden" : "absolute left-1 top-1/2 z-[2] flex"} h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border-0 bg-transparent text-[#D7DBE4]/38 transition duration-150 hover:bg-white/[0.035] hover:text-[#F4F8FF]/82 md:h-8 md:w-8`}
                       aria-label="Upload file"
                     >
                       <svg
@@ -8450,7 +8343,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         minHeight: "40px",
                         maxHeight: "140px",
                       }}
-                      className={`${forceLive || liveMode ? "min-h-[40px] pl-14 pr-[92px] py-2 md:min-h-[38px] md:pl-11 md:pr-[84px] md:py-2" : "min-h-[46px] pl-14 pr-[92px] py-2.5 md:min-h-[42px] md:pl-11 md:pr-[84px] md:py-2"} relative z-[2] pointer-events-auto touch-manipulation block w-full resize-none rounded-none border-0 bg-transparent text-[16px] leading-[1.35] font-normal tracking-[0.002em] text-[#F4F8FF]/92 shadow-none outline-none placeholder:italic placeholder:text-[#D7DBE4]/38 transition focus:border-0 focus:bg-transparent focus:outline-none focus:ring-0 md:text-[15px]`}
+                      className={`${forceLive || liveMode ? "min-h-[40px] pl-14 pr-[92px] py-2 md:min-h-[38px] md:pl-11 md:pr-[84px] md:py-2" : "min-h-[46px] pl-14 pr-[92px] py-2.5 md:min-h-[42px] md:pl-11 md:pr-[84px] md:py-2"} relative z-[2] pointer-events-auto touch-manipulation block w-full resize-none rounded-none border-0 bg-transparent text-[16px] leading-[1.35] font-normal tracking-[0.002em] text-[#F4F8FF]/92 shadow-none outline-none placeholder:italic placeholder:text-[#D7DBE4]/34 transition focus:border-0 focus:bg-transparent focus:outline-none focus:ring-0 md:text-[15px]`}
                     />
 
                     <div
@@ -8474,7 +8367,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                               }
                             }}
                             disabled={!voiceSupported || isThinking}
-                            className="flex h-8 w-8 items-center justify-center border-0 bg-transparent text-[#D7DBE4]/44 transition hover:text-[#D7DBE4]/82 disabled:cursor-not-allowed disabled:opacity-30"
+                            className="flex h-8 w-8 items-center justify-center rounded-full border-0 bg-transparent text-[#D7DBE4]/38 transition duration-150 hover:bg-white/[0.035] hover:text-[#F4F8FF]/82 disabled:cursor-not-allowed disabled:opacity-30"
                             aria-label="Voice"
                           >
                             <svg
@@ -8499,7 +8392,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                           if (submitPreLiveSignalAnswer()) return;
                           handleSend();
                         }}
-                        className="flex h-8 w-8 items-center justify-center border-0 bg-transparent text-[#D7DBE4]/42 transition hover:text-white"
+                        className="flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.055] text-[#F4F8FF]/72 shadow-[0_3px_10px_rgba(0,0,0,0.16)] transition duration-150 hover:border-white/[0.14] hover:bg-white/[0.10] hover:text-white"
                         aria-label="Share"
                       >
                         <svg

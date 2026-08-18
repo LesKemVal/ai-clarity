@@ -1,7 +1,5 @@
 "use client";
 
-import BxPageHeader from "@/components/BxPageHeader";
-
 import { useEffect, useState } from "react";
 
 import {
@@ -1129,25 +1127,15 @@ export default function OperationalLibraryClient() {
 
   return (
     <>
-      <BxPageHeader
-        backLabel="BACK"
-        onBack={
-          livePrepReturnAvailable
-            ? returnToLivePrep
-            : () => {
-                window.location.href = "/george";
-              }
-        }
-      />
-
       <div className="george-motion-fade-soft mt-10 space-y-8">
       <section
         data-marketplace-hero="operational-strategy"
+        data-george-guide="library-recommended"
         className="overflow-hidden rounded-[24px] border border-white/14 bg-[#090909] shadow-[0_24px_80px_rgba(0,0,0,0.42)]"
       >
         <div className="border-b border-white/10 px-6 py-5 sm:px-9">
           <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/45">
-            Recommended for this conversation
+            Recommended formula
           </p>
         </div>
 
@@ -1190,7 +1178,7 @@ export default function OperationalLibraryClient() {
                   onClick={() => void useMarketplaceFormula(recommendedFormula)}
                   className={`${marketplacePrimaryActionClassName} min-h-12 rounded-[12px] px-6 py-3 text-sm`}
                 >
-                  Use Strategy
+                  Use Formula
                 </button>
               ) : (
                 <span className="min-h-12 rounded-[12px] border border-white/14 px-6 py-3 text-sm text-white/48">
@@ -1232,10 +1220,10 @@ export default function OperationalLibraryClient() {
             id="marketplace-sandbox-heading"
             className="mt-3 text-2xl font-medium tracking-[-0.025em] text-white sm:text-3xl"
           >
-            Discover strategies
+            More recommended formulas
           </h2>
           <p className="mt-3 text-sm leading-6 text-white/55">
-            Browse strategies for specific conversations and outcomes.
+            Compare other formulas GEORGE considers relevant to your current work.
           </p>
         </div>
 
@@ -1425,13 +1413,16 @@ export default function OperationalLibraryClient() {
       </section>
       ) : null}
 
-      <section className="rounded-xl border border-white/10 p-6">
+      <section
+        data-george-guide="library-formulas"
+        className="rounded-xl border border-white/10 p-6"
+      >
         <div className="flex items-baseline justify-between gap-4">
           <div>
             <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/42">
-              My Workspace
+              Your formulas
             </p>
-            <h2 className="mt-2 text-lg font-medium">Owned strategies</h2>
+            <h2 className="mt-2 text-lg font-medium">Work with your formulas</h2>
           </div>
           <span className="text-xs uppercase tracking-[0.18em] text-white/40">
             {ownedFormulas.length} owned
@@ -1471,6 +1462,12 @@ export default function OperationalLibraryClient() {
                 historyLoadingFormulaId === formula.id;
               const history = formulaHistory[formula.id];
               const historyError = historyErrors[formula.id];
+              const linkedScripts = workspaceScripts.filter(
+                (script) =>
+                  script.formulaId === formula.id &&
+                  script.formulaVersion === formula.version,
+              );
+              const primaryLinkedScript = linkedScripts[0] ?? null;
 
               return (
                 <article
@@ -1492,7 +1489,10 @@ export default function OperationalLibraryClient() {
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div
+                      data-george-guide="library-formula-actions"
+                      className="flex items-center gap-3"
+                    >
                       <p className="text-xs text-white/40">
                         Updated {formatDate(formula.updatedAt)}
                       </p>
@@ -1510,7 +1510,7 @@ export default function OperationalLibraryClient() {
                             )}
                             className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                           >
-                            Derive
+                            Change Formula
                           </button>
 
                           {isOwned ? (
@@ -1525,7 +1525,36 @@ export default function OperationalLibraryClient() {
                                 )}
                                 className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                               >
-                                Edit
+                                Edit Formula
+                              </button>
+
+                              {primaryLinkedScript ? (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const target = document.getElementById(
+                                      `operational-script-${primaryLinkedScript.id}`,
+                                    );
+                                    target?.scrollIntoView({
+                                      behavior: "smooth",
+                                      block: "center",
+                                    });
+                                  }}
+                                  className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white"
+                                >
+                                  Review Script
+                                </button>
+                              ) : null}
+
+                              <button
+                                type="button"
+                                onClick={() => void toggleFormulaHistory(formula.id)}
+                                aria-expanded={isHistoryExpanded}
+                                className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white"
+                              >
+                                {isHistoryExpanded
+                                  ? "Hide Evidence"
+                                  : "View Evidence"}
                               </button>
 
                               <button
@@ -2092,13 +2121,16 @@ export default function OperationalLibraryClient() {
         )}
       </section>
 
-      <section className="rounded-xl border border-white/10 p-6">
+      <section
+        data-george-guide="library-scripts"
+        className="rounded-xl border border-white/10 p-6"
+      >
         <div className="flex items-baseline justify-between gap-4">
           <div>
             <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/42">
-              My Workspace
+              Scripts
             </p>
-            <h2 className="mt-2 text-lg font-medium">Scripts</h2>
+            <h2 className="mt-2 text-lg font-medium">Review your scripts</h2>
           </div>
           <span className="text-xs uppercase tracking-[0.18em] text-white/40">
             {scripts.length} saved
@@ -2113,8 +2145,9 @@ export default function OperationalLibraryClient() {
           <div className="mt-5 space-y-4">
             {workspaceScripts.map((script) => (
               <article
+                id={`operational-script-${script.id}`}
                 key={script.id}
-                className="rounded-lg border border-white/8 bg-white/[0.025] p-5"
+                className="scroll-mt-24 rounded-lg border border-white/8 bg-white/[0.025] p-5"
               >
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>

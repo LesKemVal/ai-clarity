@@ -1,0 +1,5 @@
+import { HomeConversationTypeSurface } from "@/components/home/HomeConversationTypeSurface";
+
+export default function GeorgeLiveHomePage() {
+  return <HomeConversationTypeSurface />;
+}

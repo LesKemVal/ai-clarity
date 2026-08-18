@@ -7419,7 +7419,7 @@ export default function LiveEntryClient() {
                   </div>
 
                   <h1 className="mt-3 max-w-[620px] font-mono text-[23px] font-medium leading-[1.16] tracking-[-0.025em] text-white/90 sm:text-[27px]">
-                    Start with the conversation before choosing how GEORGE supports it.
+                    Start from your role in the discussion. Who are you?
                   </h1>
 
                   <p className="mt-3 max-w-[600px] text-[13px] leading-[1.75] text-white/44">
