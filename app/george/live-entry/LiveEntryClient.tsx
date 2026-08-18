@@ -7385,7 +7385,7 @@ export default function LiveEntryClient() {
 
       <div className="relative z-10 w-full">
         <div className="pointer-events-none fixed inset-x-0 top-0 z-50">
-          <div className="mx-auto w-full max-w-[1180px] px-6 pt-5 sm:px-10 sm:pt-7 lg:px-16 xl:px-20">
+          <div className="mx-auto w-full max-w-5xl px-6 pt-4 sm:px-8 sm:pt-5">
             <a
               href="/"
               aria-label="Go to BRANESx home"
@@ -7394,7 +7394,7 @@ export default function LiveEntryClient() {
               <img
                 src="/logofav.png"
                 alt="Bx"
-                className="h-[72px] w-[72px] object-contain opacity-[0.96] sm:h-[82px] sm:w-[82px]"
+                className="h-[80px] w-[80px] object-contain opacity-[0.96] sm:h-[90px] sm:w-[90px]"
               />
             </a>
           </div>
@@ -7403,26 +7403,26 @@ export default function LiveEntryClient() {
 
           <div className="relative z-10">
             {/* LIVE ENTRY ORIENTATION */}
-            <div className="mx-auto w-full max-w-[760px] px-5 pb-4 pt-32 sm:px-8 sm:pb-5 sm:pt-36">
-              <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.28em] text-white/32">
+            <div className="mx-auto w-full max-w-5xl px-6 pb-5 pt-[124px] sm:px-8 sm:pt-[138px]">
+              <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.26em] text-white/36">
                 GEORGE LIVE · CHOOSE YOUR ROUTE
               </div>
             </div>
 
             {/* PREPARATION ROUTES */}
-            <section className="mx-auto w-full max-w-[760px] px-5 pb-20 sm:px-8 sm:pb-24">
+            <section className="mx-auto w-full max-w-5xl px-6 pb-20 sm:px-8 sm:pb-24">
               <div className="border-t border-white/[0.08]">
 
-                <div className="border-b border-white/[0.07] py-7 sm:py-8">
+                <div className="border-b border-white/[0.07] py-10 sm:py-12">
                   <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-white/30">
                     ROLE FIRST / CONVERSATION SETUP
                   </div>
 
-                  <h1 className="mt-3 max-w-[620px] font-mono text-[23px] font-medium leading-[1.16] tracking-[-0.025em] text-white/90 sm:text-[27px]">
+                  <h1 className="mt-4 max-w-3xl font-mono text-[26px] font-medium leading-[1.12] tracking-[-0.03em] text-white/92 sm:text-[31px]">
                     Start from your role in the discussion. Who are you?
                   </h1>
 
-                  <p className="mt-3 max-w-[600px] text-[13px] leading-[1.75] text-white/44">
+                  <p className="mt-4 max-w-[46rem] text-[13px] leading-[1.8] text-white/46">
                     Choose your role and the kind of conversation you are preparing for.
                     GEORGE uses that setup to establish the room before you decide how to enter LIVE.
                   </p>
@@ -7445,11 +7445,11 @@ export default function LiveEntryClient() {
                     TRADITIONAL LIVE
                   </div>
 
-                  <h2 className="mt-3 max-w-[620px] font-mono text-[23px] font-medium leading-[1.16] tracking-[-0.025em] text-white sm:text-[27px]">
+                  <h2 className="mt-4 max-w-3xl font-mono text-[26px] font-medium leading-[1.12] tracking-[-0.03em] text-white sm:text-[31px]">
                     Brief GEORGE directly, step by step.
                   </h2>
 
-                  <p className="mt-3 max-w-[600px] text-[13px] leading-[1.75] text-white/48">
+                  <p className="mt-4 max-w-[46rem] text-[13px] leading-[1.8] text-white/50">
                     Traditional LIVE walks you through the desired outcome, participants,
                     known context, support mechanics, and final readiness before entering the room.
                     Use it when you want the full briefing process before LIVE begins.
@@ -7469,7 +7469,7 @@ export default function LiveEntryClient() {
                 </div>
 
 
-                <div className="py-7 sm:py-8">
+                <div className="py-10 sm:py-12">
                   <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-white/30">
                     NORMAL GEORGE
                   </div>
