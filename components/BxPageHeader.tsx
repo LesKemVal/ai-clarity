@@ -29,11 +29,6 @@ export default function BxPageHeader({
       return
     }
 
-    if (backLabel === 'GEORGE') {
-      router.push(backHref || '/george')
-      return
-    }
-
     if (typeof window !== 'undefined' && window.history.length > 1) {
       router.back()
       return
