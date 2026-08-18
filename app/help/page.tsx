@@ -92,24 +92,24 @@ const principles = [
 
 export default function HelpPage() {
   return (
-    <main className="min-h-[100dvh] bg-black px-4 py-5 text-[#D7DBE4] sm:px-6 sm:py-8">
-      <div className="mx-auto w-full max-w-[1120px]">
+    <main className="min-h-[100dvh] bg-black px-6 py-6 text-[#D7DBE4] sm:px-8 sm:py-8">
+      <div className="mx-auto w-full max-w-5xl">
         <BxPageHeader backLabel="GEORGE" backHref="/george" />
 
-        <section className="border-b border-white/[0.08] pb-10 pt-4 sm:pb-14 sm:pt-8">
-          <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/34">
+        <section className="border-b border-white/[0.08] pb-12 pt-5 sm:pb-16 sm:pt-8">
+          <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.26em] text-white/38">
             USING GEORGE
           </div>
 
-          <h1 className="mt-5 max-w-4xl font-mono text-[40px] font-black uppercase leading-[0.92] tracking-[-0.07em] text-white sm:text-[68px]">
+          <h1 className="mt-5 max-w-4xl font-mono text-[40px] font-black uppercase leading-[0.94] tracking-[-0.065em] text-white sm:text-[64px]">
             A practical guide to the GEORGE workspace.
           </h1>
 
-          <p className="mt-7 max-w-3xl text-[17px] leading-8 text-white/68 sm:text-[20px] sm:leading-9">
+          <p className="mt-6 max-w-[46rem] text-[16px] leading-8 text-white/66 sm:text-[19px] sm:leading-9">
             One GEORGE supports Normal work, collaborative Preparation, focused LIVE execution, and the review that follows. You remain in control of what is adopted, reused, or changed.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-7 flex flex-wrap gap-3">
             <a
               href="/george"
               className="inline-flex min-h-11 items-center rounded-[14px] bg-white px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-black transition hover:-translate-y-px"
@@ -126,12 +126,12 @@ export default function HelpPage() {
           </div>
         </section>
 
-        <section className="py-10 sm:py-14">
-          <div className="grid gap-4 md:grid-cols-2">
+        <section className="py-12 sm:py-16">
+          <div className="grid gap-5 md:grid-cols-2">
             {steps.map((step) => (
               <article
                 key={step.index}
-                className="rounded-[24px] border border-white/[0.07] bg-[#05060A] p-5 shadow-[0_22px_70px_rgba(0,0,0,0.28)] sm:p-6"
+                className="rounded-[22px] border border-white/[0.075] bg-[#05060A] p-5 shadow-[0_22px_70px_rgba(0,0,0,0.30)] sm:p-6"
               >
                 <div className="flex items-center justify-between gap-4">
                   <span className="font-mono text-[10px] tracking-[0.18em] text-white/30">
@@ -143,7 +143,7 @@ export default function HelpPage() {
                   </span>
                 </div>
 
-                <h2 className="mt-5 font-mono text-[23px] font-black uppercase leading-[1] tracking-[-0.045em] text-white sm:text-[29px]">
+                <h2 className="mt-5 font-mono text-[24px] font-black uppercase leading-[1.02] tracking-[-0.045em] text-white sm:text-[30px]">
                   {step.title}
                 </h2>
 
@@ -169,12 +169,12 @@ export default function HelpPage() {
           </div>
         </section>
 
-        <section className="border-t border-white/[0.08] py-10 sm:py-14">
+        <section className="border-t border-white/[0.08] py-12 sm:py-16">
             <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/30">
             Your control
           </div>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <div className="mt-6 grid gap-5 md:grid-cols-3">
             {principles.map((principle) => (
               <article
                 key={principle.title}
