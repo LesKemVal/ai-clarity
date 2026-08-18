@@ -116,13 +116,6 @@ export default function HomePage() {
           </div>
         </footer>
 
-        <footer className="george-public-home-footer">
-          <div className="george-public-home-footer-line" />
-          <div className="george-public-home-footer-row">
-            <span>GEORGE · OPERATIONAL INTELLIGENCE</span>
-            <span>PREPARE · EXECUTE · ADAPT</span>
-          </div>
-        </footer>
       </div>
     </main>
   );
