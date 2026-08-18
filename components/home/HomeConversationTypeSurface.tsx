@@ -2013,24 +2013,24 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   return (
     <section
       ref={surfaceRef}
-      className={`relative min-h-[100dvh] scroll-mt-4 border-t border-white/10 px-5 py-14 transition-colors duration-700 sm:px-8 sm:py-20 ${
+      className={`relative min-h-[100dvh] scroll-mt-4 border-t border-white/[0.08] px-6 pb-16 pt-8 transition-colors duration-700 sm:px-8 sm:pb-20 sm:pt-10 ${
         isMissionTransition
           ? "bg-[#020304] max-sm:px-3 max-sm:py-3"
           : "bg-black"
       }`}
     >
-      <div className="mx-auto w-full max-w-[1700px]">
+      <div className="mx-auto w-full max-w-5xl">
         {phase === "selection" ? (
           <div className="animate-[fadeIn_420ms_ease-out]">
             <div className="max-w-6xl">
               <div
                 id="conversation-setup"
-                className="mt-1 scroll-mt-28 sm:mt-3"
+                className="scroll-mt-28"
               >
-                <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-white/46">
+                <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-white/52">
                   Role first / conversation setup
                 </div>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {FEATURED_HOMEPAGE_ROLES.map((role) => (
                     <HomepageRoleCard
                       key={role.id}
@@ -2042,15 +2042,15 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                 </div>
               </div>
 
-              <div className="mt-8 flex flex-wrap items-center gap-4">
+              <div className="mt-7 flex flex-wrap items-center gap-4 border-t border-white/[0.06] pt-6">
                 <button
                   type="button"
                   onClick={() => setShowAllRoles((current) => !current)}
-                  className="rounded-[10px] border border-white/[0.14] bg-white/[0.025] px-4 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/72 transition hover:border-white/30 hover:text-white"
+                  className="rounded-[12px] border border-white/[0.14] bg-white/[0.025] px-4 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/72 shadow-[inset_0_1px_0_rgba(255,255,255,0.035)] transition hover:border-white/30 hover:bg-white/[0.04] hover:text-white"
                 >
                   {showAllRoles ? "Hide roles" : "View all roles"}
                 </button>
-                <span className="text-[12px] text-white/38">
+                <span className="max-w-xl text-[12px] leading-5 text-white/40">
                   Roles are included when conversation or presentation materially affects success.
                 </span>
               </div>
