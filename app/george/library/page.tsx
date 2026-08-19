@@ -5,8 +5,8 @@ import GeorgePageGuide from "@/components/george/page-guide/GeorgePageGuide";
 export default function GeorgeLibraryPage() {
   return (
     <main className="min-h-screen bg-black text-white">
-      <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-12">
-        <div className="sticky top-3 z-50 rounded-[18px] border border-white/[0.08] bg-black/80 px-3 py-2.5 shadow-[0_18px_60px_rgba(0,0,0,0.34)] backdrop-blur-xl sm:px-4">
+      <div className="mx-auto max-w-6xl px-4 pb-10 pt-3 sm:px-6 sm:pb-12 sm:pt-4">
+        <div className="sticky top-0 z-50 border-b border-white/[0.065] bg-black/92 px-1 py-2.5 backdrop-blur-xl">
           <div className="flex min-w-0 items-center justify-between gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <Link
             href="/george"
@@ -17,7 +17,7 @@ export default function GeorgeLibraryPage() {
               src="/logofav.png"
               alt=""
               aria-hidden="true"
-              className="h-11 w-11 shrink-0 rounded-[0.8rem] object-contain sm:h-12 sm:w-12"
+              className="h-10 w-10 shrink-0 object-contain sm:h-12 sm:w-12"
             />
           </Link>
 
@@ -80,18 +80,19 @@ export default function GeorgeLibraryPage() {
           </div>
         </div>
 
-        <header className="mt-16 max-w-3xl sm:mt-20">
+        <header className="mt-8 max-w-4xl sm:mt-10">
           <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/34">
             GEORGE / LIBRARY
           </p>
 
-          <h1 className="mt-4 text-4xl font-medium tracking-[-0.045em] sm:text-6xl">
-            Operational Library
+          <h1 className="mt-2 text-[30px] font-medium leading-[1.05] tracking-[-0.04em] sm:text-[44px]">
+            Your operational working set.
           </h1>
 
-          <p className="mt-5 max-w-2xl text-[15px] leading-7 text-white/56 sm:text-base">
-            Work with the operational strategies, formulas, scripts, and
-            execution history connected to your objectives.
+          <p className="mt-3 max-w-3xl text-[13px] leading-6 text-white/46 sm:text-[14px]">
+            Review, adapt, and manage the formulas and scripts you can use in
+            execution. Inspect what changed, what has worked, and what should
+            carry into the next conversation.
           </p>
         </header>
 

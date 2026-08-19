@@ -5,10 +5,10 @@ import GeorgePageGuide from "@/components/george/page-guide/GeorgePageGuide";
 export default function GeorgeMarketplacePage() {
   return (
     <main className="min-h-screen bg-black text-white">
-      <div className="mx-auto max-w-6xl px-5 py-10 sm:px-6 sm:py-12">
-        <div className="sticky top-3 z-50 rounded-[18px] border border-white/[0.08] bg-black/80 px-3 py-2.5 shadow-[0_18px_60px_rgba(0,0,0,0.34)] backdrop-blur-xl sm:px-4">
+      <div className="mx-auto max-w-6xl px-5 pb-14 pt-5 sm:px-6 sm:pb-16 sm:pt-6">
+        <div className="sticky top-0 z-50 border-b border-white/[0.065] bg-black/92 px-1 py-2.5 backdrop-blur-xl">
           <div className="flex min-w-0 items-center justify-between gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <Link href="/george" className="inline-flex shrink-0 items-center transition-opacity duration-200 hover:opacity-82" aria-label="Return to GEORGE"><img src="/logofav.png" alt="" aria-hidden="true" className="h-11 w-11 shrink-0 rounded-[0.8rem] object-contain sm:h-12 sm:w-12" /></Link>
+          <Link href="/george" className="inline-flex shrink-0 items-center transition-opacity duration-200 hover:opacity-82" aria-label="Return to GEORGE"><img src="/logofav.png" alt="" aria-hidden="true" className="h-12 w-12 shrink-0 object-contain sm:h-14 sm:w-14" /></Link>
 
           <div className="flex shrink-0 items-center gap-2">
             <GeorgePageGuide
@@ -69,18 +69,19 @@ export default function GeorgeMarketplacePage() {
           </div>
         </div>
 
-        <header className="mt-16 max-w-3xl sm:mt-20">
+        <header className="mt-14 max-w-4xl sm:mt-18">
           <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/34">
             GEORGE / MARKETPLACE
           </p>
 
           <h1 className="mt-4 text-4xl font-medium tracking-[-0.045em] sm:text-6xl">
-            Operational Strategy Marketplace
+            Choose the strategy most likely to improve the outcome.
           </h1>
 
-          <p className="mt-5 max-w-2xl text-[15px] leading-7 text-white/56 sm:text-base">
-            Choose the operational strategy most likely to improve your chance
-            of achieving the outcome in front of you.
+          <p className="mt-5 max-w-3xl text-[15px] leading-7 text-white/52 sm:text-base">
+            Start with GEORGE&apos;s recommendation and the reasoning behind it.
+            Compare another approach only when it may improve your chance of
+            reaching the objective.
           </p>
         </header>
 

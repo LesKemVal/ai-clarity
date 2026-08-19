@@ -342,7 +342,7 @@ export default function MarketplaceClient() {
   );
 
   return (
-    <div className="mt-14">
+    <div className="mt-8 sm:mt-10">
       <section aria-labelledby="marketplace-recommended">
         <div className="flex items-start gap-4">
           <CheckMark />
@@ -356,7 +356,7 @@ export default function MarketplaceClient() {
               <>
                 <h2
                   id="marketplace-recommended"
-                  className="mt-3 max-w-4xl text-3xl font-medium tracking-[-0.035em] text-white sm:text-5xl"
+                  className="mt-2 max-w-4xl text-[28px] font-medium leading-[1.06] tracking-[-0.035em] text-white sm:text-[42px]"
                 >
                   {displayName(
                     recommendedFormula.name,
@@ -364,7 +364,7 @@ export default function MarketplaceClient() {
                   )}
                 </h2>
 
-                <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/38">
+                <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[9px] uppercase tracking-[0.13em] text-white/32">
                   <span>
                     {recommendedFormula.publication?.publisher ||
                       recommendedFormula.publication?.author ||
@@ -373,22 +373,22 @@ export default function MarketplaceClient() {
                   <span>{publicationLabel(recommendedFormula)}</span>
                 </div>
 
-                <div className="mt-8 max-w-3xl border-t border-white/[0.07] pt-6">
+                <div className="mt-5 max-w-3xl border-t border-white/[0.07] pt-4">
                   <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/30">
                     Why this strategy?
                   </p>
-                  <p className="mt-3 text-[15px] leading-7 text-white/64">
+                  <p className="mt-2 text-[13px] leading-6 text-white/56 sm:text-[14px]">
                     {recommendation?.recommendationSummary ||
                       "This strategy best fits the objective and context GEORGE currently understands."}
                   </p>
                 </div>
 
-                <div className="mt-7 flex flex-wrap gap-3">
+                <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
                   {entitlements[recommendedFormula.id]?.allowed ? (
                     <button
                       type="button"
                       onClick={() => useStrategy(recommendedFormula)}
-                      className="george-primary-action min-h-11 rounded-[0.7rem] px-5 py-2.5 text-sm font-medium"
+                      className="george-primary-action min-h-10 rounded-[0.65rem] px-4 py-2 text-[13px] font-medium"
                     >
                       Use Strategy
                     </button>
@@ -409,21 +409,26 @@ export default function MarketplaceClient() {
                           : recommendedFormula.id,
                       )
                     }
-                    className="george-secondary-action min-h-11 rounded-[0.7rem] px-5 py-2.5 text-sm"
+                    className="inline-flex min-h-11 items-center gap-2 px-1 text-sm text-white/44 transition hover:text-white/78"
                   >
-                    {formulaOpenId === recommendedFormula.id
-                      ? "Hide Formula"
-                      : "View Formula"}
+                    <span>
+                      {formulaOpenId === recommendedFormula.id
+                        ? "Hide Formula"
+                        : "View Formula"}
+                    </span>
+                    <span aria-hidden="true">
+                      {formulaOpenId === recommendedFormula.id ? "↑" : "→"}
+                    </span>
                   </button>
                 </div>
 
                 {formulaOpenId === recommendedFormula.id ? (
-                  <div className="mt-7 max-w-3xl border-l border-white/[0.08] pl-5">
+                  <div className="mt-5 max-w-3xl border-l border-white/[0.08] pl-4">
                     <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/28">
                       Formula
                     </p>
 
-                    <div className="mt-4 space-y-4 text-sm leading-6 text-white/54">
+                    <div className="mt-3 space-y-3 text-[12px] leading-5 text-white/48 sm:text-[13px]">
                       {recommendedFormula.bestUsedFor?.length ? (
                         <p>
                           <span className="text-white/32">Best used for </span>
@@ -478,55 +483,61 @@ export default function MarketplaceClient() {
           <CheckMark />
           <div className="min-w-0 flex-1">
             <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/30">
-              Discover
+              Other approaches
             </p>
             <h2
               id="marketplace-discover"
               className="mt-2 text-2xl font-medium tracking-[-0.025em]"
             >
-              Explore another approach
+              Compare when another strategy may fit better
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/46">
-              Browse when you want a different operational strategy than
-              GEORGE&apos;s recommendation.
+              Inspect an alternative when the recommendation does not fit
+              the room, constraints, or objective as well as another approach.
             </p>
 
-            <div className="mt-7 grid gap-px overflow-hidden rounded-[1rem] border border-white/[0.055] bg-white/[0.055] md:grid-cols-2">
+            <div className="mt-5 divide-y divide-white/[0.065] border-y border-white/[0.065]">
               {discover.slice(0, 6).map((formula) => (
                 <article
                   key={formula.id}
-                  className="bg-[#07080B] p-5 transition duration-200 hover:bg-[#0A0C10]"
+                  className="py-4 transition duration-200 sm:py-5"
                 >
-                  <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-white/28">
-                    {Number(formula.successCount || 0) > 0
-                      ? "Evidence accumulating"
-                      : "Working strategy"}
-                  </p>
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[9px] uppercase tracking-[0.13em] text-white/30">
+                    <span>
+                      {formula.status === "validated"
+                        ? "Proven"
+                        : Number(formula.successCount || 0) > 0
+                          ? "Emerging"
+                          : "Working strategy"}
+                    </span>
 
-                  <h3 className="mt-3 text-lg font-medium text-white/86">
+                    <span aria-hidden="true">·</span>
+
+                    <span>
+                      {Number(formula.successCount || 0) > 0
+                        ? `${formula.successCount} successful`
+                        : "No execution proof yet"}
+                    </span>
+
+                    <span aria-hidden="true">·</span>
+
+                    <span>{Math.round(formula.confidence * 100)}% confidence</span>
+                  </div>
+
+                  <h3 className="mt-2 text-[17px] font-medium tracking-[-0.02em] text-white/82 sm:text-[18px]">
                     {displayName(
                       formula.name,
                       "Untitled operational strategy",
                     )}
                   </h3>
 
-                  <p className="mt-2 line-clamp-2 text-sm leading-6 text-white/44">
+                  <p className="mt-1.5 line-clamp-2 max-w-3xl text-[12px] leading-5 text-white/40 sm:text-[13px]">
                     {formula.bestUsedFor?.join(" · ") ||
                       formula.objectiveTypes?.join(" · ") ||
                       "Available for operational execution."}
                   </p>
 
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {entitlements[formula.id]?.allowed ? (
-                      <button
-                        type="button"
-                        onClick={() => useStrategy(formula)}
-                        className="george-primary-action rounded-[0.6rem] px-3.5 py-2 text-xs"
-                      >
-                        Use Strategy
-                      </button>
-                    ) : null}
-
+                  <div className="mt-3 flex flex-wrap items-center gap-4">
                     <button
                       type="button"
                       onClick={() =>
@@ -534,11 +545,71 @@ export default function MarketplaceClient() {
                           current === formula.id ? null : formula.id,
                         )
                       }
-                      className="george-secondary-action rounded-[0.6rem] px-3.5 py-2 text-xs"
+                      className="inline-flex items-center gap-2 text-xs text-white/44 transition hover:text-white/78"
                     >
-                      View Formula
+                      <span>
+                        {formulaOpenId === formula.id
+                          ? "Hide Formula"
+                          : "View Formula"}
+                      </span>
+                      <span aria-hidden="true">
+                        {formulaOpenId === formula.id ? "↑" : "→"}
+                      </span>
                     </button>
                   </div>
+
+                  {formulaOpenId === formula.id ? (
+                    <div className="mt-3 border-t border-white/[0.06] pt-3">
+                      <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/28">
+                        Formula
+                      </p>
+
+                      {formula.bestUsedFor?.length ? (
+                        <p className="mt-2 text-[12px] leading-5 text-white/44 sm:text-[13px]">
+                          <span className="text-white/28">Best used for </span>
+                          {formula.bestUsedFor.join(" · ")}
+                        </p>
+                      ) : null}
+
+                      {formula.steps?.length ? (
+                        <ol className="mt-3 space-y-1.5 text-[12px] leading-5 text-white/48 sm:text-[13px]">
+                          {formula.steps.map((step, index) => (
+                            <li key={`${formula.id}-discover-${index}`}>
+                              <span className="mr-2 text-white/24">
+                                {String(index + 1).padStart(2, "0")}
+                              </span>
+                              {typeof step === "string"
+                                ? step
+                                : JSON.stringify(step)}
+                            </li>
+                          ))}
+                        </ol>
+                      ) : (
+                        <p className="mt-3 text-sm text-white/34">
+                          Formula details are not available for this strategy.
+                        </p>
+                      )}
+
+                      <div className="mt-5 border-t border-white/[0.06] pt-4">
+                        {entitlements[formula.id]?.allowed ? (
+                          <button
+                            type="button"
+                            onClick={() => useStrategy(formula)}
+                            className="inline-flex items-center gap-2 text-xs font-medium text-white/64 transition hover:text-white"
+                          >
+                            <span>Use this strategy</span>
+                            <span aria-hidden="true">→</span>
+                          </button>
+                        ) : (
+                          <span className="text-xs text-white/28">
+                            {entitlements[formula.id]?.purchasable
+                              ? "Strategy locked"
+                              : "Strategy unavailable"}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ) : null}
                 </article>
               ))}
             </div>
@@ -548,31 +619,6 @@ export default function MarketplaceClient() {
 
       <Glide />
 
-      <section className="grid gap-8 border-t border-white/[0.055] pt-8 md:grid-cols-2">
-        <div>
-          <div className="flex items-center gap-3">
-            {emerging.length ? <CheckMark /> : null}
-            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/30">
-              Emerging
-            </p>
-          </div>
-          <p className="mt-3 text-sm leading-6 text-white/44">
-            {emerging.length} strategies are accumulating execution evidence.
-          </p>
-        </div>
-
-        <div>
-          <div className="flex items-center gap-3">
-            {proven.length ? <CheckMark /> : null}
-            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/30">
-              Proven
-            </p>
-          </div>
-          <p className="mt-3 text-sm leading-6 text-white/44">
-            {proven.length} strategies have reached validated status.
-          </p>
-        </div>
-      </section>
     </div>
   );
 }

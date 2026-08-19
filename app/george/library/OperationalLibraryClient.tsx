@@ -1078,26 +1078,11 @@ export default function OperationalLibraryClient() {
     );
   }
 
-  const marketplaceFormulas = marketplaceEntries.map((entry) => entry.formula);
   const ownedFormulas = formulas
     .filter((formula) => ownedFormulaIds.has(formula.id))
     .sort((left, right) => right.updatedAt - left.updatedAt);
   const workspaceScripts = [...scripts].sort(
     (left, right) => right.updatedAt - left.updatedAt,
-  );
-
-  const sandboxFormulas = marketplaceFormulas.filter(
-    (formula) => formula.status !== "validated",
-  );
-
-  const emergingFormulas = marketplaceFormulas.filter(
-    (formula) =>
-      formula.status !== "validated" &&
-      Number(formula.successCount ?? 0) > 0,
-  );
-
-  const provenFormulas = marketplaceFormulas.filter(
-    (formula) => formula.status === "validated",
   );
 
   const recommendationRole =
@@ -1119,268 +1104,9 @@ export default function OperationalLibraryClient() {
             : ""
         }.`
       : "Recommendations appear here when a strategy fits your current work.";
-  const recommendationPublisher = recommendedFormula
-    ? recommendedFormula.publication?.publisher ||
-      recommendedFormula.publication?.author ||
-      "BRANESX"
-    : "BRANESX";
-
   return (
     <>
       <div className="george-motion-fade-soft mt-10 space-y-8">
-      <section
-        data-marketplace-hero="operational-strategy"
-        data-george-guide="library-recommended"
-        className="overflow-hidden rounded-[24px] border border-white/14 bg-[#090909] shadow-[0_24px_80px_rgba(0,0,0,0.42)]"
-      >
-        <div className="border-b border-white/10 px-6 py-5 sm:px-9">
-          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/45">
-            Recommended formula
-          </p>
-        </div>
-
-        {recommendedFormula ? (
-          <div className="px-6 py-8 sm:px-9 sm:py-10">
-            <div className="max-w-3xl">
-              <h2 className="mt-4 text-3xl font-medium tracking-[-0.035em] text-white sm:text-5xl">
-                {displayName(
-                  recommendedFormula.name,
-                  "Untitled operational strategy",
-                )}
-              </h2>
-              <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-white/48">
-                <span>Published by {recommendationPublisher}</span>
-                <span aria-hidden="true" className="hidden text-white/20 sm:inline">
-                  /
-                </span>
-                <span className="uppercase tracking-[0.14em]">
-                  {publicationState(recommendedFormula) === "marketplace_listed"
-                    ? "Recommended"
-                    : publicationState(recommendedFormula).replaceAll("_", " ")}
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-8 border-t border-white/10 pt-7">
-              <p className="max-w-3xl line-clamp-2 text-base leading-7 text-white/72">
-                {recommendationReason}
-              </p>
-            </div>
-
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-              {entitlementLoadingId === "bulk" ? (
-                <span className="min-h-12 rounded-[12px] border border-white/14 px-6 py-3 text-sm text-white/48">
-                  Checking access…
-                </span>
-              ) : entitlements[recommendedFormula.id]?.allowed ? (
-                <button
-                  type="button"
-                  onClick={() => void useMarketplaceFormula(recommendedFormula)}
-                  className={`${marketplacePrimaryActionClassName} min-h-12 rounded-[12px] px-6 py-3 text-sm`}
-                >
-                  Use Formula
-                </button>
-              ) : (
-                <span className="min-h-12 rounded-[12px] border border-white/14 px-6 py-3 text-sm text-white/48">
-                  {entitlements[recommendedFormula.id]?.purchasable
-                    ? "Locked"
-                    : "Unavailable"}
-                </span>
-              )}
-              <button
-                type="button"
-                onClick={() => viewMarketplaceFormula(recommendedFormula.id)}
-                className="george-secondary-action min-h-12 rounded-[12px] px-6 py-3 text-sm font-medium"
-              >
-                View Formula
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="px-6 py-10 sm:px-9">
-            <h2 className="text-2xl font-medium tracking-tight">
-              No strategy is available for this preparation yet.
-            </h2>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/55">
-              Recommendations appear here when a strategy fits your current work.
-            </p>
-          </div>
-        )}
-      </section>
-
-      <section
-        aria-labelledby="marketplace-sandbox-heading"
-        className="rounded-[20px] border border-white/10 bg-[#070707] p-6 sm:p-8"
-      >
-        <div className="max-w-3xl">
-          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/58">
-            Discover
-          </p>
-          <h2
-            id="marketplace-sandbox-heading"
-            className="mt-3 text-2xl font-medium tracking-[-0.025em] text-white sm:text-3xl"
-          >
-            More recommended formulas
-          </h2>
-          <p className="mt-3 text-sm leading-6 text-white/55">
-            Compare other formulas GEORGE considers relevant to your current work.
-          </p>
-        </div>
-
-        {sandboxFormulas.length ? (
-          <div className="mt-7 grid gap-3 md:grid-cols-2">
-            {sandboxFormulas.slice(0, 6).map((formula) => (
-              <article
-                key={`sandbox-${formula.id}`}
-                className="rounded-[14px] border border-white/[0.08] bg-white/[0.018] p-5"
-              >
-                <div className="flex items-center justify-between gap-4">
-                  <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white/38">
-                    {formula.origin === "hypothesis"
-                      ? "Working strategy"
-                      : "Experimental baseline"}
-                  </span>
-                  <span className="text-[11px] text-white/32">
-                    {Math.round(formula.confidence * 100)}% confidence
-                  </span>
-                </div>
-
-                <h3 className="mt-4 text-lg font-medium text-white">
-                  {displayName(formula.name, "Untitled operational strategy")}
-                </h3>
-
-                <p className="mt-2 line-clamp-2 text-sm leading-6 text-white/52">
-                  {formula.bestUsedFor?.join(" · ") ||
-                    formula.objectiveTypes?.join(" · ") ||
-                    "Available as an operational hypothesis for real execution."}
-                </p>
-
-                {formula.objectiveTypes?.length ? (
-                  <p className="mt-2 text-xs text-white/38">
-                    For {formula.objectiveTypes.slice(0, 2).join(" · ")}
-                  </p>
-                ) : null}
-
-                <div className="mt-5 flex gap-2">
-                  {entitlementLoadingId === "bulk" ? (
-                    <span className="rounded-[9px] border border-white/14 px-4 py-2 text-xs text-white/48">
-                      Checking access…
-                    </span>
-                  ) : entitlements[formula.id]?.allowed ? (
-                    <button
-                      type="button"
-                      onClick={() => void useMarketplaceFormula(formula)}
-                      className={`${marketplacePrimaryActionClassName} rounded-[9px] px-4 py-2 text-xs`}
-                    >
-                      Try Strategy
-                    </button>
-                  ) : (
-                    <span className="rounded-[9px] border border-white/14 px-4 py-2 text-xs text-white/48">
-                      {entitlements[formula.id]?.purchasable
-                        ? "Locked"
-                        : "Unavailable"}
-                    </span>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => viewMarketplaceFormula(formula.id)}
-                    className="george-secondary-action rounded-[9px] px-4 py-2 text-xs"
-                  >
-                    View Formula
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <div className="mt-7 rounded-[14px] border border-dashed border-white/10 px-5 py-6">
-            <p className="text-sm text-white/48">
-              Baseline formulas will appear here as operational hypotheses are created.
-            </p>
-          </div>
-        )}
-      </section>
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <section className="rounded-[18px] border border-white/10 bg-[#070707] p-6">
-          <div className="flex items-start justify-between gap-5">
-            <div>
-              <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-white/38">
-                Evidence accumulating
-              </p>
-              <h2 className="mt-2 text-xl font-medium text-white">Emerging</h2>
-            </div>
-            <span className="text-xs text-white/35">
-              {emergingFormulas.length}
-            </span>
-          </div>
-
-          {emergingFormulas.length ? (
-            <div className="mt-5 space-y-2">
-              {emergingFormulas.slice(0, 4).map((formula) => (
-                <button
-                  key={`emerging-${formula.id}`}
-                  type="button"
-                  onClick={() => viewMarketplaceFormula(formula.id)}
-                  className="flex w-full items-center justify-between gap-4 rounded-[11px] border border-white/[0.07] px-4 py-3 text-left transition hover:border-white/18"
-                >
-                  <span className="text-sm text-white/72">
-                    {displayName(formula.name, "Untitled strategy")}
-                  </span>
-                  <span className="shrink-0 text-[11px] text-white/35">
-                    {formula.successCount} successful
-                  </span>
-                </button>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-5 text-sm leading-6 text-white/42">
-              Sandbox strategies move here when successful execution begins
-              producing meaningful evidence.
-            </p>
-          )}
-        </section>
-
-        <section className="rounded-[18px] border border-white/10 bg-[#070707] p-6">
-          <div className="flex items-start justify-between gap-5">
-            <div>
-              <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-white/38">
-                Operationally validated
-              </p>
-              <h2 className="mt-2 text-xl font-medium text-white">Proven</h2>
-            </div>
-            <span className="text-xs text-white/35">
-              {provenFormulas.length}
-            </span>
-          </div>
-
-          {provenFormulas.length ? (
-            <div className="mt-5 space-y-2">
-              {provenFormulas.slice(0, 4).map((formula) => (
-                <button
-                  key={`proven-${formula.id}`}
-                  type="button"
-                  onClick={() => viewMarketplaceFormula(formula.id)}
-                  className="flex w-full items-center justify-between gap-4 rounded-[11px] border border-white/[0.07] px-4 py-3 text-left transition hover:border-white/18"
-                >
-                  <span className="text-sm text-white/72">
-                    {displayName(formula.name, "Untitled strategy")}
-                  </span>
-                  <span className="shrink-0 text-[11px] text-white/35">
-                    Validated
-                  </span>
-                </button>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-5 text-sm leading-6 text-white/42">
-              Proven strategies will appear here only after operational
-              validation. Sandbox access does not depend on proof.
-            </p>
-          )}
-        </section>
-      </div>
-
       {livePrepReturnAvailable ? (
       <section className="george-motion-collapse-down rounded-xl border border-white/10 bg-[#070707] p-6">
         <div className="flex items-baseline justify-between gap-4">
@@ -1415,14 +1141,19 @@ export default function OperationalLibraryClient() {
 
       <section
         data-george-guide="library-formulas"
-        className="rounded-xl border border-white/10 p-6"
+        className="pt-5 sm:pt-6"
       >
         <div className="flex items-baseline justify-between gap-4">
           <div>
             <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/42">
-              Your formulas
+              Operational strategies
             </p>
-            <h2 className="mt-2 text-lg font-medium">Work with your formulas</h2>
+            <h2 className="mt-1 text-xl font-medium tracking-[-0.025em] text-white/88 sm:text-2xl">
+              Your formulas
+            </h2>
+            <p className="mt-1.5 max-w-2xl text-[12px] leading-5 text-white/38 sm:text-[13px]">
+              Inspect, adapt, or carry proven operational work forward.
+            </p>
           </div>
           <span className="text-xs uppercase tracking-[0.18em] text-white/40">
             {ownedFormulas.length} owned
@@ -1473,7 +1204,7 @@ export default function OperationalLibraryClient() {
                 <article
                   id={`operational-formula-${formula.id}`}
                   key={formula.id}
-                  className="scroll-mt-8 rounded-lg border border-white/8 bg-white/[0.025] p-5"
+                  className="scroll-mt-8 border-t border-white/[0.07] py-4 first:border-t-0 sm:py-5"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
@@ -1483,17 +1214,26 @@ export default function OperationalLibraryClient() {
                           "Untitled operational formula",
                         )}
                       </h3>
-                      <p className="mt-1 text-xs text-white/40">
-                        Version {formula.version} · {formula.scope} ·{" "}
-                        {formula.status ?? "candidate"}
-                      </p>
+                      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[9px] uppercase tracking-[0.14em] text-white/34">
+                        <span>V{formula.version}</span>
+                        <span aria-hidden="true">·</span>
+                        <span>{formula.scope}</span>
+                        <span aria-hidden="true">·</span>
+                        <span>{formula.status ?? "candidate"}</span>
+                        <span aria-hidden="true">·</span>
+                        <span>
+                          {Number(formula.successCount || 0) > 0
+                            ? `${formula.successCount} successful`
+                            : "No execution proof yet"}
+                        </span>
+                      </div>
                     </div>
 
                     <div
                       data-george-guide="library-formula-actions"
                       className="flex items-center gap-3"
                     >
-                      <p className="text-xs text-white/40">
+                      <p className="font-mono text-[9px] uppercase tracking-[0.12em] text-white/28">
                         Updated {formatDate(formula.updatedAt)}
                       </p>
 
@@ -1508,9 +1248,9 @@ export default function OperationalLibraryClient() {
                                 savingMetadataFormulaId ||
                                 transitioningPublicationFormulaId,
                             )}
-                            className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                            className="text-xs text-white/48 transition hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                           >
-                            Change Formula
+                            Adapt →
                           </button>
 
                           {isOwned ? (
@@ -1523,9 +1263,9 @@ export default function OperationalLibraryClient() {
                                     deletingFormulaId ||
                                     savingMetadataFormulaId,
                                 )}
-                                className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                                className="text-xs text-white/48 transition hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                               >
-                                Edit Formula
+                                Edit →
                               </button>
 
                               {primaryLinkedScript ? (
@@ -1540,22 +1280,11 @@ export default function OperationalLibraryClient() {
                                       block: "center",
                                     });
                                   }}
-                                  className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white"
+                                  className="text-xs text-white/48 transition hover:text-white"
                                 >
-                                  Review Script
+                                  Script →
                                 </button>
                               ) : null}
-
-                              <button
-                                type="button"
-                                onClick={() => void toggleFormulaHistory(formula.id)}
-                                aria-expanded={isHistoryExpanded}
-                                className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white"
-                              >
-                                {isHistoryExpanded
-                                  ? "Hide Evidence"
-                                  : "View Evidence"}
-                              </button>
 
                               <button
                                 type="button"
@@ -1565,7 +1294,7 @@ export default function OperationalLibraryClient() {
                                     deletingFormulaId ||
                                     savingMetadataFormulaId,
                                 )}
-                                className="rounded-lg border border-red-300/20 px-3 py-1.5 text-xs text-red-200/70 transition hover:border-red-300/40 hover:text-red-100 disabled:cursor-not-allowed disabled:opacity-40"
+                                className="text-xs text-red-200/36 transition hover:text-red-100/72 disabled:cursor-not-allowed disabled:opacity-40"
                               >
                                 {isDeleting ? "Deleting…" : "Delete"}
                               </button>
@@ -1576,17 +1305,15 @@ export default function OperationalLibraryClient() {
                     </div>
                   </div>
 
-                  <div className="mt-4 grid gap-3 text-sm text-white/65 sm:grid-cols-3">
-                    <p>
-                      Confidence: {Math.round(formula.confidence * 100)}%
-                    </p>
-                    <p>Samples: {formula.sampleCount}</p>
-                    <p>Successful: {formula.successCount}</p>
+                  <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] uppercase tracking-[0.12em] text-white/34">
+                    <span>{Math.round(formula.confidence * 100)}% confidence</span>
+                    <span>{formula.sampleCount} samples</span>
+                    <span>{formula.successCount} successful</span>
                   </div>
 
                   {formula.bestUsedFor?.length ? (
-                    <p className="mt-4 text-sm text-white/55">
-                      Best used for: {formula.bestUsedFor.join(", ")}
+                    <p className="mt-2 text-[12px] leading-5 text-white/42 sm:text-[13px]">
+                      {formula.bestUsedFor.slice(0, 2).join(" · ")}
                     </p>
                   ) : null}
 
@@ -1820,7 +1547,7 @@ export default function OperationalLibraryClient() {
                     type="button"
                     onClick={() => void toggleFormulaHistory(formula.id)}
                     aria-expanded={isHistoryExpanded}
-                    className="mt-4 flex w-full items-center justify-between rounded-lg border border-white/10 bg-black/20 px-3 py-2.5 text-left text-xs text-white/60 transition hover:border-white/20 hover:text-white"
+                    className="mt-3 flex w-full items-center justify-between border-t border-white/[0.06] pt-2.5 text-left text-[11px] text-white/38 transition hover:text-white/72"
                   >
                     <span>Learning history</span>
                     <span
@@ -2123,7 +1850,7 @@ export default function OperationalLibraryClient() {
 
       <section
         data-george-guide="library-scripts"
-        className="rounded-xl border border-white/10 p-6"
+        className="border-t border-white/[0.07] pt-6 sm:pt-7"
       >
         <div className="flex items-baseline justify-between gap-4">
           <div>
