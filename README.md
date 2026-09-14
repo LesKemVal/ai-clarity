@@ -1,5 +1,10 @@
 # GEORGE — Clarity & Execution System
 
+> **Proprietary:** This project is not open source. No use, copying,
+> modification, distribution, hosting, or commercialization is permitted
+> without prior written authorization from R. Block Share Holdings, LLC.
+> See [LICENSE.md](LICENSE.md).
+
 GEORGE is not a chatbot.
 
 GEORGE is a clarity and execution system designed to help users:
