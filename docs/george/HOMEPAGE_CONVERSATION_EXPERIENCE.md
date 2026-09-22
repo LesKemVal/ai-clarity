@@ -108,6 +108,16 @@ Rules
 
 • Everything else fades away
 
+The active question action row also carries exactly three compact intelligence
+controls: S, I, and B. Verified session authority establishes the highest tier
+the account may use. A valid account-scoped previously selected tier is restored; otherwise
+the verified highest tier becomes active. Available tiers activate immediately
+without leaving or clearing the briefing. A locked tier opens the existing
+access decision only when intentionally selected. Pointer hover, keyboard
+focus, and mobile tap temporarily disclose each tier's concise explanation.
+No persistent keep-or-upgrade panel remains, and browser state never grants
+access.
+
 ======================================================================
 MILESTONE 4
 LIVE DECISION POINT

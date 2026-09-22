@@ -14,7 +14,7 @@ const authorityPaths = [
   'docs/george/NEXT_THREAD_HANDOFF.md',
 ]
 const syncMarker =
-  'GEORGE_DOCUMENTATION_SYNC: 2026-08-15-formula-script-refinement'
+  'GEORGE_DOCUMENTATION_SYNC: 2026-09-17-lh3a3e-governed-communication'
 const implementationAuthority =
   'IMPLEMENTATION_AUTHORITY: Implementation is authoritative; these documents are authoritative only while synchronized with the validated local implementation.'
 const readOrder =
@@ -41,10 +41,30 @@ for (const [path, source] of Object.entries(docs)) {
   )
   assert(source.includes(readOrder), `${path} has a different authority read order`)
   assert(
+    source.includes('LH-3A3e'),
+    `${path} is missing the governed communication checkpoint`,
+  )
+  assert(
     source.includes('Documentation Synchronization Rule') &&
       source.includes('implementation-ahead documentation debt') &&
       source.includes('Documentation debt must not survive a production checkpoint'),
     `${path} is missing the documentation anti-regression rule`
+  )
+}
+
+const deadCodeLedger = readFileSync(
+  resolve(root, 'docs/george/DEAD_CODE_LEDGER.md'),
+  'utf8',
+)
+for (const candidate of [
+  'DEFAULT_GEORGE_POSTURES',
+  'applyGovernedLiveCueRuntimeMemory()',
+  'getPreferredLiveSupportTags()',
+  'duplicate/disconnected communication-style paths',
+]) {
+  assert(
+    deadCodeLedger.includes(candidate),
+    `Dead-code ledger is missing LH-3A3e candidate: ${candidate}`,
   )
 }
 
@@ -145,8 +165,8 @@ for (const [index, source] of preparationStatusDocs.entries()) {
     `${path} does not represent Traditional as migrated`
   )
   assert(
-    /Quick LIVE[\s\S]{0,180}(?:Migrated|Complete|is migrated)/i.test(source),
-    `${path} does not represent Quick LIVE as migrated`
+    /Quick LIVE[\s\S]{0,240}(?:retired|obsolete|removed|no longer an active route)/i.test(source),
+    `${path} does not represent Quick LIVE as retired`
   )
   assert(
     /Homepage[\s\S]{0,180}(?:Migrated|Complete|is migrated)/i.test(source),

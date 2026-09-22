@@ -1,6 +1,6 @@
 import { UniversalButtonFeedback } from "@/components/ui/UniversalButtonFeedback";
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Montserrat, Roboto_Mono } from 'next/font/google'
 import './globals.css'
 import './operational-overrides.css'
 import MobileHeaderGate from '@/components/layout/MobileHeaderGate'
@@ -11,6 +11,18 @@ const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-inter',
+})
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-montserrat',
+})
+
+const robotoMono = Roboto_Mono({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-roboto-mono',
 })
 
 export const metadata: Metadata = {
@@ -71,7 +83,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`h-full antialiased ${inter.variable}`}
+      className={`h-full antialiased ${inter.variable} ${montserrat.variable} ${robotoMono.variable}`}
     >
       <body className="min-h-full flex flex-col bg-black text-neutral-100 touch-manipulation font-[var(--font-inter)]">
         <UniversalButtonFeedback />

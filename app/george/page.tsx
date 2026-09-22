@@ -44,7 +44,12 @@ const GEORGE_LIVE_VISUAL_COMPOSER_STYLE = `
 `;
 
 import GeorgeAssistantMessage from "@/components/george/GeorgeAssistantMessage";
+import { NormalLiveVerificationOpportunitySurface } from "@/components/george/NormalLiveVerificationOpportunity";
 import type { GeorgeMessage } from "@/lib/george/chat/message-types";
+import {
+  resolveNormalLiveVerificationOpportunity,
+  type NormalLiveVerificationOpportunity,
+} from "@/lib/george/runtime/live-verification-opportunity";
 import {
   clearPreparationSession,
   clearLivePreparationPreviewReady,
@@ -756,18 +761,6 @@ export default function Page({
     }
   }, []);
 
-  useEffect(() => {
-    try {
-      const saved = JSON.parse(
-        localStorage.getItem("GEORGE_FEEDBACK_STATE") || "{}",
-      );
-
-      if (saved && typeof saved === "object") {
-        setFeedback(saved);
-      }
-    } catch {}
-  }, []);
-
   const dismissTrajectory = (id: string) => {
     setDismissedTrajectoryIds((prev) => {
       const next = Array.from(new Set([...prev, id]));
@@ -860,41 +853,43 @@ export default function Page({
   }, []);
 
   function handleFeedback(index: number, type: "up" | "down") {
+    const current = feedback[index];
+    const selecting = current !== type;
+
     setFeedback((prev) => {
-      const current = prev[index];
+      const next = { ...prev };
 
-      const next = {
-        ...prev,
-      };
-
-      if (current === type) {
+      if (prev[index] === type) {
         delete next[index];
       } else {
         next[index] = type;
       }
 
-      try {
-        localStorage.setItem("GEORGE_FEEDBACK_STATE", JSON.stringify(next));
-      } catch {}
-
       return next;
     });
 
-    const pulseKey = `${index}-${type}`;
-    setFeedbackPulse((prev) => ({
-      ...prev,
-      [pulseKey]: true,
-    }));
+    if (selecting) {
+      const pulseKey = `${index}-${type}`;
 
-    window.setTimeout(() => {
       setFeedbackPulse((prev) => ({
         ...prev,
-        [pulseKey]: false,
+        [pulseKey]: true,
       }));
-    }, 520);
+
+      window.setTimeout(() => {
+        setFeedbackPulse((prev) => ({
+          ...prev,
+          [pulseKey]: false,
+        }));
+      }, 520);
+    }
 
     const msg = messagesRef.current[index];
-    if (!msg || msg.role !== "assistant") return;
+
+    // User-message thumbs are presentation feedback only.
+    // Assistant-message selections continue to feed GEORGE learning.
+    // Unselecting a thumb must not create another learning event.
+    if (!selecting || !msg || msg.role !== "assistant") return;
 
     const key = type === "up" ? "GEORGE_POSITIVE" : "GEORGE_NEGATIVE";
     const existing = JSON.parse(localStorage.getItem(key) || "[]");
@@ -921,6 +916,8 @@ export default function Page({
     null,
   );
   const [showPreLiveSignalSurface, setShowPreLiveSignalSurface] =
+    useState(false);
+  const [normalLiveOrientationArmed, setNormalLiveOrientationArmed] =
     useState(false);
   const [currentPreLiveQuestion, setCurrentPreLiveQuestion] =
     useState<PreparationQuestion | null>(null);
@@ -1840,24 +1837,8 @@ export default function Page({
       setLiveEntryBriefing(null);
       setShowLiveEntrySequence(false);
 
-      const quickLiveRequested =
-        window.localStorage.getItem("george_quick_live_entry") === "1";
-      const quickLiveMessage =
-        window.localStorage.getItem("george_quick_live_message") ||
-        "I'll become sharper as the interaction unfolds.";
-
-      if (quickLiveRequested) {
-        window.localStorage.removeItem("george_quick_live_entry");
-        window.localStorage.removeItem("george_quick_live_message");
-        const quickLiveMessages = [
-          { role: "assistant" as const, content: quickLiveMessage },
-        ];
-        setMessages(quickLiveMessages);
-        messagesRef.current = quickLiveMessages;
-      } else {
-        setMessages([]);
-        messagesRef.current = [];
-      }
+      setMessages([]);
+      messagesRef.current = [];
 
       setVoiceOn(true);
       setInteractionMode("speech");
@@ -2389,17 +2370,27 @@ export default function Page({
   const assistantRevealedRef = useRef(false);
   const skipNextTypewriterRef = useRef(false);
   const restoredMessagesSignatureRef = useRef<string | null>(null);
+  const lastAnimatedAssistantRef = useRef<string | null>(null);
 
   function getMessagesSignature(items: Message[]) {
     return items.map((item) => `${item.role}:${item.content}`).join("|");
   }
 
-  // CHATGPT-STYLE TYPING ENGINE
+  // Animate only a genuinely new assistant delivery.
+  // Existing GEORGE responses must remain stable when surrounding
+  // conversation or preparation state changes.
   useEffect(() => {
     if (skipNextTypewriterRef.current) {
       skipNextTypewriterRef.current = false;
       setTypedMessageIndex(null);
       setTypedMessageContent("");
+
+      const lastIndex = messages.length - 1;
+      const lastMessage = messages[lastIndex];
+      if (lastMessage?.role === "assistant") {
+        lastAnimatedAssistantRef.current =
+          `${lastIndex}:${lastMessage.content || ""}`;
+      }
       return;
     }
 
@@ -2409,6 +2400,13 @@ export default function Page({
     if (restoredMessagesSignatureRef.current === signature) {
       setTypedMessageIndex(null);
       setTypedMessageContent("");
+
+      const lastIndex = messages.length - 1;
+      const lastMessage = messages[lastIndex];
+      if (lastMessage?.role === "assistant") {
+        lastAnimatedAssistantRef.current =
+          `${lastIndex}:${lastMessage.content || ""}`;
+      }
       return;
     }
 
@@ -2416,9 +2414,19 @@ export default function Page({
     const lastMessage = messages[lastIndex];
 
     if (lastMessage.role !== "assistant") {
-      restoredMessagesSignatureRef.current = null;
       return;
     }
+
+    const assistantDeliveryKey =
+      `${lastIndex}:${lastMessage.content || ""}`;
+
+    if (lastAnimatedAssistantRef.current === assistantDeliveryKey) {
+      setTypedMessageIndex(null);
+      setTypedMessageContent("");
+      return;
+    }
+
+    lastAnimatedAssistantRef.current = assistantDeliveryKey;
 
     let i = 0;
     const fullText = lastMessage.content || "";
@@ -2426,18 +2434,19 @@ export default function Page({
     setTypedMessageIndex(lastIndex);
     setTypedMessageContent("");
 
-    const interval = setInterval(() => {
+    const interval = window.setInterval(() => {
       i++;
 
-      setTypedMessageContent((prev) => fullText.slice(0, i));
+      setTypedMessageContent(fullText.slice(0, i));
 
       if (i >= fullText.length) {
-        clearInterval(interval);
+        window.clearInterval(interval);
         setTypedMessageIndex(null);
+        setTypedMessageContent("");
       }
     }, 12);
 
-    return () => clearInterval(interval);
+    return () => window.clearInterval(interval);
   }, [messages]);
 
   const lastSpeechTsRef = useRef<number>(0);
@@ -2916,7 +2925,7 @@ export default function Page({
     const setupMessage: Message = {
       role: "assistant",
       content:
-        "I can prepare you for this conversation.\n\nQuick LIVE: Begin with what I already know. I’ll ask only for what is still missing.\n\nFull Brief: Keep preparing with me before we enter LIVE.",
+        "I can prepare you for this conversation.\n\nKeep preparing with me before we enter LIVE.",
       source: "system_override",
       presentationMode: "live_preparation",
     };
@@ -3089,7 +3098,6 @@ export default function Page({
         operationalJudgment.signalAcquisition.shouldAcquire &&
           authorizedEvidenceNeed,
       );
-
       if (!signalAcquisitionAuthorized) {
         consumeNormalOperationalJudgment(
           judgmentResult,
@@ -3190,6 +3198,9 @@ export default function Page({
         evidenceNeed: String(
           payload.evidenceNeed || payload.key || "",
         ).trim(),
+        ...(operationalJudgment.signalAcquisition.purpose
+          ? { purpose: operationalJudgment.signalAcquisition.purpose }
+          : {}),
         clarificationRequired:
           payload.clarificationRequired === true,
       };
@@ -3333,8 +3344,123 @@ export default function Page({
     void requestNormalAdaptiveQuestion(preparationSession);
   };
 
-  const handleNormalLiveControl = () => {
+  const presentNormalLiveOrientation = () => {
+    const orientationContent = [
+      "LIVE lets me support you while another conversation is happening.",
+      "We can continue with THIS CONVERSATION, or use LIVE for SOMETHING ELSE.",
+      "While LIVE, watch your screen or listen closely to your audio device as I analyze the conversation for openings, behavior tells, and risk, identify leverage, and merge high-impact lines and cues with your voice.",
+      "Tap LIVE again to continue with this conversation.",
+    ].join("\n\n");
+
+    const latest = messagesRef.current[messagesRef.current.length - 1];
+
+    if (
+      latest?.role !== "assistant" ||
+      String(latest.content || "").trim() !== orientationContent
+    ) {
+      const orientationMessage: Message = {
+        role: "assistant",
+        content: orientationContent,
+        source: "system_override",
+      };
+
+      setMessages((previous) => {
+        const next = [...previous, orientationMessage];
+        messagesRef.current = next;
+        return next;
+      });
+    }
+
+    setNormalLiveOrientationArmed(true);
+    setActivePromptLabel("LIVE");
+    setActivePromptContext("live_orientation");
+    setSuggestedSignal(Date.now());
+  };
+
+  const continueCurrentConversationIntoLive = () => {
+    setNormalLiveOrientationArmed(false);
     startLiveSignalAcquisition();
+  };
+
+  const startDifferentLiveConversation = () => {
+    if (typeof window === "undefined") return;
+
+    setNormalLiveOrientationArmed(false);
+    preserveNormalDraft();
+
+    if (currentTier === "smart") {
+      setShowUpgradeModal(true);
+      return;
+    }
+
+    window.location.href = "/george/live-entry?source=start";
+  };
+
+  const handleNormalLiveControl = () => {
+    if (normalLiveOrientationArmed) {
+      continueCurrentConversationIntoLive();
+      return;
+    }
+
+    presentNormalLiveOrientation();
+  };
+
+  const setupVerificationLive = (
+    opportunity: NormalLiveVerificationOpportunity,
+  ) => {
+    if (typeof window === "undefined") return;
+
+    preserveNormalDraft();
+
+    if (currentTier === "smart") {
+      setShowUpgradeModal(true);
+      return;
+    }
+
+    const preparationSession = beginNormalLivePreparation({
+      signals: {
+        desiredOutcome: opportunity.objective,
+        broadGoal: opportunity.purpose || opportunity.objective,
+        counterparty: opportunity.interaction,
+        conversationContext: [
+          "GEORGE-prepared verification conversation.",
+          `Planned interaction: ${opportunity.interaction}`,
+          `Verify whether: ${opportunity.uncertainty}`,
+          `LIVE purpose: ${opportunity.benefit}`,
+          opportunity.desiredResult
+            ? `Desired verification result: ${opportunity.desiredResult}`
+            : "",
+        ]
+          .filter(Boolean)
+          .join("\n"),
+        verificationTarget: opportunity.uncertainty,
+        verificationInteraction: opportunity.interaction,
+        verificationBenefit: opportunity.benefit,
+      },
+      explicitObjective: opportunity.objective,
+      briefing: {
+        priorInteractions: [],
+        currentQuestion: undefined,
+      },
+      checkpoint: {
+        surface: "ready_room",
+        phase: "readiness",
+        section: "ready",
+      },
+    });
+
+    if (!preparationSession) return;
+
+    setNormalLiveOrientationArmed(false);
+
+    const url = new URL(
+      buildNormalLiveEntryUrl(preparationSession),
+      window.location.origin,
+    );
+    url.searchParams.set("verification", "1");
+
+    window.location.href =
+      `${url.pathname}${url.search}`;
   };
 
   useEffect(() => {
@@ -5639,9 +5765,15 @@ export default function Page({
       {
         key: currentPreLiveQuestion.key,
         question: currentPreLiveQuestion.question,
+        ...(currentPreLiveQuestion.example
+          ? { example: currentPreLiveQuestion.example }
+          : {}),
         answer: interactionStatus === "answered" ? answer : "",
         status: interactionStatus,
         evidenceNeed: currentPreLiveQuestion.evidenceNeed,
+        ...(currentPreLiveQuestion.purpose
+          ? { purpose: currentPreLiveQuestion.purpose }
+          : {}),
       },
     ]);
 
@@ -6767,7 +6899,15 @@ export default function Page({
                       return true;
                     })
                   : normalConversationStarted
-                    ? messages
+                    ? messages.filter((message) => {
+                        const clean = (message.content || "").trim();
+                        if (
+                          message.role === "assistant" &&
+                          clean === greeting.trim()
+                        )
+                          return false;
+                        return true;
+                      })
                     : []
                 )
                   .filter((m, index) => {
@@ -6828,7 +6968,7 @@ export default function Page({
                             } landscape:leading-8 tracking-[0.002em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[#D7DBE4]/88 ${
                               liveMode
                                 ? "ml-auto self-end w-fit max-w-[72%] text-left rounded-[0.6rem] border-0 bg-[#F7F8FA] px-2.5 py-1.5 text-[#171717] shadow-[0_6px_16px_rgba(3,8,14,0.14)]"
-                                : "message-user ml-auto self-end max-w-[min(80%,34rem)] text-left rounded-[1rem] border border-black/[0.035] bg-[#F7F8FA] px-3.5 py-2.5 text-[#171717] shadow-[0_8px_24px_rgba(0,0,0,0.13)]"
+                                : "message-user ml-auto self-end max-w-[min(82%,32rem)] text-left rounded-[0.8rem] border border-white/[0.06] bg-white/[0.075] px-3 py-2 text-[#D7DBE4]/82"
                             }`}
                           >
                             {m.imageDataUrl && (
@@ -6844,28 +6984,34 @@ export default function Page({
                           </div>
                         )}
 
-
                         {m.role === "user" && !liveMode && (
-                          <div className="mt-1 flex items-center gap-1 pr-1 text-[#D7DBE4]/56">
+                          <div className="mt-1 flex justify-end gap-2 pr-1 text-[#D7DBE4]/28">
                             <button
                               type="button"
-                              onClick={() => {
-                                handleFeedback(i, "up");
-                                setToastMessage("Saved");
-                                setShowToast(true);
-                              }}
-                              className={`george-quiet-action relative flex items-center justify-center transition duration-150 ${
+                              onClick={() => handleFeedback(i, "up")}
+                              className={`relative flex items-center justify-center transition duration-150 ${
                                 feedback[i] === "up"
-                                  ? "text-[#D7DBE4]/82"
-                                  : "text-[#D7DBE4]/50 hover:text-[#D7DBE4]/80"
+                                  ? "text-[#D7DBE4]/72"
+                                  : "text-[#D7DBE4]/28 hover:text-[#D7DBE4]/58"
+                              } ${
+                                feedbackPulse[`${i}-up`]
+                                  ? "scale-125"
+                                  : "scale-100"
                               }`}
-                              aria-label="Thumbs up"
+                              aria-label={
+                                feedback[i] === "up"
+                                  ? "Remove thumbs up"
+                                  : "Thumbs up"
+                              }
+                              aria-pressed={feedback[i] === "up"}
                             >
                               <svg
                                 viewBox="0 0 24 24"
-                                className="h-[17px] w-[17px]"
+                                className="h-[15px] w-[15px]"
                                 fill={
-                                  feedback[i] === "up" ? "currentColor" : "none"
+                                  feedback[i] === "up"
+                                    ? "currentColor"
+                                    : "none"
                                 }
                                 stroke="currentColor"
                                 strokeWidth="1.9"
@@ -6880,21 +7026,26 @@ export default function Page({
 
                             <button
                               type="button"
-                              onClick={() => {
-                                handleFeedback(i, "down");
-                                setToastMessage("Saved");
-                                setShowToast(true);
-                              }}
-                              className={`george-quiet-action relative flex items-center justify-center transition duration-150 ${
+                              onClick={() => handleFeedback(i, "down")}
+                              className={`relative flex items-center justify-center transition duration-150 ${
                                 feedback[i] === "down"
-                                  ? "text-red-100/82"
-                                  : "text-[#D7DBE4]/50 hover:text-[#D7DBE4]/80"
+                                  ? "text-[#D7DBE4]/72"
+                                  : "text-[#D7DBE4]/28 hover:text-[#D7DBE4]/58"
+                              } ${
+                                feedbackPulse[`${i}-down`]
+                                  ? "scale-125"
+                                  : "scale-100"
                               }`}
-                              aria-label="Thumbs down"
+                              aria-label={
+                                feedback[i] === "down"
+                                  ? "Remove thumbs down"
+                                  : "Thumbs down"
+                              }
+                              aria-pressed={feedback[i] === "down"}
                             >
                               <svg
                                 viewBox="0 0 24 24"
-                                className="h-[17px] w-[17px]"
+                                className="h-[15px] w-[15px]"
                                 fill={
                                   feedback[i] === "down"
                                     ? "currentColor"
@@ -6906,8 +7057,8 @@ export default function Page({
                                 strokeLinejoin="round"
                                 aria-hidden="true"
                               >
-                                <path d="M10 14v4.2c0 1-.3 2-.9 2.8L8 22.5l-2-1.9c-.7-.7-1-1.6-1-2.6v-3H3.5c-1.1 0-1.9-1-1.7-2.1l1.1-6.4A2 2 0 0 1 4.9 5H16a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-6Z" />
-                                <path d="M18 14h3V5h-3" />
+                                <path d="M14 14v4.2c0 1-.3 2-.9 2.8L12 22.5l-2-1.9c-.7-.7-1-1.6-1-2.6v-3H7.5c-1.1 0-1.9-1-1.7-2.1l1.1-6.4A2 2 0 0 1 8.9 5H20a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-6Z" />
+                                <path d="M6 14H3V5h3" />
                               </svg>
                             </button>
                           </div>
@@ -6915,6 +7066,24 @@ export default function Page({
 
                         {m.role === "assistant" && (
                           <div className="relative space-y-1.5">
+                            {isLatestAssistant &&
+                              !liveMode &&
+                              (() => {
+                                const opportunity =
+                                  resolveNormalLiveVerificationOpportunity(
+                                    canonicalRuntimeAuthority?.operationalJudgment,
+                                  );
+
+                                return opportunity ? (
+                                  <NormalLiveVerificationOpportunitySurface
+                                    opportunity={opportunity}
+                                    onSetupLive={() =>
+                                      setupVerificationLive(opportunity)
+                                    }
+                                  />
+                                ) : null;
+                              })()}
+
                             {isLatestAssistant && liveMode && (
                               <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-[#D7DBE4]/50">
                                 <div className="relative bx-command-shimmer">
@@ -7037,52 +7206,34 @@ export default function Page({
                                         ) : (
                                           <LiveCapabilitySurface
                                             phase={
-                                              preLiveSignalComplete
-                                                ? "ready"
-                                                : showPreLiveSignalSurface
-                                                  ? "preparing"
-                                                  : "available"
+                                              normalLiveOrientationArmed
+                                                ? "orientation"
+                                                : preLiveSignalComplete
+                                                  ? "ready"
+                                                  : showPreLiveSignalSurface
+                                                    ? "preparing"
+                                                    : "available"
                                             }
                                             onPrepare={() => {
+                                              if (normalLiveOrientationArmed) {
+                                                startDifferentLiveConversation();
+                                                return;
+                                              }
+
                                               handleNormalLiveControl();
                                             }}
-                                            onStart={openLiveEntry}
+                                            onStart={
+                                              normalLiveOrientationArmed
+                                                ? continueCurrentConversationIntoLive
+                                                : openLiveEntry
+                                            }
                                           />
                                         )}
 
-                                        {[
-                                          {
-                                            label: "DECK",
-                                            prompt:
-                                              "Help me build a presentation deck from this conversation.",
-                                          },
-                                        ].map((capability) => (
-                                          <button
-                                            key={capability.label}
-                                            type="button"
-                                            onClick={() => {
-                                              setInput(capability.prompt);
-
-                                              window.requestAnimationFrame(
-                                                () => {
-                                                  textareaRef.current?.focus();
-                                                  textareaRef.current?.setSelectionRange(
-                                                    capability.prompt.length,
-                                                    capability.prompt.length,
-                                                  );
-                                                },
-                                              );
-                                            }}
-                                            className="george-secondary-action inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-[0.55rem] px-2.5 py-1.5 text-[10px] font-semibold tracking-[0.14em]"
-                                            aria-label={`Use GEORGE to ${capability.label.toLowerCase()}`}
-                                          >
-                                            {capability.label}
-                                          </button>
-                                        ))}
                                       </>
                                     )}
 
-                                    <div className="ml-0.5 flex shrink-0 items-center gap-0.5 border-l border-white/[0.055] pl-1.5">
+                                    <div className="ml-1 flex shrink-0 items-center gap-2 text-white/24">
                                       <button
                                         type="button"
                                         onClick={async () => {
@@ -7094,7 +7245,7 @@ export default function Page({
                                             setShowToast(true);
                                           } catch {}
                                         }}
-                                        className="george-quiet-action inline-flex h-7 items-center justify-center rounded-[0.5rem] px-1.5 text-[9px] font-medium tracking-[0.11em]"
+                                        className="inline-flex items-center justify-center py-1 text-[9px] font-medium tracking-[0.11em] text-white/26 transition hover:text-white/58"
                                         aria-label="Copy response"
                                         title="Copy"
                                       >
@@ -7127,7 +7278,7 @@ export default function Page({
                                             }
                                           } catch {}
                                         }}
-                                        className="george-quiet-action inline-flex h-7 items-center justify-center rounded-[0.5rem] px-1.5 text-[9px] font-medium tracking-[0.11em]"
+                                        className="inline-flex items-center justify-center py-1 text-[9px] font-medium tracking-[0.11em] text-white/26 transition hover:text-white/58"
                                         aria-label="Share response"
                                         title="Share"
                                       >
@@ -7153,7 +7304,12 @@ export default function Page({
                                       ? "scale-125 drop-shadow-[0_0_12px_rgba(174,182,255,0.55)]"
                                       : "scale-100"
                                   }`}
-                                  aria-label="Thumbs up"
+                                  aria-label={
+                                    feedback[i] === "up"
+                                      ? "Remove thumbs up"
+                                      : "Thumbs up"
+                                  }
+                                  aria-pressed={feedback[i] === "up"}
                                 >
                                   <svg
                                     viewBox="0 0 24 24"
@@ -7190,7 +7346,12 @@ export default function Page({
                                       ? "scale-125 drop-shadow-[0_0_12px_rgba(174,182,255,0.55)]"
                                       : "scale-100"
                                   }`}
-                                  aria-label="Thumbs down"
+                                  aria-label={
+                                    feedback[i] === "down"
+                                      ? "Remove thumbs down"
+                                      : "Thumbs down"
+                                  }
+                                  aria-pressed={feedback[i] === "down"}
                                 >
                                   <svg
                                     viewBox="0 0 24 24"
@@ -7216,129 +7377,56 @@ export default function Page({
                             {activeSaveIndex === i && (
                               <div
                                 ref={savePickerRef}
-                                className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 p-2 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom`}
+                                className="absolute bottom-full left-1/2 z-30 mb-2 w-[220px] max-w-[82vw] -translate-x-1/2 rounded-[0.9rem] border border-white/[0.07] bg-[#05080D]/94 p-2.5 shadow-[0_20px_60px_rgba(0,0,0,0.44)] backdrop-blur-xl"
                               >
-                                <div className="space-y-1.5">
-                                  <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/48">
-                                    Remember
-                                  </div>
+                                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/34">
+                                  Remember
+                                </div>
 
-                                  <div className="grid grid-cols-2 gap-1.5">
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setActiveMemoryFolder("Sessions");
-                                        saveMemory(m, i, "Sessions");
-                                      }}
-                                      className="rounded-lg border border-white/[0.06] bg-white/[0.018] px-1.5.5 py-2 text-[10px] font-medium leading-4 text-[#D7DBE4]/76 transition hover:border-white/[0.12] hover:bg-white/[0.04]"
-                                    >
-                                      Conversation
-                                    </button>
+                                <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setActiveMemoryFolder("Sessions");
+                                      saveMemory(m, i, "Sessions");
+                                    }}
+                                    className="text-[11px] text-white/56 transition hover:text-white"
+                                  >
+                                    Conversation
+                                  </button>
 
-                                    <button
-                                      type="button"
-                                      onClick={() => saveGoal(m, i)}
-                                      className="rounded-lg border border-[#AEB6FF]/[0.12] bg-[#AEB6FF]/[0.055] px-1.5.5 py-2 text-[10px] font-medium leading-4 text-[#D7DCFF]/82 transition hover:border-[#AEB6FF]/[0.22] hover:bg-[#AEB6FF]/[0.09]"
-                                    >
-                                      Goal
-                                    </button>
-                                  </div>
-
-                                  <div className="flex gap-1.5">
-                                    {["Follow-ups"].map((folder) => (
-                                      <button
-                                        key={folder}
-                                        type="button"
-                                        onClick={() => {
-                                          setActiveMemoryFolder(folder);
-                                          saveMemory(m, i, folder);
-                                        }}
-                                        className="flex-1 rounded-lg border border-white/[0.06] bg-white/[0.018] px-1.5 py-1.5 text-[10px] font-medium text-[#D7DBE4]/76 transition hover:border-white/[0.09] hover:bg-white/[0.04] hover:text-[#D7DBE4]"
-                                      >
-                                        {folder}
-                                      </button>
-                                    ))}
-                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => saveGoal(m, i)}
+                                    className="text-[11px] text-[#AFC0FF]/68 transition hover:text-[#D5DEFF]"
+                                  >
+                                    Goal
+                                  </button>
 
                                   <button
                                     type="button"
                                     onClick={() => {
-                                      const folder = getDefaultFolder();
-                                      setActiveMemoryFolder(folder);
-                                      saveMemory(m, i, folder);
+                                      setActiveMemoryFolder("Follow-ups");
+                                      saveMemory(m, i, "Follow-ups");
                                     }}
-                                    className="w-full rounded-lg border border-white/[0.06] bg-white/[0.018] px-1.5.5 py-2 text-[11px] font-medium leading-4 text-[#D7DBE4]/86 transition hover:border-white/[0.12] hover:bg-white/[0.04]"
+                                    className="text-[11px] text-white/56 transition hover:text-white"
                                   >
-                                    Remember in {getDefaultFolder()}
+                                    Follow-up
                                   </button>
-
-                                  {getExistingFolders().length > 0 && (
-                                    <div className="space-y-1.5">
-                                      <div className="text-[10px] text-neutral-500">
-                                        Recent
-                                      </div>
-                                      <div className="flex flex-wrap gap-1">
-                                        {getExistingFolders().map((folder) => (
-                                          <button
-                                            key={folder}
-                                            type="button"
-                                            onClick={() => {
-                                              setActiveMemoryFolder(folder);
-                                              saveMemory(m, i, folder);
-                                            }}
-                                            className={`max-w-full break-words rounded-full border px-1.5 py-1 text-[10px] leading-4 transition ${
-                                              activeMemoryFolder === folder
-                                                ? "border-white/[0.09] bg-white/[0.026] text-[#D7DBE4]"
-                                                : "border-white/[0.08] text-neutral-300 hover:border-white/[0.12] hover:text-[#D7DBE4]"
-                                            }`}
-                                          >
-                                            {folder}
-                                          </button>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {activeMemoryFolder &&
-                                    getLatestSavedMemoryByFolder(
-                                      activeMemoryFolder,
-                                    ) && (
-                                      <div className="rounded-xl border border-white/[0.06] bg-black/28 p-1.5 text-[10px] leading-4 text-neutral-500 break-words">
-                                        {getLatestSavedMemoryByFolder(
-                                          activeMemoryFolder,
-                                        )}
-                                      </div>
-                                    )}
-
-                                  <div className="space-y-1.5">
-                                    <div className="text-[10px] text-neutral-500">
-                                      New folder
-                                    </div>
-                                    <div className="flex flex-col gap-1.5">
-                                      <input
-                                        value={newFolderName}
-                                        onChange={(e) =>
-                                          setNewFolderName(e.target.value)
-                                        }
-                                        placeholder="New folder"
-                                        className="w-full rounded-xl border border-white/[0.06] bg-black/24 px-1.5.5 py-1.5 text-[11px] leading-4 text-[#D7DBE4] outline-none placeholder:text-neutral-500"
-                                      />
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          const folder =
-                                            newFolderName.trim() ||
-                                            getDefaultFolder();
-                                          setActiveMemoryFolder(folder);
-                                          saveMemory(m, i, folder);
-                                        }}
-                                        className="w-full rounded-xl border border-white/[0.05] px-1.5.5 py-1.5 text-[11px] leading-4 text-[#D7DBE4] transition hover:border-white/[0.12] hover:bg-white/[0.04]"
-                                      >
-                                        Remember
-                                      </button>
-                                    </div>
-                                  </div>
                                 </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const folder = getDefaultFolder();
+                                    setActiveMemoryFolder(folder);
+                                    saveMemory(m, i, folder);
+                                  }}
+                                  className="mt-3 flex w-full items-center justify-between border-t border-white/[0.06] pt-2.5 text-left font-mono text-[9px] uppercase tracking-[0.12em] text-white/34 transition hover:text-white/62"
+                                >
+                                  <span>Save to {getDefaultFolder()}</span>
+                                  <span aria-hidden="true">→</span>
+                                </button>
                               </div>
                             )}
                           </div>
@@ -8007,7 +8095,7 @@ export default function Page({
                 >
                   <div
                     aria-hidden="true"
-                    className="pointer-events-none mb-2.5 select-none text-center text-[10px] font-normal tracking-[0.015em] text-white/28"
+                    className="pointer-events-none mb-1.5 select-none text-center text-[9px] font-normal tracking-[0.01em] text-white/22"
                   >
                     GEORGE can make mistakes. Check important info.
                   </div>
@@ -8018,7 +8106,7 @@ export default function Page({
                         ? "border-white/[0.09] bg-[#070B12]/96 shadow-[0_10px_28px_rgba(0,0,0,0.28)]"
                         : isNormalPreparationBriefingActive
                           ? "border-[#4668B8]/65 !bg-[#101A36] shadow-[0_12px_38px_rgba(4,10,28,0.46),0_0_34px_rgba(8,18,48,0.48)]"
-                          : "border-white/[0.105] !bg-[#0A0E15] shadow-[0_14px_38px_rgba(0,0,0,0.38),inset_0_1px_0_rgba(255,255,255,0.025)]"
+                          : "border-white/[0.075] !bg-[#080B10]/94 shadow-[0_10px_28px_rgba(0,0,0,0.30)]"
                     }`}
                   >
                     {composerSendFeedback && (
@@ -8186,7 +8274,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className={`${forceLive || liveMode ? "hidden" : "absolute left-1 top-1/2 z-[2] flex"} h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border-0 bg-transparent text-[#D7DBE4]/38 transition duration-150 hover:bg-white/[0.035] hover:text-[#F4F8FF]/82 md:h-8 md:w-8`}
+                      className={`${forceLive || liveMode ? "hidden" : "absolute left-1 top-1/2 z-[2] flex"} h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border-0 bg-transparent text-[#D7DBE4]/30 transition duration-150 hover:bg-white/[0.025] hover:text-[#F4F8FF]/72`}
                       aria-label="Upload file"
                     >
                       <svg
@@ -8343,7 +8431,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         minHeight: "40px",
                         maxHeight: "140px",
                       }}
-                      className={`${forceLive || liveMode ? "min-h-[40px] pl-14 pr-[92px] py-2 md:min-h-[38px] md:pl-11 md:pr-[84px] md:py-2" : "min-h-[46px] pl-14 pr-[92px] py-2.5 md:min-h-[42px] md:pl-11 md:pr-[84px] md:py-2"} relative z-[2] pointer-events-auto touch-manipulation block w-full resize-none rounded-none border-0 bg-transparent text-[16px] leading-[1.35] font-normal tracking-[0.002em] text-[#F4F8FF]/92 shadow-none outline-none placeholder:italic placeholder:text-[#D7DBE4]/34 transition focus:border-0 focus:bg-transparent focus:outline-none focus:ring-0 md:text-[15px]`}
+                      className={`${forceLive || liveMode ? "min-h-[40px] pl-14 pr-[92px] py-2 md:min-h-[38px] md:pl-11 md:pr-[84px] md:py-2" : isNormalPreparationBriefingActive ? "min-h-[46px] pl-14 pr-[92px] py-2.5 md:min-h-[42px] md:pl-11 md:pr-[84px] md:py-2" : "min-h-[42px] pl-12 pr-[84px] py-2 md:min-h-[40px] md:pl-10 md:pr-[78px] md:py-1.5"} relative z-[2] pointer-events-auto touch-manipulation block w-full resize-none rounded-none border-0 bg-transparent text-[16px] leading-[1.35] font-normal tracking-[0.002em] text-[#F4F8FF]/92 shadow-none outline-none placeholder:italic placeholder:text-[#D7DBE4]/30 transition focus:border-0 focus:bg-transparent focus:outline-none focus:ring-0 md:text-[15px]`}
                     />
 
                     <div
@@ -8367,7 +8455,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                               }
                             }}
                             disabled={!voiceSupported || isThinking}
-                            className="flex h-8 w-8 items-center justify-center rounded-full border-0 bg-transparent text-[#D7DBE4]/38 transition duration-150 hover:bg-white/[0.035] hover:text-[#F4F8FF]/82 disabled:cursor-not-allowed disabled:opacity-30"
+                            className="flex h-7 w-7 items-center justify-center rounded-full border-0 bg-transparent text-[#D7DBE4]/30 transition duration-150 hover:bg-white/[0.025] hover:text-[#F4F8FF]/72 disabled:cursor-not-allowed disabled:opacity-30"
                             aria-label="Voice"
                           >
                             <svg
@@ -8392,8 +8480,8 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                           if (submitPreLiveSignalAnswer()) return;
                           handleSend();
                         }}
-                        className="flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.055] text-[#F4F8FF]/72 shadow-[0_3px_10px_rgba(0,0,0,0.16)] transition duration-150 hover:border-white/[0.14] hover:bg-white/[0.10] hover:text-white"
-                        aria-label="Share"
+                        className="flex h-7 w-7 items-center justify-center rounded-full border border-white/[0.07] bg-white/[0.035] text-[#F4F8FF]/62 transition duration-150 hover:border-white/[0.13] hover:bg-white/[0.075] hover:text-white"
+                        aria-label="Send"
                       >
                         <svg
                           viewBox="0 0 24 24"

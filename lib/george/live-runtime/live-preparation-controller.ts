@@ -15,12 +15,18 @@ export type PreparationInteractionStatus =
   | 'skipped'
   | 'unknown'
 
+export type PreparationQuestionPurpose =
+  | 'live_scope_grounding'
+  | 'qualification'
+
 export type PreparationInteraction = {
   key: string
   question: string
+  example?: string
   answer: string
   status: PreparationInteractionStatus
   evidenceNeed?: string
+  purpose?: PreparationQuestionPurpose
 }
 
 export type PreparationQuestion = {
@@ -30,6 +36,7 @@ export type PreparationQuestion = {
   why: string
   example: string
   evidenceNeed?: string
+  purpose?: PreparationQuestionPurpose
   clarificationRequired?: boolean
 }
 
@@ -76,7 +83,6 @@ export type PreparationCheckpoint =
 export type PreparationEntrySource =
   | 'homepage'
   | 'traditional'
-  | 'quick_live'
   | 'normal'
   | 'resume'
 
@@ -299,14 +305,17 @@ export type NormalPreparationEvidenceProjection = Readonly<{
   pendingQuestion?: Readonly<{
     key: string
     question: string
+    example?: string
     evidenceNeed?: string
   }>
   priorInteractions: readonly Readonly<{
     key: string
     question: string
+    example?: string
     answer: string
     status: PreparationInteractionStatus
     evidenceNeed?: string
+    purpose?: PreparationQuestionPurpose
   }>[]
   sourcePrecedence: readonly PreparationEvidencePrecedence[]
   evidenceSufficiency: 'unresolved' | 'sufficient'
@@ -315,6 +324,106 @@ export type NormalPreparationEvidenceProjection = Readonly<{
     id: string
     version: number
     source: 'george' | 'user'
+  }>
+}>
+
+export type PreparationRuntimeEvidenceAuthority = Readonly<{
+  source: PreparationEvidenceSource
+  rank: number
+  authority: PreparationEvidencePrecedence['authority']
+}>
+
+export type PreparationRuntimeEvidenceValue = Readonly<
+  PreparationRuntimeEvidenceAuthority & {
+    value: string
+  }
+>
+
+export type PreparationRuntimeQuestionPresentation = Readonly<{
+  label?: string
+  why?: string
+  example?: string
+}>
+
+export type PreparationRuntimeInteractionProjection = Readonly<{
+  key: string
+  question: string
+  answer: string
+  status: PreparationInteractionStatus
+  evidenceNeed?: string
+  purpose?: PreparationQuestionPurpose
+  answerAuthority?: PreparationRuntimeEvidenceAuthority
+  presentation?: PreparationRuntimeQuestionPresentation
+}>
+
+export type PreparationRuntimeQuestionProjection = Readonly<{
+  key: string
+  question: string
+  evidenceNeed?: string
+  purpose?: PreparationQuestionPurpose
+  clarificationRequired?: boolean
+  presentation?: PreparationRuntimeQuestionPresentation
+}>
+
+export type PreparationRuntimeEvidenceProjection = Readonly<{
+  preparationVersion: typeof PREPARATION_SESSION_VERSION
+  preparationSessionId: string
+  createdAt: number
+  updatedAt: number
+  provenance: Readonly<{
+    entrySource: PreparationEntrySource
+    restoredFrom?: Readonly<{
+      kind: 'preparation' | 'normal_session' | 'live_session'
+      id: string
+    }>
+  }>
+  relations: Readonly<{
+    normalSessionId?: string
+    liveSessionId?: string
+  }>
+  knowledge: Readonly<{
+    objective?: PreparationRuntimeEvidenceValue
+    baselineAssumptions: readonly PreparationRuntimeEvidenceValue[]
+    name?: PreparationRuntimeEvidenceValue
+    role?: PreparationRuntimeEvidenceValue
+    participants: readonly PreparationRuntimeEvidenceValue[]
+    audience?: PreparationRuntimeEvidenceValue
+    perspectives: readonly PreparationRuntimeEvidenceValue[]
+    conversation: Readonly<{
+      id?: string
+      title?: PreparationRuntimeEvidenceValue
+      group?: PreparationRuntimeEvidenceValue
+    }>
+    knownContext?: PreparationRuntimeEvidenceValue
+    communicationMedium?: PreparationRuntimeEvidenceValue
+    receiverEvidence?: PreparationRuntimeEvidenceValue
+    acceptableOutcome?: PreparationRuntimeEvidenceValue
+    secondaryOutcome?: PreparationRuntimeEvidenceValue
+    roomObjective?: PreparationRuntimeEvidenceValue
+    additionalSignals: Readonly<
+      Record<string, PreparationRuntimeEvidenceValue>
+    >
+    documents: readonly Readonly<{
+      id: string
+      name: string
+      kind: string
+      summary?: string
+      evidence: PreparationRuntimeEvidenceValue
+    }>[]
+  }>
+  briefing: Readonly<{
+    priorInteractions: readonly PreparationRuntimeInteractionProjection[]
+    currentQuestion?: PreparationRuntimeQuestionProjection
+  }>
+  readiness: Readonly<{
+    confirmations: Readonly<
+      PreparationSessionV1['support']['confirmations']
+    >
+    workflow: Readonly<{
+      current: Readonly<PreparationCheckpoint>
+      history: readonly Readonly<PreparationCheckpoint>[]
+      returnTo?: Readonly<PreparationCheckpoint>
+    }>
   }>
 }>
 
@@ -521,10 +630,17 @@ export function normalizePreparationInteractions(
     normalized.set(key, {
       key,
       question: cleanString(interaction.question),
+      ...(cleanOptionalString(interaction.example)
+        ? { example: cleanOptionalString(interaction.example) }
+        : {}),
       answer: cleanString(interaction.answer),
       status,
       ...(cleanOptionalString(interaction.evidenceNeed)
         ? { evidenceNeed: cleanOptionalString(interaction.evidenceNeed) }
+        : {}),
+      ...(interaction.purpose === 'live_scope_grounding' ||
+      interaction.purpose === 'qualification'
+        ? { purpose: interaction.purpose }
         : {}),
     })
   }
@@ -793,6 +909,10 @@ export function createPreparationSession(
                       currentQuestion.evidenceNeed,
                     ),
                   }
+                : {}),
+              ...(currentQuestion.purpose === 'live_scope_grounding' ||
+              currentQuestion.purpose === 'qualification'
+                ? { purpose: currentQuestion.purpose }
                 : {}),
               ...(currentQuestion.clarificationRequired
                 ? { clarificationRequired: true }
@@ -1116,6 +1236,303 @@ function preparationEvidenceLabel(
   )
 }
 
+type PreparationRuntimeEvidenceSource = Extract<
+  PreparationEvidenceSource,
+  | 'confirmed_preparation_answer'
+  | 'qualified_document'
+  | 'persisted_preparation'
+  | 'inference'
+>
+
+function preparationRuntimeEvidenceAuthority(
+  source: PreparationRuntimeEvidenceSource,
+): PreparationRuntimeEvidenceAuthority {
+  const precedence = NORMAL_PREPARATION_EVIDENCE_PRECEDENCE.find(
+    (candidate) => candidate.source === source,
+  )
+
+  if (!precedence) {
+    throw new Error(`Missing preparation evidence precedence for ${source}.`)
+  }
+
+  return Object.freeze({
+    source,
+    rank: precedence.rank,
+    authority: precedence.authority,
+  })
+}
+
+function preparationRuntimeEvidenceValue(
+  value: unknown,
+  source: PreparationRuntimeEvidenceSource,
+): PreparationRuntimeEvidenceValue {
+  return Object.freeze({
+    ...preparationRuntimeEvidenceAuthority(source),
+    value: cleanString(value),
+  })
+}
+
+function projectPreparationKnowledgeValue(input: {
+  value: unknown
+  source?: Exclude<
+    PreparationRuntimeEvidenceSource,
+    'confirmed_preparation_answer' | 'qualified_document'
+  >
+}): PreparationRuntimeEvidenceValue | undefined {
+  const value = cleanString(input.value)
+  if (!value) return undefined
+
+  return preparationRuntimeEvidenceValue(
+    value,
+    input.source || 'persisted_preparation',
+  )
+}
+
+function projectPreparationKnowledgeValues(input: {
+  values: unknown
+  source?: Exclude<
+    PreparationRuntimeEvidenceSource,
+    'confirmed_preparation_answer' | 'qualified_document'
+  >
+}): readonly PreparationRuntimeEvidenceValue[] {
+  return Object.freeze(
+    uniqueStrings(input.values).map((value) =>
+      preparationRuntimeEvidenceValue(
+        value,
+        input.source || 'persisted_preparation',
+      ),
+    ),
+  )
+}
+
+function projectPreparationQuestionPresentation(input: {
+  label?: unknown
+  why?: unknown
+  example?: unknown
+}): PreparationRuntimeQuestionPresentation | undefined {
+  const label = cleanOptionalString(input.label)
+  const why = cleanOptionalString(input.why)
+  const example = cleanOptionalString(input.example)
+
+  if (!label && !why && !example) return undefined
+
+  return Object.freeze({
+    ...(label ? { label } : {}),
+    ...(why ? { why } : {}),
+    ...(example ? { example } : {}),
+  })
+}
+
+function freezePreparationCheckpoint(
+  checkpoint: PreparationCheckpoint,
+): Readonly<PreparationCheckpoint> {
+  return Object.freeze({ ...checkpoint })
+}
+
+/**
+ * Runtime-safe projection of canonical preparation state. This preserves
+ * evidence provenance and exact question/answer association without choosing
+ * a LIVE move, reinterpreting evidence, or treating presentation as evidence.
+ */
+export function projectPreparationSessionForLiveRuntime(
+  value: unknown,
+): PreparationRuntimeEvidenceProjection | null {
+  const session = normalizePreparationSession(value)
+  if (!session) return null
+
+  const interactions = normalizePreparationInteractions(
+    session.briefing.priorInteractions,
+  )
+  const objective = projectPreparationKnowledgeValue({
+    value: session.knowledge.objective,
+  })
+  const name = projectPreparationKnowledgeValue({
+    value: session.knowledge.name,
+  })
+  const role = projectPreparationKnowledgeValue({
+    value: session.knowledge.role,
+  })
+  const audience = projectPreparationKnowledgeValue({
+    value: session.knowledge.audience,
+  })
+  const conversationTitle = projectPreparationKnowledgeValue({
+    value: session.knowledge.conversation.title,
+  })
+  const conversationGroup = projectPreparationKnowledgeValue({
+    value: session.knowledge.conversation.group,
+  })
+  const knownContext = projectPreparationKnowledgeValue({
+    value: session.knowledge.knownContext,
+  })
+  const communicationMedium = projectPreparationKnowledgeValue({
+    value: session.knowledge.communicationMedium,
+  })
+  const receiverEvidence = projectPreparationKnowledgeValue({
+    value: session.knowledge.receiverEvidence,
+  })
+  const acceptableOutcome = projectPreparationKnowledgeValue({
+    value: session.knowledge.acceptableOutcome,
+  })
+  const secondaryOutcome = projectPreparationKnowledgeValue({
+    value: session.knowledge.secondaryOutcome,
+  })
+  const roomObjective = projectPreparationKnowledgeValue({
+    value: session.knowledge.roomObjective,
+  })
+  const additionalSignals = Object.freeze(
+    Object.fromEntries(
+      Object.entries(session.knowledge.additionalSignals).map(
+        ([key, signalValue]) => [
+          key,
+          projectPreparationKnowledgeValue({
+            value: signalValue,
+            source:
+              normalizeEvidenceField(key) === 'proposedoutcome'
+                ? 'inference'
+                : 'persisted_preparation',
+          })!,
+        ],
+      ),
+    ),
+  )
+  const priorInteractions = Object.freeze(
+    interactions.map((interaction) => {
+      const answer = cleanString(interaction.answer)
+      const presentation = projectPreparationQuestionPresentation({
+        example: interaction.example,
+      })
+
+      return Object.freeze({
+        key: interaction.key,
+        question: interaction.question,
+        answer,
+        status: interaction.status,
+        ...(interaction.evidenceNeed
+          ? { evidenceNeed: interaction.evidenceNeed }
+          : {}),
+        ...(interaction.purpose ? { purpose: interaction.purpose } : {}),
+        ...(interaction.status === 'answered' && answer
+          ? {
+              answerAuthority: preparationRuntimeEvidenceAuthority(
+                'confirmed_preparation_answer',
+              ),
+            }
+          : {}),
+        ...(presentation ? { presentation } : {}),
+      })
+    }),
+  )
+  const currentQuestion = session.briefing.currentQuestion
+  const currentQuestionPresentation = currentQuestion
+    ? projectPreparationQuestionPresentation(currentQuestion)
+    : undefined
+
+  return Object.freeze({
+    preparationVersion: session.version,
+    preparationSessionId: session.preparationSessionId,
+    createdAt: session.createdAt,
+    updatedAt: session.updatedAt,
+    provenance: Object.freeze({
+      entrySource: session.provenance.entrySource,
+      ...(session.provenance.restoredFrom
+        ? {
+            restoredFrom: Object.freeze({
+              ...session.provenance.restoredFrom,
+            }),
+          }
+        : {}),
+    }),
+    relations: Object.freeze({ ...session.relations }),
+    knowledge: Object.freeze({
+      ...(objective ? { objective } : {}),
+      baselineAssumptions: Object.freeze(
+        session.knowledge.baselineAssumptions.map((assumption) =>
+          preparationRuntimeEvidenceValue(assumption, 'inference'),
+        ),
+      ),
+      ...(name ? { name } : {}),
+      ...(role ? { role } : {}),
+      participants: projectPreparationKnowledgeValues({
+        values: session.knowledge.participants,
+      }),
+      ...(audience ? { audience } : {}),
+      perspectives: projectPreparationKnowledgeValues({
+        values: session.knowledge.perspectives,
+      }),
+      conversation: Object.freeze({
+        ...(session.knowledge.conversation.id
+          ? { id: session.knowledge.conversation.id }
+          : {}),
+        ...(conversationTitle ? { title: conversationTitle } : {}),
+        ...(conversationGroup ? { group: conversationGroup } : {}),
+      }),
+      ...(knownContext ? { knownContext } : {}),
+      ...(communicationMedium ? { communicationMedium } : {}),
+      ...(receiverEvidence ? { receiverEvidence } : {}),
+      ...(acceptableOutcome ? { acceptableOutcome } : {}),
+      ...(secondaryOutcome ? { secondaryOutcome } : {}),
+      ...(roomObjective ? { roomObjective } : {}),
+      additionalSignals,
+      documents: Object.freeze(
+        session.knowledge.documents.map((evidenceAsset) =>
+          Object.freeze({
+            id: evidenceAsset.id,
+            name: evidenceAsset.name,
+            kind: evidenceAsset.kind,
+            ...(evidenceAsset.summary
+              ? { summary: evidenceAsset.summary }
+              : {}),
+            evidence: preparationRuntimeEvidenceValue(
+              evidenceAsset.summary ||
+                `${evidenceAsset.name} (${evidenceAsset.kind})`,
+              'qualified_document',
+            ),
+          }),
+        ),
+      ),
+    }),
+    briefing: Object.freeze({
+      priorInteractions,
+      ...(currentQuestion
+        ? {
+            currentQuestion: Object.freeze({
+              key: currentQuestion.key,
+              question: currentQuestion.question,
+              ...(currentQuestion.evidenceNeed
+                ? { evidenceNeed: currentQuestion.evidenceNeed }
+                : {}),
+              ...(currentQuestion.purpose
+                ? { purpose: currentQuestion.purpose }
+                : {}),
+              ...(currentQuestion.clarificationRequired
+                ? { clarificationRequired: true }
+                : {}),
+              ...(currentQuestionPresentation
+                ? { presentation: currentQuestionPresentation }
+                : {}),
+            }),
+          }
+        : {}),
+    }),
+    readiness: Object.freeze({
+      confirmations: Object.freeze({ ...session.support.confirmations }),
+      workflow: Object.freeze({
+        current: freezePreparationCheckpoint(session.workflow.current),
+        history: Object.freeze(
+          session.workflow.history.map(freezePreparationCheckpoint),
+        ),
+        ...(session.workflow.returnTo
+          ? {
+              returnTo: freezePreparationCheckpoint(
+                session.workflow.returnTo,
+              ),
+            }
+          : {}),
+      }),
+    }),
+  })
+}
+
 /**
  * Canonical projection from one identity-bound PreparationSessionV1 into
  * runtime evidence. It classifies provenance; it does not choose an
@@ -1273,6 +1690,9 @@ export function projectNormalPreparationEvidence(
           pendingQuestion: Object.freeze({
             key: pendingQuestion.key,
             question: pendingQuestion.question,
+            ...(pendingQuestion.example
+              ? { example: pendingQuestion.example }
+              : {}),
             ...(pendingQuestion.evidenceNeed
               ? { evidenceNeed: pendingQuestion.evidenceNeed }
               : {}),

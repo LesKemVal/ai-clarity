@@ -10,6 +10,22 @@ export type AdaptiveUserProfile = {
   layeredExplanationTolerance: AdaptiveConfidence
 }
 
+export type AdaptiveSessionEvidence = Readonly<{
+  userText: string
+  pressureHigh?: boolean
+  earbudActive?: boolean
+}>
+
+export type AdaptiveSessionEvidenceSummary = Readonly<{
+  inspectedTurnCount: number
+  concisePositiveSignals: number
+  conciseContradictions: number
+  independentConciseSignals: number
+  broadExplicitConciseDirection: boolean
+  conciseSessionTendencyQualified: boolean
+  durableConciseCandidateQualified: boolean
+}>
+
 export const DEFAULT_ADAPTIVE_USER_PROFILE: AdaptiveUserProfile = {
   conciseDeliveryPreference: 0.5,
   repeatableLineAffinity: 0.5,
@@ -45,15 +61,6 @@ export function adaptUserProfile(
 
   const next = { ...current }
 
-  const shortInput = text.split(/\s+/).length <= 10
-
-  if (shortInput) {
-    next.conciseDeliveryPreference = adjust(
-      next.conciseDeliveryPreference,
-      'up'
-    )
-  }
-
   if (
     /\bsay:|tell him|tell her|repeat|exact words|what do i say\b/.test(text)
   ) {
@@ -74,9 +81,7 @@ export function adaptUserProfile(
     )
   }
 
-  if (
-    /\bcalm|steady|measured|don't escalate|careful\b/.test(text)
-  ) {
+  if (/\b(?:make|keep|be|stay) (?:it |this |that )?(?:calm|steady|measured)|don't escalate\b/.test(text)) {
     next.calmPressurePreference = adjust(
       next.calmPressurePreference,
       'up'
@@ -92,27 +97,8 @@ export function adaptUserProfile(
     )
   }
 
-  if (input.earbudActive) {
-    next.tacticalCueRetention = adjust(
-      next.tacticalCueRetention,
-      'up',
-      0.07
-    )
-
-    next.layeredExplanationTolerance = adjust(
-      next.layeredExplanationTolerance,
-      'down',
-      0.05
-    )
-  }
-
-  if (input.pressureHigh) {
-    next.calmPressurePreference = adjust(
-      next.calmPressurePreference,
-      'up',
-      0.05
-    )
-  }
+  // Pressure and receiver constraints shape the current realization. They are
+  // deliberately not learned as user identity or preference here.
 
   for (const signal of input.learningSignals || []) {
     const hypothesis = String(signal.hypothesis || '').toLowerCase()
@@ -145,8 +131,142 @@ export function adaptUserProfile(
   return next
 }
 
+function normalizedEvidenceText(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+}
+
+function classifyConciseEvidence(evidence: AdaptiveSessionEvidence) {
+  const text = evidence.userText.toLowerCase().replace(/\s+/g, ' ').trim()
+  const normalized = normalizedEvidenceText(text)
+  const wordCount = normalized.split(/\s+/).filter(Boolean).length
+  const contradiction =
+    /\b(more detail|more context|expand|longer|explain more|too short|too brief|not enough detail|don'?t be so brief)\b/.test(text)
+  const explicitConcise =
+    /\b(shorter|more concise|be concise|keep it brief|brief cues?|less words?|shorter cues?|short cues?|keep it tight|tighten (?:this|that|it))\b/.test(text)
+  const lineScoped =
+    /\b(this|that) (line|sentence|wording|response|answer)\b/.test(text)
+  const broadExplicit =
+    explicitConcise &&
+    /\b(always|from now on|throughout|this (?:live )?(?:conversation|room|session)|for the rest|generally|usually)\b/.test(text)
+  const inferredTerse =
+    !explicitConcise &&
+    !contradiction &&
+    !evidence.pressureHigh &&
+    !evidence.earbudActive &&
+    wordCount > 0 &&
+    wordCount <= 6
+
+  return {
+    normalized,
+    contradiction,
+    explicitConcise,
+    lineScoped,
+    broadExplicit,
+    inferredTerse,
+  }
+}
+
+/**
+ * Derives bounded current-session tendencies from recent conversation evidence.
+ * No new storage is created: callers rebuild this deterministic projection from
+ * the existing recent conversation window on each request.
+ */
+export function deriveAdaptiveUserProfileFromSession(input: {
+  turns: readonly AdaptiveSessionEvidence[]
+  learningSignals?: Array<{
+    hypothesis?: string
+    confidence?: number
+  }>
+}) {
+  const turns = input.turns.slice(-8)
+  let profile = { ...DEFAULT_ADAPTIVE_USER_PROFILE }
+  const conciseSignalIds = new Set<string>()
+  let concisePositiveSignals = 0
+  let conciseContradictions = 0
+  let broadExplicitConciseDirection = false
+
+  turns.forEach((turn, index) => {
+    profile = adaptUserProfile(profile, {
+      userText: turn.userText,
+      learningSignals: index === turns.length - 1 ? input.learningSignals : [],
+    })
+
+    const evidence = classifyConciseEvidence(turn)
+    const recencyWeight = 0.5 + ((index + 1) / Math.max(1, turns.length)) * 0.5
+
+    if (evidence.contradiction) {
+      conciseContradictions += 1
+      conciseSignalIds.clear()
+      profile.conciseDeliveryPreference = adjust(
+        profile.conciseDeliveryPreference,
+        'down',
+        0.1 * recencyWeight
+      )
+      return
+    }
+
+    if (evidence.broadExplicit) {
+      broadExplicitConciseDirection = true
+      concisePositiveSignals += 1
+      conciseSignalIds.add(evidence.normalized)
+      profile.conciseDeliveryPreference = adjust(
+        profile.conciseDeliveryPreference,
+        'up',
+        0.12 * recencyWeight
+      )
+      return
+    }
+
+    if (evidence.explicitConcise && evidence.lineScoped) {
+      // This line is governed directly by Operational Judgment. It is not
+      // evidence of a broader session preference.
+      return
+    }
+
+    if (evidence.explicitConcise || evidence.inferredTerse) {
+      const before = conciseSignalIds.size
+      conciseSignalIds.add(evidence.normalized)
+      if (conciseSignalIds.size === before) return
+
+      concisePositiveSignals += 1
+      if (conciseSignalIds.size >= 2) {
+        profile.conciseDeliveryPreference = adjust(
+          profile.conciseDeliveryPreference,
+          'up',
+          (evidence.explicitConcise ? 0.07 : 0.04) * recencyWeight
+        )
+      }
+    }
+  })
+
+  const independentConciseSignals = conciseSignalIds.size
+  const conciseSessionTendencyQualified = Boolean(
+    broadExplicitConciseDirection || independentConciseSignals >= 2
+  )
+  const durableConciseCandidateQualified = Boolean(
+    independentConciseSignals >= 3 &&
+      conciseContradictions === 0 &&
+      profile.conciseDeliveryPreference >= 0.64
+  )
+  const evidence: AdaptiveSessionEvidenceSummary = Object.freeze({
+    inspectedTurnCount: turns.length,
+    concisePositiveSignals,
+    conciseContradictions,
+    independentConciseSignals,
+    broadExplicitConciseDirection,
+    conciseSessionTendencyQualified,
+    durableConciseCandidateQualified,
+  })
+
+  return Object.freeze({
+    profile: Object.freeze(profile),
+    evidence,
+  })
+}
+
 export function buildAdaptiveUserProfileNote(
-  profile: AdaptiveUserProfile
+  profile: AdaptiveUserProfile,
+  evidence?: AdaptiveSessionEvidenceSummary
 ) {
   return `
 OPERATIONAL PROFILE EVIDENCE
@@ -156,6 +276,8 @@ OPERATIONAL PROFILE EVIDENCE
 - Recalibrate continuously from runtime evidence, current objective, room pressure, and explicit user direction.
 - Do not patronize the user.
 - Do not permanently simplify intelligence because of temporary overload.
+- One inferred signal remains line/turn evidence only. A current-session tendency requires repeated independent signals or explicit broader direction.
+- Contradictory evidence weakens the tendency. Pressure, fatigue, haste, receiver constraints, and one rewritten sentence are not permanent identity.
 
 Current evidence tendencies:
 - concise delivery preference: ${profile.conciseDeliveryPreference.toFixed(2)}
@@ -165,6 +287,7 @@ Current evidence tendencies:
 - leverage protection preference: ${profile.leverageProtectionPreference.toFixed(2)}
 - tactical cue retention: ${profile.tacticalCueRetention.toFixed(2)}
 - layered explanation tolerance: ${profile.layeredExplanationTolerance.toFixed(2)}
+${evidence ? `- concise session tendency qualified: ${evidence.conciseSessionTendencyQualified ? 'yes' : 'no'} (${evidence.independentConciseSignals} independent signals; ${evidence.conciseContradictions} contradictions)\n- durable concise candidate qualified: ${evidence.durableConciseCandidateQualified ? 'yes' : 'no'} (candidate only; persistence not authorized)` : ''}
 
 Use this evidence to shape:
 - pacing

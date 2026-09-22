@@ -60,7 +60,7 @@ import { buildContinuityRestorationState } from '@/lib/george/runtime/continuity
 import { buildPresentationAuthorityNote, determinePresentationMode, enforcePresentationMode } from '@/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '@/lib/george/chat/operational-excellence'
 import { buildArbitrationResponseShape } from '@/lib/george/chat/arbitration-response-shaping'
-import { DEFAULT_ADAPTIVE_USER_PROFILE, adaptUserProfile, buildAdaptiveUserProfileNote } from '@/lib/george/runtime/adaptive-user-profile'
+import { buildAdaptiveUserProfileNote, deriveAdaptiveUserProfileFromSession } from '@/lib/george/runtime/adaptive-user-profile'
 import { evaluateDurableBehavioralMemory } from '@/lib/george/runtime/durable-behavioral-memory'
 import { evaluateRuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-learning'
 import { resolveRuntimeControls } from '@/lib/george/runtime/resolve-runtime-controls'
@@ -84,6 +84,8 @@ import {
   buildNormalOperationalResponseResult,
   NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST,
   normalizeOperationalPreparationContext,
+  normalizePreparationTurnClassificationRequest,
+  type NormalLiveOperationalJudgmentResult,
 } from '@/lib/george/runtime/operational-judgment'
 import { createOperationalMemory } from '@/lib/george/operational-memory/operational-memory'
 import { createRedisOperationalFormulaLibrary } from '@/lib/george/operational-memory/redis-formula-library'
@@ -96,7 +98,10 @@ import {
 } from '@/lib/george/operational-memory/retrieval-policy'
 import { createOperationalMemoryRuntimeEvidence } from '@/lib/george/operational-memory/runtime-evidence'
 import type { RetrievedOperationalFormula } from '@/lib/george/operational-memory/types'
-import { projectNormalPreparationEvidence } from '@/lib/george/live-runtime/live-preparation-controller'
+import {
+  projectNormalPreparationEvidence,
+  projectPreparationSessionForLiveRuntime,
+} from '@/lib/george/live-runtime/live-preparation-controller'
 import { formulateAuthorizedSignalQuestion } from '@/lib/george/live-runtime/authorized-signal-question'
 import { readGeorgeSession } from '@/lib/security/george-session'
 
@@ -677,8 +682,20 @@ export async function POST(req: NextRequest) {
       !Array.isArray(body.preparationContext)
         ? (body.preparationContext as Record<string, unknown>)
         : null
-    const preparationEvidenceProjection = preparationTransport
-      ? projectNormalPreparationEvidence({
+    const projectedPreparationSession = preparationTransport
+      ? projectPreparationSessionForLiveRuntime(preparationTransport.session)
+      : null
+    const projectedEntrySource =
+      projectedPreparationSession?.provenance.entrySource || null
+    const declaredEntrySource =
+      typeof preparationTransport?.entrySource === 'string'
+        ? preparationTransport.entrySource
+        : null
+    const normalPreparationProjection =
+      preparationTransport &&
+      projectedEntrySource === 'normal' &&
+      (!declaredEntrySource || declaredEntrySource === 'normal')
+        ? projectNormalPreparationEvidence({
           session: preparationTransport.session,
           activeNormalSessionId:
             typeof preparationTransport.activeNormalSessionId === 'string'
@@ -697,13 +714,68 @@ export async function POST(req: NextRequest) {
             preparationTransport.signalAcquisitionAllowed !== false,
         })
       : null
+    const homepagePreparationProjection =
+      preparationTransport &&
+      projectedPreparationSession?.provenance.entrySource === 'homepage' &&
+      declaredEntrySource === 'homepage' &&
+      typeof preparationTransport.preparationSessionId === 'string' &&
+      preparationTransport.preparationSessionId ===
+        projectedPreparationSession.preparationSessionId &&
+      !preparationTransport.activeNormalSessionId &&
+      !preparationTransport.linkedPreparationSessionId &&
+      !projectedPreparationSession.relations.normalSessionId
+        ? Object.freeze({
+            preparationEvidenceProjection: projectedPreparationSession,
+            evidenceSufficiency:
+              preparationTransport.evidenceSufficiency === 'sufficient'
+                ? ('sufficient' as const)
+                : ('unresolved' as const),
+            signalAcquisitionAllowed:
+              preparationTransport.signalAcquisitionAllowed !== false,
+          })
+        : null
+    const preparationEvidenceProjection =
+      normalPreparationProjection || homepagePreparationProjection
     const preparationContext = normalizeOperationalPreparationContext(
       preparationEvidenceProjection
     )
-    const operationalJudgmentRequest =
-      body?.requestPurpose === NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST &&
-      preparationContext?.entrySource === 'normal'
+    const operationalJudgmentRequested =
+      body?.requestPurpose === NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST
+    const preparationTurnIntentProvided = Object.prototype.hasOwnProperty.call(
+      body || {},
+      'preparationTurnIntent'
+    )
+    const preparationTurnClassificationRequest =
+      preparationTurnIntentProvided
+        ? normalizePreparationTurnClassificationRequest(
+            body?.preparationTurnIntent
+          )
+        : null
 
+    if (operationalJudgmentRequested && !preparationContext) {
+      return NextResponse.json(
+        { error: 'Valid operational preparation provenance is required.' },
+        { status: 400 }
+      )
+    }
+
+    if (
+      preparationTurnClassificationRequest &&
+      (!operationalJudgmentRequested || !preparationContext)
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            'Preparation-turn classification requires validated preparation provenance and the canonical Operational Judgment request.',
+        },
+        { status: 400 }
+      )
+    }
+
+    const operationalJudgmentRequest =
+      operationalJudgmentRequested &&
+      (preparationContext?.entrySource === 'normal' ||
+        preparationContext?.entrySource === 'homepage')
 
     const sessionTier =
       session?.tier === 'smart' ||
@@ -873,20 +945,27 @@ LANGUAGE MODE: SPANISH
     const arbitrationResponseShapeNote =
       arbitrationResponseShape.note
 
-    const adaptiveUserProfile =
-      adaptUserProfile(
-        DEFAULT_ADAPTIVE_USER_PROFILE,
-        {
-          userText: latestUserRaw,
-          earbudActive: earbudRuntime.active,
-          pressureHigh:
-            control.pressureLevel.toLowerCase() === 'high',
-        }
-      )
+    const adaptiveSessionProjection =
+      deriveAdaptiveUserProfileFromSession({
+        turns: recentMessages
+          .filter((message) => message.role === 'user')
+          .map((message) => ({
+            userText: message.content,
+            pressureHigh:
+              message === latestUserMessage &&
+              control.pressureLevel.toLowerCase() === 'high',
+            earbudActive:
+              message === latestUserMessage && earbudRuntime.active,
+          })),
+      })
+    const adaptiveUserProfile = adaptiveSessionProjection.profile
 
     const adaptiveUserProfileNote =
       runtimeControls.adaptiveLearningEnabled
-        ? buildAdaptiveUserProfileNote(adaptiveUserProfile)
+        ? buildAdaptiveUserProfileNote(
+            adaptiveUserProfile,
+            adaptiveSessionProjection.evidence
+          )
         : ''
 
     const durableBehavioralMemory =
@@ -894,6 +973,7 @@ LANGUAGE MODE: SPANISH
         ? evaluateDurableBehavioralMemory({
         latestUserText: latestUserRaw,
         adaptiveProfile: adaptiveUserProfile,
+        sessionEvidence: adaptiveSessionProjection.evidence,
         pressureHigh:
           control.pressureLevel.toLowerCase() === 'high',
         earbudActive: earbudRuntime.active,
@@ -1165,6 +1245,7 @@ LANGUAGE MODE: SPANISH
       operationalSignals: coreInterpretation.operationalSignals || [],
       operationalMemoryEvidence,
       preparationContext,
+      preparationTurnClassificationRequest,
       providerPrompt,
       governedContextNotes: {
         liveRuntimeContext,
@@ -1265,6 +1346,9 @@ LANGUAGE MODE: SPANISH
             model,
             systemContent,
             messages: providerMessages,
+            requiredSignalAcquisitionPurpose: operationalJudgmentRequest
+              ? 'qualification'
+              : undefined,
           })
         } catch (error) {
           console.warn(
@@ -1282,6 +1366,9 @@ LANGUAGE MODE: SPANISH
           model: semanticTarget.model,
           systemContent,
           messages: providerMessages,
+          requiredSignalAcquisitionPurpose: operationalJudgmentRequest
+            ? 'qualification'
+            : undefined,
         })
 
         resolvedSemanticProvider = semanticTarget.provider
@@ -1355,6 +1442,13 @@ LANGUAGE MODE: SPANISH
         judgmentSurface,
         providerReasoning:
           providerSemanticJudgment?.operationalReasoning || null,
+        providerCommunicationChange:
+          providerSemanticJudgment?.communicationChange || null,
+        providerSpeechComposition:
+          providerSemanticJudgment?.speechComposition || null,
+        providerPreparationTurnClassification:
+          providerSemanticJudgment?.preparationTurnClassification || null,
+        preparationTurnClassificationRequest,
         providerCapability:
           providerSemanticJudgment?.capability || null,
         capabilityExplicitlyRequested:
@@ -1409,6 +1503,8 @@ LANGUAGE MODE: SPANISH
             authorizedEvidenceNeed: authorizedSignal,
             authorizationReason:
               acceptedJudgment.signalAcquisition.reason,
+            authorizationPurpose:
+              acceptedJudgment.signalAcquisition.purpose,
             knownSignal: {
               latestUserText: latestUserRaw,
               knownEvidence:
@@ -1493,6 +1589,91 @@ LANGUAGE MODE: SPANISH
       }
     }
 
+    const communicationClarification =
+      runtimeAuthoritySnapshot.operationalJudgment.communicationChange
+    if (
+      currentRuntime === 'live_george' &&
+      communicationClarification?.clarificationRequired &&
+      communicationClarification.clarificationQuestion
+    ) {
+      reply = communicationClarification.clarificationQuestion
+      providerExecutionSource = 'canonical_presentation'
+    }
+
+    const preparationTurnRealization =
+      runtimeAuthoritySnapshot.operationalJudgment
+        .preparationTurnRealizationAuthorization
+    let preparationTurnExecutionText: string | null = null
+    let preparationTurnProviderExecution = false
+
+    if (
+      operationalJudgmentRequest &&
+      preparationTurnRealization?.action === 'respond_to_preparation' &&
+      preparationTurnRealization.providerExecutionAuthorized
+    ) {
+      const acceptedJudgment =
+        runtimeAuthoritySnapshot.operationalJudgment
+      const executionRequest = buildProviderResolvedNormalExecutionRequest({
+        authority: runtimeAuthoritySnapshot,
+        latestUserText: latestUserRaw,
+        hasPreparationContext: Boolean(preparationContext),
+        prompt: providerPrompt,
+      })
+      let executionResult = null
+
+      try {
+        executionResult = await runNormalExecutionCompletion({
+          provider: resolvedSemanticProvider,
+          model: resolvedSemanticModel,
+          systemContent: executionRequest.systemContent,
+          messages: executionRequest.messages,
+          acceptedJudgment,
+          acceptedExecutionPolicy:
+            runtimeAuthoritySnapshot.executionPolicy,
+        })
+      } catch (error) {
+        console.warn(
+          '[GEORGE][preparation-turn-execution] Provider execution failed.',
+          error instanceof Error ? error.message : error
+        )
+      }
+
+      if (
+        !executionResult &&
+        providerFallback &&
+        resolvedSemanticProvider !== providerFallback.provider
+      ) {
+        executionResult = await runNormalExecutionCompletion({
+          provider: providerFallback.provider,
+          model: providerFallback.model,
+          systemContent: executionRequest.systemContent,
+          messages: executionRequest.messages,
+          acceptedJudgment,
+          acceptedExecutionPolicy:
+            runtimeAuthoritySnapshot.executionPolicy,
+        })
+      }
+
+      const preparationResponse = buildNormalOperationalResponseResult({
+        operationalJudgment: acceptedJudgment,
+        executionText: executionResult?.text || null,
+        governedProviderExecution: Boolean(executionResult),
+      })
+
+      if (!preparationResponse.message) {
+        return NextResponse.json(
+          {
+            error:
+              'Canonical Operational Judgment authorized a Preparation response, but no governed execution was generated.',
+          },
+          { status: 502 }
+        )
+      }
+
+      preparationTurnExecutionText = preparationResponse.message
+      preparationTurnProviderExecution = true
+    }
+
     if (!operationalJudgmentRequest) {
       reply = enforcePresentationMode(reply, presentationMode)
       reply = renderOperationalExcellenceOutput({
@@ -1534,10 +1715,57 @@ LANGUAGE MODE: SPANISH
       }
     }
 
+    let homepageAuthorizedSignalQuestion:
+      NormalLiveOperationalJudgmentResult['authorizedSignalQuestion'] = null
+    const operationalJudgment = runtimeAuthoritySnapshot.operationalJudgment
+    const homepageAuthorizedSignal =
+      operationalJudgmentRequest && homepagePreparationProjection &&
+      operationalJudgment.signalAcquisition.shouldAcquire
+        ? operationalJudgment.signalAcquisition.requestedSignal
+        : null
+
+    if (homepageAuthorizedSignal) {
+      try {
+        const formulation = await formulateAuthorizedSignalQuestion({
+          client: openai,
+          model: resolvedSemanticModel,
+          authorizedEvidenceNeed: homepageAuthorizedSignal,
+          authorizationReason:
+            operationalJudgment.signalAcquisition.reason,
+          authorizationPurpose:
+            operationalJudgment.signalAcquisition.purpose,
+          knownSignal: {
+            knownEvidence:
+              operationalJudgment.operationalDisposition.knownEvidence,
+            consequentialUncertainty:
+              operationalJudgment.operationalDisposition
+                .consequentialUncertainty,
+            preparationEvidence:
+              homepagePreparationProjection?.preparationEvidenceProjection,
+          },
+        })
+
+        if (formulation.status === 'question') {
+          homepageAuthorizedSignalQuestion = Object.freeze({
+            ...formulation,
+            evidenceNeed: homepageAuthorizedSignal,
+          })
+        }
+      } catch (error) {
+        console.warn(
+          '[GEORGE][homepage-signal-question] Authorized question formulation failed.',
+          error instanceof Error ? error.message : error
+        )
+      }
+    }
+
     const operationalJudgmentResult = operationalJudgmentRequest
       ? buildNormalLiveOperationalJudgmentResult({
           operationalJudgment:
             runtimeAuthoritySnapshot.operationalJudgment,
+          executionText: preparationTurnExecutionText,
+          governedProviderExecution: preparationTurnProviderExecution,
+          authorizedSignalQuestion: homepageAuthorizedSignalQuestion,
         })
       : null
 

@@ -45,6 +45,33 @@ const formulaLibraryOwner = read(
 const preparationController = read(
   'lib/george/live-runtime/live-preparation-controller.ts',
 )
+const liveEntry = read('app/george/live-entry/LiveEntryClient.tsx')
+const liveRuntimeTypes = read('lib/george/live-runtime/prep-runtime.ts')
+const liveRuntimeContext = read('lib/george/live-runtime/live-runtime-context.ts')
+const livePage = read('app/george/page.tsx')
+
+assert(
+  liveRuntimeTypes.includes(
+    'preparationEvidence?: PreparationRuntimeEvidenceProjection',
+  ) &&
+    liveEntry.match(/\bprojectPreparationSessionForLiveRuntime\s*\(/g)
+      ?.length === 1 &&
+    /const selectedPreparationSession\s*=\s*liveEntryRoute === "homepage"\s*\? homepagePreparationSession\s*:\s*liveEntryRoute === "normal"\s*\? normalPreparationSession\s*:\s*traditionalPreparationSession;/.test(
+      liveEntry,
+    ) &&
+    liveEntry.includes(
+      '...(preparationEvidence ? { preparationEvidence } : {}),',
+    ),
+  'LIVE entry does not attach exactly one route-selected canonical preparation projection to runtimeSupport',
+)
+
+assert(
+  (livePage.match(/buildLiveRuntimeContext\s*\(/g) || []).length === 1 &&
+    !liveEntry.includes('buildLiveRuntimeContext(') &&
+    !liveRuntimeContext.includes('homepagePreparationSession') &&
+    !liveRuntimeContext.includes('traditionalPreparationSession'),
+  'LIVE entry routes do not converge on one route-neutral shared reasoning-input owner',
+)
 
 assert(
   !signalRoute.includes('executionDecision') &&
@@ -199,6 +226,8 @@ const acceptedPolicyExecutionBindings =
   chatRoute.match(
     /acceptedExecutionPolicy:\s*\n\s*runtimeAuthoritySnapshot\.executionPolicy/g,
   ) || []
+const normalExecutionCalls =
+  chatRoute.match(/runNormalExecutionCompletion\(\{/g) || []
 assert(
   normalReasoningGovernor.includes(
     'fallback: NormalGeorgeProviderTarget | null',
@@ -212,8 +241,9 @@ assert(
     chatRoute.includes('provider: providerFallback.provider') &&
     chatRoute.includes('model: providerFallback.model') &&
     acceptedJudgmentAlias &&
-    acceptedJudgmentExecutionBindings.length === 2 &&
-    acceptedPolicyExecutionBindings.length === 2 &&
+    normalExecutionCalls.length > 0 &&
+    acceptedJudgmentExecutionBindings.length === normalExecutionCalls.length &&
+    acceptedPolicyExecutionBindings.length === normalExecutionCalls.length &&
     !chatRoute.includes('openAIFallbackModel') &&
     !chatRoute.includes('OPENAI_MODEL_INTELLIGENT') &&
     !chatRoute.includes('GROQ_NORMAL_FAST_MODEL'),
@@ -377,8 +407,11 @@ import {
   createPreparationSession,
   preparationEvidenceNeedIsAlreadyKnown,
   projectNormalPreparationEvidence,
+  projectPreparationSessionForLiveRuntime,
   reconcileNormalPreparationSession,
 } from '${root}/lib/george/live-runtime/live-preparation-controller'
+import { resolveLiveRuntimeAuthority } from '${root}/lib/george/live-runtime/live-runtime-authority'
+import { buildLiveRuntimeContext } from '${root}/lib/george/live-runtime/live-runtime-context'
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message)
@@ -629,6 +662,7 @@ const stalePreparationSession = createPreparationSession({
       'A detailed but stale preparation record about negotiating terms.',
     additionalSignals: {
       conversationContext: 'The seller previously offered a small discount.',
+      maximumDilution: 'Twelve percent remains unconfirmed.',
     },
     documents: [
       {
@@ -644,6 +678,7 @@ const stalePreparationSession = createPreparationSession({
       {
         key: 'decision_constraint',
         question: 'What constraint changes the decision?',
+        example: 'For example: the seller may need an answer this week.',
         answer: 'The deadline is Friday.',
         status: 'answered',
         evidenceNeed: 'decision deadline',
@@ -662,6 +697,195 @@ const stalePreparationSession = createPreparationSession({
   },
   relations: { normalSessionId: 'normal-current' },
 })
+
+const runtimePreparationProjection =
+  projectPreparationSessionForLiveRuntime(stalePreparationSession)
+const runtimeConstraintInteraction =
+  runtimePreparationProjection?.briefing.priorInteractions.find(
+    (interaction) => interaction.key === 'decision_constraint',
+  )
+
+assert(
+  runtimePreparationProjection !== null &&
+    runtimeConstraintInteraction?.question ===
+      'What constraint changes the decision?' &&
+    runtimeConstraintInteraction.answer === 'The deadline is Friday.',
+  'LIVE runtime projection detached an exact preparation answer from its exact eliciting question',
+)
+assert(
+  runtimeConstraintInteraction?.answerAuthority?.source ===
+      'confirmed_preparation_answer' &&
+    runtimeConstraintInteraction.answerAuthority.authority === 'user_owned' &&
+    runtimeConstraintInteraction.answerAuthority.rank === 2,
+  'confirmed preparation answer lost its existing evidence source, authority, or precedence',
+)
+assert(
+  runtimePreparationProjection?.knowledge.objective?.value ===
+      'negotiate a lower purchase price' &&
+    runtimePreparationProjection.knowledge.objective.source ===
+      'persisted_preparation' &&
+    runtimePreparationProjection.knowledge.objective.authority ===
+      'provisional' &&
+    runtimePreparationProjection.knowledge.role?.value === 'buyer' &&
+    runtimePreparationProjection.knowledge.audience?.value ===
+      'original seller',
+  'objective, role, audience, or provisional preparation authority was lost in LIVE projection',
+)
+assert(
+  runtimePreparationProjection?.knowledge.baselineAssumptions[0]?.value ===
+      'The purchase probably still matters.' &&
+    runtimePreparationProjection.knowledge.baselineAssumptions[0]?.source ===
+      'inference' &&
+    runtimePreparationProjection.knowledge.baselineAssumptions[0]?.authority ===
+      'provisional',
+  'preparation inference became indistinguishable from confirmed evidence',
+)
+assert(
+  runtimePreparationProjection?.knowledge.additionalSignals.maximumDilution
+    ?.value === 'Twelve percent remains unconfirmed.' &&
+    runtimePreparationProjection.knowledge.additionalSignals.maximumDilution
+      .source === 'persisted_preparation' &&
+    runtimePreparationProjection.knowledge.additionalSignals.maximumDilution
+      .authority === 'provisional',
+  'arbitrary additional preparation signal or its provisional authority was dropped',
+)
+assert(
+  runtimeConstraintInteraction?.presentation?.example ===
+      'For example: the seller may need an answer this week.' &&
+    !JSON.stringify(runtimePreparationProjection?.knowledge).includes(
+      'the seller may need an answer this week',
+    ) &&
+    runtimeConstraintInteraction.answer !==
+      runtimeConstraintInteraction.presentation.example,
+  'contextual example escaped its presentation-only boundary into runtime evidence',
+)
+assert(
+  runtimePreparationProjection?.provenance.entrySource === 'normal' &&
+    runtimePreparationProjection.provenance.restoredFrom?.kind ===
+      'normal_session' &&
+    runtimePreparationProjection.provenance.restoredFrom.id ===
+      'normal-current' &&
+    runtimePreparationProjection.relations.normalSessionId ===
+      'normal-current',
+  'entry route or parent Normal-session provenance was lost in LIVE projection',
+)
+assert(
+  runtimePreparationProjection?.knowledge.documents[0]?.evidence.source ===
+      'qualified_document' &&
+    runtimePreparationProjection.knowledge.documents[0]?.evidence.authority ===
+      'qualified' &&
+    !('assets' in runtimePreparationProjection) &&
+    !('runtimePreferences' in runtimePreparationProjection),
+  'qualified document evidence was lost or adjacent execution ownership was duplicated',
+)
+
+const transportSentinel = {
+  nested: ['arbitrary', 'runtime-support', 'field'],
+}
+const transportedRuntimeSupport = JSON.parse(
+  JSON.stringify(
+    resolveLiveRuntimeAuthority({
+      preparedSetup: {
+        runtimeSupport: {
+          preparationEvidence: runtimePreparationProjection,
+          transportSentinel,
+        } as any,
+      },
+    }),
+  ),
+)
+
+assert(
+  JSON.stringify(transportedRuntimeSupport.preparationEvidence) ===
+    JSON.stringify(runtimePreparationProjection) &&
+    JSON.stringify(transportedRuntimeSupport.transportSentinel) ===
+      JSON.stringify(transportSentinel),
+  'canonical preparation evidence or an arbitrary runtimeSupport field mutated across the existing LIVE transport boundary',
+)
+
+const missingPreparationProjection =
+  projectPreparationSessionForLiveRuntime(null)
+const transportedRuntimeSupportWithoutPreparation = JSON.parse(
+  JSON.stringify(
+    resolveLiveRuntimeAuthority({
+      preparedSetup: {
+        runtimeSupport: {
+          room: 'LIVE without preparation',
+          ...(missingPreparationProjection
+            ? { preparationEvidence: missingPreparationProjection }
+            : {}),
+        },
+      },
+    }),
+  ),
+)
+
+assert(
+  missingPreparationProjection === null &&
+    !('preparationEvidence' in transportedRuntimeSupportWithoutPreparation),
+  'LIVE transport manufactured preparation evidence when no preparation session existed',
+)
+
+const sharedLiveReasoningContext = buildLiveRuntimeContext({
+  liveMode: true,
+  runtimeSupport: {
+    preparationEvidence: runtimePreparationProjection,
+  },
+  setup: null,
+  steeringLabels: [],
+})
+const sharedEvidenceSection = sharedLiveReasoningContext.split(
+  'Presentation-only preparation metadata (not evidence):',
+)[0]
+
+assert(
+  sharedLiveReasoningContext.includes(
+    'Question: What constraint changes the decision?',
+  ) &&
+    sharedLiveReasoningContext.includes('Answer: The deadline is Friday.') &&
+    sharedLiveReasoningContext.includes(
+      'Answer authority: source=confirmed_preparation_answer; authority=user_owned; rank=2',
+    ) &&
+    sharedLiveReasoningContext.includes(
+      'Additional signal maximumDilution: Twelve percent remains unconfirmed. [source=persisted_preparation; authority=provisional',
+    ) &&
+    sharedLiveReasoningContext.includes(
+      'Baseline assumption 1: The purchase probably still matters. [source=inference; authority=provisional',
+    ) &&
+    sharedLiveReasoningContext.includes(
+      'Qualified document Current terms (document): The written terms list a cancellation window. [source=qualified_document; authority=qualified',
+    ) &&
+    sharedLiveReasoningContext.includes(
+      'Preparation provenance: entrySource=normal; relations={"normalSessionId":"normal-current"}',
+    ) &&
+    !sharedEvidenceSection.includes(
+      'For example: the seller may need an answer this week.',
+    ),
+  'canonical preparation evidence did not reach the shared LIVE reasoning context with its Q/A, authority, classification, document, or provenance distinctions intact',
+)
+assert(
+  sharedLiveReasoningContext.includes(
+    'Presentation-only preparation metadata (not evidence):',
+  ) &&
+    sharedLiveReasoningContext.includes(
+      'decision_constraint example: For example: the seller may need an answer this week.',
+    ),
+  'contextual preparation examples were not retained as explicitly presentation-only metadata',
+)
+
+const emptySharedLiveReasoningContext = buildLiveRuntimeContext({
+  liveMode: true,
+  runtimeSupport: null,
+  setup: null,
+  steeringLabels: [],
+})
+assert(
+  emptySharedLiveReasoningContext.includes(
+    'No preparation evidence was established for this LIVE entry.',
+  ) &&
+    !emptySharedLiveReasoningContext.includes('Question: What constraint changes the decision?'),
+  'shared LIVE reasoning context manufactured preparation evidence without a projection',
+)
 
 const projectedPreparation = projectNormalPreparationEvidence({
   session: stalePreparationSession,
@@ -2134,7 +2358,7 @@ assert(
 )
 assert(
   judgmentProviderRequest.systemContent.includes(
-    'NORMAL LIVE OPERATIONAL JUDGMENT REQUEST',
+    'OPERATIONAL PREPARATION JUDGMENT REQUEST',
   ) &&
     judgmentProviderRequest.messages.length === 3 &&
     judgmentProviderRequest.messages[1]?.role === 'assistant' &&

@@ -4,7 +4,7 @@
 
 This document is the behavioral authority for how GEORGE works with an individual user.
 
-`GEORGE_DOCUMENTATION_SYNC: 2026-08-15-formula-script-refinement`
+`GEORGE_DOCUMENTATION_SYNC: 2026-09-17-lh3a3e-governed-communication`
 
 `IMPLEMENTATION_AUTHORITY: Implementation is authoritative; these documents are authoritative only while synchronized with the validated local implementation.`
 
@@ -54,10 +54,10 @@ The Preparation Runtime owns one versioned Preparation Session for the upcoming 
 
 The objective remains stable unless the user explicitly changes it. Inferred direction may supply context or a proposed outcome, but it must not silently replace an established objective. GEORGE's recommendations and the user's overrides are distinct: a recommendation may be reviewed or changed without rewriting the evidence that produced it.
 
-Traditional, Quick LIVE, and Homepage Preparation Session migrations are complete. The current route experiences intentionally have different depth while sharing preparation authority:
+Traditional and Homepage Preparation Session migrations are complete and use the shared Preparation Session authority while preserving distinct route experiences. Quick LIVE is retired and is no longer an active LIVE entry route:
 
 - Traditional remains the full path: questions, Popup 1, Popup 2, Popup 3, then LIVE;
-- Quick LIVE remains minimum outcome-first preparation and enters LIVE without the full Traditional sequence;
+- Quick LIVE is retired. GEORGE must not recreate a dedicated minimum-outcome Quick LIVE preparation or entry path;
 - Homepage remains adaptive briefing followed by Popup 3 / Ready Room and LIVE;
 - Normal GEORGE preserves the parent GEORGE session through its canonical preparation/LIVE handoff;
 - Full Normal GEORGE route migration remains pending while the validated parent linkage is adopted;
@@ -1513,6 +1513,8 @@ After the user answers or skips, GEORGE reassesses.
 
 Skip is information about the interaction. It is not an instruction to ask another question automatically.
 
+Validated Normal and Homepage preparation may enter the same Operational Preparation Judgment ingress. Source and session provenance remain distinct: Homepage preparation retains its Preparation Session identity without acquiring a Normal-session identity, while existing Normal validation and behavior remain unchanged. Homepage UI invocation remains a later patch.
+
 ### Preparation answers remain part of the work
 
 An answer supplied during Normal LIVE preparation remains visible conversation evidence and remains attached to the evidence need that produced the question.
@@ -1707,3 +1709,141 @@ Analysis, explanation, research, planning, advice, writing, and reflection remai
 Preparation and collaborative execution do not imply permission for autonomous external action.
 
 The user's expressed permission remains the boundary for execution on the user's behalf.
+
+--------------------------------------------------
+LH-3A2 — AUTHORIZED HOMEPAGE QUESTION TRANSPORT
+--------------------------------------------------
+
+Homepage preparation now preserves the user’s exact answer or Current
+Understanding revision before submitting the same canonical Homepage
+Preparation Session to the shared Operational Preparation Judgment ingress.
+
+Operational Judgment remains the sole authority that determines whether another
+material signal should be acquired. When acquisition is authorized, the exact
+requested signal and authorization provenance are passed unchanged to the
+signal-question formulation owner. Homepage requests without that authorization
+cannot enter independent evidence selection.
+
+The absence of an authorized question does not establish LIVE readiness.
+ENTER LIVE remains inactive until the later canonical minimum-viable-support
+judgment is implemented. Normal preparation behavior, shared runtime ownership,
+and Patch 4 preparation-evidence transport remain unchanged.
+
+--------------------------------------------------
+LH-3A3d1 — PREPARATION-TURN OPERATING CONTRACT
+--------------------------------------------------
+
+Every validated user turn on the preparation surface is classified by canonical
+Operational Judgment as `live_briefing`, `preparation`, or
+`clarification_required` before it can influence LIVE preparation or execution.
+The provider proposes; Operational Judgment accepts or rejects.
+
+A `live_briefing` turn may enter the existing semantic evidence and readiness
+assessment, but classification alone does not make every sentence accepted
+evidence or answer the pending question. A `preparation` turn receives a GEORGE
+response while remaining excluded from accepted preparation state and future
+LIVE behavior. `clarification_required` is an immediate hard gate that preserves
+the existing pending question and prior assessments and asks: “Should I use that
+to shape your LIVE briefing, or are we discussing preparation?”
+
+Valid explicit user selection is authoritative. Inferred classification records
+whether GEORGE retained or switched the current mode and may provide a concise
+acknowledgment only when the inferred mode changes. This contract makes no
+privacy, deletion, non-storage, or “off the record” representation.
+
+This milestone is runtime-contract preparation for the later homepage control;
+it does not redesign that UI or remove the current `ask_george` branch.
+
+--------------------------------------------------
+LH-3A3d2a — PREPARATION RESPONSE BEHAVIOR
+--------------------------------------------------
+
+After Operational Judgment accepts a turn as Preparation, GEORGE responds
+conversationally to that submission. The provider realizes the response only
+after canonical authorization and may use relevant established conversation
+context, but the turn remains excluded from LIVE evidence and preparation-state
+change.
+
+The pending operational question remains unresolved. Clarification-required
+turns continue to show the exact canonical clarification without substantive
+provider execution. LIVE-briefing turns continue through canonical assessment.
+This boundary does not yet change the homepage controls or remove any legacy
+`ask_george` path.
+
+--------------------------------------------------
+LH-3A3d2b — HOMEPAGE CONVERSATIONAL BEHAVIOR
+--------------------------------------------------
+
+The homepage preparation surface now uses one composer and the visible control
+`LIVE briefing | Preparation`, with LIVE briefing as the initial mode. The
+control reflects the last accepted canonical use. User selection applies
+explicitly to one turn; later turns return to inference.
+
+GEORGE responds to accepted Preparation turns with the authorized Operational
+Judgment result message while preserving the evidence record and pending
+question. An ambiguous turn immediately replaces the displayed question with
+the canonical clarification and remains uncommitted until an option is chosen;
+that choice automatically resubmits the original text. Failed submissions keep
+the user's exact text available for retry. Current Understanding continues to
+derive only from accepted evidence.
+
+--------------------------------------------------
+LH-3A3e — COMMUNICATION ADAPTATION BEHAVIOR
+--------------------------------------------------
+
+User correction is interpreted by meaning and governed by scope. Editing words
+does not silently edit facts, objectives, substantive positions, or durable
+style. Changing a material time, number, person, commitment, or boundary
+updates the factual record without becoming a tone preference. Explicit
+instructions such as “make this line softer,” “be firmer,” or “use shorter
+cues” take effect within the accepted scope.
+
+Evidence strength is ordered:
+
+```text
+explicit user direction within its stated scope
+→ repeated independent current-session behavior
+→ isolated edit or runtime inference, limited to line/turn
+```
+
+Contradictory evidence weakens the current-session tendency. Pressure, fatigue,
+haste, audio/receiver constraints, and one rewritten sentence are temporary
+conditions, not permanent identity. Repeated qualified evidence may produce a
+durable candidate, but only authorized continuity/profile systems may persist
+it.
+
+When ambiguity can materially change outcome, facts, support configuration, or
+future behavior and no safe bounded interpretation exists, GEORGE asks one
+concise clarification. It does not ask merely to promote a harmless line- or
+turn-scoped adjustment.
+
+Confirmed speaking style shapes realization in LIVE. Adaptive stays responsive;
+Executive means structured and measured rather than aggressive;
+Conversational means natural and direct rather than casual at the expense of
+the objective. These preferences never override current explicit direction,
+objective requirements, room evidence, safety, agency, or receiver limits.
+
+Role, authority, relationship, and room dynamics may shape current etiquette
+only when evidence is sufficiently supported. Respect does not require
+submission, and authority does not require aggression. No role observation
+creates a permanent personality or tone.
+
+--------------------------------------------------
+LH-3A3k2 — CLEAR OUTCOME AND GOVERNING QUESTION BEHAVIOR
+--------------------------------------------------
+
+GEORGE accepts a clear natural-language preferred outcome without requiring the
+user to restate it as an interaction-specific objective or name a conversation
+type GEORGE can responsibly infer. Confirmed outcome evidence and reasonable
+contextual inference remain visibly and operationally distinct; an inferred
+interaction, stage, person, deadline, objection, commitment, or minimum result
+never becomes a confirmed fact.
+
+Every preparation reassessment considers the complete record as though only one
+more question may be available before LIVE. GEORGE does not repeat answered or
+reliably implied questions, does not ask the user to design its strategy, and
+does not run a scenario questionnaire. When another user-owned fact is truly
+needed, GEORGE selects exactly one highest-value unresolved fact and explains in
+plain language why it matters to the preferred outcome. When GEORGE can already
+provide realistic LIVE support, additional detail that would merely sharpen the
+help does not prevent readiness.

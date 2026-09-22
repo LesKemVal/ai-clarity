@@ -10,13 +10,37 @@ type MomentMarkerProps = {
   assessment: MomentAssessment;
 };
 
-const markerGlyph: Record<MomentMarkerKind, string> = {
-  momentum: "🔥",
-  alignment: "🎯",
-  movement: "🏃",
-  interaction: "🙌",
-  outcome: "🏁",
-  deft_excellence: "BX",
+const markerPresentation: Record<
+  MomentMarkerKind,
+  {
+    glyph: string;
+    label: string;
+  }
+> = {
+  momentum: {
+    glyph: "🔥",
+    label: "Momentum",
+  },
+  alignment: {
+    glyph: "🎯",
+    label: "Alignment",
+  },
+  movement: {
+    glyph: "🏃",
+    label: "Movement",
+  },
+  interaction: {
+    glyph: "🙌",
+    label: "Interaction",
+  },
+  outcome: {
+    glyph: "🏁",
+    label: "Outcome",
+  },
+  deft_excellence: {
+    glyph: "BX",
+    label: "Deft execution",
+  },
 };
 
 export default function MomentMarker({
@@ -26,121 +50,122 @@ export default function MomentMarker({
   const [activePulse, setActivePulse] = useState(true);
   const hostRef = useRef<HTMLDivElement | null>(null);
 
+  const presentation = markerPresentation[assessment.marker];
+
   useEffect(() => {
-    const host = hostRef.current;
+    if (!activePulse) return;
 
-    if (!host || typeof IntersectionObserver === "undefined") {
-      return;
-    }
+    const timer = window.setTimeout(() => {
+      setActivePulse(false);
+    }, 3200);
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry && entry.intersectionRatio === 0) {
-          setActivePulse(false);
-        }
-      },
-      { threshold: [0, 0.1] },
-    );
+    return () => window.clearTimeout(timer);
+  }, [activePulse]);
 
-    observer.observe(host);
-
-    return () => observer.disconnect();
-  }, []);
-
-  const handleOpen = () => {
+  const toggleOpen = () => {
     setActivePulse(false);
-    setOpen(true);
+    setOpen((current) => !current);
   };
 
   return (
-    <div ref={hostRef} className="relative">
+    <div ref={hostRef} className="mb-3 max-w-[42rem]">
       <button
         type="button"
-        onClick={handleOpen}
-        aria-label="Open GEORGE moment assessment"
+        onClick={toggleOpen}
+        aria-label={`${open ? "Close" : "Open"} GEORGE moment assessment`}
         aria-expanded={open}
-        className={`absolute -right-1 -top-3 z-20 flex h-6 min-w-6 items-center justify-center rounded-full border border-white/[0.08] bg-[#080A0D]/94 px-1.5 text-[10px] font-semibold leading-none text-white/82 shadow-[0_6px_22px_rgba(0,0,0,0.34)] transition hover:border-white/[0.16] hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/35 ${
-          activePulse && !open ? "george-moment-marker-pulse" : ""
+        className={`group flex max-w-full items-center gap-2 text-left transition ${
+          activePulse ? "george-moment-marker-pulse" : ""
         }`}
       >
-        {markerGlyph[assessment.marker]}
+        <span
+          aria-hidden="true"
+          className={`shrink-0 leading-none ${
+            assessment.marker === "deft_excellence"
+              ? "font-mono text-[10px] font-bold tracking-[0.08em] text-white/78"
+              : "text-[15px]"
+          }`}
+        >
+          {presentation.glyph}
+        </span>
+
+        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.19em] text-white/34 transition group-hover:text-white/54">
+          Moment
+        </span>
+
+        <span
+          aria-hidden="true"
+          className="h-px w-3 shrink-0 bg-white/14"
+        />
+
+        <span className="truncate font-mono text-[9px] font-semibold uppercase tracking-[0.17em] text-white/52 transition group-hover:text-white/72">
+          {presentation.label}
+        </span>
+
+        <span
+          aria-hidden="true"
+          className={`ml-0.5 shrink-0 font-mono text-[10px] text-white/24 transition duration-200 group-hover:text-white/48 ${
+            open ? "rotate-90" : ""
+          }`}
+        >
+          →
+        </span>
       </button>
 
       {open ? (
-        <div className="fixed inset-0 z-[180] flex items-center justify-center bg-black/48 px-4 backdrop-blur-[6px]">
-          <button
-            type="button"
-            aria-label="Close GEORGE moment assessment"
-            onClick={() => setOpen(false)}
-            className="absolute inset-0 cursor-default"
-          />
+        <section
+          aria-label="GEORGE moment assessment"
+          className="mt-3 border-l border-white/[0.08] pl-3 sm:pl-4"
+        >
+          <p className="max-w-[40rem] text-[13px] leading-6 text-white/68">
+            {assessment.observed}
+          </p>
 
-          <section
-            role="dialog"
-            aria-modal="true"
-            aria-label="GEORGE moment assessment"
-            className="relative z-10 w-full max-w-[430px] rounded-[1.15rem] border border-white/[0.08] bg-[#07090D]/96 p-5 shadow-[0_28px_90px_rgba(0,0,0,0.58)]"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <div className="text-[9px] font-semibold uppercase tracking-[0.28em] text-white/30">
-                  GEORGE · MOMENT
-                </div>
-
-                <div className="mt-3 text-[17px] leading-7 text-white/88">
-                  {assessment.observed}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                aria-label="Close"
-                className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/[0.06] text-[18px] text-white/38 transition hover:border-white/[0.12] hover:text-white/72"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="mt-5 border-t border-white/[0.06] pt-4">
-              <div className="text-[9px] font-semibold uppercase tracking-[0.24em] text-white/28">
+          {assessment.evidence.length > 0 ? (
+            <div className="mt-3">
+              <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.2em] text-white/24">
                 Evidence
               </div>
 
-              <div className="mt-2 space-y-2">
+              <div className="mt-1.5 space-y-1">
                 {assessment.evidence.map((item, index) => (
                   <div
                     key={`${item}-${index}`}
-                    className="flex gap-2 text-[13px] leading-6 text-white/58"
+                    className="flex max-w-[40rem] gap-2 text-[12px] leading-5 text-white/44"
                   >
-                    <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-white/32" />
+                    <span
+                      aria-hidden="true"
+                      className="mt-[8px] h-px w-2 shrink-0 bg-white/18"
+                    />
                     <span>{item}</span>
                   </div>
                 ))}
               </div>
             </div>
+          ) : null}
 
-            <div className="mt-5 border-t border-white/[0.06] pt-4">
-              <div className="text-[9px] font-semibold uppercase tracking-[0.24em] text-white/28">
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 sm:gap-5">
+            <div>
+              <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.2em] text-white/24">
                 Why it matters
               </div>
 
-              <p className="mt-2 text-[13px] leading-6 text-white/62">
+              <p className="mt-1 text-[12px] leading-5 text-white/48">
                 {assessment.whyItMatters}
               </p>
             </div>
 
-            <div className="mt-5 rounded-[0.85rem] border border-white/[0.06] bg-white/[0.025] p-3.5">
-              <div className="text-[9px] font-semibold uppercase tracking-[0.24em] text-white/28">
+            <div>
+              <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.2em] text-white/24">
                 Focus
               </div>
 
-              <p className="mt-2 text-[13px] leading-6 text-white/72">
+              <p className="mt-1 text-[12px] leading-5 text-white/62">
                 {assessment.focus}
               </p>
             </div>
-          </section>
-        </div>
+          </div>
+        </section>
       ) : null}
     </div>
   );

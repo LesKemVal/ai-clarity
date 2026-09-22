@@ -4,7 +4,7 @@
 
 This document is the architectural authority for the current GEORGE implementation.
 
-`GEORGE_DOCUMENTATION_SYNC: 2026-08-15-formula-script-refinement`
+`GEORGE_DOCUMENTATION_SYNC: 2026-09-17-lh3a3e-governed-communication`
 
 `IMPLEMENTATION_AUTHORITY: Implementation is authoritative; these documents are authoritative only while synchronized with the validated local implementation.`
 
@@ -116,7 +116,7 @@ Readiness, missing evidence, confidence, and recommended next step are derived s
 Current route status:
 
 - Traditional is migrated and seeds the shared session while preserving questions → Popup 1 → Popup 2 → Popup 3 → LIVE;
-- Quick LIVE is migrated and seeds the shared session while preserving its narrow outcome-first gate and direct entry;
+- Quick LIVE is retired. Its dedicated setup, preparation, transport, UI, localStorage handoff, and receiver behavior have been removed from production and must not be restored as an active route;
 - Homepage is migrated and preserves stable session identity through briefing, handoff, Continue Briefing, Popup 3 / Ready Room, Library or Marketplace return, and LIVE entry;
 - Normal GEORGE is pending migration and continues to use its legacy handoff;
 - Resume is pending meaningful eligibility and must eventually restore a valid Preparation Session rather than a popup or mere storage key;
@@ -1654,7 +1654,7 @@ Canonical ownership:
 Homepage-origin preparation must not fall through to:
 
 ```text
-Quick LIVE picker
+retired Quick LIVE path
 Traditional briefing
 Popup 1
 Mechanics
@@ -2012,6 +2012,8 @@ Duplicate or unauthorized evidence requests are rejected.
 
 Answer and skip both return to judgment-first reassessment.
 
+Operational Preparation Judgment ingress is source-neutral for validated Normal and Homepage Preparation Sessions. Each request retains its actual entry source and source-appropriate session identity, then uses the same semantic-proposal and Operational Judgment sequence; Homepage preparation is not relabeled as Normal and does not receive a manufactured Normal-session relationship. This ingress boundary does not yet connect the Homepage surface to judgment.
+
 ### Fresh Normal session boundary
 
 `createFreshNormalSession()` is the canonical Fresh Normal creation boundary.
@@ -2190,3 +2192,210 @@ Presentation decomposition for launch must preserve ownership. Large hosts may b
 Branding, BX assets, premium controls, route-specific visual systems, icons, animation, typography, and other product presentation should become independently maintainable where useful, but presentation modules remain downstream of semantic/runtime authority.
 
 Codex launch work must preserve the established runtime and use existing production, portability, ownership, resilience, and interface qualifications as regression guards.
+
+--------------------------------------------------
+LH-3A2 — AUTHORIZED HOMEPAGE QUESTION TRANSPORT
+--------------------------------------------------
+
+Homepage preparation now preserves the user’s exact answer or Current
+Understanding revision before submitting the same canonical Homepage
+Preparation Session to the shared Operational Preparation Judgment ingress.
+
+Operational Judgment remains the sole authority that determines whether another
+material signal should be acquired. When acquisition is authorized, the exact
+requested signal and authorization provenance are passed unchanged to the
+signal-question formulation owner. Homepage requests without that authorization
+cannot enter independent evidence selection.
+
+The absence of an authorized question does not establish LIVE readiness.
+ENTER LIVE remains inactive until the later canonical minimum-viable-support
+judgment is implemented. Normal preparation behavior, shared runtime ownership,
+and Patch 4 preparation-evidence transport remain unchanged.
+
+--------------------------------------------------
+LH-3A3d1 — PREPARATION-TURN CLASSIFICATION AUTHORITY
+--------------------------------------------------
+
+Preparation-turn classification is a canonical Operational Judgment concern.
+The Normal provider may propose semantic classification through the shared
+provider-reasoning path, but the proposal is non-authoritative. Operational
+Judgment validates and accepts or rejects it before any preparation evidence,
+readiness, outcome-potential, signal-acquisition, strategy, Formula, mechanics,
+story, or LIVE behavior may change.
+
+`/api/chat` transports the user's optional explicit intent and returns the
+accepted classification inside the existing runtime Operational Judgment
+response. It does not create an independent classifier endpoint or response
+authority. A valid explicit selection is authoritative. Inferred results expose
+whether the mode was retained, switched, or requires clarification. Invalid or
+contradictory proposals fail closed to `clarification_required` and preserve the
+unresolved pending question and prior accepted preparation state.
+
+The signal-question route remains only the wording owner for an already
+authorized evidence need. The homepage remains a downstream consumer and is not
+converted by this milestone; its `ask_george` branch remains in place for the
+following consumer/UI patch.
+
+--------------------------------------------------
+LH-3A3d2a — PREPARATION CONVERSATIONAL REALIZATION BOUNDARY
+--------------------------------------------------
+
+Operational Judgment remains the sole authorization owner after preparation-turn
+classification. Its typed realization authorization selects exactly one of:
+
+- provider realization of the current Preparation turn;
+- direct canonical clarification;
+- continued LIVE-briefing assessment.
+
+The Normal provider realizes an accepted Preparation response from the current
+turn and relevant conversation context without reopening classification or
+Operational Judgment. `/api/chat` invokes that realization only after acceptance
+and returns it through the existing Operational Judgment result message.
+Clarification bypasses substantive provider execution. Runtime pipeline,
+signal-question, preparation-session, and homepage ownership remain unchanged.
+
+--------------------------------------------------
+LH-3A3d2b — HOMEPAGE CONSUMER BOUNDARY
+--------------------------------------------------
+
+`HomeConversationTypeSurface` owns only homepage presentation and transient
+consumer state. It sends the current accepted classification and either a
+one-turn explicit selection or null through `/api/chat`, then renders only the
+classification, transition acknowledgment, and message authorized by
+Operational Judgment.
+
+The original pending operational question remains in the Preparation Session.
+Preparation and clarification do not consume it. Ambiguous text is held only in
+homepage state and is automatically resubmitted after explicit clarification;
+it cannot enter evidence first. Canonically accepted LIVE-briefing evidence is
+the sole input from this composer that may update preparation state. The
+signal-question `ask_george` branch remains reachable from Traditional/LIVE
+Entry and retains wording-only ownership.
+
+--------------------------------------------------
+LH-3A3e — COMMUNICATION-CHANGE AUTHORITY FLOW
+--------------------------------------------------
+
+The canonical direction of travel is:
+
+```text
+existing provider semantic proposal
+  (non-authoritative communication-change interpretation)
+→ Operational Judgment
+  (sole acceptance, clarification, and scope authority)
+→ Execution Policy
+  (realizes only accepted effects for the operating mode)
+→ LIVE governance when LIVE
+  (timing, silence, support, room constraints)
+→ Receiver Policy
+  (audio/visual shaping only)
+→ presentation
+  (display/playback only)
+```
+
+The provider proposal contract includes change kind, requested scope, signal
+source, confidence, evidence, clarification requirement, and proposed effects
+on objective, facts, support configuration, and realization. Operational
+Judgment may reject or narrow the proposal. No downstream consumer may broaden
+it, and no part of this flow authorizes durable persistence.
+
+Scope order is bounded rather than promotional: `line` and `turn` are immediate
+realization scopes; `live_room` and `preparation_session` require explicit or
+repeated qualified evidence; `durable_candidate` is evidence for an authorized
+continuity/profile owner, never stored preference. A safe line/turn
+interpretation avoids unnecessary clarification. Material ambiguity affecting
+meaning or future behavior requires one concise clarification.
+
+Adaptive User Profile remains a deterministic current-session projection. The
+chat route supplies at most the recent eight user turns already present in the
+request; the profile applies recency, independent-signal qualification, and
+contradiction. It does not create a second memory system. Durable Behavioral
+Memory consumes the projection only as candidate evidence.
+
+Confirmed speaking style travels from canonical Preparation Session support
+configuration through `LivePrepSetup` into `buildLiveRuntimeContext()`, which is
+consumed by the shared `/api/chat` reasoning path. `adaptive`, `executive`, and
+`conversational` are realization preferences, not personas. Explicit current
+direction, objective requirements, room evidence, safety, agency, and receiver
+constraints outrank them.
+
+Role evidence may affect momentary etiquette only after repeated weighted
+support. The active orchestrator reads `transcriptBuffer`, but inspection found
+no production insertion caller for that buffer. The threshold is implemented;
+the missing ingestion connection is an explicit dependency and was not
+replaced in this milestone.
+
+--------------------------------------------------
+EXPRESSION MILESTONE 2 — PRODUCTION AUTHORITY FLOW
+--------------------------------------------------
+
+Expression Milestone 1 established `ProviderSpeechCompositionProposal` and
+the canonical `resolveSpeechCompositionJudgment()` acceptance boundary. That
+boundary was reachable through qualification, but it was disconnected from the
+production provider → route → runtime pipeline → Operational Judgment path.
+It therefore proved policy without granting production realization authority.
+
+Milestone 2 connects that existing boundary without adding another parser,
+acceptance function, runtime, or wording owner:
+
+```text
+Normal provider semantic proposal
+  (nullable, normalized, non-authoritative P/N/V/M/S/R/F/I evidence)
+→ /api/chat transport
+→ runtime pipeline transport
+→ Operational Judgment
+  (sole acceptance, rejection, clarification, and scope-narrowing owner)
+→ accepted bounded speech-composition judgment or null
+→ existing governed Normal provider execution
+→ user-facing wording
+```
+
+The semantic pass remains reasoning-only. Its result type has no user-facing
+text, and the response-producing provider contract cannot propose speech
+composition in the same pass. Only an accepted Operational Judgment object is
+included in execution authority. Rejected and clarification-required proposals
+are retained only as judgment state and are excluded from realization.
+
+All eight expression dimensions—perspective, noun selection, verb
+construction, modifier density, syntax, rhythm, figurative language, and
+implication—remain subordinate to protected objective, facts, commitments, and
+boundaries. Runtime inference and isolated edits are bounded to line/turn
+scope. `durable_candidate` remains non-persistent evidence;
+`durablePersistenceAuthorized` is always false and no storage path is added.
+
+--------------------------------------------------
+LH-3A3k2 — OUTCOME INTELLIGENCE
+--------------------------------------------------
+
+The Normal provider remains the model-owned semantic proposal boundary for
+desired-outcome sufficiency and adaptive candidate discovery. A clear
+natural-language preferred outcome is usable preparation evidence even when it
+does not restate a conversation-specific sub-result. A likely interaction may
+be inferred from the complete record, but that inference remains explicitly
+separate from confirmed user evidence.
+
+After every answer, provider reasoning reassesses the complete conversation and
+Preparation Session, excludes facts already stated or reliably implied, and
+ranks unresolved user-owned facts by expected contribution to the preferred
+outcome. It proposes at most one evidence need and explains what the answer
+would materially change. Operational Judgment remains the sole authorization
+owner. The authorized signal-question runtime remains wording-only and may not
+reopen sufficiency or select a different need.
+
+Canonical Homepage consumer path:
+
+```text
+/george/live-home
+→ HomeConversationTypeSurface
+→ /api/chat
+→ Normal provider semantic proposal
+→ Operational Judgment
+→ authorized signal-question wording when authorized
+→ HomeConversationTypeSurface
+```
+
+The fixed direct-outcome wording remains reachable only after Operational
+Judgment authorizes genuinely missing outcome evidence. It is not a duplicate
+sufficiency or next-question owner and must not be reached when a clear outcome
+already exists. No scenario questionnaire or scenario-specific sequence was
+introduced.

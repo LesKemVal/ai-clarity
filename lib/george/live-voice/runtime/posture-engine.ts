@@ -13,6 +13,8 @@ export type PostureInput = {
   confidence?: number
   emotionalVelocity?: 'stable' | 'rising' | 'spiking'
   dominantRole?: string | null
+  dominantRoleScore?: number
+  dominantRoleEvidenceCount?: number
 }
 
 export type PostureDecision = {
@@ -25,16 +27,21 @@ class GeorgePostureEngine {
   decide(input: PostureInput): PostureDecision {
     const interruptionRisk = input.interruptionRisk ?? 0
     const confidence = input.confidence ?? 0.5
+    const roleEvidenceSupported = Boolean(
+      input.dominantRole &&
+      (input.dominantRoleScore || 0) >= 1 &&
+      (input.dominantRoleEvidenceCount || 0) >= 2
+    )
 
-    if (input.dominantRole === 'authority') {
+    if (roleEvidenceSupported && input.dominantRole === 'authority') {
       return {
         posture: 'deferential',
-        cuePrefix: 'Respectfully.',
-        reason: 'Authority speaker is dominating the room.',
+        cuePrefix: 'Respect the role. Keep your position.',
+        reason: 'Repeated role evidence supports authority-aware etiquette for this room moment; it does not define a permanent tone.',
       }
     }
 
-    if (input.dominantRole === 'skeptic') {
+    if (roleEvidenceSupported && input.dominantRole === 'skeptic') {
       return {
         posture: 'directing',
         cuePrefix: 'Answer with proof.',
@@ -42,7 +49,7 @@ class GeorgePostureEngine {
       }
     }
 
-    if (input.dominantRole === 'gatekeeper') {
+    if (roleEvidenceSupported && input.dominantRole === 'gatekeeper') {
       return {
         posture: 'calming',
         cuePrefix: 'Reduce friction.',
@@ -50,7 +57,7 @@ class GeorgePostureEngine {
       }
     }
 
-    if (input.dominantRole === 'ally') {
+    if (roleEvidenceSupported && input.dominantRole === 'ally') {
       return {
         posture: 'directing',
         cuePrefix: 'Use the opening.',

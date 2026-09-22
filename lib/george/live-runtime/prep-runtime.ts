@@ -1,5 +1,6 @@
 import type { LegacyLiveAssistMode, LiveSupportStyle } from './support-style'
 import type { OperationalScript } from '../operational-memory/types'
+import type { PreparationRuntimeEvidenceProjection } from './live-preparation-controller'
 
 export type LiveAssistMode = LegacyLiveAssistMode
 
@@ -37,6 +38,7 @@ export type LivePurview = {
 }
 
 export type LiveRuntimeSupport = {
+  preparationEvidence?: PreparationRuntimeEvidenceProjection
   room?: string
   objective?: string
   chair?: string
@@ -81,6 +83,8 @@ export type LivePrepSetup = {
   toneAdjustment?: 'softer' | 'balanced' | 'sharper'
   supportDensity?: 'minimal' | 'balanced' | 'supportive'
   supportStyle?: LiveSupportStyle
+  communicationStyle?: LiveCommunicationBaseline | string
+  communicationStyleConfirmed?: boolean
   /** Legacy compatibility. Prefer supportStyle. */
   liveAssistMode?: LiveAssistMode
   purview?: LivePurview | null

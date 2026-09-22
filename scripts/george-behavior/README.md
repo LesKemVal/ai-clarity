@@ -180,7 +180,7 @@ Upcoming implementation should add or extend scenarios for:
 - Conversation Summary Runtime
 - Relevant Documentation reuse through Conversation Packages
 - Resumable Conversation Readiness
-- Quick LIVE sufficiency
+- LIVE entry sufficiency
 - Cartesia voice stack expectations
 - end-to-end latency instrumentation
 - communication-pattern learning

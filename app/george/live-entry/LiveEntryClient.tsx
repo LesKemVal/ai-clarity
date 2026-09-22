@@ -71,6 +71,7 @@ import {
   createPreparationSession,
   normalizePreparationInteractions,
   normalizePreparationSession,
+  projectPreparationSessionForLiveRuntime,
   resolveLivePreparationState,
   resolvePreparationSession,
   type PreparationCheckpoint,
@@ -126,83 +127,6 @@ type HomepageBriefingHandoff = HomepageLiveHandoff & {
 };
 
 type LiveMechanicsSection = "support" | "receiver" | "speaking";
-type QuickLiveSupportStyle = "advice" | "response";
-type QuickLiveCommunicationMedium =
-  | ""
-  | "phone"
-  | "video"
-  | "in_person"
-  | "written"
-  | "other";
-type QuickLiveSpeakingStyle = "Adaptive" | "Executive" | "Conversational";
-
-const QUICK_LIVE_PLACEHOLDER_OUTCOMES = new Set([
-  "in progress",
-  "outcome not set",
-  "outcome pending",
-  "the desired outcome",
-]);
-
-function isValidQuickLiveDesiredOutcome(value: unknown) {
-  const outcome = String(value || "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, " ")
-    .replace(/[.!?]+$/g, "");
-
-  return Boolean(outcome) && !QUICK_LIVE_PLACEHOLDER_OUTCOMES.has(outcome);
-}
-
-function resolveQuickLiveRecommendation(input: {
-  desiredOutcome: string;
-  context: string;
-  audience: string;
-  communicationMedium: QuickLiveCommunicationMedium;
-  receiverEvidence: LiveReceiverProfilePanelId | "";
-}) {
-  const operationalSignal = [
-    input.desiredOutcome,
-    input.context,
-    input.audience,
-    input.communicationMedium,
-  ]
-    .map((value) => String(value || "").trim())
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
-
-  const responseExecutionSignal =
-    /answer|appointment|book|close|closing|objection|pitch|present|proposal|respond|response|sales|schedule|script|interview|negotiat|terms/.test(
-      operationalSignal,
-    );
-  const supportStyle: QuickLiveSupportStyle = responseExecutionSignal
-    ? "response"
-    : "advice";
-
-  const receiverProfile: LiveReceiverProfilePanelId =
-    input.receiverEvidence || "visual_only";
-
-  const executiveSignal =
-    /board|business|buyer|commercial|decision.?maker|executive|founder|investor|leadership|manager|negotiat|professional|prospect|sales|stakeholder|vendor/.test(
-      operationalSignal,
-    );
-  const conversationalSignal =
-    /care|coach|customer service|family|friend|partner|patient|relationship|support|personal/.test(
-      operationalSignal,
-    );
-  const speakingStyle: QuickLiveSpeakingStyle = executiveSignal
-    ? "Executive"
-    : conversationalSignal
-      ? "Conversational"
-      : "Adaptive";
-
-  return {
-    supportStyle,
-    receiverProfile,
-    speakingStyle,
-  };
-}
-
 function resolveHomepageSupportRecommendation(
   signals: Record<string, unknown>,
   room: string,
@@ -697,10 +621,6 @@ export default function LiveEntryClient() {
     preparationSessionId: string;
     createdAt: number;
   } | null>(null);
-  const quickLivePreparationIdentityRef = useRef<{
-    preparationSessionId: string;
-    createdAt: number;
-  } | null>(null);
   const homepagePreparationSeedRef = useRef<PreparationSessionV1 | null>(null);
   const normalPreparationSeedRef = useRef<PreparationSessionV1 | null>(null);
   const liveBriefingRoomSignalEditedRef = useRef(false);
@@ -728,6 +648,9 @@ export default function LiveEntryClient() {
     useState(false);
   const [showLiveBriefingRoom, setShowLiveBriefingRoom] = useState(false);
   const [liveBriefingStep, setLiveBriefingStep] = useState<1 | 2 | 3>(1);
+  const [verificationLiveMode, setVerificationLiveMode] = useState(false);
+  const [verificationReceiverChosen, setVerificationReceiverChosen] =
+    useState(false);
   const [livePrepOpenSection, setLivePrepOpenSection] = useState<
     "formula" | "receiver" | "support" | "brief" | "ready"
   >("support");
@@ -973,48 +896,6 @@ export default function LiveEntryClient() {
     liveBriefingCommunicationConfirmed,
     setLiveBriefingCommunicationConfirmed,
   ] = useState(false);
-  const [showQuickLiveSetup, setShowQuickLiveSetup] = useState(false);
-  const [quickLiveDesiredOutcome, setQuickLiveDesiredOutcome] = useState("");
-  const [quickLiveContext, setQuickLiveContext] = useState("");
-  const [quickLiveAudience, setQuickLiveAudience] = useState("");
-  const [quickLiveCommunicationMedium, setQuickLiveCommunicationMedium] =
-    useState<QuickLiveCommunicationMedium>("");
-  const [quickLiveReceiverEvidence, setQuickLiveReceiverEvidence] = useState<
-    LiveReceiverProfilePanelId | ""
-  >("");
-  const [quickLiveSupportOverride, setQuickLiveSupportOverride] =
-    useState<QuickLiveSupportStyle | null>(null);
-  const [quickLiveReceiverOverride, setQuickLiveReceiverOverride] =
-    useState<LiveReceiverProfilePanelId | null>(null);
-  const [quickLiveSpeakingOverride, setQuickLiveSpeakingOverride] =
-    useState<QuickLiveSpeakingStyle | null>(null);
-  const [quickLiveSupportOpen, setQuickLiveSupportOpen] = useState(false);
-  const [quickLiveReceiverOpen, setQuickLiveReceiverOpen] = useState(false);
-  const [quickLiveSpeakingOpen, setQuickLiveSpeakingOpen] = useState(false);
-  const [quickLiveValidationError, setQuickLiveValidationError] = useState("");
-  const [quickLiveSteeringOpen, setQuickLiveSteeringOpen] = useState(false);
-  const [quickLiveSteeringPhrases, setQuickLiveSteeringPhrases] = useState<
-    Record<string, string>
-  >({
-    buyTime: "Let me think for a second...",
-    clarify: "I want to make sure I understand.",
-    expand: "Walk me through that.",
-    changeDirection: "What matters now is...",
-    slowDown: "Can we slow down?",
-  });
-  const quickLiveRecommendation = resolveQuickLiveRecommendation({
-    desiredOutcome: quickLiveDesiredOutcome,
-    context: quickLiveContext,
-    audience: quickLiveAudience,
-    communicationMedium: quickLiveCommunicationMedium,
-    receiverEvidence: quickLiveReceiverEvidence,
-  });
-  const quickLiveSupportStyle =
-    quickLiveSupportOverride || quickLiveRecommendation.supportStyle;
-  const quickLiveReceiverProfile =
-    quickLiveReceiverOverride || quickLiveRecommendation.receiverProfile;
-  const quickLiveSpeakingStyle =
-    quickLiveSpeakingOverride || quickLiveRecommendation.speakingStyle;
   const [liveReadyAccepted, setLiveReadyAccepted] = useState(false);
   const [liveReadinessComplete, setLiveReadinessComplete] = useState(false);
   const [liveRoomObjectiveOption, setLiveRoomObjectiveOption] = useState<
@@ -2192,7 +2073,7 @@ export default function LiveEntryClient() {
   */
 
   const traditionalPreparationSession = useMemo(() => {
-    if (!isFreshTraditionalPreparation || showQuickLiveSetup) return null;
+    if (!isFreshTraditionalPreparation) return null;
 
     if (!traditionalPreparationIdentityRef.current) {
       const seed = createPreparationSession({
@@ -2417,7 +2298,6 @@ export default function LiveEntryClient() {
     selectedReceiverProfile,
     selectedScript,
     selectedSupportStyle,
-    showQuickLiveSetup,
     skippedOptionalSignalKeys,
     useRoomPhrases,
     userPosition,
@@ -2427,100 +2307,6 @@ export default function LiveEntryClient() {
     if (!traditionalPreparationSession) return;
     savePreparationSession(traditionalPreparationSession);
   }, [traditionalPreparationSession]);
-
-  const quickLivePreparationSession = useMemo(() => {
-    if (!showQuickLiveSetup) return null;
-
-    if (!quickLivePreparationIdentityRef.current) {
-      const seed = createPreparationSession({
-        provenance: { entrySource: "quick_live" },
-      });
-
-      quickLivePreparationIdentityRef.current = {
-        preparationSessionId: seed.preparationSessionId,
-        createdAt: seed.createdAt,
-      };
-    }
-
-    const identity = quickLivePreparationIdentityRef.current;
-
-    return createPreparationSession({
-      preparationSessionId: identity.preparationSessionId,
-      provenance: { entrySource: "quick_live" },
-      createdAt: identity.createdAt,
-      updatedAt: Date.now(),
-      knowledge: {
-        objective: quickLiveDesiredOutcome,
-        participants: quickLiveAudience ? [quickLiveAudience] : [],
-        audience: quickLiveAudience,
-        perspectives: [],
-        conversation: { title: "Quick LIVE" },
-        knownContext: quickLiveContext,
-        communicationMedium: quickLiveCommunicationMedium,
-        receiverEvidence: quickLiveReceiverEvidence || undefined,
-        additionalSignals: {},
-        documents: [],
-      },
-      briefing: {
-        priorInteractions: [],
-      },
-      support: {
-        recommendation: {
-          behavior:
-            quickLiveRecommendation.supportStyle === "response"
-              ? "response"
-              : "cue",
-          receiver: quickLiveRecommendation.receiverProfile,
-          speakingStyle: quickLiveRecommendation.speakingStyle,
-        },
-        overrides: {
-          ...(quickLiveSupportOverride
-            ? {
-                behavior:
-                  quickLiveSupportOverride === "response"
-                    ? ("response" as const)
-                    : ("cue" as const),
-              }
-            : {}),
-          ...(quickLiveReceiverOverride
-            ? { receiver: quickLiveReceiverOverride }
-            : {}),
-          ...(quickLiveSpeakingOverride
-            ? { speakingStyle: quickLiveSpeakingOverride }
-            : {}),
-        },
-        runtimePreferences: {
-          recoveryOptionIds: [],
-          steeringEnabled: true,
-          steeringPhrases: Object.values(quickLiveSteeringPhrases),
-          selectedResources: [],
-        },
-      },
-      workflow: {
-        current: { surface: "briefing", phase: "review" },
-        history: [],
-      },
-    });
-  }, [
-    quickLiveAudience,
-    quickLiveCommunicationMedium,
-    quickLiveContext,
-    quickLiveDesiredOutcome,
-    quickLiveReceiverEvidence,
-    quickLiveReceiverOverride,
-    quickLiveRecommendation.receiverProfile,
-    quickLiveRecommendation.speakingStyle,
-    quickLiveRecommendation.supportStyle,
-    quickLiveSpeakingOverride,
-    quickLiveSteeringPhrases,
-    quickLiveSupportOverride,
-    showQuickLiveSetup,
-  ]);
-
-  useEffect(() => {
-    if (!quickLivePreparationSession) return;
-    savePreparationSession(quickLivePreparationSession);
-  }, [quickLivePreparationSession]);
 
   const homepagePreparationSession = useMemo(() => {
     const seed = homepagePreparationSeedRef.current;
@@ -3211,6 +2997,11 @@ export default function LiveEntryClient() {
           ? resolvePreparationSession(normalPreparationSeed).signals
           : {};
 
+      const verificationEntry =
+        params.get("verification") === "1";
+
+      setVerificationLiveMode(verificationEntry);
+
       const entryResolution = resolveLiveEntry({
         source,
         homepageHandoff: homepagePreparationSeed
@@ -3242,13 +3033,25 @@ export default function LiveEntryClient() {
 
       setLiveEntryRoute(entryResolution.route);
 
-      if (entryResolution.firstStep === "orientation") {
-        setShowQuickLiveSetup(false);
+      if (verificationEntry && normalPreparationSeed) {
+        setShowOpenAISignalSurface(false);
+        setLiveEntryReadyMessageVisible(false);
+        setShowLiveBriefingRoom(true);
+        setLiveBriefingStep(3);
+        setLivePrepOpenSection("ready");
+        setVerificationReceiverChosen(false);
+        setReceiverProfileConfirmed(false);
+        setLiveBriefingToaAccepted(true);
+        setLiveBriefingSupportAccepted(true);
+        setLiveBriefingCommunicationConfirmed(true);
+        setLiveRecoveryAcknowledged(true);
+        setLiveReadyAccepted(true);
+        setLiveReadinessComplete(true);
+      } else if (entryResolution.firstStep === "orientation") {
         setShowLiveBriefingRoom(false);
         setShowOpenAISignalSurface(false);
         setLiveEntryReadyMessageVisible(false);
       } else if (entryResolution.firstStep === "questions") {
-        setShowQuickLiveSetup(false);
         setShowLiveBriefingRoom(false);
         setShowOpenAISignalSurface(true);
       }
@@ -4089,9 +3892,7 @@ export default function LiveEntryClient() {
     );
 
     const preparationSession =
-      showQuickLiveSetup
-        ? quickLivePreparationSession
-        : liveEntryRoute === "homepage"
+      liveEntryRoute === "homepage"
           ? homepagePreparationSession
           : liveEntryRoute === "normal"
             ? normalPreparationSession
@@ -4199,11 +4000,10 @@ export default function LiveEntryClient() {
     console.info("[GEORGE][LIVE_ENTRY][FORMULA_SELECTION_REQUESTED]");
 
     try {
-      const activePreparationSession = showQuickLiveSetup
-        ? quickLivePreparationSession
-        : homepagePreparationSession ||
-          normalPreparationSession ||
-          traditionalPreparationSession;
+      const activePreparationSession =
+        homepagePreparationSession ||
+        normalPreparationSession ||
+        traditionalPreparationSession;
       const returnUrl = new URL(window.location.href);
       returnUrl.searchParams.set("return", "live-prep");
       if (activePreparationSession?.preparationSessionId) {
@@ -4428,163 +4228,6 @@ export default function LiveEntryClient() {
     setShowLiveBriefingRoom(restoredHasOperationalSignal);
   };
 
-  const openQuickLiveSetup = () => {
-    quickLivePreparationIdentityRef.current = null;
-    clearPreparationSession();
-    setQuickLiveDesiredOutcome("");
-    setQuickLiveContext("");
-    setQuickLiveAudience("");
-    setQuickLiveCommunicationMedium("");
-    setQuickLiveReceiverEvidence("");
-    setQuickLiveSupportOverride(null);
-    setQuickLiveReceiverOverride(null);
-    setQuickLiveSpeakingOverride(null);
-    setQuickLiveSupportOpen(false);
-    setQuickLiveReceiverOpen(false);
-    setQuickLiveSpeakingOpen(false);
-    setQuickLiveValidationError("");
-    setShowQuickLiveSetup(true);
-    setQuickLiveSteeringOpen(false);
-  };
-
-  const startQuickLive = () => {
-    if (typeof window === "undefined") return;
-
-    const quickLivePreparation = quickLivePreparationSession
-      ? resolvePreparationSession(quickLivePreparationSession)
-      : null;
-    const desiredOutcome = (
-      quickLivePreparation?.session.knowledge.objective ||
-      quickLiveDesiredOutcome
-    ).trim();
-
-    if (!isValidQuickLiveDesiredOutcome(desiredOutcome)) {
-      setQuickLiveValidationError(
-        "A specific desired outcome is required for Quick LIVE.",
-      );
-      return;
-    }
-
-    setQuickLiveValidationError("");
-
-    try {
-      const sessionSupportBehavior =
-        quickLivePreparation?.supportConfiguration.behavior;
-      const resolvedQuickLiveSupportStyle: QuickLiveSupportStyle =
-        sessionSupportBehavior === "response" ? "response" : "advice";
-      const resolvedQuickLiveReceiverProfile =
-        quickLivePreparation?.supportConfiguration.receiver ||
-        quickLiveReceiverProfile;
-      const sessionSpeakingStyle =
-        quickLivePreparation?.supportConfiguration.speakingStyle;
-      const resolvedQuickLiveSpeakingStyle: QuickLiveSpeakingStyle =
-        sessionSpeakingStyle === "Executive" ||
-        sessionSpeakingStyle === "Conversational" ||
-        sessionSpeakingStyle === "Adaptive"
-          ? sessionSpeakingStyle
-          : quickLiveSpeakingStyle;
-      const runtimeSupportStyle = toRuntimeSupportStyle(
-        resolvedQuickLiveSupportStyle,
-      );
-      const supportStyle = normalizeLiveSupportStyle(runtimeSupportStyle);
-      const communicationMedium =
-        quickLivePreparation?.session.knowledge.communicationMedium ||
-        quickLiveCommunicationMedium;
-      const sessionContext =
-        quickLivePreparation?.session.knowledge.knownContext ||
-        quickLiveContext;
-      const sessionAudience =
-        quickLivePreparation?.session.knowledge.audience || quickLiveAudience;
-      const medium = communicationMedium
-        ? communicationMedium.replace("_", " ")
-        : "";
-      const currentSessionContext = [
-        sessionContext.trim(),
-        sessionAudience.trim()
-          ? `Conversation with: ${sessionAudience.trim()}`
-          : "",
-        medium ? `Communication medium: ${medium}` : "",
-      ]
-        .filter(Boolean)
-        .join("\n");
-      const quickLiveSetup = {
-        room: "Quick LIVE",
-        objective: desiredOutcome,
-        knownContext: currentSessionContext,
-        observedReality: currentSessionContext,
-        communicationStyle: resolvedQuickLiveSpeakingStyle,
-        receiverProfile: resolvedQuickLiveReceiverProfile,
-        supportStyle,
-        liveAssistMode: legacyAssistModeFromSupportStyle(supportStyle),
-        skipPrep: true,
-        runtimeSupport: {
-          room: "Quick LIVE",
-          objective: desiredOutcome,
-          knownContext: currentSessionContext,
-          briefingKnowledge: currentSessionContext,
-        },
-        createdAt: Date.now(),
-      };
-
-      if (quickLivePreparationSession) {
-        savePreparationSession(quickLivePreparationSession);
-      }
-
-      window.localStorage.removeItem("GEORGE_LAST_LIVE_SETUP");
-      window.localStorage.removeItem("george_live_runtime_support_active");
-      window.localStorage.removeItem("george_live_runtime_support");
-      window.localStorage.setItem(
-        "GEORGE_LIVE_SETUP",
-        JSON.stringify(quickLiveSetup),
-      );
-      window.localStorage.setItem(
-        "george_live_setup_active",
-        JSON.stringify(quickLiveSetup),
-      );
-
-      window.localStorage.setItem(
-        "GEORGE_LIVE_SUPPORT_STYLE",
-        runtimeSupportStyle,
-      );
-      window.localStorage.setItem(
-        "GEORGE_LIVE_DELIVERY_STYLE",
-        runtimeSupportStyle,
-      );
-      window.localStorage.setItem(
-        "george_live_entry_support_preference",
-        resolvedQuickLiveSupportStyle,
-      );
-      window.localStorage.setItem(
-        "george_live_entry_support_default",
-        resolvedQuickLiveSupportStyle,
-      );
-      window.localStorage.setItem(
-        "GEORGE_LIVE_RECEIVER_PROFILE",
-        resolvedQuickLiveReceiverProfile,
-      );
-      window.localStorage.setItem(
-        "george_live_entry_receiver_profile",
-        resolvedQuickLiveReceiverProfile,
-      );
-      window.localStorage.setItem(
-        "george_live_communication_style",
-        resolvedQuickLiveSpeakingStyle,
-      );
-      window.localStorage.setItem("george_start_new_live", "1");
-      window.localStorage.setItem("george_quick_live_entry", "1");
-      window.localStorage.setItem(
-        "george_quick_live_message",
-        "I'll become sharper as the interaction unfolds.",
-      );
-      window.localStorage.setItem(
-        "GEORGE_LIVE_STEERING_PHRASES",
-        JSON.stringify(quickLiveSteeringPhrases),
-      );
-    } catch {}
-
-    window.location.href = "/george/live?ready=1";
-  };
-
   const startLive = (
     skipPrep = false,
     resources = editableResources,
@@ -4620,14 +4263,16 @@ export default function LiveEntryClient() {
         )
       : supportStyle;
     const entryReceiverProfile =
-      resolvedCanonicalPreparation?.supportConfiguration.receiver ||
-      (resolvedNormalPreparation
+      verificationLiveMode
         ? selectedReceiverProfile
-        : window.localStorage.getItem("GEORGE_LIVE_RECEIVER_PROFILE") ||
-          window.localStorage.getItem(
-            "george_live_entry_receiver_profile",
-          ) ||
-          "audio_only");
+        : resolvedCanonicalPreparation?.supportConfiguration.receiver ||
+          (resolvedNormalPreparation
+            ? selectedReceiverProfile
+            : window.localStorage.getItem("GEORGE_LIVE_RECEIVER_PROFILE") ||
+              window.localStorage.getItem(
+                "george_live_entry_receiver_profile",
+              ) ||
+              "audio_only");
     const entryCommunicationStyle =
       resolvedCanonicalPreparation?.supportConfiguration.speakingStyle ||
       communicationStyle;
@@ -4654,7 +4299,7 @@ export default function LiveEntryClient() {
       selected: normalizeLiveRecoverySelection(liveRecoveryOptions),
     };
 
-    if (!hasRequiredLiveSignal) {
+    if (!hasRequiredLiveSignal && !verificationLiveMode) {
       const missing = missingMandatoryLiveSignals
         .map((signal) => signal.label)
         .join(", ");
@@ -4775,7 +4420,18 @@ export default function LiveEntryClient() {
 
     const secondaryObjective = secondaryOutcome;
 
+    const selectedPreparationSession =
+      liveEntryRoute === "homepage"
+        ? homepagePreparationSession
+        : liveEntryRoute === "normal"
+          ? normalPreparationSession
+          : traditionalPreparationSession;
+    const preparationEvidence = selectedPreparationSession
+      ? projectPreparationSessionForLiveRuntime(selectedPreparationSession)
+      : null;
+
     const runtimeSupport = {
+      ...(preparationEvidence ? { preparationEvidence } : {}),
       selectedCapacityCents: finalEstimate.estimatedCents,
       selectedCapabilityIds,
       selectedCapabilities: finalResources,
@@ -4853,6 +4509,10 @@ export default function LiveEntryClient() {
       useRoomPhrases,
       customRoomPhrases,
       communicationStyle: entryCommunicationStyle,
+      communicationStyleConfirmed:
+        resolvedCanonicalPreparation?.session.support.confirmations
+          .speakingStyleConfirmed === true ||
+        liveBriefingCommunicationConfirmed,
       liveAssistMode: entryLiveAssistMode,
       skipPrep,
       runtimeSupport,
@@ -6671,6 +6331,147 @@ export default function LiveEntryClient() {
       );
     }
 
+    if (verificationLiveMode && liveBriefingStep === 3) {
+      const verificationTarget = String(
+        preLiveSignals.verificationTarget ||
+          "the assumption we are relying on",
+      ).trim();
+
+      const verificationInteraction = String(
+        preLiveSignals.verificationInteraction ||
+          preLiveSignals.counterparty ||
+          "the related conversation",
+      ).trim();
+
+      const verificationBenefit = String(
+        preLiveSignals.verificationBenefit ||
+          "listen for evidence that confirms or challenges what we currently believe",
+      ).trim();
+
+      const selectVerificationReceiver = (
+        receiver: "visual_only" | "audio_only",
+      ) => {
+        setSelectedReceiverProfile(receiver);
+        setReceiverProfileConfirmed(true);
+        setVerificationReceiverChosen(true);
+
+        try {
+          window.localStorage.setItem(
+            "GEORGE_LIVE_RECEIVER_PROFILE",
+            receiver,
+          );
+          window.localStorage.setItem(
+            "george_live_entry_receiver_profile",
+            receiver,
+          );
+          window.dispatchEvent(
+            new Event("george-live-receiver-profile-change"),
+          );
+        } catch {}
+      };
+
+      return (
+        <PanelShell
+          label="BRIEF ROOM · READINESS"
+          title="Ready Room."
+          stage={3}
+          onBack={goToPreviousLivePreparationState}
+        >
+          <div className="mt-8">
+            <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.19em] text-[#AFC0FF]/58">
+              Verification call
+            </div>
+
+            <h2 className="mt-3 max-w-[640px] text-[18px] leading-7 text-white/84">
+              I&apos;ve set LIVE around one job: determine whether{" "}
+              <span className="text-white">
+                {verificationTarget}
+              </span>{" "}
+              still holds.
+            </h2>
+
+            <p className="mt-3 max-w-[620px] text-[12px] leading-6 text-white/46">
+              {verificationInteraction}. I&apos;ll {verificationBenefit}.
+              You stay in the conversation.
+            </p>
+
+            <div className="mt-7 border-t border-white/[0.06] pt-5">
+              <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/32">
+                How should I reach you?
+              </div>
+
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    selectVerificationReceiver("visual_only")
+                  }
+                  className={`text-left transition ${
+                    verificationReceiverChosen &&
+                    selectedReceiverProfile === "visual_only"
+                      ? "border-l border-[#AFC0FF]/54 pl-3"
+                      : "border-l border-white/[0.08] pl-3 hover:border-white/[0.18]"
+                  }`}
+                >
+                  <span className="block font-mono text-[10px] font-semibold uppercase tracking-[0.17em] text-white/72">
+                    Visual
+                  </span>
+
+                  <span className="mt-1.5 block text-[11px] leading-5 text-white/40">
+                    Best when you can glance discreetly and may need to compare
+                    details as they emerge. My guidance stays visible.
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    selectVerificationReceiver("audio_only")
+                  }
+                  className={`text-left transition ${
+                    verificationReceiverChosen &&
+                    selectedReceiverProfile === "audio_only"
+                      ? "border-l border-[#AFC0FF]/54 pl-3"
+                      : "border-l border-white/[0.08] pl-3 hover:border-white/[0.18]"
+                  }`}
+                >
+                  <span className="block font-mono text-[10px] font-semibold uppercase tracking-[0.17em] text-white/72">
+                    Audio
+                  </span>
+
+                  <span className="mt-1.5 block text-[11px] leading-5 text-white/40">
+                    Best when eye contact, rapport, or attention to the other
+                    person matters most. I&apos;ll keep support short,
+                    sequential, and repeatable.
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <p className="mt-6 max-w-[620px] text-[12px] leading-6 text-white/58">
+              Intelligent communication doesn&apos;t work without your voice.
+            </p>
+
+            <button
+              type="button"
+              disabled={!verificationReceiverChosen}
+              onClick={() => {
+                if (!verificationReceiverChosen) return;
+                startLive(false, editableResources, true);
+              }}
+              className={`mt-5 w-full rounded-[0.8rem] border px-4 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] transition ${
+                verificationReceiverChosen
+                  ? "george-live-primary-shimmer border-[#D8DEE8]/70 bg-[#4E7CFF] text-white shadow-[0_10px_28px_rgba(78,124,255,0.26)] hover:bg-[#5B86FF]"
+                  : "cursor-default border-white/[0.05] bg-transparent text-white/20"
+              }`}
+            >
+              Enter LIVE
+            </button>
+          </div>
+        </PanelShell>
+      );
+    }
+
     const supportLabel =
       activeSupportPanelId === "response"
         ? "Adaptive response"
@@ -7043,331 +6844,6 @@ export default function LiveEntryClient() {
           )}
         </div>
       </PanelShell>
-    );
-  }
-
-  if (showQuickLiveSetup) {
-    const activeQuickLiveSupportPanel =
-      LIVE_SUPPORT_PANELS.find(
-        (panel) => panel.id === quickLiveSupportStyle,
-      ) || LIVE_SUPPORT_PANELS[0];
-    const quickLiveReceiverPanels = LIVE_RECEIVER_PROFILE_PANELS.map(
-      (panel) => ({
-        ...panel,
-        label:
-          panel.id === "audio_visual"
-            ? "Audio + Visual"
-            : panel.id === "visual_only"
-              ? "Visual"
-              : "Audio",
-      }),
-    );
-    const activeQuickLiveReceiverPanel =
-      quickLiveReceiverPanels.find(
-        (panel) => panel.id === quickLiveReceiverProfile,
-      ) || quickLiveReceiverPanels[0];
-    const quickLiveSpeakingStyles: QuickLiveSpeakingStyle[] = [
-      "Adaptive",
-      "Executive",
-      "Conversational",
-    ];
-
-    const steeringRows: Array<{ key: string; label: string }> = [
-      { key: "buyTime", label: "Buy time" },
-      { key: "clarify", label: "Clarify" },
-      { key: "expand", label: "Expand" },
-      { key: "changeDirection", label: "Change direction" },
-      { key: "slowDown", label: "Slow down" },
-    ];
-
-    const updateQuickLiveSteeringPhrase = (key: string, value: string) => {
-      setQuickLiveSteeringPhrases((current) => {
-        const next = {
-          ...current,
-          [key]: value,
-        };
-
-        try {
-          window.localStorage.setItem(
-            "GEORGE_LIVE_STEERING_PHRASES",
-            JSON.stringify(next),
-          );
-        } catch {}
-
-        return next;
-      });
-    };
-
-    const selectQuickLiveSupport = (style: LiveBriefingSupportPanelId) => {
-      if (style !== "advice" && style !== "response") return;
-      setQuickLiveSupportOverride(style);
-      setQuickLiveSteeringOpen(false);
-    };
-
-    return (
-      <main className="relative min-h-[100dvh] overflow-y-auto bg-black px-4 pb-[260px] pt-5 text-white sm:px-5 sm:pb-24 sm:pt-6">
-        <div className="pointer-events-none absolute inset-0 bg-black" />
-        <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-24 bg-black" />
-        <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
-
-        <div className="relative z-30 mx-auto w-full max-w-[640px]">
-          <div className="mb-5 flex items-center gap-4">
-            <BxPageHeader backLabel="" />
-          </div>
-        </div>
-
-        <div className="relative z-10 mx-auto w-full max-w-[640px] pt-0">
-          <section className="rounded-[1.05rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.014),rgba(255,255,255,0.004))] p-3 shadow-[0_12px_34px_rgba(0,0,0,0.18)] sm:p-4">
-            <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/42">
-              QUICK LIVE
-            </div>
-
-            <h1 className="mt-2 text-[30px] font-semibold leading-[1.08] tracking-[-0.045em] text-white/92 md:text-[40px]">
-              What should this LIVE conversation accomplish?
-            </h1>
-
-            <p className="mt-3 text-[14px] leading-6 text-white/46">
-              Give GEORGE the outcome. Add only the context that matters now.
-            </p>
-
-            <div className="mt-5 space-y-3">
-              <label className="block rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-3">
-                <span className="text-[9px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/54">
-                  Desired outcome · Required
-                </span>
-                <textarea
-                  value={quickLiveDesiredOutcome}
-                  onChange={(event) => {
-                    setQuickLiveDesiredOutcome(event.target.value);
-                    setQuickLiveValidationError("");
-                  }}
-                  rows={2}
-                  aria-invalid={Boolean(quickLiveValidationError)}
-                  placeholder="What should happen as a result of this conversation?"
-                  className="mt-2 w-full resize-none rounded-[0.7rem] border border-white/[0.07] bg-black/[0.24] px-3 py-2.5 text-[13px] leading-5 text-[#F2F4FF]/86 outline-none placeholder:text-white/24 focus:border-[#4E7CFF]/38"
-                />
-                {quickLiveValidationError && (
-                  <span className="mt-2 block text-[11px] leading-4 text-[#FFB4B4]/76">
-                    {quickLiveValidationError}
-                  </span>
-                )}
-              </label>
-
-              <label className="block rounded-[0.82rem] border border-white/[0.06] bg-[#080A10]/[0.52] px-4 py-3">
-                <span className="text-[9px] uppercase tracking-[0.22em] text-white/34">
-                  One-line context · Optional
-                </span>
-                <input
-                  value={quickLiveContext}
-                  onChange={(event) => setQuickLiveContext(event.target.value)}
-                  placeholder="What is happening right now?"
-                  className="mt-2 w-full rounded-[0.7rem] border border-white/[0.06] bg-black/[0.20] px-3 py-2.5 text-[12px] text-[#D7DBE4]/78 outline-none placeholder:text-white/22 focus:border-[#4E7CFF]/30"
-                />
-              </label>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                <label className="block rounded-[0.82rem] border border-white/[0.06] bg-[#080A10]/[0.52] px-4 py-3">
-                  <span className="text-[9px] uppercase tracking-[0.22em] text-white/34">
-                    Conversation with · Optional
-                  </span>
-                  <input
-                    value={quickLiveAudience}
-                    onChange={(event) =>
-                      setQuickLiveAudience(event.target.value)
-                    }
-                    placeholder="Buyer, manager, customer..."
-                    className="mt-2 w-full rounded-[0.7rem] border border-white/[0.06] bg-black/[0.20] px-3 py-2.5 text-[12px] text-[#D7DBE4]/78 outline-none placeholder:text-white/22 focus:border-[#4E7CFF]/30"
-                  />
-                </label>
-
-                <label className="block rounded-[0.82rem] border border-white/[0.06] bg-[#080A10]/[0.52] px-4 py-3">
-                  <span className="text-[9px] uppercase tracking-[0.22em] text-white/34">
-                    Communication medium · Optional
-                  </span>
-                  <select
-                    value={quickLiveCommunicationMedium}
-                    onChange={(event) =>
-                      setQuickLiveCommunicationMedium(
-                        event.target.value as QuickLiveCommunicationMedium,
-                      )
-                    }
-                    className="mt-2 w-full rounded-[0.7rem] border border-white/[0.06] bg-[#080A10] px-3 py-2.5 text-[12px] text-[#D7DBE4]/78 outline-none focus:border-[#4E7CFF]/30"
-                  >
-                    <option value="">Not specified</option>
-                    <option value="phone">Phone call</option>
-                    <option value="video">Video call</option>
-                    <option value="in_person">In person</option>
-                    <option value="written">Written / chat</option>
-                    <option value="other">Other</option>
-                  </select>
-                </label>
-              </div>
-
-              <label className="block rounded-[0.82rem] border border-white/[0.06] bg-[#080A10]/[0.52] px-4 py-3">
-                <span className="text-[9px] uppercase tracking-[0.22em] text-white/34">
-                  Available receiver · Optional
-                </span>
-                <select
-                  value={quickLiveReceiverEvidence}
-                  onChange={(event) => {
-                    setQuickLiveReceiverEvidence(
-                      event.target.value as LiveReceiverProfilePanelId | "",
-                    );
-                    setQuickLiveReceiverOverride(null);
-                  }}
-                  className="mt-2 w-full rounded-[0.7rem] border border-white/[0.06] bg-[#080A10] px-3 py-2.5 text-[12px] text-[#D7DBE4]/78 outline-none focus:border-[#4E7CFF]/30"
-                >
-                  <option value="">No receiver evidence — use Visual</option>
-                  <option value="audio_only">Earbuds or audio receiver</option>
-                  <option value="visual_only">Browser screen</option>
-                  <option value="audio_visual">Audio and screen</option>
-                </select>
-              </label>
-            </div>
-
-            <div className="mt-5 rounded-[0.95rem] border border-[#4E7CFF]/[0.14] bg-[#4E7CFF]/[0.035] p-3">
-              <div className="text-[9px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/58">
-                GEORGE&apos;s current-session recommendation
-              </div>
-              <p className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/46">
-                Review or change this configuration. GEORGE will continue
-                adapting moment by moment in LIVE.
-              </p>
-
-              <div className="mt-3 space-y-3">
-                <LiveAdaptiveSupportPanel
-                  activePanel={activeQuickLiveSupportPanel}
-                  open={quickLiveSupportOpen}
-                  panels={LIVE_SUPPORT_PANELS}
-                  onToggle={() =>
-                    setQuickLiveSupportOpen((current) => !current)
-                  }
-                  onSelect={selectQuickLiveSupport}
-                />
-
-                <LiveReceiverProfilePanel
-                  activePanel={activeQuickLiveReceiverPanel}
-                  open={quickLiveReceiverOpen}
-                  panels={quickLiveReceiverPanels}
-                  onToggle={() =>
-                    setQuickLiveReceiverOpen((current) => !current)
-                  }
-                  onSelect={(profile) =>
-                    setQuickLiveReceiverOverride(profile)
-                  }
-                />
-
-                <div className="rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/46">
-                        Speaking style
-                      </div>
-                      <div className="mt-2 text-[14px] font-semibold text-[#F2F4FF]/88">
-                        {quickLiveSpeakingStyle}
-                      </div>
-                      <div className="mt-1 text-[11px] leading-5 text-[#D7DBE4]/50">
-                        GEORGE will shape guidance around this speaking style.
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setQuickLiveSpeakingOpen((current) => !current)
-                      }
-                      className="shrink-0 rounded-[0.65rem] border border-white/[0.08] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/46 transition hover:border-white/[0.16] hover:text-white/72"
-                    >
-                      {quickLiveSpeakingOpen ? "Close" : "Change"}
-                    </button>
-                  </div>
-
-                  {quickLiveSpeakingOpen && (
-                    <div className="mt-4 grid gap-2 sm:grid-cols-3">
-                      {quickLiveSpeakingStyles.map((style) => (
-                        <button
-                          key={style}
-                          type="button"
-                          onClick={() => {
-                            setQuickLiveSpeakingOverride(style);
-                            setQuickLiveSpeakingOpen(false);
-                          }}
-                          className={`rounded-[0.72rem] border px-3 py-2.5 text-left text-[11px] font-semibold transition ${
-                            quickLiveSpeakingStyle === style
-                              ? "border-[#4E7CFF]/[0.24] bg-[#4E7CFF]/[0.055] text-[#F2F4FF]/84"
-                              : "border-white/[0.06] bg-white/[0.018] text-[#F2F4FF]/64 hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]"
-                          }`}
-                        >
-                          {style}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setQuickLiveSteeringOpen((open) => {
-                  return !open;
-                });
-              }}
-              className="mt-4 w-full rounded-[0.82rem] border border-white/[0.055] bg-[#080A10]/[0.42] px-3.5 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-[#D7DBE4]/58 transition hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035] hover:text-[#D7DCFF]/78"
-            >
-              {quickLiveSteeringOpen ? "Hide steering" : "View steering"}
-            </button>
-
-            <div
-              className={`overflow-hidden transition-all duration-300 ${
-                quickLiveSteeringOpen
-                  ? "max-h-[420px] opacity-100"
-                  : "max-h-0 opacity-0"
-              }`}
-            >
-              <div className="mt-3 rounded-[0.82rem] border border-white/[0.055] bg-[#080A10]/[0.42] px-3.5 py-3">
-                <p className="text-[11px] leading-5 text-[#D7DBE4]/46">
-                  If you are using earbuds alone, steering phrases help us adapt
-                  discreetly. You can use these defaults, edit them later, or
-                  control support directly from a phone, glasses, watch, or
-                  other visual device.
-                </p>
-
-                <div className="mt-3 divide-y divide-white/[0.045]">
-                  {steeringRows.map((row) => (
-                    <label
-                      key={row.key}
-                      className="grid gap-1 py-2 sm:grid-cols-[150px_1fr] sm:gap-3"
-                    >
-                      <span className="text-[10px] uppercase tracking-[0.18em] text-white/28">
-                        {row.label}
-                      </span>
-                      <input
-                        value={quickLiveSteeringPhrases[row.key] || ""}
-                        onChange={(event) =>
-                          updateQuickLiveSteeringPhrase(
-                            row.key,
-                            event.target.value,
-                          )
-                        }
-                        className="w-full rounded-[0.58rem] border border-white/[0.055] bg-black/[0.20] px-2.5 py-2 text-[12px] leading-5 text-[#D7DBE4]/70 outline-none transition placeholder:text-white/20 focus:border-[#4E7CFF]/24 focus:bg-[#4E7CFF]/[0.035]"
-                      />
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={startQuickLive}
-              className="mt-5 w-full rounded-[0.95rem] border border-[#4E7CFF]/35 bg-[#4E7CFF]/[0.075] px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/88 transition hover:bg-[#4E7CFF]/[0.12] hover:text-white active:scale-[0.98]"
-            >
-              Let&apos;s go to work
-            </button>
-          </section>
-        </div>
-      </main>
     );
   }
 

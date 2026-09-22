@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import BxPageHeader from "@/components/BxPageHeader";
-import { ContextualGeorgeInput } from "@/components/george/ContextualGeorgeInput";
 import {
   CONVERSATION_TYPES,
   getConversationTypeBaselineAssumptions,
@@ -17,14 +15,19 @@ import {
   saveLivePreparationSignals,
 } from "@/lib/george/live-browser/live-preparation-browser-storage";
 import {
-  resolveLivePreparationReadiness,
-} from "@/lib/george/live-runtime/live-intent-runtime";
-import {
   createPreparationSession,
   normalizePreparationInteractions,
+  projectPreparationSessionForLiveRuntime,
   type PreparationCheckpoint,
+  type PreparationQuestion,
   type PreparationSessionV1,
 } from "@/lib/george/live-runtime/live-preparation-controller";
+import {
+  NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST,
+  type NormalLiveOperationalJudgmentResult,
+  type OperationalPreparationTurnClassification,
+  type OperationalPreparationReadinessJudgment,
+} from "@/lib/george/runtime/operational-judgment";
 
 import type {
   OperationalFormula,
@@ -52,8 +55,11 @@ type HomepageRole = {
 type HomepagePriorInteraction = {
   key: string;
   question: string;
+  example?: string;
   answer: string;
   status: "answered" | "skipped";
+  evidenceNeed?: string;
+  purpose?: "live_scope_grounding" | "qualification";
 };
 
 function SelectionAcknowledgement({ label }: { label: string }) {
@@ -662,7 +668,6 @@ function CategoryDescriptor({ category }: { category: ConversationCategory }) {
 
 type SurfacePhase =
   | "selection"
-  | "selected"
   | "goal"
   | "introduction"
   | "decision"
@@ -677,13 +682,81 @@ type FormulaResponse = {
   error?: string;
 };
 
-type HomepageOptionalQuestion = {
-  key: string;
-  label: string;
-  question: string;
-  why: string;
-  example: string;
+type HomepageOptionalQuestion = PreparationQuestion;
+
+type HomepageConversationMode = "live_briefing" | "preparation";
+
+type HomepageConversationSequence = {
+  stage:
+    | "question"
+    | "transitioning"
+    | "acknowledgment"
+    | "response"
+    | "clarification";
+  message: string;
 };
+
+type HomepageHeldAmbiguousTurn = {
+  submission: string;
+  pendingQuestion: HomepageOptionalQuestion;
+  currentClassification: HomepageConversationMode;
+};
+
+type HomepageOperationalJudgmentAuthorization = {
+  request: typeof NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST;
+  source: "operational_judgment";
+  entrySource: "homepage";
+  preparationSessionId: string;
+  shouldAcquire: true;
+  requestedSignal: string;
+  reason: string;
+  purpose?: "live_scope_grounding" | "qualification";
+};
+
+const HOMEPAGE_INTELLIGENCE_TIERS = [
+  {
+    id: "smart",
+    shortLabel: "S",
+    label: "Smart",
+    explanation: "Fast, focused support.",
+  },
+  {
+    id: "intelligent",
+    shortLabel: "I",
+    label: "Intelligent",
+    explanation: "Deeper reasoning and adaptation.",
+  },
+  {
+    id: "brilliant",
+    shortLabel: "B",
+    label: "Brilliant",
+    explanation:
+      "Highest available reasoning for complex or consequential conversations.",
+  },
+] as const;
+
+const HOMEPAGE_SELECTED_TIER_STORAGE_KEY =
+  "george_live_home_selected_tier";
+
+function homepageSelectedTierStorageKey(payload: {
+  authenticated?: boolean;
+  email?: unknown;
+  source?: unknown;
+}) {
+  const identity = payload.authenticated
+    ? String(payload.email || payload.source || "authenticated")
+        .trim()
+        .toLowerCase()
+    : "anonymous";
+
+  return `${HOMEPAGE_SELECTED_TIER_STORAGE_KEY}:${encodeURIComponent(identity)}`;
+}
+
+function isHomepageMissionTier(value: unknown): value is HomepageMissionTier {
+  return (
+    value === "smart" || value === "intelligent" || value === "brilliant"
+  );
+}
 
 function useTypewriter(text: string, enabled: boolean, speed = 28) {
   const [value, setValue] = useState("");
@@ -691,13 +764,21 @@ function useTypewriter(text: string, enabled: boolean, speed = 28) {
   useEffect(() => {
     setValue("");
     if (!enabled || !text) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setValue(text);
+      return;
+    }
 
     let index = 0;
+    const interval = Math.max(
+      8,
+      Math.min(speed, Math.floor(900 / Math.max(text.length, 1))),
+    );
     const timer = window.setInterval(() => {
       index += 1;
       setValue(text.slice(0, index));
       if (index >= text.length) window.clearInterval(timer);
-    }, speed);
+    }, interval);
 
     return () => window.clearInterval(timer);
   }, [enabled, speed, text]);
@@ -709,20 +790,29 @@ function HomepageRoleCard({
   role,
   onSelect,
   featured = false,
+  selected = false,
+  receded = false,
 }: {
   role: HomepageRole;
   onSelect: (role: HomepageRole) => void;
   featured?: boolean;
+  selected?: boolean;
+  receded?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={() => onSelect(role)}
-      className={`bx-command-shimmer group flex items-center justify-between gap-3 rounded-[14px] border text-left transition-[border-color,background-color,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7EA1FF]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-[0.99] ${
-        featured
+      aria-pressed={selected}
+      className={`bx-command-shimmer group flex items-center justify-between gap-3 rounded-[14px] border text-left transition-[border-color,background-color,transform,opacity] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7EA1FF]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-[0.99] ${
+        selected
+          ? "border-[#AEB6FF]/75 bg-[#172347] opacity-100"
+          : featured
           ? "min-h-[88px] border-white/[0.28] bg-[#050505] px-5 py-4 hover:border-white/[0.58] hover:bg-[#0B0B0C]"
           : "min-h-[64px] border-white/[0.12] bg-[#08090A] px-4 py-3 hover:border-white/[0.24] hover:bg-[#0D0F12]"
-      }`}
+      } ${receded ? "opacity-30 hover:opacity-70" : "opacity-100"} ${
+        selected && featured ? "min-h-[88px] px-5 py-4" : ""
+      } ${selected && !featured ? "min-h-[64px] px-4 py-3" : ""}`}
     >
       <div>
         <h3 className="font-mono text-[11px] font-semibold uppercase leading-5 tracking-[0.16em] text-white">
@@ -759,6 +849,12 @@ function homepageOperationalPromise(
 }
 
 type HomepageMissionTier = "smart" | "intelligent" | "brilliant";
+
+function homepageTierRank(tier: HomepageMissionTier) {
+  if (tier === "smart") return 0;
+  if (tier === "intelligent") return 1;
+  return 2;
+}
 
 function homepageMissionLimit(tier: HomepageMissionTier) {
   if (tier === "smart") return 1;
@@ -837,16 +933,33 @@ function homepageOperationalSupport(
 
 export function HomeConversationTypeSurface() {
   const surfaceRef = useRef<HTMLElement | null>(null);
-  const preparationScrollRef = useRef<HTMLDivElement | null>(null);
   const homepagePreparationSeedRef = useRef<PreparationSessionV1 | null>(null);
+  const homepageAssessmentSequenceRef = useRef(0);
+  const homepageConversationSequenceRef = useRef(0);
+  const homepageAssessmentAbortRef = useRef<AbortController | null>(null);
+  const homepageAssessmentInFlightRef = useRef(false);
+  const tierDisclosureTimeoutRef = useRef<number | null>(null);
+  const lastTierPointerTypeRef = useRef<string | null>(null);
+  const mobileLockedTierArmedRef = useRef<HomepageMissionTier | null>(null);
+  const selectedTierStorageKeyRef = useRef(
+    `${HOMEPAGE_SELECTED_TIER_STORAGE_KEY}:anonymous`,
+  );
   const [selectedType, setSelectedType] = useState<ConversationType | null>(
     null,
   );
   const [selectedRole, setSelectedRole] = useState<HomepageRole | null>(null);
+  const [outcomeDraft, setOutcomeDraft] = useState("");
 
 const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [selectedMissions, setSelectedMissions] = useState<string[]>([]);
-  const [missionTier, setMissionTier] = useState<HomepageMissionTier>("smart");
+  const [missionTier, setMissionTier] = useState<HomepageMissionTier | null>(
+    null,
+  );
+  const [entitledMissionTier, setEntitledMissionTier] =
+    useState<HomepageMissionTier | null>(null);
+  const [disclosedMissionTier, setDisclosedMissionTier] =
+    useState<HomepageMissionTier | null>(null);
+  const [tierAuthorityResolved, setTierAuthorityResolved] = useState(false);
   const [customMissionOpen, setCustomMissionOpen] = useState(false);
   const [assumptionCorrectionOpen, setAssumptionCorrectionOpen] = useState(false);
   const [assumptionCorrection, setAssumptionCorrection] = useState("");
@@ -861,12 +974,24 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [introStage, setIntroStage] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [briefingSufficient, setBriefingSufficient] = useState(false);
+  const [preparationReadiness, setPreparationReadiness] =
+    useState<OperationalPreparationReadinessJudgment | null>(null);
   const [optionalQuestion, setOptionalQuestion] =
     useState<HomepageOptionalQuestion | null>(null);
   const [optionalAnswer, setOptionalAnswer] = useState("");
-  const [optionalInteractionMode, setOptionalInteractionMode] =
-    useState<"briefing" | "ask_george">("briefing");
-  const [optionalGeorgeResponse, setOptionalGeorgeResponse] = useState("");
+  const [acceptedConversationMode, setAcceptedConversationMode] =
+    useState<HomepageConversationMode>("live_briefing");
+  const [pendingExplicitConversationMode, setPendingExplicitConversationMode] =
+    useState<HomepageConversationMode | null>(null);
+  const [homepageConversationSequence, setHomepageConversationSequence] =
+    useState<HomepageConversationSequence>({
+      stage: "question",
+      message: "",
+    });
+  const [homepageConversationError, setHomepageConversationError] =
+    useState("");
+  const [heldAmbiguousTurn, setHeldAmbiguousTurn] =
+    useState<HomepageHeldAmbiguousTurn | null>(null);
   const [editingOptionalQuestionKey, setEditingOptionalQuestionKey] =
     useState<string | null>(null);
   const [optionalAnswers, setOptionalAnswers] = useState<Record<string, string>>({});
@@ -875,6 +1000,14 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [skippedOptionalQuestions, setSkippedOptionalQuestions] =
     useState<string[]>([]);
   const [optionalQuestionLoading, setOptionalQuestionLoading] = useState(false);
+  const [currentUnderstandingRevision, setCurrentUnderstandingRevision] =
+    useState("");
+  const [currentUnderstandingDraft, setCurrentUnderstandingDraft] =
+    useState("");
+  const [editingCurrentUnderstanding, setEditingCurrentUnderstanding] =
+    useState(false);
+  const [currentUnderstandingStatus, setCurrentUnderstandingStatus] =
+    useState<"idle" | "editing" | "preserved">("idle");
   const [searchQuery, setSearchQuery] = useState("");
   const [formulaSurfaceMode, setFormulaSurfaceMode] =
     useState<FormulaSurfaceMode>("closed");
@@ -885,12 +1018,105 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [formulaError, setFormulaError] = useState("");
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const storedTier = window.localStorage.getItem("george_tier");
-    if (storedTier === "smart" || storedTier === "intelligent" || storedTier === "brilliant") {
-      setMissionTier(storedTier);
-    }
+    let cancelled = false;
+
+    fetch("/api/session", { cache: "no-store" })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Session authority unavailable.");
+        }
+
+        return response.json();
+      })
+      .then((payload) => {
+        if (cancelled) return;
+        const grantedTier: HomepageMissionTier = isHomepageMissionTier(
+          payload?.tier,
+        )
+          ? payload.tier
+          : "smart";
+        const selectionStorageKey = homepageSelectedTierStorageKey(payload);
+        const persistedSelection =
+          window.localStorage.getItem(selectionStorageKey);
+        const selectedTier =
+          isHomepageMissionTier(persistedSelection) &&
+          homepageTierRank(persistedSelection) <= homepageTierRank(grantedTier)
+            ? persistedSelection
+            : grantedTier;
+
+        setEntitledMissionTier(grantedTier);
+        setMissionTier(selectedTier);
+        selectedTierStorageKeyRef.current = selectionStorageKey;
+        window.localStorage.setItem("george_tier", grantedTier);
+        window.localStorage.setItem(selectionStorageKey, selectedTier);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setTierAuthorityResolved(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  useEffect(
+    () => () => {
+      homepageAssessmentSequenceRef.current += 1;
+      homepageConversationSequenceRef.current += 1;
+      homepageAssessmentAbortRef.current?.abort();
+      homepageAssessmentAbortRef.current = null;
+      homepageAssessmentInFlightRef.current = false;
+      if (tierDisclosureTimeoutRef.current !== null) {
+        window.clearTimeout(tierDisclosureTimeoutRef.current);
+      }
+    },
+    [],
+  );
+
+  function discloseMissionTier(
+    tier: HomepageMissionTier,
+    temporary = false,
+  ) {
+    if (tierDisclosureTimeoutRef.current !== null) {
+      window.clearTimeout(tierDisclosureTimeoutRef.current);
+      tierDisclosureTimeoutRef.current = null;
+    }
+
+    setDisclosedMissionTier(tier);
+
+    if (temporary) {
+      tierDisclosureTimeoutRef.current = window.setTimeout(() => {
+        setDisclosedMissionTier(null);
+        mobileLockedTierArmedRef.current = null;
+        tierDisclosureTimeoutRef.current = null;
+      }, 2400);
+    }
+  }
+
+  function selectHomepageMissionTier(tier: HomepageMissionTier) {
+    if (!tierAuthorityResolved || !entitledMissionTier) return;
+
+    const available =
+      homepageTierRank(tier) <= homepageTierRank(entitledMissionTier);
+    const mobileTap = lastTierPointerTypeRef.current === "touch";
+
+    discloseMissionTier(tier, mobileTap);
+
+    if (!available) {
+      if (mobileTap && mobileLockedTierArmedRef.current !== tier) {
+        mobileLockedTierArmedRef.current = tier;
+        return;
+      }
+
+      window.location.assign(`/activate?tier=${tier}&intent=be-${tier}`);
+      return;
+    }
+
+    mobileLockedTierArmedRef.current = null;
+    setMissionTier(tier);
+    window.localStorage.setItem(selectedTierStorageKeyRef.current, tier);
+  }
 
   const activeFormula = useMemo(() => {
     if (!selectedType || accessibleFormulas.length === 0) return null;
@@ -1120,9 +1346,166 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
   const optionalQuestionText = useTypewriter(
     optionalQuestion?.question || "",
-    phase === "optional" && Boolean(optionalQuestion),
+    phase === "optional" &&
+      Boolean(optionalQuestion) &&
+      !editingCurrentUnderstanding &&
+      homepageConversationSequence.stage === "question",
     18,
   );
+  const optionalQuestionWhyText = useTypewriter(
+    optionalQuestion?.why || "",
+    phase === "optional" &&
+      Boolean(optionalQuestion) &&
+      !editingCurrentUnderstanding &&
+      homepageConversationSequence.stage === "question",
+    14,
+  );
+  const homepageConversationSequenceText = useTypewriter(
+    homepageConversationSequence.message,
+    phase === "optional" &&
+      !editingCurrentUnderstanding &&
+      (homepageConversationSequence.stage === "acknowledgment" ||
+        homepageConversationSequence.stage === "response" ||
+        homepageConversationSequence.stage === "clarification"),
+    18,
+  );
+  const visibleConversationMode =
+    pendingExplicitConversationMode || acceptedConversationMode;
+
+  function waitForHomepageConversation(milliseconds: number) {
+    return new Promise<void>((resolve) => {
+      window.setTimeout(resolve, milliseconds);
+    });
+  }
+
+  async function presentHomepageConversationSequence(
+    items: Array<{
+      stage: "acknowledgment" | "response";
+      message: string;
+    }>,
+    restoreQuestion = true,
+  ) {
+    const sequence = homepageConversationSequenceRef.current + 1;
+    homepageConversationSequenceRef.current = sequence;
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    setHomepageConversationSequence({
+      stage: "transitioning",
+      message: "",
+    });
+    if (!reducedMotion) {
+      await waitForHomepageConversation(190);
+    }
+
+    for (const item of items) {
+      if (
+        homepageConversationSequenceRef.current !== sequence ||
+        !item.message.trim()
+      ) {
+        continue;
+      }
+
+      setHomepageConversationSequence(item);
+      const readingTime =
+        item.stage === "acknowledgment"
+          ? 900
+          : Math.min(3200, Math.max(1400, item.message.length * 18));
+      await waitForHomepageConversation(readingTime);
+    }
+
+    if (homepageConversationSequenceRef.current === sequence) {
+      setHomepageConversationSequence({
+        stage: restoreQuestion ? "question" : "transitioning",
+        message: "",
+      });
+    }
+  }
+
+  const supportedCurrentUnderstanding = useMemo(() => {
+    const explicitRevision =
+      currentUnderstandingRevision ||
+      String(answers.currentUnderstandingRevision || "");
+    if (explicitRevision) return explicitRevision;
+
+    return [
+      String(answers.desiredOutcome || "").trim(),
+      answers.role ? `Your role: ${answers.role}` : "",
+      String(answers.conversationContext || "").trim(),
+      ...Object.entries(optionalAnswers).map(([, answer]) =>
+        String(answer || "").trim(),
+      ),
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+  }, [
+    answers.conversationContext,
+    answers.currentUnderstandingRevision,
+    answers.desiredOutcome,
+    answers.role,
+    currentUnderstandingRevision,
+    optionalAnswers,
+  ]);
+
+  const currentUnderstandingSignals = useMemo(() => {
+    const punctuate = (value: string) => {
+      const clean = value.trim().replace(/^[-✓•]\s*/, "");
+      if (!clean) return "";
+      return /[.!?]$/.test(clean) ? clean : `${clean}.`;
+    };
+    const describeOutcome = (value: string) => {
+      const clean = value.trim();
+      const firstPersonOpenings: Array<[RegExp, string]> = [
+        [/^I\s+want\b/i, "You want"],
+        [/^I\s+need\b/i, "You need"],
+        [/^I\s+hope\b/i, "You hope"],
+        [/^I\s+intend\b/i, "You intend"],
+        [/^I\s+would\s+like\b/i, "You would like"],
+        [/^I'd\s+like\b/i, "You'd like"],
+        [/^I(?:'m|\s+am)\b/i, "You are"],
+        [/^My\b/i, "Your"],
+      ];
+      const opening = firstPersonOpenings.find(([pattern]) =>
+        pattern.test(clean),
+      );
+
+      return opening
+        ? clean.replace(opening[0], opening[1])
+        : `Desired outcome: ${clean}`;
+    };
+    const outcome = String(answers.desiredOutcome || "").trim();
+    const revision = String(
+      currentUnderstandingRevision ||
+        answers.currentUnderstandingRevision ||
+        "",
+    ).trim();
+
+    if (revision) {
+      return revision
+        .split(/\n+/)
+        .map(punctuate)
+        .filter(Boolean);
+    }
+
+    return [
+      outcome ? punctuate(describeOutcome(outcome)) : "",
+      answers.role ? punctuate(`Your role is ${answers.role}`) : "",
+      answers.conversationContext
+        ? punctuate(`Relevant context: ${answers.conversationContext}`)
+        : "",
+      ...Object.values(optionalAnswers).map((answer) =>
+        punctuate(String(answer || "")),
+      ),
+    ].filter(Boolean);
+  }, [
+    answers.conversationContext,
+    answers.currentUnderstandingRevision,
+    answers.desiredOutcome,
+    answers.role,
+    currentUnderstandingRevision,
+    optionalAnswers,
+  ]);
 
   const currentOperationalPromise = homepageOperationalPromise(
     selectedRole,
@@ -1163,7 +1546,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
         key: "role",
         label: selectedRole?.label
           ? `I understand your role: ${selectedRole.label}.`
-          : "I still need to understand your role.",
+          : "Your role is not established yet; I’ll ask only if it matters.",
         complete: Boolean(selectedRole),
       },
       {
@@ -1183,8 +1566,8 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       {
         key: "readiness",
         label: briefingSufficient
-          ? "I have enough context to support you LIVE."
-          : "I'm still gathering the context I need to support you LIVE.",
+          ? "I have enough verified context to support you LIVE."
+          : "I’m still determining whether I can realistically support you LIVE.",
         complete: briefingSufficient,
       },
     ];
@@ -1284,42 +1667,129 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     selectedRole && (phase === "goal" || phase === "introduction"),
   );
 
-  useEffect(() => {
-    if (!isMissionTransition) return;
-    preparationScrollRef.current?.scrollTo({ top: 0, behavior: "auto" });
-  }, [isMissionTransition, phase, selectedRole]);
-
   function selectRole(role: HomepageRole) {
     if (role.id === "other") {
-      window.localStorage.setItem("george_start_new_live", "1");
-      window.location.href = "/george/live-entry?source=start";
+      setShowAllRoles(true);
       return;
     }
 
-    if (loadPreparationSession()?.provenance.entrySource === "homepage") {
+    setSelectedRole(role);
+    const nextAnswers = { ...answers, role: role.label };
+    setAnswers(nextAnswers);
+    saveLivePreparationSignals(nextAnswers);
+
+    const seed = homepagePreparationSeedRef.current;
+    if (!seed) return;
+
+    const explicitRoleInteraction = {
+      key: "role",
+      question: "Which role best describes your position in this conversation?",
+      answer: role.label,
+      status: "answered" as const,
+      evidenceNeed: "the user's role in the anticipated conversation",
+    };
+    const nextSession = createPreparationSession({
+      preparationSessionId: seed.preparationSessionId,
+      provenance: seed.provenance,
+      createdAt: seed.createdAt,
+      updatedAt: Date.now(),
+      knowledge: {
+        ...seed.knowledge,
+        role: role.label,
+        additionalSignals: {
+          ...seed.knowledge.additionalSignals,
+          role: role.label,
+        },
+      },
+      briefing: {
+        priorInteractions: normalizePreparationInteractions([
+          ...seed.briefing.priorInteractions.filter(
+            (interaction) => interaction.key !== "role",
+          ),
+          explicitRoleInteraction,
+        ]),
+        currentQuestion: seed.briefing.currentQuestion,
+      },
+      assets: seed.assets,
+      support: seed.support,
+      workflow: seed.workflow,
+      relations: seed.relations,
+    });
+
+    homepagePreparationSeedRef.current = nextSession;
+    savePreparationSession(nextSession);
+    if (nextSession.knowledge.objective) {
+      void requestHomepageOperationalJudgment(nextSession);
+    }
+  }
+
+  function captureDesiredOutcome() {
+    if (homepageAssessmentInFlightRef.current) return;
+    if (!tierAuthorityResolved || !missionTier) return;
+    const exactOutcome = outcomeDraft;
+    if (!exactOutcome.trim()) return;
+
+    const nextSignals = {
+      desiredOutcome: exactOutcome,
+      broadGoal: exactOutcome,
+    };
+    const existingSeed = homepagePreparationSeedRef.current;
+    const exactOutcomeInteraction = {
+      key: "desiredOutcome",
+      question: "What do you want this conversation to accomplish?",
+      answer: exactOutcome,
+      status: "answered" as const,
+      evidenceNeed: "the user's desired outcome for the anticipated conversation",
+    };
+
+    if (!existingSeed) {
       clearPreparationSession();
     }
-    homepagePreparationSeedRef.current = null;
 
-    setSelectedRole(role);
-    setSelectedType(null);
-    setSelectedGoal(null);
-    setSelectedMissions([]);
-    setAdaptiveUnderstanding("");
-    setAdaptiveUnderstandingOutcome("");
-    setAdaptiveDirections([]);
-    setUnderstandingUpdatePending(false);
-    setCustomMissionOpen(false);
-    setMissionCollapsing(false);
-    setPhase("goal");
-    setIntroStage(0);
-    setAnswers({});
+    const seed = createPreparationSession({
+      preparationSessionId: existingSeed?.preparationSessionId,
+      provenance: existingSeed?.provenance || { entrySource: "homepage" },
+      createdAt: existingSeed?.createdAt,
+      updatedAt: Date.now(),
+      knowledge: {
+        ...(existingSeed?.knowledge || {}),
+        objective: exactOutcome,
+        additionalSignals: {
+          ...(existingSeed?.knowledge.additionalSignals || {}),
+          ...nextSignals,
+        },
+      },
+      briefing: {
+        priorInteractions: normalizePreparationInteractions([
+          ...(existingSeed?.briefing.priorInteractions || []).filter(
+            (interaction) => interaction.key !== "desiredOutcome",
+          ),
+          exactOutcomeInteraction,
+        ]),
+        currentQuestion: existingSeed?.briefing.currentQuestion,
+      },
+      assets: existingSeed?.assets,
+      support: existingSeed?.support,
+      workflow: existingSeed?.workflow,
+      relations: existingSeed?.relations,
+    });
+
+    homepagePreparationSeedRef.current = seed;
+    savePreparationSession(seed);
+    saveLivePreparationSignals(nextSignals);
+    setSelectedGoal(exactOutcome);
+    setSelectedMissions([exactOutcome]);
+    setAnswers(nextSignals);
+    setBriefingSufficient(false);
     setOptionalQuestion(null);
     setOptionalAnswer("");
-    setOptionalAnswers({});
-    setOptionalQuestionHistory({});
-    setSkippedOptionalQuestions([]);
-    setOptionalQuestionLoading(false);
+    setAcceptedConversationMode("live_briefing");
+    setPendingExplicitConversationMode(null);
+    setHeldAmbiguousTurn(null);
+    setHomepageConversationError("");
+    setHomepageConversationSequence({ stage: "question", message: "" });
+    setPhase("optional");
+    void requestHomepageOperationalJudgment(seed);
   }
 
   function resetSelection() {
@@ -1331,6 +1801,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setFormulaError("");
     setSelectedType(null);
     setSelectedRole(null);
+    setOutcomeDraft("");
     setSelectedGoal(null);
     setSelectedMissions([]);
     setAdaptiveUnderstanding("");
@@ -1344,10 +1815,19 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setAnswers({});
     setOptionalQuestion(null);
     setOptionalAnswer("");
+    setAcceptedConversationMode("live_briefing");
+    setPendingExplicitConversationMode(null);
+    setHeldAmbiguousTurn(null);
+    setHomepageConversationError("");
+    setHomepageConversationSequence({ stage: "question", message: "" });
     setOptionalAnswers({});
     setOptionalQuestionHistory({});
     setSkippedOptionalQuestions([]);
     setOptionalQuestionLoading(false);
+    setCurrentUnderstandingRevision("");
+    setCurrentUnderstandingDraft("");
+    setEditingCurrentUnderstanding(false);
+    setCurrentUnderstandingStatus("idle");
   }
 
   function toggleMission(mission: string) {
@@ -1359,7 +1839,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
         return current.filter((value) => value !== normalizedMission);
       }
 
-      const limit = homepageMissionLimit(missionTier);
+      const limit = homepageMissionLimit(missionTier || "smart");
       if (current.length >= limit) return current;
       return [...current, normalizedMission];
     });
@@ -1403,112 +1883,73 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     if (!normalizedMission) return;
     setSelectedMissions((current) => {
       if (current.includes(normalizedMission)) return current;
-      const limit = homepageMissionLimit(missionTier);
+      const limit = homepageMissionLimit(missionTier || "smart");
       if (current.length >= limit) return current;
       return [...current, normalizedMission];
     });
     setCustomMissionOpen(false);
   }
 
-  async function submitAssumptionCorrection() {
-    const correction = assumptionCorrection.trim();
-    if (!correction) return;
+  function submitAssumptionCorrection() {
+    const exactCorrection = assumptionCorrection;
+    if (!exactCorrection.trim()) return;
+
+    const seed = homepagePreparationSeedRef.current;
+    if (!seed || seed.provenance.entrySource !== "homepage") return;
 
     const nextAnswers: Record<string, string> = {
       ...answers,
-      role: answers.role || selectedRole?.label || "",
-      conversationContext: correction,
+      conversationContext: exactCorrection,
     };
+    const correctionInteraction = {
+      key: "assumptionCorrection",
+      question: "What should I understand instead?",
+      answer: exactCorrection,
+      status: "answered" as const,
+      evidenceNeed: "the user's correction to the preparation context",
+    };
+    const nextSession = createPreparationSession({
+      preparationSessionId: seed.preparationSessionId,
+      provenance: seed.provenance,
+      createdAt: seed.createdAt,
+      updatedAt: Date.now(),
+      knowledge: {
+        ...seed.knowledge,
+        knownContext: exactCorrection,
+        additionalSignals: {
+          ...seed.knowledge.additionalSignals,
+          assumptionCorrection: exactCorrection,
+        },
+      },
+      briefing: {
+        priorInteractions: normalizePreparationInteractions([
+          ...seed.briefing.priorInteractions.filter(
+            (interaction) => interaction.key !== "assumptionCorrection",
+          ),
+          correctionInteraction,
+        ]),
+        currentQuestion: seed.briefing.currentQuestion,
+      },
+      assets: seed.assets,
+      support: seed.support,
+      workflow: seed.workflow,
+      relations: seed.relations,
+    });
 
+    homepagePreparationSeedRef.current = nextSession;
+    savePreparationSession(nextSession);
+    saveLivePreparationSignals(nextAnswers);
+    setAnswers(nextAnswers);
     setAssumptionCorrection("");
     setAssumptionCorrectionOpen(false);
-    setUnderstandingUpdatePending(true);
-
-    try {
-      const response = await fetch("/api/george/live/signal-question", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          role: nextAnswers.role,
-          broadGoal: nextAnswers.broadGoal || selectedGoal || "",
-          desiredOutcome: nextAnswers.desiredOutcome || "",
-          acceptableOutcome: "",
-          audience:
-            nextAnswers.audience ||
-            nextAnswers.participants ||
-            nextAnswers.who ||
-            "",
-          room: selectedType?.title || "",
-          knownContext: correction,
-          documentSummary: "",
-          priorAnswers: optionalAnswers,
-          priorInteractions: [
-            ...Object.entries(optionalAnswers).map(([key, answer]) => ({
-              key,
-              question: optionalQuestionHistory[key] || "",
-              answer: String(answer || "").trim(),
-              status: "answered" as const,
-            })),
-            {
-              key: "assumptionCorrection",
-              question: "What should I understand instead?",
-              answer: correction,
-              status: "answered" as const,
-            },
-          ],
-          skippedQuestions: skippedOptionalQuestions,
-        }),
-      });
-
-      const payload = await response.json().catch(() => ({}));
-
-      const understanding =
-        typeof payload?.understanding === "string"
-          ? payload.understanding.trim()
-          : "";
-
-      const directions = Array.isArray(payload?.directions)
-        ? payload.directions
-            .map((value: unknown) =>
-              typeof value === "string" ? value.trim() : "",
-            )
-            .filter(Boolean)
-            .slice(0, 6)
-        : [];
-
-      setAnswers(nextAnswers);
-      saveLivePreparationSignals(nextAnswers);
-
-      if (understanding) {
-        setAdaptiveUnderstanding(understanding);
-        setAdaptiveUnderstandingOutcome(
-          String(nextAnswers.desiredOutcome || "").trim(),
-        );
-      } else {
-        // Clear stale adaptive text so the corrected deterministic
-        // understanding becomes the single fallback render.
-        setAdaptiveUnderstanding("");
-        setAdaptiveUnderstandingOutcome("");
-      }
-
-      if (directions.length > 0) {
-        setAdaptiveDirections(directions);
-        setSelectedMissions((current) =>
-          current.filter((mission) => directions.includes(mission)),
-        );
-      }
-    } catch {
-      // If adaptive reasoning fails, apply the correction once and let
-      // the deterministic understanding become the single revised render.
-      setAnswers(nextAnswers);
-      saveLivePreparationSignals(nextAnswers);
-      setAdaptiveUnderstanding("");
-      setAdaptiveUnderstandingOutcome("");
-    } finally {
-      setUnderstandingUpdatePending(false);
-    }
-
+    setUnderstandingUpdatePending(false);
+    setAdaptiveUnderstanding("");
+    setAdaptiveUnderstandingOutcome("");
     setIntroStage(2);
+    setBriefingSufficient(false);
+    setOptionalQuestion(null);
+    setPhase("optional");
+    void requestHomepageOperationalJudgment(nextSession);
   }
 
   function beginPreparation() {
@@ -1516,18 +1957,13 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   }
 
   function goBack() {
-    if (phase === "selected") {
-      resetSelection();
-      return;
-    }
-
     if (phase === "goal") {
       resetSelection();
       return;
     }
 
     if (phase === "introduction") {
-      setPhase("goal");
+      resetSelection();
       return;
     }
 
@@ -1542,6 +1978,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   }
 
   function beginQuestions() {
+    if (homepageAssessmentInFlightRef.current) return;
     if (!homepagePreparationSeedRef.current) {
       clearPreparationSession();
       const seed = createPreparationSession({
@@ -1552,7 +1989,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
     const freshAnswers: Record<string, string> = {
       ...answers,
-      role: answers.role || selectedRole?.label || "",
+      role: answers.role || "",
       broadGoal: answers.broadGoal || selectedGoal || "",
     };
 
@@ -1561,63 +1998,271 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setBriefingSufficient(false);
     setOptionalQuestion(null);
     setOptionalAnswer("");
-    setOptionalInteractionMode("briefing");
-    setOptionalGeorgeResponse("");
+    setAcceptedConversationMode("live_briefing");
+    setPendingExplicitConversationMode(null);
+    setHeldAmbiguousTurn(null);
+    setHomepageConversationError("");
+    setHomepageConversationSequence({ stage: "question", message: "" });
     setPhase("optional");
-    void requestHomepageOptionalQuestion({}, []);
+    const preparationSession = homepagePreparationSeedRef.current;
+    if (preparationSession) {
+      void requestHomepageOperationalJudgment(preparationSession);
+    }
   }
 
-  async function requestHomepageOptionalQuestion(
-    priorAnswers = optionalAnswers,
-    skippedQuestions = skippedOptionalQuestions,
+  function preserveHomepagePendingQuestion(
+    session: PreparationSessionV1,
+    currentQuestion: HomepageOptionalQuestion | null,
   ) {
-    if (!selectedRole) return;
+    const nextSession = createPreparationSession({
+      preparationSessionId: session.preparationSessionId,
+      provenance: session.provenance,
+      createdAt: session.createdAt,
+      updatedAt: Date.now(),
+      knowledge: session.knowledge,
+      briefing: {
+        priorInteractions: session.briefing.priorInteractions,
+        currentQuestion,
+      },
+      assets: session.assets,
+      support: session.support,
+      workflow: session.workflow,
+      relations: session.relations,
+    });
+
+    homepagePreparationSeedRef.current = nextSession;
+    savePreparationSession(nextSession);
+    return nextSession;
+  }
+
+  function normalizeHomepageEvidence(value: string) {
+    return value.trim().toLowerCase().replace(/\s+/g, " ");
+  }
+
+  function applyAcceptedLiveBriefingTurn(
+    session: PreparationSessionV1,
+    pendingQuestion: HomepageOptionalQuestion,
+    classification: OperationalPreparationTurnClassification,
+    judgmentResult: NormalLiveOperationalJudgmentResult,
+  ) {
+    const acceptedDisposition =
+      judgmentResult.operationalJudgment.operationalDisposition;
+    const existingEvidence = new Set<string>();
+
+    for (const interaction of session.briefing.priorInteractions) {
+      if (interaction.status !== "answered" || !interaction.answer.trim()) {
+        continue;
+      }
+
+      existingEvidence.add(normalizeHomepageEvidence(interaction.answer));
+      existingEvidence.add(
+        normalizeHomepageEvidence(
+          `${interaction.evidenceNeed || interaction.question}: ${interaction.answer}`,
+        ),
+      );
+    }
+
+    for (const value of Object.values(session.knowledge.additionalSignals)) {
+      if (value.trim()) {
+        existingEvidence.add(normalizeHomepageEvidence(value));
+      }
+    }
+
+    const acceptedEvidence = acceptedDisposition.providerProposalAccepted
+      ? Array.from(
+          new Set(
+            acceptedDisposition.knownEvidence
+              .map((value) => String(value || "").trim())
+              .filter(Boolean),
+          ),
+        ).filter(
+          (value) => !existingEvidence.has(normalizeHomepageEvidence(value)),
+        )
+      : [];
+    const acceptedAnswer = acceptedEvidence.join("\n");
+    const preservePendingQuestion = classification.preservePendingQuestion;
+    const acceptedKey = preservePendingQuestion
+      ? `accepted_live_turn_${Date.now()}`
+      : pendingQuestion.key;
+    const acceptedQuestion = preservePendingQuestion
+      ? "Additional accepted LIVE briefing evidence"
+      : pendingQuestion.question;
+    const acceptedInteraction = acceptedAnswer
+      ? {
+          key: acceptedKey,
+          question: acceptedQuestion,
+          answer: acceptedAnswer,
+          status: "answered" as const,
+          ...(preservePendingQuestion
+            ? {}
+            : {
+                ...(pendingQuestion.example
+                  ? { example: pendingQuestion.example }
+                  : {}),
+                ...(pendingQuestion.evidenceNeed
+                  ? { evidenceNeed: pendingQuestion.evidenceNeed }
+                  : {}),
+                ...(pendingQuestion.purpose
+                  ? { purpose: pendingQuestion.purpose }
+                  : {}),
+              }),
+        }
+      : null;
+    const nextOptionalAnswers = acceptedInteraction
+      ? {
+          ...optionalAnswers,
+          [acceptedInteraction.key]: acceptedInteraction.answer,
+        }
+      : optionalAnswers;
+    const nextSession = createPreparationSession({
+      preparationSessionId: session.preparationSessionId,
+      provenance: session.provenance,
+      createdAt: session.createdAt,
+      updatedAt: Date.now(),
+      knowledge: {
+        ...session.knowledge,
+        additionalSignals: acceptedInteraction
+          ? {
+              ...session.knowledge.additionalSignals,
+              [acceptedInteraction.key]: acceptedInteraction.answer,
+            }
+          : session.knowledge.additionalSignals,
+      },
+      briefing: {
+        priorInteractions: normalizePreparationInteractions([
+          ...session.briefing.priorInteractions.filter(
+            (interaction) => interaction.key !== acceptedInteraction?.key,
+          ),
+          ...(acceptedInteraction ? [acceptedInteraction] : []),
+        ]),
+        currentQuestion: preservePendingQuestion ? pendingQuestion : null,
+      },
+      assets: session.assets,
+      support: session.support,
+      workflow: session.workflow,
+      relations: session.relations,
+    });
+
+    homepagePreparationSeedRef.current = nextSession;
+    savePreparationSession(nextSession);
+    setOptionalQuestion(
+      preservePendingQuestion ? pendingQuestion : null,
+    );
+
+    if (acceptedInteraction) {
+      setOptionalAnswers(nextOptionalAnswers);
+      setOptionalQuestionHistory((current) => ({
+        ...current,
+        [acceptedInteraction.key]: acceptedInteraction.question,
+      }));
+      try {
+        window.localStorage.setItem(
+          "GEORGE_PRE_LIVE_OPTIONAL_SIGNALS",
+          JSON.stringify(nextOptionalAnswers),
+        );
+      } catch {}
+    }
+
+    return nextSession;
+  }
+
+  async function requestHomepageOperationalJudgment(
+    preparationSession: PreparationSessionV1,
+    reassessmentSource: "preparation" | "current_understanding" = "preparation",
+  ) {
+    const projectedPreparation =
+      projectPreparationSessionForLiveRuntime(preparationSession);
+    if (
+      !projectedPreparation ||
+      projectedPreparation.provenance.entrySource !== "homepage" ||
+      projectedPreparation.preparationSessionId !==
+        preparationSession.preparationSessionId ||
+      projectedPreparation.relations.normalSessionId
+    ) {
+      setBriefingSufficient(false);
+      setOptionalQuestion(null);
+      setOptionalAnswer("");
+      setPhase("optional");
+      return;
+    }
+
+    homepageAssessmentAbortRef.current?.abort();
+    const controller = new AbortController();
+    homepageAssessmentAbortRef.current = controller;
+    const requestSequence = homepageAssessmentSequenceRef.current + 1;
+    homepageAssessmentSequenceRef.current = requestSequence;
+    homepageAssessmentInFlightRef.current = true;
+    const preparationSessionId = preparationSession.preparationSessionId;
+    const responseIsCurrent = () =>
+      homepageAssessmentSequenceRef.current === requestSequence &&
+      homepagePreparationSeedRef.current?.preparationSessionId ===
+        preparationSessionId;
 
     setOptionalQuestionLoading(true);
+    setBriefingSufficient(false);
+    setPreparationReadiness(null);
+    setOptionalQuestion(null);
+    setOptionalAnswer("");
+    setPhase("optional");
+    if (reassessmentSource === "current_understanding") {
+      setCurrentUnderstandingStatus("preserved");
+    }
 
     try {
-      const answeredQuestionKeys = new Set(Object.keys(priorAnswers));
-      const priorInteractions = [
-        ...Object.entries(priorAnswers).map(([key, answer]) => ({
-          key,
-          question: optionalQuestionHistory[key] || "",
-          answer: String(answer || "").trim(),
-          status: "answered" as const,
-        })),
-        ...Array.from(new Set(skippedQuestions))
-          .filter((key) => !answeredQuestionKeys.has(key))
-          .map((key) => ({
-            key,
-            question: optionalQuestionHistory[key] || "",
-            answer: "",
-            status: "skipped" as const,
-          })),
-      ];
-
-      const response = await fetch("/api/george/live/signal-question", {
+      const judgmentResponse = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
         body: JSON.stringify({
-          role: answers.role || selectedRole?.label || "",
-          broadGoal: answers.broadGoal || selectedGoal || "",
-          desiredOutcome: answers.desiredOutcome || "",
-          acceptableOutcome: "",
-          audience: "",
-          room: selectedType?.title || "",
-          knownContext: answers.conversationContext || "",
-          documentSummary: "",
-          priorAnswers,
-          priorInteractions,
-          skippedQuestions,
+          messages: [
+            {
+              role: "user",
+              content:
+                "Apply the Operational Preparation Judgment request to the current validated evidence.",
+            },
+          ],
+          mode: "normal",
+          tier: missionTier,
+          requestPurpose: NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST,
+          preparationContext: {
+            entrySource: "homepage",
+            preparationSessionId,
+            session: preparationSession,
+            evidenceSufficiency: "unresolved",
+            signalAcquisitionAllowed: true,
+          },
         }),
       });
+      const judgmentPayload = await judgmentResponse
+        .json()
+        .catch(() => ({}));
+      if (!responseIsCurrent() || controller.signal.aborted) return;
 
-      const payload = await response.json().catch(() => ({}));
-
+      const judgmentResult = judgmentPayload?.operationalJudgmentResult as
+        | NormalLiveOperationalJudgmentResult
+        | null;
       if (
-        payload?.status === "sufficient" ||
-        !String(payload?.question || "").trim()
+        !judgmentResponse.ok ||
+        judgmentResult?.request !==
+          NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST ||
+        judgmentResult.source !== "operational_judgment" ||
+        judgmentResult.operationalJudgment?.source !== "operational_judgment"
       ) {
+        return;
+      }
+
+      const readinessJudgment =
+        judgmentResult.operationalJudgment.preparationReadiness;
+      const minimumLiveSupportEstablished =
+        readinessJudgment?.source === "operational_judgment" &&
+        readinessJudgment.minimumLiveSupportEstablished === true &&
+        (readinessJudgment.level === "supportable" ||
+          readinessJudgment.level === "sharp");
+
+      setPreparationReadiness(readinessJudgment);
+
+      if (minimumLiveSupportEstablished) {
+        preserveHomepagePendingQuestion(preparationSession, null);
         setOptionalQuestion(null);
         setOptionalAnswer("");
         setBriefingSufficient(true);
@@ -1625,131 +2270,507 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
         return;
       }
 
-      const nextQuestion: HomepageOptionalQuestion = {
-        key: String(payload.key || `signal_${Date.now()}`),
-        label: String(payload.label || "Additional signal"),
-        question: String(payload.question || ""),
-        why: String(
-          payload.why ||
-            payload.helper ||
-            "This answer may materially improve GEORGE's preparation.",
-        ),
-        example: String(payload.example || "Answer if useful, or skip."),
+      const signalAcquisition =
+        judgmentResult.operationalJudgment.signalAcquisition;
+      const authorizedEvidenceNeed = String(
+        signalAcquisition.requestedSignal || "",
+      );
+      const authorizationReason = String(signalAcquisition.reason || "");
+
+      if (
+        signalAcquisition.shouldAcquire !== true ||
+        !authorizedEvidenceNeed.trim() ||
+        !authorizationReason.trim()
+      ) {
+        preserveHomepagePendingQuestion(preparationSession, null);
+        setOptionalQuestion(null);
+        return;
+      }
+
+      const authorization: HomepageOperationalJudgmentAuthorization = {
+        request: judgmentResult.request,
+        source: judgmentResult.source,
+        entrySource: "homepage",
+        preparationSessionId,
+        shouldAcquire: true,
+        requestedSignal: authorizedEvidenceNeed,
+        reason: authorizationReason,
+        ...(signalAcquisition.purpose
+          ? { purpose: signalAcquisition.purpose }
+          : {}),
       };
 
-      setBriefingSufficient(false);
+      const bundledQuestion = judgmentResult.authorizedSignalQuestion;
+      if (
+        bundledQuestion?.evidenceNeed === authorizedEvidenceNeed &&
+        bundledQuestion.question.trim() &&
+        bundledQuestion.key.trim()
+      ) {
+        const nextQuestion: HomepageOptionalQuestion = {
+          key: bundledQuestion.key,
+          label: bundledQuestion.label || "Additional signal",
+          question: bundledQuestion.question,
+          why: bundledQuestion.why || authorizationReason,
+          example: bundledQuestion.example || "",
+          evidenceNeed: authorizedEvidenceNeed,
+          ...(authorization.purpose
+            ? { purpose: authorization.purpose }
+            : {}),
+          clarificationRequired: false,
+        };
+
+        preserveHomepagePendingQuestion(preparationSession, nextQuestion);
+        setOptionalQuestion(nextQuestion);
+        setOptionalQuestionHistory((current) => ({
+          ...current,
+          [nextQuestion.key]: nextQuestion.question,
+        }));
+        setOptionalAnswer("");
+        return;
+      }
+
+      const formulationResponse = await fetch(
+        "/api/george/live/signal-question",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
+          body: JSON.stringify({
+            entrySource: "homepage",
+            preparationSessionId,
+            homepagePreparationContext: {
+              session: preparationSession,
+              preparationSessionId,
+            },
+            authorizedEvidenceNeed,
+            authorizationReason,
+            operationalJudgmentAuthorization: authorization,
+          }),
+        },
+      );
+      const formulationPayload = await formulationResponse
+        .json()
+        .catch(() => ({}));
+      if (!responseIsCurrent() || controller.signal.aborted) return;
+
+      const returnedAuthorization =
+        formulationPayload?.authorization as
+          | HomepageOperationalJudgmentAuthorization
+          | null;
+      const question = String(formulationPayload?.question || "");
+      const key = String(formulationPayload?.key || "");
+      if (
+        !formulationResponse.ok ||
+        formulationPayload?.nextAction !== "ask_question" ||
+        String(formulationPayload?.evidenceNeed || "") !==
+          authorizedEvidenceNeed ||
+        returnedAuthorization?.request !==
+          NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST ||
+        returnedAuthorization?.source !== "operational_judgment" ||
+        returnedAuthorization.entrySource !== "homepage" ||
+        returnedAuthorization.preparationSessionId !== preparationSessionId ||
+        returnedAuthorization.shouldAcquire !== true ||
+        returnedAuthorization.requestedSignal !== authorizedEvidenceNeed ||
+        returnedAuthorization.reason !== authorizationReason ||
+        returnedAuthorization.purpose !== authorization.purpose ||
+        !question.trim() ||
+        !key.trim()
+      ) {
+        return;
+      }
+
+      const nextQuestion: HomepageOptionalQuestion = {
+        key,
+        label: String(formulationPayload.label || "Additional signal"),
+        question,
+        why: String(formulationPayload.why || formulationPayload.helper || ""),
+        example: String(formulationPayload.example || ""),
+        evidenceNeed: authorizedEvidenceNeed,
+        ...(authorization.purpose
+          ? { purpose: authorization.purpose }
+          : {}),
+        clarificationRequired:
+          formulationPayload.clarificationRequired === true,
+      };
+
+      preserveHomepagePendingQuestion(preparationSession, nextQuestion);
       setOptionalQuestion(nextQuestion);
       setOptionalQuestionHistory((current) => ({
         ...current,
         [nextQuestion.key]: nextQuestion.question,
       }));
       setOptionalAnswer("");
-      setPhase("optional");
-    } catch {
-      const fallbackQuestion: HomepageOptionalQuestion = {
-        key: `fallback_${Date.now()}`,
-        label: "Additional signal",
-        question: "What should I be especially ready for in this room?",
-        why: "This may materially improve my preparation.",
-        example: "Answer if useful, or skip.",
-      };
-
-      setOptionalQuestion(fallbackQuestion);
-      setOptionalQuestionHistory((current) => ({
-        ...current,
-        [fallbackQuestion.key]: fallbackQuestion.question,
-      }));
-      setOptionalAnswer("");
-      setPhase("optional");
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
     } finally {
-      setOptionalQuestionLoading(false);
+      if (homepageAssessmentSequenceRef.current === requestSequence) {
+        homepageAssessmentAbortRef.current = null;
+        homepageAssessmentInFlightRef.current = false;
+        setOptionalQuestionLoading(false);
+      }
     }
   }
 
-  async function submitHomepageOptionalAnswer() {
-    if (!optionalQuestion) return;
+  function editCurrentUnderstanding() {
+    setCurrentUnderstandingDraft(supportedCurrentUnderstanding);
+    setCurrentUnderstandingStatus("editing");
+    setEditingCurrentUnderstanding(true);
+  }
 
-    const answer = optionalAnswer.trim();
-    if (!answer) return;
+  function cancelCurrentUnderstandingEdit() {
+    setCurrentUnderstandingDraft("");
+    setCurrentUnderstandingStatus("idle");
+    setEditingCurrentUnderstanding(false);
+  }
 
-    if (optionalInteractionMode === "ask_george") {
-      setOptionalQuestionLoading(true);
-      setOptionalGeorgeResponse("");
+  function preserveCurrentUnderstanding() {
+    const exactRevision = currentUnderstandingDraft;
+    if (!exactRevision.trim()) return;
 
-      try {
-        const response = await fetch("/api/george/live/signal-question", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            interactionMode: "ask_george",
-            userTurn: answer,
-            role: answers.role || selectedRole?.label || "",
-            broadGoal: answers.broadGoal || selectedGoal || "",
-            desiredOutcome: answers.desiredOutcome || "",
-            acceptableOutcome: "",
-            audience: "",
-            room: selectedType?.title || "",
-            knownContext: answers.conversationContext || "",
-            documentSummary: "",
-            priorAnswers: optionalAnswers,
-            priorInteractions: buildHomepagePriorInteractions(),
-            skippedQuestions: skippedOptionalQuestions,
-          }),
-        });
-
-        const payload = await response.json().catch(() => ({}));
-        const georgeResponse = String(payload?.response || "").trim();
-
-        setOptionalGeorgeResponse(
-          georgeResponse ||
-            "I can answer that while preserving the current briefing question.",
-        );
-        setOptionalAnswer("");
-        setOptionalInteractionMode("briefing");
-      } catch {
-        setOptionalGeorgeResponse(
-          "I couldn't answer that just now. The briefing question is still here.",
-        );
-      } finally {
-        setOptionalQuestionLoading(false);
-      }
-
-      return;
-    }
+    const seed = homepagePreparationSeedRef.current;
+    if (!seed) return;
 
     const nextAnswers = {
-      ...optionalAnswers,
-      [optionalQuestion.key]: answer,
+      ...answers,
+      currentUnderstandingRevision: exactRevision,
     };
+    const revisionInteraction = {
+      key: "currentUnderstandingRevision",
+      question:
+        "Continue editing from here. Correct anything I misunderstood, remove what no longer applies, or add what I should know.",
+      answer: exactRevision,
+      status: "answered" as const,
+      evidenceNeed: "the user's corrected current understanding",
+    };
+    const nextSession = createPreparationSession({
+      preparationSessionId: seed.preparationSessionId,
+      provenance: seed.provenance,
+      createdAt: seed.createdAt,
+      updatedAt: Date.now(),
+      knowledge: {
+        ...seed.knowledge,
+        knownContext: exactRevision,
+        additionalSignals: {
+          ...seed.knowledge.additionalSignals,
+          currentUnderstandingRevision: exactRevision,
+        },
+      },
+      briefing: {
+        priorInteractions: normalizePreparationInteractions([
+          ...seed.briefing.priorInteractions.filter(
+            (interaction) =>
+              interaction.key !== "currentUnderstandingRevision",
+          ),
+          revisionInteraction,
+        ]),
+        currentQuestion: seed.briefing.currentQuestion,
+      },
+      assets: seed.assets,
+      support: seed.support,
+      workflow: seed.workflow,
+      relations: seed.relations,
+    });
 
-    setOptionalAnswers(nextAnswers);
+    homepagePreparationSeedRef.current = nextSession;
+    savePreparationSession(nextSession);
+    saveLivePreparationSignals(nextAnswers);
+    setAnswers(nextAnswers);
+    setCurrentUnderstandingRevision(exactRevision);
+    setCurrentUnderstandingDraft("");
+    setCurrentUnderstandingStatus("preserved");
+    setEditingCurrentUnderstanding(false);
+    setBriefingSufficient(false);
     setOptionalQuestion(null);
     setOptionalAnswer("");
-    setOptionalGeorgeResponse("");
-    setOptionalInteractionMode("briefing");
+    setPhase("optional");
+    void requestHomepageOperationalJudgment(
+      nextSession,
+      "current_understanding",
+    );
+  }
 
-    try {
-      window.localStorage.setItem(
-        "GEORGE_PRE_LIVE_OPTIONAL_SIGNALS",
-        JSON.stringify(nextAnswers),
-      );
-    } catch {}
+  async function submitHomepageOptionalAnswer(options?: {
+    explicitSelection?: HomepageConversationMode;
+    heldTurn?: HomepageHeldAmbiguousTurn;
+  }) {
+    if (homepageAssessmentInFlightRef.current) return;
 
-    if (editingOptionalQuestionKey) {
-      setEditingOptionalQuestionKey(null);
-      setPhase("review");
+    const heldTurn = options?.heldTurn;
+    const pendingQuestion = heldTurn?.pendingQuestion || optionalQuestion;
+    const exactSubmission = heldTurn?.submission ?? optionalAnswer;
+    if (!pendingQuestion || !exactSubmission.trim()) return;
+
+    const seed = homepagePreparationSeedRef.current;
+    if (!seed || seed.provenance.entrySource !== "homepage") return;
+
+    const projectedPreparation =
+      projectPreparationSessionForLiveRuntime(seed);
+    if (
+      !projectedPreparation ||
+      projectedPreparation.provenance.entrySource !== "homepage" ||
+      projectedPreparation.preparationSessionId !== seed.preparationSessionId ||
+      projectedPreparation.relations.normalSessionId
+    ) {
       return;
     }
 
-    setBriefingSufficient(false);
-    setPhase("optional");
-    void requestHomepageOptionalQuestion(nextAnswers, skippedOptionalQuestions);
+    const currentClassification =
+      heldTurn?.currentClassification || acceptedConversationMode;
+    const explicitSelection =
+      options?.explicitSelection ?? pendingExplicitConversationMode;
+    const controller = new AbortController();
+    homepageAssessmentAbortRef.current?.abort();
+    homepageAssessmentAbortRef.current = controller;
+    const requestSequence = homepageAssessmentSequenceRef.current + 1;
+    homepageAssessmentSequenceRef.current = requestSequence;
+    homepageAssessmentInFlightRef.current = true;
+    const preparationSessionId = seed.preparationSessionId;
+    const responseIsCurrent = () =>
+      homepageAssessmentSequenceRef.current === requestSequence &&
+      homepagePreparationSeedRef.current?.preparationSessionId ===
+        preparationSessionId;
+
+    setHomepageConversationError("");
+    setOptionalQuestionLoading(true);
+    setHomepageConversationSequence({
+      stage: "transitioning",
+      message: "",
+    });
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          messages: [{ role: "user", content: exactSubmission }],
+          mode: "normal",
+          tier: missionTier,
+          requestPurpose: NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST,
+          preparationTurnIntent: {
+            currentClassification,
+            explicitSelection: explicitSelection ?? null,
+          },
+          preparationContext: {
+            entrySource: "homepage",
+            preparationSessionId,
+            session: seed,
+            evidenceSufficiency: "unresolved",
+            signalAcquisitionAllowed: true,
+          },
+        }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!responseIsCurrent() || controller.signal.aborted) return;
+
+      const judgmentResult = payload?.operationalJudgmentResult as
+        | NormalLiveOperationalJudgmentResult
+        | null;
+      const classification =
+        judgmentResult?.operationalJudgment
+          ?.preparationTurnClassification;
+      const realization =
+        judgmentResult?.operationalJudgment
+          ?.preparationTurnRealizationAuthorization;
+
+      if (
+        !response.ok ||
+        judgmentResult?.request !==
+          NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST ||
+        judgmentResult.source !== "operational_judgment" ||
+        judgmentResult.operationalJudgment?.source !==
+          "operational_judgment" ||
+        classification?.authority !== "operational_judgment" ||
+        realization?.source !== "operational_judgment"
+      ) {
+        throw new Error("The canonical turn result was unavailable.");
+      }
+
+      if (classification.classification === "clarification_required") {
+        const clarificationMessage = String(
+          judgmentResult.message || "",
+        ).trim();
+        if (
+          realization.action !== "direct_canonical_clarification" ||
+          realization.providerExecutionAuthorized ||
+          !clarificationMessage
+        ) {
+          throw new Error("The canonical clarification was unavailable.");
+        }
+
+        setHeldAmbiguousTurn({
+          submission: exactSubmission,
+          pendingQuestion,
+          currentClassification,
+        });
+        setPendingExplicitConversationMode(null);
+        setHomepageConversationSequence({
+          stage: "clarification",
+          message: clarificationMessage,
+        });
+        return;
+      }
+
+      const acceptedMode = classification.classification;
+      const canonicalAcknowledgment =
+        classification.inferredModeTransition === "switched"
+          ? String(classification.acknowledgment || "").trim()
+          : "";
+      if (
+        classification.inferredModeTransition === "switched" &&
+        !canonicalAcknowledgment
+      ) {
+        throw new Error("The canonical mode acknowledgment was unavailable.");
+      }
+
+      if (acceptedMode === "preparation") {
+        const preparationResponse = String(
+          judgmentResult.message || "",
+        ).trim();
+        if (
+          realization.action !== "respond_to_preparation" ||
+          !realization.providerExecutionAuthorized ||
+          !realization.preservePendingQuestion ||
+          !preparationResponse
+        ) {
+          throw new Error("The authorized Preparation response was unavailable.");
+        }
+
+        setAcceptedConversationMode(acceptedMode);
+        setPendingExplicitConversationMode(null);
+        setHeldAmbiguousTurn(null);
+        setEditingOptionalQuestionKey(null);
+        setOptionalAnswer("");
+        await presentHomepageConversationSequence([
+          ...(canonicalAcknowledgment
+            ? [
+                {
+                  stage: "acknowledgment" as const,
+                  message: canonicalAcknowledgment,
+                },
+              ]
+            : []),
+          { stage: "response", message: preparationResponse },
+        ]);
+        return;
+      }
+
+      if (
+        realization.action !== "assess_live_briefing" ||
+        !realization.assessLiveBriefing ||
+        !realization.mayAffectLivePreparation
+      ) {
+        throw new Error("The LIVE-briefing assessment was unavailable.");
+      }
+
+      setAcceptedConversationMode(acceptedMode);
+      setPendingExplicitConversationMode(null);
+      setHeldAmbiguousTurn(null);
+      setEditingOptionalQuestionKey(null);
+      const nextSession = applyAcceptedLiveBriefingTurn(
+        seed,
+        pendingQuestion,
+        classification,
+        judgmentResult,
+      );
+      const canonicalResponse = String(judgmentResult.message || "").trim();
+      setOptionalAnswer("");
+      setBriefingSufficient(false);
+      setPhase("optional");
+
+      await presentHomepageConversationSequence(
+        [
+          ...(canonicalAcknowledgment
+            ? [
+                {
+                  stage: "acknowledgment" as const,
+                  message: canonicalAcknowledgment,
+                },
+              ]
+            : []),
+          ...(canonicalResponse
+            ? [{ stage: "response" as const, message: canonicalResponse }]
+            : []),
+        ],
+        false,
+      );
+      await requestHomepageOperationalJudgment(nextSession);
+      setHomepageConversationSequence({ stage: "question", message: "" });
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+
+      setHomepageConversationError(
+        "I couldn’t process that turn. Your text and briefing are still here—try again.",
+      );
+      setHomepageConversationSequence(
+        heldAmbiguousTurn || heldTurn
+          ? {
+              stage: "clarification",
+              message:
+                homepageConversationSequence.message,
+            }
+          : { stage: "question", message: "" },
+      );
+    } finally {
+      if (homepageAssessmentSequenceRef.current === requestSequence) {
+        homepageAssessmentAbortRef.current = null;
+        homepageAssessmentInFlightRef.current = false;
+        setOptionalQuestionLoading(false);
+      }
+    }
+  }
+
+  function selectHomepageConversationMode(mode: HomepageConversationMode) {
+    setPendingExplicitConversationMode(mode);
+    setHomepageConversationError("");
+
+    if (heldAmbiguousTurn) {
+      void submitHomepageOptionalAnswer({
+        explicitSelection: mode,
+        heldTurn: heldAmbiguousTurn,
+      });
+    }
   }
 
   function skipHomepageOptionalQuestion() {
-    if (!optionalQuestion) return;
+    if (!optionalQuestion || homepageAssessmentInFlightRef.current) return;
+
+    const seed = homepagePreparationSeedRef.current;
+    if (!seed || seed.provenance.entrySource !== "homepage") return;
 
     const nextSkipped = [...skippedOptionalQuestions, optionalQuestion.key];
+    const skippedInteraction = {
+      key: optionalQuestion.key,
+      question: optionalQuestion.question,
+      example: optionalQuestion.example,
+      answer: "",
+      status: "skipped" as const,
+      evidenceNeed: optionalQuestion.evidenceNeed,
+      purpose: optionalQuestion.purpose,
+    };
+    const nextSession = createPreparationSession({
+      preparationSessionId: seed.preparationSessionId,
+      provenance: seed.provenance,
+      createdAt: seed.createdAt,
+      updatedAt: Date.now(),
+      knowledge: seed.knowledge,
+      briefing: {
+        priorInteractions: normalizePreparationInteractions([
+          ...seed.briefing.priorInteractions.filter(
+            (interaction) => interaction.key !== optionalQuestion.key,
+          ),
+          skippedInteraction,
+        ]),
+        currentQuestion: null,
+      },
+      assets: seed.assets,
+      support: seed.support,
+      workflow: seed.workflow,
+      relations: seed.relations,
+    });
+
+    homepagePreparationSeedRef.current = nextSession;
+    savePreparationSession(nextSession);
 
     setSkippedOptionalQuestions(nextSkipped);
     setOptionalQuestion(null);
@@ -1757,24 +2778,29 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
     setBriefingSufficient(false);
     setPhase("optional");
-    void requestHomepageOptionalQuestion(optionalAnswers, nextSkipped);
+    void requestHomepageOperationalJudgment(nextSession);
   }
 
   function continueHomepageBriefing() {
+    if (homepageAssessmentInFlightRef.current) return;
+    const preparationSession = homepagePreparationSeedRef.current;
+    if (!preparationSession) return;
+
     setEditingOptionalQuestionKey(null);
     setOptionalQuestion(null);
     setOptionalAnswer("");
     setBriefingSufficient(false);
     setPhase("optional");
-    void requestHomepageOptionalQuestion(
-      optionalAnswers,
-      skippedOptionalQuestions,
-    );
+    void requestHomepageOperationalJudgment(preparationSession);
   }
 
   function editHomepageOptionalAnswer(key: string) {
     const question = String(optionalQuestionHistory[key] || "").trim();
     const answer = String(optionalAnswers[key] || "");
+    const existingInteraction =
+      homepagePreparationSeedRef.current?.briefing.priorInteractions.find(
+        (interaction) => interaction.key === key,
+      );
 
     if (!question) return;
 
@@ -1785,44 +2811,65 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       question,
       why: "Update this answer without restarting the briefing.",
       example: "Revise your answer.",
+      ...(existingInteraction?.evidenceNeed
+        ? { evidenceNeed: existingInteraction.evidenceNeed }
+        : {}),
+      ...(existingInteraction?.purpose
+        ? { purpose: existingInteraction.purpose }
+        : {}),
     });
     setOptionalAnswer(answer);
     setPhase("optional");
-  }
-
-  function reviewHomepageAnswers() {
-    setEditingOptionalQuestionKey(null);
-    setOptionalQuestion(null);
-    setOptionalAnswer("");
-    setPhase("review");
   }
 
   type HomepageBriefingAction = "review_brief";
 
   function buildHomepagePriorInteractions() {
     const answeredQuestionKeys = new Set(Object.keys(optionalAnswers));
+    const canonicalInteractions = new Map(
+      (homepagePreparationSeedRef.current?.briefing.priorInteractions || []).map(
+        (interaction) => [interaction.key, interaction],
+      ),
+    );
 
     return [
-      ...Object.entries(optionalAnswers).map(([key, answer]) => ({
-        key,
-        question: optionalQuestionHistory[key] || "",
-        answer: String(answer || "").trim(),
-        status: "answered" as const,
-      })),
+      ...Object.entries(optionalAnswers).map(([key, answer]) => {
+        const interaction = canonicalInteractions.get(key);
+        return {
+          key,
+          question: interaction?.question || optionalQuestionHistory[key] || "",
+          ...(interaction?.example ? { example: interaction.example } : {}),
+          answer: String(answer || ""),
+          status: "answered" as const,
+          ...(interaction?.evidenceNeed
+            ? { evidenceNeed: interaction.evidenceNeed }
+            : {}),
+          ...(interaction?.purpose ? { purpose: interaction.purpose } : {}),
+        };
+      }),
       ...Array.from(new Set(skippedOptionalQuestions))
         .filter((key) => !answeredQuestionKeys.has(key))
-        .map((key) => ({
-          key,
-          question: optionalQuestionHistory[key] || "",
-          answer: "",
-          status: "skipped" as const,
-        })),
+        .map((key) => {
+          const interaction = canonicalInteractions.get(key);
+          return {
+            key,
+            question:
+              interaction?.question || optionalQuestionHistory[key] || "",
+            ...(interaction?.example ? { example: interaction.example } : {}),
+            answer: "",
+            status: "skipped" as const,
+            ...(interaction?.evidenceNeed
+              ? { evidenceNeed: interaction.evidenceNeed }
+              : {}),
+            ...(interaction?.purpose ? { purpose: interaction.purpose } : {}),
+          };
+        }),
     ];
   }
 
   const homepagePreparationSession = useMemo(() => {
     const seed = homepagePreparationSeedRef.current;
-    if (!seed || !selectedRole) return null;
+    if (!seed) return null;
 
     const additionalSignals = Object.fromEntries(
       Object.entries({
@@ -1853,7 +2900,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
           answers.desiredOutcome || selectedGoal || seed.knowledge.objective,
         baselineAssumptions: [...baselineAssumptions],
         name: answers.name || seed.knowledge.name,
-        role: answers.role || selectedRole?.label || seed.knowledge.role,
+        role: answers.role || seed.knowledge.role,
         participants: audience ? [audience] : seed.knowledge.participants,
         audience: audience || seed.knowledge.audience,
         perspectives: seed.knowledge.perspectives,
@@ -1865,7 +2912,9 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
             }
           : seed.knowledge.conversation,
         knownContext:
-          answers.conversationContext || seed.knowledge.knownContext,
+          answers.currentUnderstandingRevision ||
+          answers.conversationContext ||
+          seed.knowledge.knownContext,
         communicationMedium: seed.knowledge.communicationMedium,
         receiverEvidence: seed.knowledge.receiverEvidence,
         acceptableOutcome: seed.knowledge.acceptableOutcome,
@@ -1912,7 +2961,6 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     workflowAction: HomepageBriefingAction,
   ) {
     if (
-      !selectedType ||
       !briefingSufficient ||
       !homepagePreparationSession
     ) {
@@ -1963,13 +3011,21 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       window.localStorage.setItem(
         "GEORGE_HOMEPAGE_LIVE_HANDOFF",
         JSON.stringify({
-          conversationTypeId: selectedType.id,
-          conversationType: selectedType.title,
-          conversationGroup: selectedType.group,
+          conversationTypeId:
+            selectedType?.id ||
+            homepagePreparationSession.knowledge.conversation.id ||
+            "",
+          conversationType:
+            selectedType?.title ||
+            homepagePreparationSession.knowledge.conversation.title ||
+            "",
+          conversationGroup:
+            selectedType?.group ||
+            homepagePreparationSession.knowledge.conversation.group ||
+            "",
           signals,
           readiness: {
-            ...resolveLivePreparationReadiness(signals),
-            source: "openai",
+            ...preparationReadiness,
             thresholdMet: briefingSufficient,
             complete: briefingSufficient,
           },
@@ -2021,536 +3077,211 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     >
       <div className="mx-auto w-full max-w-5xl">
         {phase === "selection" ? (
-          <div className="animate-[fadeIn_420ms_ease-out]">
-            <div className="max-w-6xl">
-              <div
-                id="conversation-setup"
-                className="scroll-mt-28"
+          <div className="mx-auto flex min-h-[62dvh] w-full max-w-3xl items-center animate-[fadeIn_420ms_ease-out]">
+            <form
+              className="w-full min-w-0 py-8 sm:py-12"
+              onSubmit={(event) => {
+                event.preventDefault();
+                captureDesiredOutcome();
+              }}
+            >
+              <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-[#AEB6FF]/62">
+                Desired outcome
+              </div>
+              <label
+                htmlFor="homepage-desired-outcome"
+                className="mt-4 block max-w-2xl font-mono text-[24px] font-semibold leading-[1.22] tracking-[-0.04em] text-white sm:text-[34px]"
               >
-                <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-white/52">
-                  Role first / conversation setup
-                </div>
-                <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {FEATURED_HOMEPAGE_ROLES.map((role) => (
-                    <HomepageRoleCard
-                      key={role.id}
-                      role={role}
-                      featured
-                      onSelect={selectRole}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-7 flex flex-wrap items-center gap-4 border-t border-white/[0.06] pt-6">
+                What do you want this conversation to accomplish?
+              </label>
+              <p className="mt-4 max-w-xl text-[13px] leading-6 text-white/44 sm:text-[14px]">
+                Start with the result in your own words. GEORGE can determine the next best question to materially improve the likelihood of a successful conclusion.
+              </p>
+              <textarea
+                id="homepage-desired-outcome"
+                autoFocus
+                value={outcomeDraft}
+                onChange={(event) => setOutcomeDraft(event.target.value)}
+                onKeyDown={(event) => {
+                  if (
+                    event.key === "Enter" &&
+                    !event.shiftKey &&
+                    !event.nativeEvent.isComposing &&
+                    outcomeDraft.trim()
+                  ) {
+                    event.preventDefault();
+                    captureDesiredOutcome();
+                  }
+                }}
+                rows={3}
+                placeholder="Describe the outcome you want"
+                className="mt-8 min-h-[118px] w-full min-w-0 resize-none border-x-0 border-b border-t-0 border-white/[0.16] bg-transparent px-0 py-3 text-[17px] leading-7 text-white outline-none transition placeholder:text-white/24 focus:border-[#7EA1FF]/65 focus:ring-0 sm:text-[19px]"
+              />
+              <div className="mt-6 flex justify-end">
                 <button
-                  type="button"
-                  onClick={() => setShowAllRoles((current) => !current)}
-                  className="rounded-[12px] border border-white/[0.14] bg-white/[0.025] px-4 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/72 shadow-[inset_0_1px_0_rgba(255,255,255,0.035)] transition hover:border-white/30 hover:bg-white/[0.04] hover:text-white"
+                  type="submit"
+                  disabled={!outcomeDraft.trim() || !tierAuthorityResolved || !missionTier}
+                  className="h-11 rounded-[9px] border border-[#7EA1FF]/48 bg-[#11182A] px-6 font-mono text-[9px] font-semibold uppercase tracking-[0.17em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#18213A] disabled:cursor-not-allowed disabled:opacity-30"
                 >
-                  {showAllRoles ? "Hide roles" : "View all roles"}
+                  Continue →
                 </button>
-                <span className="max-w-xl text-[12px] leading-5 text-white/40">
-                  Roles are included when conversation or presentation materially affects success.
-                </span>
               </div>
-
-              {showAllRoles ? (
-                <div className="mt-8 animate-[fadeIn_320ms_ease-out]">
-                  <label className="block max-w-3xl">
-                    <span className="sr-only">Search roles</span>
-                    <input
-                      type="search"
-                      value={searchQuery}
-                      onChange={(event) => setSearchQuery(event.target.value)}
-                      placeholder="Search roles or describe how you communicate"
-                      className="w-full rounded-[16px] border border-white/[0.1] bg-[#08090A] px-5 py-4 text-[15px] text-white outline-none transition placeholder:text-white/28 focus:border-[#7EA1FF]/55"
-                    />
-                  </label>
-
-                  {visibleRoleCount > 0 ? (
-                    <div className="mt-7 space-y-8 pb-24 sm:pb-0">
-                      {visibleRoleGroups.map((group) => (
-                        <section key={group.category}>
-                          <div className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/46">
-                            {group.category}
-                          </div>
-                          <div className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-                            {group.roles.map((role) => (
-                              <HomepageRoleCard
-                                key={role.id}
-                                role={role}
-                                onSelect={selectRole}
-                              />
-                            ))}
-                          </div>
-                        </section>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="mt-6 rounded-[18px] border border-white/[0.08] bg-[#08090A] px-5 py-6">
-                      <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/48">
-                        No close role match yet. Choose the nearest role; OpenAI will adapt during briefing.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              ) : null}
-            </div>
+            </form>
           </div>
         ) : (
-          <div className="mx-auto w-full max-w-6xl animate-[fadeIn_420ms_ease-out]">
-            <div ref={preparationScrollRef} className="rounded-[18px] border border-white/[0.08] bg-[#050607] p-3 shadow-[0_18px_70px_rgba(0,0,0,0.42)] sm:p-5 sm:p-7">
-              <BxPageHeader
-                onBack={goBack}
-                rightSlot={
+          <div className="mx-auto w-full max-w-3xl min-w-0 py-8 animate-[fadeIn_280ms_ease-out] sm:py-12">
+            {editingCurrentUnderstanding ? (
+              <form
+                className="min-w-0"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  preserveCurrentUnderstanding();
+                }}
+              >
+                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/62">
+                  Editing your understanding
+                </div>
+                <h2 className="mt-4 max-w-2xl font-mono text-[22px] font-semibold leading-8 tracking-[-0.035em] text-white sm:text-[28px] sm:leading-9">
+                  Continue editing from here.
+                </h2>
+                <p className="mt-3 max-w-2xl text-[13px] leading-6 text-white/48">
+                  Correct anything I misunderstood, remove what no longer applies, or add what I should know.
+                </p>
+                <textarea
+                  autoFocus
+                  value={currentUnderstandingDraft}
+                  onChange={(event) =>
+                    setCurrentUnderstandingDraft(event.target.value)
+                  }
+                  rows={7}
+                  className="mt-7 min-h-[180px] w-full min-w-0 resize-y border-x-0 border-b border-t-0 border-white/[0.16] bg-transparent px-0 py-3 text-[16px] leading-7 text-white outline-none transition focus:border-[#7EA1FF]/65 focus:ring-0"
+                />
+                <div className="mt-5 flex flex-wrap items-center justify-end gap-3">
                   <button
                     type="button"
-                    onClick={resetSelection}
-                    className="inline-flex h-[23px] items-center justify-center rounded-[7px] border border-white bg-white px-2.5 font-mono !text-[8px] font-semibold uppercase leading-none tracking-[0.11em] text-black transition hover:bg-white/88"
+                    onClick={cancelCurrentUnderstandingEdit}
+                    className="px-2 py-2 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white/42 transition hover:text-white/72"
                   >
-                    Change role
+                    Cancel
                   </button>
-                }
-              />
-              <div
-                className={`border-b border-white/[0.07] pb-5 transition-all duration-500 ${
-                  phase === "optional" ? "border-transparent pb-3" : ""
-                }`}
-              >
-                <div className="flex items-start justify-between gap-2 sm:gap-3">
-                  <div className="min-w-0 flex-1">
-                    <SelectionAcknowledgement
-                      label={selectedRole?.label || selectedType?.title || "Selected role"}
-                    />
-                  </div>
-
+                  <button
+                    type="submit"
+                    disabled={!currentUnderstandingDraft.trim()}
+                    className="rounded-[9px] border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.17em] text-white transition hover:border-[#AEB6FF]/75 disabled:cursor-not-allowed disabled:opacity-30"
+                  >
+                    Preserve changes
+                  </button>
                 </div>
-              </div>
-
-              <section
-                aria-live="polite"
-                className="border-b border-white/[0.07] py-5 transition-all duration-500 sm:py-6"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/58">
-                      GEORGE understands
-                    </div>
-                    <h2 className="mt-2 font-mono text-[18px] font-semibold uppercase tracking-[-0.03em] text-white sm:text-[20px]">
-                      {selectedRole?.label || selectedType?.title || "Conversation"}
-                    </h2>
-                  </div>
-
-                  <div className="font-mono text-[8px] uppercase tracking-[0.15em] text-white/30">
-                    {briefingSufficient ? "Briefing ready" : "Updating as we brief"}
-                  </div>
-                </div>
-
-                <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(220px,0.72fr)_minmax(0,1.45fr)] lg:items-start">
-                  <ul className="space-y-2 text-[12px] leading-5">
-                    {preparationUnderstandingChecklist.map((item) => (
-                      <li
-                        key={item.key}
-                        className={`flex gap-2 ${
-                          item.complete ? "text-white/68" : "text-white/34"
-                        }`}
-                      >
-                        <span
-                          aria-hidden="true"
-                          className={
-                            item.complete
-                              ? "text-[#AEB6FF]"
-                              : "text-white/24"
-                          }
-                        >
-                          {item.complete ? "✓" : "○"}
-                        </span>
-                        <span>{item.label}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="min-w-0">
-                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#AEB6FF]/58">
-                      Current understanding
-                    </div>
-
-                    <p className="mt-2 max-w-3xl text-[13px] leading-6 text-white/64">
-                      {typedPreparationUnderstanding}
-                    </p>
-
-                    {baselineAssumptions.length > 0 && !answers.conversationContext?.trim() ? (
-                      <div className="mt-4">
-                        <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-[#AEB6FF]/58">
-                          Working assumptions
-                        </div>
-                        <ul className="mt-2 space-y-1 text-[11px] leading-5 text-white/42">
-                          {baselineAssumptions.map((assumption) => (
-                            <li key={assumption}>{assumption}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    ) : null}
-
-                    {assumptionCorrectionOpen ? (
-                      <ContextualGeorgeInput
-                        id="homepage-assumption-correction"
-                        value={assumptionCorrection}
-                        label="What should I understand instead?"
-                        placeholder="Tell me what is different or important about this conversation."
-                        submitLabel="Update my understanding"
-                        onChange={setAssumptionCorrection}
-                        onSubmit={submitAssumptionCorrection}
-                        onCancel={() => setAssumptionCorrectionOpen(false)}
-                      />
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => setAssumptionCorrectionOpen(true)}
-                        className="mt-4 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[#AEB6FF]/58 transition hover:text-white"
-                      >
-                        Clarify something? →
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </section>
-
-              {phase === "selected" && (
-                <div className="pt-6">
-                  {formulaSurfaceMode === "closed" ? (
-                    <div className="animate-[fadeIn_420ms_ease-out]">
-                      <div className="mt-4 max-w-3xl">
-                        <p className="text-[14px] leading-6 text-white/62 sm:text-[15px]">
-                          {currentOperationalPromise}
-                        </p>
-
-                        {selectedRole ? (
-                          <div className="mt-5 grid gap-1.5 sm:grid-cols-2">
-                            {selectedRole.capabilities.map((capability) => (
-                              <div
-                                key={capability}
-                                className="min-h-[44px] rounded-[10px] border border-white/[0.07] bg-white/[0.018] px-3 py-2.5 text-[12px] leading-5 text-white/62"
-                              >
-                                {capability}
-                              </div>
-                            ))}
-                          </div>
-                        ) : null}
-                      </div>
-
-                      <div className="mt-6 grid grid-cols-2 gap-3">
-                        <button
-                          type="button"
-                          onClick={() => setPhase("goal")}
-                          className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-[#7EA1FF]/42 bg-[#11182A] px-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white transition-colors duration-150 hover:border-white hover:bg-white hover:text-[#111318] focus-visible:border-white focus-visible:bg-white focus-visible:text-[#111318]"
-                        >
-                          Continue →
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={resetSelection}
-                          className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-white bg-white px-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[#111318] transition hover:border-[#4E7CFF] hover:bg-[#4E7CFF] hover:text-white"
-                        >
-                          Change role
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="animate-[fadeIn_320ms_ease-out]">
-                      <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-white/42">
-                        Formula
-                      </div>
-
-                      {formulaLoading ? (
-                        <p className="mt-4 text-[13px] text-white/42">
-                          Reviewing the formula…
-                        </p>
-                      ) : formulaError ? (
-                        <p className="mt-4 text-[13px] leading-6 text-white/52">
-                          {formulaError}
-                        </p>
-                      ) : activeFormula ? (
-                        <div className="mt-4 max-w-3xl">
-                          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                            <h3 className="font-mono text-[17px] font-semibold uppercase tracking-[-0.02em] text-white">
-                              {activeFormula.name || selectedType?.title}
-                            </h3>
-                            <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-white/32">
-                              Version {activeFormula.version} ·{" "}
-                              {activeFormula.status}
-                            </span>
-                          </div>
-
-                          {(activeFormula.bestUsedFor || []).length > 0 && (
-                            <p className="mt-3 text-[13px] leading-6 text-white/46">
-                              {(activeFormula.bestUsedFor || [])[0]}
-                            </p>
-                          )}
-
-                          <div className="mt-5 space-y-3">
-                            {(activeFormula.steps || []).map((step, index) => (
-                              <div
-                                key={`${activeFormula.id}-${index}`}
-                                className="border-l border-white/[0.10] pl-3"
-                              >
-                                <div className="text-[13px] leading-6 text-white/72">
-                                  {step.actionType ||
-                                    step.expectedTransition ||
-                                    step.signalType}
-                                </div>
-
-                                {step.actionType &&
-                                  step.expectedTransition && (
-                                    <div className="mt-1 text-[11px] leading-5 text-white/34">
-                                      {step.expectedTransition}
-                                    </div>
-                                  )}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ) : (
-                        <p className="mt-4 max-w-2xl text-[13px] leading-6 text-white/46">
-                          No operational formula is currently available for this
-                          conversation.
-                        </p>
-                      )}
-
-                      <button
-                        type="button"
-                        onClick={closeFormulaReview}
-                        className="mt-7 inline-flex h-9 items-center justify-center rounded-[9px] border border-white/[0.12] px-4 font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-white/58 transition hover:border-white/28 hover:text-white"
-                      >
-                        ← Back
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {phase === "goal" && (
-                <div className="pt-6 animate-[fadeIn_360ms_ease-out]">
-                  <div className="max-w-3xl">
-                    <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.24em] text-[#AEB6FF]/58 sm:text-[9px]">
-                      Direction
-                    </div>
-                    <h3 className="mt-2.5 font-mono text-[17px] font-semibold leading-6 tracking-[-0.03em] text-white sm:text-[22px] sm:leading-7">
-                      What do you want to take away from this conversation?
-                    </h3>
-                    <p className="mt-2 max-w-2xl text-[11px] leading-[1.65] text-white/48 sm:text-[12px] sm:leading-5">
-                      Choose the direction that best describes what you want from this conversation. I’ll use your role and this direction together to refine the briefing.
-                    </p>
-                    <p className="mt-2.5 font-mono text-[9px] uppercase tracking-[0.10em] text-white/34">
-                      {missionTier === "smart"
-                        ? "Choose the closest direction."
-                        : missionTier === "intelligent"
-                          ? "Choose up to two."
-                          : "Choose what applies."}
-                    </p>
-                  </div>
-
-                  <div className={missionCollapsing ? "mt-5 grid gap-2 sm:grid-cols-2 opacity-0 transition-all duration-500" : "mt-5 grid gap-2 sm:grid-cols-2 opacity-100 transition-all duration-500"}>
-                    {(adaptiveDirections.length > 0
-                      ? adaptiveDirections.map((label) => ({
-                          id: `adaptive-${label}`,
-                          label,
-                        }))
-                      : goalsForHomepageRole(selectedRole).filter(
-                          (goal) => goal.id !== "other",
-                        )
-                    ).map((mission) => {
-                        const selected = selectedMissions.includes(mission.label);
-                        const limitReached =
-                          !selected &&
-                          selectedMissions.length >= homepageMissionLimit(missionTier);
-                        return (
-                          <button
-                            key={mission.id}
-                            type="button"
-                            aria-pressed={selected}
-                            disabled={limitReached}
-                            onClick={() => toggleMission(mission.label)}
-                            className={selected
-                              ? "min-h-[34px] rounded-[8px] border border-[#AEB6FF]/70 bg-[#172347] px-3 py-2 text-left font-mono !text-[11px] font-semibold uppercase leading-[1.4] tracking-[0.08em] text-white transition sm:min-h-[40px] sm:px-4 sm:py-2.5 sm:!text-[12px] sm:tracking-[0.10em]"
-                              : "min-h-[34px] rounded-[8px] border border-white/[0.08] bg-white/[0.018] px-3 py-2 text-left font-mono !text-[11px] font-semibold uppercase leading-[1.4] tracking-[0.08em] text-white/68 transition hover:border-[#7EA1FF]/45 hover:bg-[#11182A] hover:text-white disabled:cursor-not-allowed disabled:opacity-30 sm:min-h-[40px] sm:px-4 sm:py-2.5 sm:!text-[12px] sm:tracking-[0.10em]"}
-                          >
-                            <span className="mr-2 inline-block w-4 text-[#AEB6FF]">
-                              {selected ? "✓" : ""}
-                            </span>
-                            {mission.label}
-                          </button>
-                        );
-                      })}
-                  </div>
-
-                  <div className="mt-4">
-                    {!customMissionOpen ? (
-                      <button
-                        type="button"
-                        onClick={() => setCustomMissionOpen(true)}
-                        className="rounded-[10px] border border-dashed border-white/[0.16] px-4 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white/58 transition hover:border-white/30 hover:text-white"
-                      >
-                        Something else…
-                      </button>
-                    ) : (
-                      <div className="rounded-[12px] border border-white/[0.08] bg-white/[0.015] p-3">
-                        <label
-                          htmlFor="homepage-custom-mission"
-                          className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42"
-                        >
-                          What do you want to take away from this conversation?
-                        </label>
-                        <div className="mt-2 flex flex-col gap-2 sm:flex-row">
-                          <input
-                            id="homepage-custom-mission"
-                            value={selectedGoal || ""}
-                            onChange={(event) => setSelectedGoal(event.target.value)}
-                            onKeyDown={(event) => {
-                              if (event.key === "Enter") {
-                                event.preventDefault();
-                                selectCustomMission(selectedGoal || "");
-                              }
-                            }}
-                            placeholder="Describe the outcome you want"
-                            className="h-11 min-w-0 flex-1 rounded-[9px] border border-white/[0.09] bg-black/40 px-3 text-[14px] text-white outline-none placeholder:text-white/24 focus:border-[#7EA1FF]/55"
-                          />
-                          <button
-                            type="button"
-                            disabled={!String(selectedGoal || "").trim()}
-                            onClick={() => selectCustomMission(selectedGoal || "")}
-                            className="h-11 rounded-[9px] border border-[#7EA1FF]/42 bg-[#11182A] px-5 font-mono text-[9px] font-semibold uppercase tracking-[0.15em] text-white transition hover:border-white disabled:cursor-not-allowed disabled:opacity-35"
-                          >
-                            Add objective
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {missionCollapsing && selectedMissions.length > 0 && (
-                    <div className={missionCollapsing ? "mt-5 flex flex-wrap gap-2 -translate-y-3 transition-all duration-500" : "mt-5 flex flex-wrap gap-2 translate-y-0 transition-all duration-500"}>
-                      {selectedMissions.map((mission) => (
-                        <span
-                          key={mission}
-                          className="rounded-full border border-[#AEB6FF]/45 bg-[#172347] px-3 py-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-white"
-                        >
-                          ✓ {mission}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="mt-6 flex items-center gap-3">
-                    <button
-                      type="button"
-                      disabled={selectedMissions.length === 0}
-                      onClick={continueWithMissions}
-                      className="h-11 rounded-[9px] border border-[#7EA1FF]/42 bg-[#11182A] px-5 font-mono text-[9px] font-semibold uppercase tracking-[0.15em] text-white transition hover:border-white disabled:cursor-not-allowed disabled:opacity-35"
-                    >
-                      Continue →
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {phase === "introduction" && (
-                <div className="flex min-h-0 flex-1 flex-col">
-                  <div className="px-1 pt-4 pb-3 sm:pt-6">
-                    <div
-                      className={`mt-5 transition-all duration-700 ${
-                        introStage >= 2
-                          ? "translate-y-0 opacity-100"
-                          : "pointer-events-none translate-y-2 opacity-0"
-                      }`}
-                    >
-                      <p className="max-w-3xl text-[14px] leading-[1.6] text-white/52 sm:text-[16px] sm:leading-[1.6]">
-                        {homepageOperationalSupport(
-                      selectedRole,
-                      answers.desiredOutcome || selectedGoal || "",
-                    )}
-                      </p>
-                      <div className="mt-7">
-                        <button
-                          type="button"
-                          onClick={beginQuestions}
-                          className="h-11 rounded-[9px] border border-[#7EA1FF]/42 bg-[#11182A] px-5 font-mono text-[9px] font-semibold uppercase tracking-[0.15em] text-white transition hover:border-[#AEB6FF]/70 hover:bg-[#18213A] sm:h-10"
-                        >
-                          Start Briefing →
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+              </form>
+            ) : (
+              <>
 
               {phase === "optional" && (
-                <div className="pt-7 animate-[fadeIn_420ms_ease-out]">
+                <div className="pt-7 motion-reduce:animate-none animate-[fadeIn_420ms_ease-out]">
                   <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/56">
-                    {optionalQuestion?.label || "Optional briefing"}
+                    {homepageConversationSequence.stage === "clarification"
+                      ? "Clarification"
+                      : homepageConversationSequence.stage === "acknowledgment" ||
+                          homepageConversationSequence.stage === "response"
+                        ? "GEORGE"
+                        : optionalQuestion?.label || "Optional briefing"}
                   </div>
 
-                  {optionalQuestionLoading && !optionalQuestion ? (
-                    <div className="mt-5 rounded-[16px] border border-white/[0.08] bg-white/[0.02] p-5">
-                      <p className="font-mono text-[14px] leading-7 text-white/68">
-                        GEORGE is reviewing the brief for the next useful question...
-                      </p>
+                  {homepageConversationSequence.stage === "transitioning" ? (
+                    <div
+                      aria-live="polite"
+                      className="min-h-[172px] opacity-0 transition-opacity duration-200 motion-reduce:transition-none"
+                    >
+                      {optionalQuestion?.question || "GEORGE"}
                     </div>
+                  ) : homepageConversationSequence.stage === "acknowledgment" ||
+                    homepageConversationSequence.stage === "response" ? (
+                    <div
+                      aria-live="polite"
+                      className="animate-[fadeIn_240ms_ease-out] motion-reduce:animate-none"
+                    >
+                      <h3 className="mt-3 min-h-[88px] max-w-4xl font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px]">
+                        {homepageConversationSequenceText}
+                      </h3>
+                    </div>
+                  ) : homepageConversationSequence.stage === "clarification" ? (
+                    <div
+                      aria-live="assertive"
+                      className="animate-[fadeIn_240ms_ease-out] motion-reduce:animate-none"
+                    >
+                      <h3 className="mt-3 min-h-[88px] max-w-4xl font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px]">
+                        {homepageConversationSequenceText}
+                      </h3>
+                      <div
+                        aria-label="How GEORGE should use this turn"
+                        className="mt-4 flex items-center gap-2"
+                      >
+                        {(
+                          [
+                            ["live_briefing", "LIVE briefing"],
+                            ["preparation", "Preparation"],
+                          ] as const
+                        ).map(([mode, label]) => (
+                          <button
+                            key={mode}
+                            type="button"
+                            aria-pressed={visibleConversationMode === mode}
+                            disabled={optionalQuestionLoading}
+                            onClick={() => selectHomepageConversationMode(mode)}
+                            className={
+                              visibleConversationMode === mode
+                                ? "rounded-[9px] border border-[#7EA1FF]/48 bg-[#172347] px-3 py-2 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white"
+                                : "rounded-[9px] border border-white/[0.10] px-3 py-2 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/45 transition hover:border-white/25 hover:text-white/70"
+                            }
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                      {homepageConversationError ? (
+                        <p className="mt-3 text-[12px] leading-5 text-[#AEB6FF]/72">
+                          {homepageConversationError}
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : optionalQuestionLoading && !optionalQuestion ? (
+                    <p className="mt-5 font-mono text-[14px] leading-7 text-white/68">
+                      I’m determining what matters next.
+                    </p>
                   ) : optionalQuestion ? (
                     <>
                       <h3 className="mt-3 min-h-[58px] max-w-4xl font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px]">
                         {optionalQuestionText}
                       </h3>
-                      <p className="mt-2 max-w-3xl text-[12px] leading-5 text-white/42">
-                        {optionalQuestion.why}
+                      <p className="mt-2 min-h-5 max-w-3xl text-[12px] leading-5 text-white/42">
+                        {optionalQuestionWhyText}
                       </p>
-                      {optionalGeorgeResponse && (
-                        <div className="mt-4 rounded-[11px] border border-[#7EA1FF]/20 bg-[#11182A]/55 px-4 py-3">
-                          <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-[#AEB6FF]/64">
-                            GEORGE
-                          </div>
-                          <p className="mt-2 text-[13px] leading-6 text-white/70">
-                            {optionalGeorgeResponse}
-                          </p>
-                        </div>
-                      )}
-
-                      {!editingOptionalQuestionKey && (
-                        <div className="mt-4 flex items-center gap-2">
+                      <div
+                        aria-label="How GEORGE should use this turn"
+                        className="mt-4 flex items-center gap-2"
+                      >
+                        {(
+                          [
+                            ["live_briefing", "LIVE briefing"],
+                            ["preparation", "Preparation"],
+                          ] as const
+                        ).map(([mode, label]) => (
                           <button
+                            key={mode}
                             type="button"
-                            aria-pressed={optionalInteractionMode === "briefing"}
-                            onClick={() => {
-                              setOptionalInteractionMode("briefing");
-                              setOptionalGeorgeResponse("");
-                            }}
+                            aria-pressed={visibleConversationMode === mode}
+                            disabled={optionalQuestionLoading}
+                            onClick={() => selectHomepageConversationMode(mode)}
                             className={
-                              optionalInteractionMode === "briefing"
+                              visibleConversationMode === mode
                                 ? "rounded-[9px] border border-[#7EA1FF]/48 bg-[#172347] px-3 py-2 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white"
                                 : "rounded-[9px] border border-white/[0.10] px-3 py-2 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/45 transition hover:border-white/25 hover:text-white/70"
                             }
                           >
-                            Answer
+                            {label}
                           </button>
-                          <button
-                            type="button"
-                            aria-pressed={optionalInteractionMode === "ask_george"}
-                            onClick={() => {
-                              setOptionalInteractionMode("ask_george");
-                              setOptionalGeorgeResponse("");
-                            }}
-                            className={
-                              optionalInteractionMode === "ask_george"
-                                ? "rounded-[9px] border border-[#7EA1FF]/48 bg-[#172347] px-3 py-2 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white"
-                                : "rounded-[9px] border border-white/[0.10] px-3 py-2 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/45 transition hover:border-white/25 hover:text-white/70"
-                            }
-                          >
-                            Ask GEORGE
-                          </button>
-                        </div>
-                      )}
+                        ))}
+                      </div>
 
                       <textarea
                         autoFocus
@@ -2563,75 +3294,144 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                           }
                         }}
                         rows={3}
-                        placeholder={
-                          optionalInteractionMode === "ask_george"
-                            ? "Ask GEORGE about this conversation or briefing."
-                            : optionalQuestion.example
-                        }
+                        placeholder={optionalQuestion.example}
                         className="mt-4 min-h-[118px] w-full resize-none rounded-[11px] border border-white/[0.09] bg-black/20 px-4 py-3 text-[14px] leading-6 text-white outline-none transition placeholder:text-white/22 focus:border-[#7EA1FF]/45 focus:bg-black/30"
                       />
-                      <div className="mt-4 flex flex-wrap items-center justify-end gap-3">
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={skipHomepageOptionalQuestion}
-                            disabled={optionalQuestionLoading}
-                            className="rounded-[10px] border border-white/[0.12] px-4 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white/52 transition hover:border-white/25 hover:text-white disabled:opacity-30"
-                          >
-                            Skip
-                          </button>
-                          <button
-                            type="button"
-                            onClick={submitHomepageOptionalAnswer}
-                            disabled={optionalQuestionLoading || !optionalAnswer.trim()}
-                            className="rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.17em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-30"
-                          >
-                            {optionalInteractionMode === "ask_george"
-                              ? "Ask GEORGE"
-                              : "Continue"}
-                          </button>
+                      {homepageConversationError ? (
+                        <p className="mt-3 text-[12px] leading-5 text-[#AEB6FF]/72">
+                          {homepageConversationError}
+                        </p>
+                      ) : null}
+                      <div className="mt-4 flex min-w-0 items-center justify-between gap-3">
+                        <div
+                          role="group"
+                          aria-label="Intelligence level"
+                          className="relative flex shrink-0 items-center gap-1"
+                        >
+                          {HOMEPAGE_INTELLIGENCE_TIERS.map((tier) => {
+                            const selected = tier.id === missionTier;
+                            const available = Boolean(
+                              entitledMissionTier &&
+                                homepageTierRank(tier.id) <=
+                                  homepageTierRank(entitledMissionTier),
+                            );
+                            return (
+                              <button
+                                key={tier.id}
+                                type="button"
+                                onPointerDown={(event) => {
+                                  lastTierPointerTypeRef.current =
+                                    event.pointerType;
+                                }}
+                                onKeyDown={() => {
+                                  lastTierPointerTypeRef.current = null;
+                                }}
+                                onPointerEnter={(event) => {
+                                  if (event.pointerType !== "touch") {
+                                    discloseMissionTier(tier.id);
+                                  }
+                                }}
+                                onPointerLeave={(event) => {
+                                  if (event.pointerType !== "touch") {
+                                    setDisclosedMissionTier(null);
+                                  }
+                                }}
+                                onFocus={() => discloseMissionTier(tier.id)}
+                                onBlur={() => setDisclosedMissionTier(null)}
+                                onClick={() =>
+                                  selectHomepageMissionTier(tier.id)
+                                }
+                                aria-label={`${tier.label} tier${
+                                  selected
+                                    ? ", selected"
+                                    : available
+                                      ? ", available"
+                                      : ", review access"
+                                }`}
+                                aria-describedby={`homepage-tier-explanation-${tier.id}`}
+                                aria-pressed={selected}
+                                disabled={!tierAuthorityResolved || !missionTier}
+                                className="group grid h-11 w-11 place-items-center rounded-[11px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7EA1FF]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:cursor-wait disabled:opacity-35"
+                              >
+                                <span
+                                  aria-hidden="true"
+                                  className={`grid h-8 w-8 place-items-center rounded-[8px] border font-mono text-[11px] font-semibold transition-[border-color,background-color,color,transform,opacity] duration-150 group-hover:-translate-y-0.5 ${
+                                    selected
+                                      ? "border-[#7EA1FF]/72 bg-[#172347] text-white shadow-[0_0_0_1px_rgba(126,161,255,0.10)] group-hover:border-[#AEB6FF]/85 group-hover:bg-[#203268]"
+                                      : "border-white/[0.09] bg-white/[0.02] text-white/30 opacity-55 group-hover:border-white/25 group-hover:bg-white/[0.05] group-hover:text-white/70 group-hover:opacity-100"
+                                  }`}
+                                >
+                                  {tier.shortLabel}
+                                </span>
+                                <span
+                                  id={`homepage-tier-explanation-${tier.id}`}
+                                  className="sr-only"
+                                >
+                                  {tier.explanation}
+                                </span>
+                              </button>
+                            );
+                          })}
+                          {disclosedMissionTier ? (
+                            <div
+                              role="tooltip"
+                              aria-hidden="true"
+                              className="pointer-events-none absolute bottom-full left-0 z-10 mb-2 w-[min(18rem,calc(100vw-3rem))] rounded-[8px] border border-white/[0.10] bg-[#090B10]/95 px-3 py-2 text-[11px] leading-5 text-white/64 shadow-[0_10px_32px_rgba(0,0,0,0.38)]"
+                            >
+                              {
+                                HOMEPAGE_INTELLIGENCE_TIERS.find(
+                                  (tier) => tier.id === disclosedMissionTier,
+                                )?.explanation
+                              }
+                            </div>
+                          ) : null}
                         </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            optionalAnswer.trim()
+                              ? void submitHomepageOptionalAnswer()
+                              : skipHomepageOptionalQuestion()
+                          }
+                          disabled={optionalQuestionLoading}
+                          className={`min-w-[92px] rounded-[10px] border px-5 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.17em] transition disabled:cursor-not-allowed disabled:opacity-30 ${
+                            optionalAnswer.trim()
+                              ? "border-[#7EA1FF]/48 bg-[#172347] text-white hover:border-[#AEB6FF]/75 hover:bg-[#203268]"
+                              : "border-white/[0.12] text-white/52 hover:border-white/25 hover:text-white"
+                          }`}
+                        >
+                          {optionalAnswer.trim() ? "Submit" : "Skip"}
+                        </button>
                       </div>
                     </>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={reviewHomepageAnswers}
-                      className="mt-5 rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.17em] text-white"
-                    >
-                          Continue
-                        </button>
+                    <p className="mt-5 font-mono text-[14px] leading-7 text-white/68">
+                      I’m determining what matters next.
+                    </p>
                   )}
                 </div>
               )}
 
               {phase === "decision" && (
                 <div className="pt-7 animate-[fadeIn_420ms_ease-out]">
-                  {briefingSufficient && (
-                    <div>
-                      <h3 className="max-w-4xl font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px] sm:leading-9">
-                        I have enough context to support you LIVE.
-                      </h3>
-                      <p className="mt-3 max-w-3xl text-[13px] leading-6 text-white/52">
-                        We can start now, or continue briefing to sharpen my support.
-                      </p>
-                    </div>
-                  )}
-                  <div className={`${briefingSufficient ? "mt-7" : "mt-1"} flex flex-wrap justify-center gap-3`}>
+                  <p className="font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px]">
+                    {preparationReadiness?.level === "sharp"
+                      ? "GEORGE is ready to support you LIVE."
+                      : "GEORGE can support you LIVE now."}
+                  </p>
+                  <p className="mt-3 max-w-2xl text-[13px] leading-6 text-white/48">
+                    {preparationReadiness?.furtherBriefingCouldSharpen
+                      ? "Another answer could sharpen my support. You can still enter LIVE now and I’ll work from what we know."
+                      : "Review what I understand before we prepare how I’ll support you."}
+                  </p>
+                  <div className="mt-6 flex justify-start">
                     <button
                       type="button"
-                      onClick={approveAndContinueToLive}
+                      onClick={() => setPhase("review")}
                       disabled={!briefingSufficient}
                       className="min-w-[190px] rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
                     >
-                      START LIVE
-                    </button>
-                    <button
-                      type="button"
-                      onClick={continueHomepageBriefing}
-                      className="min-w-[190px] rounded-[10px] border border-white/[0.14] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white/72 transition hover:border-white/30 hover:text-white"
-                    >
-                      NEXT QUESTION
+                      ENTER LIVE
                     </button>
                   </div>
                 </div>
@@ -2724,7 +3524,42 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                   </div>
                 </div>
               )}
-            </div>
+              </>
+            )}
+
+            {!editingCurrentUnderstanding ? (
+              <button
+                type="button"
+                data-current-understanding="compact"
+                onClick={editCurrentUnderstanding}
+                className="mt-5 block w-full min-w-0 border-t border-white/[0.07] pt-5 text-left transition hover:border-[#7EA1FF]/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7EA1FF]/45"
+              >
+                <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.19em] text-[#AEB6FF]/58">
+                  Current understanding
+                </span>
+                <span className="mt-3 block space-y-2 text-[13px] leading-6 text-white/64">
+                  {currentUnderstandingSignals.map((signal, index) => (
+                    <span
+                      key={`${signal}-${index}`}
+                      className="flex items-start gap-2"
+                    >
+                      <span aria-hidden="true" className="text-[#AEB6FF]/78">
+                        ✓
+                      </span>
+                      <span className="min-w-0 break-words">{signal}</span>
+                    </span>
+                  ))}
+                </span>
+                <span className="mt-3 block text-[11px] leading-5 text-white/34">
+                  Edit anything I have misunderstood, or add what I should know.
+                </span>
+                {currentUnderstandingStatus === "preserved" ? (
+                  <span className="mt-3 block font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-[#AEB6FF]/64">
+                    Changes preserved
+                  </span>
+                ) : null}
+              </button>
+            ) : null}
           </div>
         )}
       </div>

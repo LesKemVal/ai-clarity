@@ -4,6 +4,7 @@ import { checkRateLimit, getRequestIdentity } from '@/lib/security/rate-limit'
 import {
   preparationEvidenceNeedIsAlreadyKnown,
   projectNormalPreparationEvidence,
+  projectPreparationSessionForLiveRuntime,
   resolveAdaptivePreparationTransition,
 } from '@/lib/george/live-runtime/live-preparation-controller'
 import { createOperationalMemory } from '@/lib/george/operational-memory/operational-memory'
@@ -20,6 +21,7 @@ import {
 import type { RetrievedOperationalFormula } from '@/lib/george/operational-memory/types'
 import { readGeorgeSession } from '@/lib/security/george-session'
 import { formulateAuthorizedSignalQuestion } from '@/lib/george/live-runtime/authorized-signal-question'
+import { NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST } from '@/lib/george/runtime/operational-judgment'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -30,12 +32,16 @@ type PriorInteractionStatus = 'answered' | 'skipped' | 'unknown'
 type PriorInteraction = {
   key: string
   question: string
+  example?: string
   answer: string
   status: PriorInteractionStatus
   evidenceNeed?: string
+  purpose?: 'live_scope_grounding' | 'qualification'
 }
 
 type SignalQuestionRequest = {
+  entrySource?: 'normal' | 'homepage'
+  preparationSessionId?: string
   interactionMode?: 'briefing' | 'ask_george' | 'briefing_examples'
   userTurn?: string
   role?: string
@@ -50,14 +56,17 @@ type SignalQuestionRequest = {
   priorInteractions?: Array<{
     key?: string
     question?: string
+    example?: string
     answer?: string
     status?: 'answered' | 'skipped' | 'unknown'
     evidenceNeed?: string
+    purpose?: 'live_scope_grounding' | 'qualification'
   }>
   skippedQuestions?: string[]
   pendingQuestion?: {
     key?: string
     question?: string
+    example?: string
     evidenceNeed?: string
   } | null
   formula?: {
@@ -67,6 +76,20 @@ type SignalQuestionRequest = {
   } | null
   authorizedEvidenceNeed?: string
   authorizationReason?: string
+  operationalJudgmentAuthorization?: {
+    request?: string
+    source?: string
+    entrySource?: string
+    preparationSessionId?: string
+    shouldAcquire?: boolean
+    requestedSignal?: string
+    reason?: string
+    purpose?: 'live_scope_grounding' | 'qualification'
+  } | null
+  homepagePreparationContext?: {
+    session?: unknown
+    preparationSessionId?: string | null
+  } | null
   normalPreparationContext?: {
     session?: unknown
     activeNormalSessionId?: string | null
@@ -99,6 +122,9 @@ function normalizePriorInteractions(
     ? priorInteractions.map((interaction) => ({
         key: preserveText(interaction?.key),
         question: preserveText(interaction?.question),
+        ...(clean(interaction?.example)
+          ? { example: clean(interaction?.example) }
+          : {}),
         answer: preserveText(interaction?.answer),
         status:
           interaction?.status === 'answered' ||
@@ -108,6 +134,10 @@ function normalizePriorInteractions(
             : 'unknown',
         ...(clean(interaction?.evidenceNeed)
           ? { evidenceNeed: clean(interaction?.evidenceNeed) }
+          : {}),
+        ...(interaction?.purpose === 'live_scope_grounding' ||
+        interaction?.purpose === 'qualification'
+          ? { purpose: interaction.purpose }
           : {}),
       }))
     : []
@@ -154,19 +184,87 @@ export async function POST(req: NextRequest) {
     if (!rate.ok) {
       return NextResponse.json(
         {
-          status: 'sufficient',
-          nextAction: 'invoke_operational_judgment',
-          transitionReason: 'evidence_sufficient',
+          status: 'unavailable',
+          nextAction: 'no_question',
+          transitionReason: 'rate_limited',
           question: '',
-          label: 'Signal sufficient',
-          helper: 'GEORGE has enough signal for LIVE support.',
-          key: 'signal_sufficient',
+          label: 'Signal unavailable',
+          helper: 'Question formulation is temporarily unavailable.',
+          key: 'signal_unavailable',
         },
         { status: 429 }
       )
     }
 
     const body = (await req.json()) as SignalQuestionRequest
+    const authorizedEvidenceNeed = clean(body.authorizedEvidenceNeed)
+    const authorizationReason = clean(body.authorizationReason)
+    const homepagePreparationInput = body.homepagePreparationContext
+    const homepagePreparationProjection = homepagePreparationInput
+      ? projectPreparationSessionForLiveRuntime(
+          homepagePreparationInput.session
+        )
+      : null
+    const homepageAuthorization = body.operationalJudgmentAuthorization
+    const homepagePreparationRequest =
+      body.entrySource === 'homepage' || Boolean(homepagePreparationInput)
+    const homepageAuthorizationValid = Boolean(
+      body.entrySource === 'homepage' &&
+        !body.normalPreparationContext &&
+        homepagePreparationProjection?.provenance.entrySource === 'homepage' &&
+        homepagePreparationProjection.provenance.restoredFrom?.kind !==
+          'normal_session' &&
+        clean(body.preparationSessionId) &&
+        clean(body.preparationSessionId) ===
+          homepagePreparationProjection?.preparationSessionId &&
+        clean(homepagePreparationInput?.preparationSessionId) ===
+          homepagePreparationProjection?.preparationSessionId &&
+        !homepagePreparationProjection?.relations.normalSessionId &&
+        authorizedEvidenceNeed &&
+        authorizationReason &&
+        homepageAuthorization?.request ===
+          NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST &&
+        homepageAuthorization.source === 'operational_judgment' &&
+        homepageAuthorization.entrySource === 'homepage' &&
+        clean(homepageAuthorization.preparationSessionId) ===
+          homepagePreparationProjection?.preparationSessionId &&
+        homepageAuthorization.shouldAcquire === true &&
+        clean(homepageAuthorization.requestedSignal) ===
+          authorizedEvidenceNeed &&
+        clean(homepageAuthorization.reason) === authorizationReason &&
+        (homepageAuthorization.purpose === undefined ||
+          homepageAuthorization.purpose === 'live_scope_grounding' ||
+          homepageAuthorization.purpose === 'qualification')
+    )
+
+    if (homepagePreparationRequest && !homepageAuthorizationValid) {
+      return NextResponse.json(
+        {
+          status: 'unavailable',
+          nextAction: 'no_question',
+          transitionReason: 'invalid_operational_judgment_authorization',
+          question: '',
+        },
+        { status: 400 }
+      )
+    }
+
+    const homepageAuthorizationProvenance = homepageAuthorizationValid
+      ? Object.freeze({
+          request: NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST,
+          source: 'operational_judgment' as const,
+          entrySource: 'homepage' as const,
+          preparationSessionId:
+            homepagePreparationProjection!.preparationSessionId,
+          shouldAcquire: true as const,
+          requestedSignal: authorizedEvidenceNeed,
+          reason: authorizationReason,
+          ...(homepageAuthorization?.purpose
+            ? { purpose: homepageAuthorization.purpose }
+            : {}),
+        })
+      : null
+
     const normalPreparationInput = body.normalPreparationContext
     const normalPreparationProjection = normalPreparationInput
       ? projectNormalPreparationEvidence({
@@ -199,6 +297,34 @@ export async function POST(req: NextRequest) {
       priorInteractions = normalPreparationProjection.priorInteractions.map(
         (interaction) => ({ ...interaction })
       )
+      priorAnswers = Object.fromEntries(
+        priorInteractions
+          .filter((interaction) => interaction.status === 'answered')
+          .map((interaction) => [interaction.key, interaction.answer])
+      )
+      skippedQuestions = priorInteractions
+        .filter((interaction) => interaction.status === 'skipped')
+        .map((interaction) => interaction.key)
+    }
+    if (homepagePreparationProjection) {
+      priorInteractions =
+        homepagePreparationProjection.briefing.priorInteractions.map(
+          (interaction) => ({
+            key: interaction.key,
+            question: interaction.question,
+            ...(clean(interaction.presentation?.example)
+              ? { example: clean(interaction.presentation?.example) }
+              : {}),
+            answer: interaction.answer,
+            status: interaction.status,
+            ...(clean(interaction.evidenceNeed)
+              ? { evidenceNeed: clean(interaction.evidenceNeed) }
+              : {}),
+            ...(interaction.purpose
+              ? { purpose: interaction.purpose }
+              : {}),
+          })
+        )
       priorAnswers = Object.fromEntries(
         priorInteractions
           .filter((interaction) => interaction.status === 'answered')
@@ -338,22 +464,39 @@ The established outcome is the mission anchor.
     }
 
     let operationalMemoryEvidence = ''
-    const effectiveRole = normalPreparationProjection?.role || clean(body.role)
+    const effectiveRole =
+      homepagePreparationProjection?.knowledge.role?.value ||
+      normalPreparationProjection?.role ||
+      clean(body.role)
     const effectiveDesiredOutcome =
-      normalPreparationProjection?.objective || clean(body.desiredOutcome)
+      homepagePreparationProjection?.knowledge.objective?.value ||
+      normalPreparationProjection?.objective ||
+      clean(body.desiredOutcome)
     const effectiveAcceptableOutcome =
+      homepagePreparationProjection?.knowledge.acceptableOutcome?.value ||
       normalPreparationProjection?.acceptableOutcome ||
       clean(body.acceptableOutcome)
     const effectiveAudience =
-      normalPreparationProjection?.audience || clean(body.audience)
-    const effectiveRoom = normalPreparationProjection?.room || clean(body.room)
+      homepagePreparationProjection?.knowledge.audience?.value ||
+      normalPreparationProjection?.audience ||
+      clean(body.audience)
+    const effectiveRoom =
+      homepagePreparationProjection?.knowledge.conversation.title?.value ||
+      normalPreparationProjection?.room ||
+      clean(body.room)
     const effectiveFormula = normalPreparationProjection?.formula || body.formula
-    const effectiveKnownContext = normalPreparationProjection
-      ? normalPreparationProjection.currentUserEvidence.join('\n')
-      : clean(body.knownContext)
-    const effectiveDocumentSummary = normalPreparationProjection
-      ? normalPreparationProjection.qualifiedDocumentEvidence.join('\n')
-      : clean(body.documentSummary)
+    const effectiveKnownContext = homepagePreparationProjection
+      ? homepagePreparationProjection.knowledge.knownContext?.value || ''
+      : normalPreparationProjection
+        ? normalPreparationProjection.currentUserEvidence.join('\n')
+        : clean(body.knownContext)
+    const effectiveDocumentSummary = homepagePreparationProjection
+      ? homepagePreparationProjection.knowledge.documents
+          .map((document) => document.evidence.value)
+          .join('\n')
+      : normalPreparationProjection
+        ? normalPreparationProjection.qualifiedDocumentEvidence.join('\n')
+        : clean(body.documentSummary)
 
     if (
       operationalMemoryUserId &&
@@ -433,16 +576,34 @@ The established outcome is the mission anchor.
       priorInteractions,
       skippedQuestions,
       pendingQuestion:
+        (homepagePreparationProjection?.briefing.currentQuestion
+          ? {
+              key: homepagePreparationProjection.briefing.currentQuestion.key,
+              question:
+                homepagePreparationProjection.briefing.currentQuestion.question,
+              example:
+                homepagePreparationProjection.briefing.currentQuestion
+                  .presentation?.example || '',
+              evidenceNeed:
+                homepagePreparationProjection.briefing.currentQuestion
+                  .evidenceNeed || '',
+            }
+          : null) ||
         normalPreparationProjection?.pendingQuestion ||
         (body.pendingQuestion && typeof body.pendingQuestion === 'object'
           ? {
               key: clean(body.pendingQuestion.key),
               question: clean(body.pendingQuestion.question),
+              example: clean(body.pendingQuestion.example),
               evidenceNeed: clean(body.pendingQuestion.evidenceNeed),
             }
           : null),
-      evidenceAuthority: normalPreparationProjection
+      evidenceAuthority: homepagePreparationProjection
         ? {
+            preparationEvidence: homepagePreparationProjection,
+          }
+        : normalPreparationProjection
+          ? {
             normalSessionId: normalPreparationProjection.normalSessionId,
             preparationSessionId:
               normalPreparationProjection.preparationSessionId,
@@ -456,12 +617,10 @@ The established outcome is the mission anchor.
             inferenceEvidence: normalPreparationProjection.inferenceEvidence,
             skippedEvidenceNeeds:
               normalPreparationProjection.skippedEvidenceNeeds,
-          }
-        : null,
+            }
+          : null,
       operationalMemoryEvidence,
     }
-    const authorizedEvidenceNeed = clean(body.authorizedEvidenceNeed)
-    const authorizationReason = clean(body.authorizationReason)
 
     if (
       authorizedEvidenceNeed &&
@@ -474,6 +633,9 @@ The established outcome is the mission anchor.
         transitionReason: 'invalid_preparation_identity',
         question: '',
         authorizedEvidenceNeed,
+        ...(homepageAuthorizationProvenance
+          ? { authorization: homepageAuthorizationProvenance }
+          : {}),
       })
     }
 
@@ -491,6 +653,9 @@ The established outcome is the mission anchor.
         transitionReason: 'evidence_already_known',
         question: '',
         authorizedEvidenceNeed,
+        ...(homepageAuthorizationProvenance
+          ? { authorization: homepageAuthorizationProvenance }
+          : {}),
       })
     }
 
@@ -602,6 +767,7 @@ Return JSON:
           'gpt-4o',
         authorizedEvidenceNeed,
         authorizationReason,
+        authorizationPurpose: homepageAuthorization?.purpose,
         knownSignal,
       })
 
@@ -651,6 +817,9 @@ Return JSON:
         helper: transition.question.why,
         key: transition.question.key,
         evidenceNeed: authorizedEvidenceNeed,
+        ...(homepageAuthorizationProvenance
+          ? { authorization: homepageAuthorizationProvenance }
+          : {}),
         clarificationRequired: false,
       })
     }

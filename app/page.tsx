@@ -1,258 +1,243 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
-const messages = [
-  "GEORGE works across preparation, execution, and learning—following the objective, context, pressure, and signals that matter while you work.",
-  "Before the room, it helps you think, prepare, decide, write, rehearse, and choose an operational strategy.",
-  "During LIVE, support reaches you discreetly while the other party experiences only a confident, uninterrupted conversation."
+type RouteCard = {
+  id: string;
+  kicker: string;
+  title: string;
+  href: string;
+  action: string;
+  description: string;
+  georgeAction: string;
+  accent?: boolean;
+};
+
+const routes: RouteCard[] = [
+  {
+    id: "normal",
+    kicker: "NORMAL GEORGE",
+    title: "Ask GEORGE.",
+    href: "/george",
+    action: "ASK GEORGE",
+    description:
+      "Plan, decide, build, write, compare options, research, or work through uncertainty.",
+    georgeAction:
+      "I’ll understand what you’re trying to accomplish, then help determine the strongest next move.",
+  },
+  {
+    id: "traditional",
+    kicker: "TRADITIONAL LIVE",
+    title: "Prepare the room.",
+    href: "/george/live-entry?source=start",
+    action: "BEGIN TRADITIONAL LIVE",
+    accent: true,
+    description:
+      "Prepare a specific conversation deliberately before LIVE begins.",
+    georgeAction:
+      "I’ll build the briefing around the interaction, what you need from it, and how I should support you in the room.",
+  },
+  {
+    id: "role",
+    kicker: "ROLE FIRST",
+    title: "Start from your position.",
+    href: "/george/live-home",
+    action: "START ROLE FIRST",
+    description:
+      "Begin with your role, responsibility, or position in the conversation.",
+    georgeAction:
+      "I’ll use your position to determine what matters next, then build the conversation around the outcome you need.",
+  },
+  {
+    id: "strategy",
+    kicker: "OPERATIONAL STRATEGY",
+    title: "Work with what you know.",
+    href: "/george/library",
+    action: "OPEN STRATEGY LIBRARY",
+    description:
+      "Review the formulas, scripts, execution history, and operational material already available to you.",
+    georgeAction:
+      "I’ll help you use what already exists, compare it against the objective, and determine whether another strategy is stronger.",
+  },
 ];
 
 export default function HomePage() {
-  const [messageIndex, setMessageIndex] = useState(0);
-  const [rendered, setRendered] = useState("");
+  const router = useRouter();
+
+  const [selectedRoute, setSelectedRoute] = useState<string | null>(null);
+  const [renderedAction, setRenderedAction] = useState("");
+  const transitionTimerRef = useRef<number | null>(null);
+  const typingTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    return () => {
+      if (transitionTimerRef.current) {
+        window.clearTimeout(transitionTimerRef.current);
+      }
 
-    const reduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
+      if (typingTimerRef.current) {
+        window.clearInterval(typingTimerRef.current);
+      }
+    };
+  }, []);
 
-    if (reduced) {
-      setRendered(messages[messages.length - 1]);
-      setMessageIndex(messages.length - 1);
+  const beginRoute = (route: RouteCard) => {
+    if (selectedRoute) return;
+
+    setSelectedRoute(route.id);
+    setRenderedAction("");
+
+    const reduceMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (reduceMotion) {
+      setRenderedAction(route.georgeAction);
+
+      transitionTimerRef.current = window.setTimeout(() => {
+        router.push(route.href);
+      }, 650);
+
       return;
     }
 
-    let charIndex = 0;
-    const active = messages[messageIndex];
-    setRendered("");
+    let index = 0;
 
-    const typing = window.setInterval(() => {
-      charIndex += 1;
-      setRendered(active.slice(0, charIndex));
+    typingTimerRef.current = window.setInterval(() => {
+      index += 1;
+      setRenderedAction(route.georgeAction.slice(0, index));
 
-      if (charIndex >= active.length) {
-        window.clearInterval(typing);
-
-        if (messageIndex < messages.length - 1) {
-          window.setTimeout(
-            () => setMessageIndex((current) => current + 1),
-            2200
-          );
+      if (index >= route.georgeAction.length) {
+        if (typingTimerRef.current) {
+          window.clearInterval(typingTimerRef.current);
+          typingTimerRef.current = null;
         }
-      }
-    }, 34);
 
-    return () => window.clearInterval(typing);
-  }, [messageIndex]);
+        transitionTimerRef.current = window.setTimeout(() => {
+          router.push(route.href);
+        }, 420);
+      }
+    }, 12);
+  };
 
   return (
     <main className="min-h-screen bg-black text-white">
-      <div className="george-public-home-mask">
-        <div className="mx-auto max-w-5xl px-6 sm:px-8">
-          <div className="flex h-[104px] items-start pt-3 sm:h-[116px]">
-            <img
-              src="/logofav.png"
-              alt="Bx"
-              className="h-[80px] w-[80px] object-contain sm:h-[90px] sm:w-[90px]"
-            />
-          </div>
-        </div>
-      </div>
+      <header className="mx-auto flex max-w-6xl items-center px-6 pt-5 sm:px-8 sm:pt-6">
+        <img
+          src="/logofav.png"
+          alt="BRANESx"
+          className="h-[70px] w-[70px] object-contain sm:h-[78px] sm:w-[78px]"
+        />
+      </header>
 
-      <div className="mx-auto max-w-5xl px-6 pb-14 pt-[150px] sm:px-8 sm:pt-[166px]">
-        <section className="border-b border-white/[0.08] pb-8 sm:pb-10">
-          <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/28">
-            INTELLIGENT COMMUNICATION
+      <div className="mx-auto max-w-6xl px-6 pb-14 pt-8 sm:px-8 sm:pt-10">
+        <div className="mb-7 sm:mb-9">
+          <p className="font-[var(--font-roboto-mono)] text-[10px] uppercase tracking-[0.22em] text-white/28">
+            GEORGE · OPERATIONAL INTELLIGENCE
           </p>
 
-          <div className="mt-5 max-w-4xl font-mono text-[24px] leading-[1.42] tracking-[-0.025em] text-white/88 sm:text-[35px] sm:leading-[1.34]">
-            {rendered}
-            <span className="george-home-proof-caret" aria-hidden="true">
-              ▍
-            </span>
-          </div>
+          <h1 className="mt-3 font-[var(--font-roboto)] text-[30px] font-normal leading-[1.1] tracking-[-0.035em] text-white/88 sm:text-[40px]">
+            Choose how you want to begin.
+          </h1>
+        </div>
 
+        <section className="grid gap-x-10 gap-y-4 lg:grid-cols-2 lg:gap-x-14 lg:gap-y-8">
+          {routes.map((route) => {
+            const selected = selectedRoute === route.id;
+            const anotherSelected =
+              selectedRoute !== null && selectedRoute !== route.id;
+
+            return (
+              <article
+                key={route.id}
+                className={`flex min-h-[310px] flex-col justify-between py-7 transition-opacity duration-300 sm:min-h-[340px] sm:py-8 ${
+                  anotherSelected ? "opacity-30" : "opacity-100"
+                }`}
+              >
+                <div>
+                  <p
+                    className={`font-[var(--font-roboto-mono)] text-[10px] uppercase tracking-[0.22em] ${
+                      route.accent ? "text-[#7EA1FF]/78" : "text-white/30"
+                    }`}
+                  >
+                    {route.kicker}
+                  </p>
+
+                  <h2 className="mt-4 max-w-xl font-[var(--font-roboto)] text-[31px] font-normal leading-[1.06] tracking-[-0.04em] text-white/82 sm:text-[40px]">
+                    {route.title}
+                  </h2>
+
+                  <div
+                    className="mt-7 min-h-[112px]"
+                    aria-live={selected ? "polite" : undefined}
+                  >
+                    {!selected ? (
+                      <p className="max-w-[36rem] font-[var(--font-roboto)] text-[15px] leading-[1.62] tracking-[-0.01em] text-white/48 sm:text-[16px]">
+                        {route.description}
+                      </p>
+                    ) : (
+                      <p className="max-w-[36rem] font-[var(--font-roboto)] text-[15px] leading-[1.62] tracking-[-0.01em] text-white/72 sm:text-[16px]">
+                        {renderedAction}
+                        <span
+                          className="ml-[2px] inline-block text-white/48"
+                          aria-hidden="true"
+                        >
+                          ▍
+                        </span>
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <Link
+                  href={route.href}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    beginRoute(route);
+                  }}
+                  aria-disabled={Boolean(selectedRoute)}
+                  className={`mt-8 inline-flex w-fit items-center gap-4 rounded-full px-5 py-3 font-[var(--font-roboto-mono)] text-[11px] uppercase tracking-[0.15em] transition ${
+                    route.accent
+                      ? "bg-[#101831] text-[#AFC0FF] hover:bg-[#152041] hover:text-white"
+                      : "bg-white/[0.055] text-white/58 hover:bg-white/[0.09] hover:text-white/88"
+                  } ${
+                    anotherSelected
+                      ? "pointer-events-none"
+                      : ""
+                  }`}
+                >
+                  <span>{selected ? "PREPARING" : route.action}</span>
+
+                  {!selected && (
+                    <span aria-hidden="true">→</span>
+                  )}
+                </Link>
+              </article>
+            );
+          })}
         </section>
 
-        <section className="border-b border-white/[0.08] pb-10 pt-8 sm:pb-14 sm:pt-9">
-          <div className="grid gap-5 lg:grid-cols-12">
-            <div className="lg:col-span-12">
-              <p className="mb-3 font-mono text-[14px] uppercase leading-6 tracking-[0.18em] text-white/30 sm:mb-4 sm:text-[16px] sm:leading-7">
-                Choose how you want to work with GEORGE.
-              </p>
-            </div>
+        <footer className="mt-10 flex flex-wrap items-center justify-between gap-5 border-t border-white/[0.055] pt-7">
+          <div className="font-[var(--font-roboto-mono)] text-[9px] uppercase tracking-[0.18em] text-white/22">
+            PREPARE · EXECUTE · ADAPT
+          </div>
 
+          <div className="flex items-center gap-6 font-[var(--font-roboto)] text-[13px] text-white/34">
             <Link
-              href="/george"
-              className="george-home-route-surface group flex flex-col justify-between px-1 py-3 lg:col-span-5 lg:px-2 lg:py-4"
+              href="/george/marketplace"
+              className="transition hover:text-white/72"
             >
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/34">
-                  NORMAL GEORGE · PREPARE
-                </p>
-
-                <h2 className="mt-5 max-w-xl text-[29px] font-medium leading-[1.06] tracking-[-0.04em] text-white/78 sm:text-[38px]">
-                  Ask GEORGE.
-                </h2>
-
-                <p className="mt-4 max-w-xl font-mono text-[13px] leading-6 text-white/38">
-                  Plan, decide, write, compare options, rehearse, research, or
-                  work through uncertainty. Determine whether intelligent LIVE
-                  support is really your next best move.
-                </p>
-              </div>
-
-              <div className="mt-8 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.17em] text-white/52 transition group-hover:text-white/82">
-                <span>Ask GEORGE</span>
-                <span>→</span>
-              </div>
+              Marketplace
             </Link>
 
             <Link
-              href="/george/live-entry?source=start"
-              className="george-home-route-surface george-home-route-traditional group flex flex-col justify-between px-1 py-3 lg:col-span-7 lg:px-3 lg:py-4"
+              href="/help"
+              className="transition hover:text-white/72"
             >
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/58">
-                  TRADITIONAL LIVE · FULL BRIEFING
-                </p>
-
-                <h2 className="mt-5 max-w-2xl text-[32px] font-medium leading-[1.04] tracking-[-0.045em] text-white/82 sm:text-[46px]">
-                  Build the room before you enter it.
-                </h2>
-
-                <p className="mt-5 max-w-2xl font-mono text-[13px] leading-6 text-white/44 sm:text-[14px] sm:leading-7">
-                  Build the brief around your goal, the participants, known context,
-                  support mechanics, and readiness. Use this route when you want
-                  the most deliberate preparation before LIVE begins.
-                </p>
-              </div>
-
-              <div className="mt-7 flex items-center justify-between font-mono text-[12px] uppercase tracking-[0.18em] text-[#7EA1FF]/78 transition group-hover:text-[#AFC0FF]">
-                <span>Begin Traditional LIVE</span>
-                <span>→</span>
-              </div>
+              Help
             </Link>
-          </div>
-        </section>
-
-        <section className="border-b border-white/[0.08] py-10 sm:py-14">
-          <Link
-            href="/george/live-home"
-            className="george-home-route-surface group flex flex-col justify-between px-1 py-3 sm:px-2 sm:py-4"
-          >
-            <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr] lg:gap-10">
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/38">
-                  ROLE FIRST · LIVE SUPPORT
-                </p>
-
-                <h2 className="mt-4 text-[30px] font-medium leading-[1.06] tracking-[-0.04em] text-white/78 sm:text-[40px]">
-                  Start from your position—your role in the conversation.
-                </h2>
-              </div>
-
-              <div className="lg:pt-7">
-                <p className="max-w-xl font-mono text-[13px] leading-6 text-white/40 sm:text-[14px] sm:leading-7">
-                  GEORGE shapes preparation and LIVE support around your
-                  responsibilities, objective, position, risks, leverage, and
-                  pressure points before the conversation begins.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-8 flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.17em] text-white/52 transition group-hover:text-white/82">
-              <span>Start Role First</span>
-              <span>→</span>
-            </div>
-          </Link>
-        </section>
-
-        <section className="grid border-b border-white/[0.08] py-10 sm:py-14 md:grid-cols-2 md:gap-5">
-          <Link
-            href="/george/library"
-            className="group flex flex-col justify-between px-2 py-3 sm:px-3 sm:py-4"
-          >
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/30">
-                OPERATIONAL LIBRARY
-              </p>
-
-              <h2 className="mt-4 text-[27px] font-medium leading-[1.06] tracking-[-0.035em] text-white/72 sm:text-[32px]">
-                Work with what you control.
-              </h2>
-
-              <p className="mt-4 font-mono text-[13px] leading-6 text-white/36">
-                Review and manage formulas, scripts, execution history, and
-                operational strategy connected to any conversation, negotiation,
-                or case. Rhetorical presentation is often key to successful
-                outcomes.
-              </p>
-            </div>
-
-            <div className="mt-7 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.17em] text-white/42 transition group-hover:text-white/72">
-              <span>Open Library</span>
-              <span>→</span>
-            </div>
-          </Link>
-
-          <Link
-            href="/george/marketplace"
-            className="group mt-5 flex flex-col justify-between px-2 py-3 sm:px-3 sm:py-4 md:mt-0 md:border-l md:border-white/[0.06] md:pl-7"
-          >
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/30">
-                STRATEGY MARKETPLACE
-              </p>
-
-              <h2 className="mt-4 text-[27px] font-medium leading-[1.06] tracking-[-0.035em] text-white/92 sm:text-[32px]">
-                Choose another operational strategy.
-              </h2>
-
-              <p className="mt-4 font-mono text-[13px] leading-6 text-white/46">
-                Start with GEORGE&apos;s recommendation, understand why it fits,
-                then inspect alternatives when another approach may improve the outcome.
-              </p>
-            </div>
-
-            <div className="mt-7 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.17em] text-white/42 transition group-hover:text-white/72">
-              <span>Open Marketplace</span>
-              <span>→</span>
-            </div>
-          </Link>
-        </section>
-
-        <section className="py-9 sm:py-11">
-          <Link
-            href="/help"
-            className="group flex items-center justify-between gap-5 border-b border-white/[0.08] pb-7"
-          >
-            <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/26">
-                HELP · HOW TO USE GEORGE
-              </p>
-
-              <p className="mt-3 max-w-2xl font-mono text-[13px] leading-6 text-white/44">
-                Understand Normal GEORGE, Role First, Traditional LIVE,
-                preparation, support mechanics, and LIVE execution.
-              </p>
-            </div>
-
-            <span className="font-mono text-[14px] text-white/48 transition group-hover:text-white">
-              →
-            </span>
-          </Link>
-        </section>
-
-        <footer className="george-public-home-footer">
-          <div className="george-public-home-footer-line" />
-          <div className="george-public-home-footer-row">
-            <span>GEORGE · OPERATIONAL INTELLIGENCE</span>
-            <span>PREPARE · EXECUTE · ADAPT</span>
           </div>
         </footer>
       </div>

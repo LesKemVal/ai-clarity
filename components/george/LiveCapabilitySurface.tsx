@@ -22,7 +22,20 @@ export function LiveCapabilitySurface({
   const [flipped, setFlipped] = useState(false)
 
   useEffect(() => {
-    if (phase === 'preparing' || phase === 'orientation') return
+    if (phase === 'preparing') {
+      setFlipped(false)
+      return
+    }
+
+    if (phase === 'orientation') {
+      setFlipped(false)
+
+      const interval = window.setInterval(() => {
+        setFlipped((current) => !current)
+      }, 2600)
+
+      return () => window.clearInterval(interval)
+    }
 
     const runFlip = () => {
       setFlipped(true)
@@ -61,11 +74,34 @@ export function LiveCapabilitySurface({
     return (
       <button
         type="button"
-        onClick={onStart}
-        className="inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-[0.55rem] border border-red-200/[0.22] bg-red-100/[0.08] px-2.5 py-1.5 text-[10px] font-semibold tracking-[0.17em] text-red-100/78 transition hover:border-red-100/[0.38] hover:bg-red-100/[0.12] hover:text-red-50 active:scale-[0.97]"
-        aria-label="Continue to LIVE preparation"
+        onClick={() => {
+          if (flipped) {
+            onPrepare()
+            return
+          }
+
+          onStart()
+        }}
+        className="group relative inline-grid shrink-0 [perspective:900px]"
+        aria-label={
+          flipped
+            ? 'Use LIVE for something else'
+            : 'Continue this conversation into LIVE preparation'
+        }
       >
-        LIVE
+        <span
+          className={`col-start-1 row-start-1 grid [transform-style:preserve-3d] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            flipped ? '[transform:rotateX(180deg)]' : ''
+          }`}
+        >
+          <span className="col-start-1 row-start-1 inline-flex items-center justify-center whitespace-nowrap rounded-[0.55rem] border border-red-200/[0.22] bg-red-100/[0.08] px-2.5 py-1.5 text-[10px] font-semibold tracking-[0.17em] text-red-100/78 [backface-visibility:hidden] transition group-hover:border-red-100/[0.38] group-hover:bg-red-100/[0.12] group-hover:text-red-50">
+            LIVE
+          </span>
+
+          <span className="col-start-1 row-start-1 inline-flex items-center justify-center whitespace-nowrap rounded-[0.55rem] border border-white/[0.075] bg-white/[0.018] px-2.5 py-1.5 text-[10px] font-semibold tracking-[0.15em] text-[#D7DBE4]/58 [backface-visibility:hidden] [transform:rotateX(180deg)] transition group-hover:border-[#6F91DE]/30 group-hover:bg-[#172347]/32 group-hover:text-[#E4EBFF]/86">
+            SOMETHING ELSE
+          </span>
+        </span>
       </button>
     )
   }

@@ -218,6 +218,8 @@ export function orchestrateLiveTurn(
 
   const postureDecision = georgePostureEngine.decide({
     dominantRole: dominantRoleState.role,
+    dominantRoleScore: dominantRoleState.score,
+    dominantRoleEvidenceCount: dominantRoleState.evidenceCount,
     speaker: nextPacket.speaker,
     roomPressure: nextPacket.roomPressure,
     interruptionRisk: normalizedInterruptionRisk,

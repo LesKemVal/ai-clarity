@@ -13,6 +13,7 @@ import { resolveGeorgeConversationStrategy, type GeorgeConversationStrategy } fr
 import {
   NORMAL_PREPARATION_EVIDENCE_PRECEDENCE,
   type PreparationEvidencePrecedence,
+  type PreparationRuntimeEvidenceProjection,
 } from '@/lib/george/live-runtime/live-preparation-controller'
 
 export type OperationalJudgmentAction =
@@ -39,11 +40,16 @@ export type LiveSupportJudgment = {
   instruction: string
 }
 
+export type SignalAcquisitionPurpose =
+  | 'live_scope_grounding'
+  | 'qualification'
+
 export type SignalAcquisitionJudgment = {
   shouldAcquire: boolean
   operationalValue: 'none' | 'low' | 'medium' | 'high'
   conversationalCost: 'low' | 'medium' | 'high'
   requestedSignal?: string
+  purpose?: SignalAcquisitionPurpose
   reason: string
 }
 
@@ -54,13 +60,103 @@ export type GeorgeOperationalDisposition =
   | 'other_action'
   | 'unresolved'
 
-export const NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST =
+export const OPERATIONAL_PREPARATION_JUDGMENT_REQUEST =
   'normal_live_operational_judgment' as const
+
+/**
+ * Compatibility alias for the existing Normal caller. The wire value is
+ * unchanged while the canonical ingress now also accepts homepage
+ * preparation provenance.
+ */
+export const NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST =
+  OPERATIONAL_PREPARATION_JUDGMENT_REQUEST
+
+export type OperationalPreparationEntrySource = 'normal' | 'homepage'
+
+export type PreparationTurnClassification =
+  | 'live_briefing'
+  | 'preparation'
+  | 'clarification_required'
+
+export type PreparationTurnClassificationSource = 'explicit' | 'inferred'
+
+export type PreparationTurnClassificationRequest = Readonly<{
+  currentClassification: 'live_briefing' | 'preparation'
+  explicitSelection: 'live_briefing' | 'preparation' | null
+  explicitSelectionProvided: boolean
+  malformed: boolean
+}>
+
+export type ProviderPreparationTurnClassificationProposal = Readonly<{
+  classification: PreparationTurnClassification | null
+  clarificationRequired: boolean | null
+  mayAffectLivePreparation: boolean | null
+  preservePendingQuestion: boolean | null
+  reason: string | null
+  acknowledgment: string | null
+}>
+
+export type OperationalPreparationTurnClassification = Readonly<{
+  classification: PreparationTurnClassification
+  classificationSource: PreparationTurnClassificationSource
+  clarificationRequired: boolean
+  mayAffectLivePreparation: boolean
+  preservePendingQuestion: boolean
+  inferredModeTransition:
+    | 'retained'
+    | 'switched'
+    | 'clarification_required'
+    | 'not_applicable'
+  reason: string
+  acknowledgment: string | null
+  providerProposalAccepted: boolean
+  authority: 'operational_judgment'
+}>
+
+export type OperationalPreparationTurnRealizationAuthorization =
+  | Readonly<{
+      action: 'respond_to_preparation'
+      providerExecutionAuthorized: true
+      directCanonicalPresentationAuthorized: false
+      assessLiveBriefing: false
+      mayAffectLivePreparation: false
+      preservePendingQuestion: true
+      source: 'operational_judgment'
+    }>
+  | Readonly<{
+      action: 'direct_canonical_clarification'
+      providerExecutionAuthorized: false
+      directCanonicalPresentationAuthorized: true
+      assessLiveBriefing: false
+      mayAffectLivePreparation: false
+      preservePendingQuestion: true
+      source: 'operational_judgment'
+    }>
+  | Readonly<{
+      action: 'assess_live_briefing'
+      providerExecutionAuthorized: false
+      directCanonicalPresentationAuthorized: false
+      assessLiveBriefing: true
+      mayAffectLivePreparation: true
+      preservePendingQuestion: boolean
+      source: 'operational_judgment'
+    }>
+
+export const PREPARATION_TURN_CLARIFICATION =
+  'Should I use that to shape your LIVE briefing, or are we discussing preparation?' as const
 
 export type OperationalPreparationContext = Readonly<{
   preparationSessionId: string
-  normalSessionId: string
-  entrySource: 'normal'
+  normalSessionId?: string
+  entrySource: OperationalPreparationEntrySource
+  preparationEvidenceProjection?: PreparationRuntimeEvidenceProjection
+  preparationProvenance: Readonly<{
+    entrySource: OperationalPreparationEntrySource
+    restoredFrom?: Readonly<{
+      kind: 'preparation' | 'normal_session' | 'live_session'
+      id: string
+    }>
+  }>
   preparationUpdatedAt: number
   objective?: string
   acceptableOutcome?: string
@@ -77,14 +173,17 @@ export type OperationalPreparationContext = Readonly<{
   pendingQuestion?: Readonly<{
     key: string
     question: string
+    example?: string
     evidenceNeed?: string
   }>
   priorInteractions: readonly Readonly<{
     key: string
     question: string
+    example?: string
     answer: string
     status: 'answered' | 'skipped' | 'unknown'
     evidenceNeed?: string
+    purpose?: SignalAcquisitionPurpose
   }>[]
   sourcePrecedence: readonly PreparationEvidencePrecedence[]
   evidenceSufficiency: 'unresolved' | 'sufficient'
@@ -126,11 +225,270 @@ export type ProviderOperationalReasoning = Readonly<{
   signalAcquisition?: Readonly<{
     shouldAcquire: boolean
     requestedSignal: string | null
+    purpose: SignalAcquisitionPurpose | null
     evidenceIsUserOwned: boolean
     consequentialToNextAction: boolean
     reason: string | null
   }>
 }>
+
+export type CommunicationChangeKind =
+  | 'fact'
+  | 'substance'
+  | 'wording'
+  | 'tone'
+  | 'timing'
+  | 'support_method'
+  | 'mixed'
+  | 'unclear'
+
+export type CommunicationChangeScope =
+  | 'line'
+  | 'turn'
+  | 'live_room'
+  | 'preparation_session'
+  | 'durable_candidate'
+
+export type CommunicationChangeSignalSource =
+  | 'explicit_user_instruction'
+  | 'user_edit'
+  | 'repeated_behavior'
+  | 'runtime_inference'
+
+export type CommunicationChangeEffects = Readonly<{
+  activeObjective: boolean
+  factualRecord: boolean
+  supportConfiguration: boolean
+  realization: boolean
+}>
+
+export const SPEECH_COMPOSITION_DIMENSIONS = Object.freeze([
+  'perspective',
+  'nounSelection',
+  'verbConstruction',
+  'modifierDensity',
+  'syntax',
+  'rhythm',
+  'figurativeLanguage',
+  'implication',
+] as const)
+
+export type SpeechCompositionDimension =
+  (typeof SPEECH_COMPOSITION_DIMENSIONS)[number]
+
+export type SpeechCompositionValues = Readonly<
+  Record<SpeechCompositionDimension, string | null>
+>
+
+export type SpeechCompositionDecisionFactor =
+  | 'desired_outcome'
+  | 'user_role'
+  | 'demonstrated_user_fit'
+  | 'counterpart_evidence'
+  | 'current_moment'
+  | 'delivery_constraints'
+
+export type ProtectedCommunicationMeaning = Readonly<{
+  objective: boolean
+  facts: boolean
+  commitments: boolean
+  boundaries: boolean
+}>
+
+/**
+ * Provider-supplied expression proposal.
+ *
+ * This is evidence, not authority. It describes how meaning may be expressed;
+ * it may not silently change what the user means.
+ */
+export type ProviderSpeechCompositionProposal = Readonly<{
+  dimensions: SpeechCompositionValues
+  requestedScope: CommunicationChangeScope
+  signalSource: CommunicationChangeSignalSource
+  confidence: number
+  evidence: readonly string[]
+  decisionFactors: readonly SpeechCompositionDecisionFactor[]
+  protectedMeaning: ProtectedCommunicationMeaning
+  reason: string | null
+}>
+
+export type OperationalSpeechCompositionJudgment = Readonly<{
+  accepted: boolean
+  dimensions: SpeechCompositionValues
+  requestedScope: CommunicationChangeScope
+  acceptedScope: CommunicationChangeScope
+  signalSource: CommunicationChangeSignalSource
+  confidence: number
+  evidence: readonly string[]
+  decisionFactors: readonly SpeechCompositionDecisionFactor[]
+  clarificationRequired: boolean
+  clarificationQuestion: string | null
+  protectedMeaning: ProtectedCommunicationMeaning
+  durablePersistenceAuthorized: false
+  reason: string
+  authority: 'operational_judgment'
+}>
+
+/**
+ * Semantic interpretation supplied by the provider. This is evidence only;
+ * Operational Judgment is the sole acceptance and scope authority.
+ */
+export type ProviderCommunicationChangeProposal = Readonly<{
+  kind: CommunicationChangeKind
+  requestedScope: CommunicationChangeScope
+  signalSource: CommunicationChangeSignalSource
+  confidence: number
+  evidence: readonly string[]
+  clarificationRequired: boolean
+  effects: CommunicationChangeEffects
+  reason: string | null
+}>
+
+export type OperationalCommunicationChangeJudgment = Readonly<{
+  accepted: boolean
+  kind: CommunicationChangeKind
+  requestedScope: CommunicationChangeScope
+  acceptedScope: CommunicationChangeScope
+  signalSource: CommunicationChangeSignalSource
+  confidence: number
+  evidence: readonly string[]
+  clarificationRequired: boolean
+  clarificationQuestion: string | null
+  effects: CommunicationChangeEffects
+  durablePersistenceAuthorized: false
+  reason: string
+  authority: 'operational_judgment'
+}>
+
+export type ProviderSignalAcquisitionSemanticValidation = Readonly<{
+  purpose: SignalAcquisitionPurpose
+  evidenceNeed: string
+  satisfiesPurpose: boolean
+  source: 'provider_semantic_validation'
+  liveScopeEvidenceIdentity?: Readonly<{
+    anticipatedLiveInteractionAddressed: boolean
+    normalContextRelationshipAddressed: boolean
+    correctionPathPreserved: boolean
+    answerCouldLeaveLiveInteractionUnstated: boolean
+    answerCouldBeNormalTaskOrSubjectDetailOnly: boolean
+    provisionalHypothesisSpan: string
+    alternativeScopeSpan: string
+  }>
+}>
+
+const providerSignalAcquisitionSemanticValidations = new WeakMap<
+  ProviderOperationalReasoning,
+  ProviderSignalAcquisitionSemanticValidation
+>()
+
+/**
+ * Records semantic evidence-purpose validation performed by the canonical
+ * provider owner. This is deliberately kept outside provider-authored JSON:
+ * a model cannot make an acquisition authoritative by adding another label
+ * to its proposal.
+ */
+export function registerProviderSignalAcquisitionSemanticValidation(
+  reasoning: ProviderOperationalReasoning,
+  validation: ProviderSignalAcquisitionSemanticValidation
+) {
+  const acquisition = reasoning.signalAcquisition
+  const requestedSignal = cleanOptionalText(acquisition?.requestedSignal)
+  const validatedEvidenceNeed = cleanOptionalText(validation.evidenceNeed)
+  const liveScopeEvidenceIdentity =
+    validation.liveScopeEvidenceIdentity
+  const normalizedValidatedEvidenceNeed = normalizeEvidenceNeed(
+    validatedEvidenceNeed
+  )
+  const provisionalHypothesisSpan = cleanOptionalText(
+    liveScopeEvidenceIdentity?.provisionalHypothesisSpan
+  )
+  const alternativeScopeSpan = cleanOptionalText(
+    liveScopeEvidenceIdentity?.alternativeScopeSpan
+  )
+  const normalizedProvisionalHypothesisSpan = normalizeEvidenceNeed(
+    provisionalHypothesisSpan
+  )
+  const normalizedAlternativeScopeSpan = normalizeEvidenceNeed(
+    alternativeScopeSpan
+  )
+  const hypothesisStart = normalizedProvisionalHypothesisSpan
+    ? normalizedValidatedEvidenceNeed.indexOf(
+        normalizedProvisionalHypothesisSpan
+      )
+    : -1
+  const alternativeStart = normalizedAlternativeScopeSpan
+    ? normalizedValidatedEvidenceNeed.indexOf(normalizedAlternativeScopeSpan)
+    : -1
+  const liveScopeSpansSatisfied = Boolean(
+    hypothesisStart >= 0 &&
+      alternativeStart >= 0 &&
+      normalizedProvisionalHypothesisSpan !==
+        normalizedAlternativeScopeSpan &&
+      (
+        hypothesisStart + normalizedProvisionalHypothesisSpan.length <=
+          alternativeStart ||
+        alternativeStart + normalizedAlternativeScopeSpan.length <=
+          hypothesisStart
+      )
+  )
+  const liveScopeEvidenceIdentitySatisfied = Boolean(
+    validation.purpose !== 'live_scope_grounding' ||
+      (
+        liveScopeEvidenceIdentity?.anticipatedLiveInteractionAddressed ===
+          true &&
+        liveScopeEvidenceIdentity.normalContextRelationshipAddressed ===
+          true &&
+        liveScopeEvidenceIdentity.correctionPathPreserved === true &&
+        liveScopeEvidenceIdentity.answerCouldLeaveLiveInteractionUnstated ===
+          false &&
+        liveScopeEvidenceIdentity.answerCouldBeNormalTaskOrSubjectDetailOnly ===
+          false &&
+        liveScopeSpansSatisfied
+      )
+  )
+
+  if (
+    acquisition?.shouldAcquire !== true ||
+    acquisition.purpose !== validation.purpose ||
+    validation.satisfiesPurpose !== true ||
+    validation.source !== 'provider_semantic_validation' ||
+    !requestedSignal ||
+    !validatedEvidenceNeed ||
+    (validation.purpose === 'live_scope_grounding' &&
+      (!provisionalHypothesisSpan || !alternativeScopeSpan)) ||
+    !liveScopeEvidenceIdentitySatisfied ||
+    normalizeEvidenceNeed(requestedSignal) !==
+      normalizeEvidenceNeed(validatedEvidenceNeed)
+  ) {
+    return false
+  }
+
+  providerSignalAcquisitionSemanticValidations.set(
+    reasoning,
+    Object.freeze({
+      purpose: validation.purpose,
+      evidenceNeed: validatedEvidenceNeed,
+      satisfiesPurpose: true,
+      source: 'provider_semantic_validation' as const,
+      ...(validation.purpose === 'live_scope_grounding' &&
+      liveScopeEvidenceIdentity
+        ? {
+            liveScopeEvidenceIdentity: Object.freeze({
+              anticipatedLiveInteractionAddressed: true,
+              normalContextRelationshipAddressed: true,
+              correctionPathPreserved: true,
+              answerCouldLeaveLiveInteractionUnstated: false,
+              answerCouldBeNormalTaskOrSubjectDetailOnly: false,
+              provisionalHypothesisSpan: provisionalHypothesisSpan ?? '',
+              alternativeScopeSpan: alternativeScopeSpan ?? '',
+            }),
+          }
+        : {}),
+    })
+  )
+
+  return true
+}
 
 export type OperationalDispositionJudgment = Readonly<{
   disposition: GeorgeOperationalDisposition
@@ -159,6 +517,15 @@ export type OperationalRealizationJudgment = Readonly<{
   source: 'operational_judgment'
 }>
 
+export type OperationalPreparationReadinessJudgment = Readonly<{
+  level: 'insufficient' | 'developing' | 'supportable' | 'sharp'
+  minimumLiveSupportEstablished: boolean
+  furtherBriefingCouldSharpen: boolean
+  sharpeningSignal: string | null
+  reason: string
+  source: 'operational_judgment'
+}>
+
 export type OperationalJudgment = {
   action: OperationalJudgmentAction
   operationalPosture: GeorgeOperationalPosture
@@ -171,6 +538,11 @@ export type OperationalJudgment = {
   signalAcquisition: SignalAcquisitionJudgment
   smallestSignal?: string
   liveSupport: LiveSupportJudgment
+  preparationTurnClassification: OperationalPreparationTurnClassification | null
+  preparationTurnRealizationAuthorization: OperationalPreparationTurnRealizationAuthorization | null
+  preparationReadiness: OperationalPreparationReadinessJudgment
+  communicationChange: OperationalCommunicationChangeJudgment | null
+  speechComposition: OperationalSpeechCompositionJudgment | null
   operationalDisposition: OperationalDispositionJudgment
   realization: OperationalRealizationJudgment
   rationale: readonly string[]
@@ -181,6 +553,14 @@ export type NormalLiveOperationalJudgmentResult = Readonly<{
   request: typeof NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST
   operationalJudgment: OperationalJudgment
   message: string | null
+  authorizedSignalQuestion: Readonly<{
+    question: string
+    label: string
+    why: string
+    example: string
+    key: string
+    evidenceNeed: string
+  }> | null
   source: 'operational_judgment'
 }>
 
@@ -212,6 +592,331 @@ export type OperationalJudgmentInput = {
 }
 
 const clamp01 = (value: number) => Math.max(0, Math.min(1, value))
+
+const EMPTY_COMMUNICATION_CHANGE_EFFECTS: CommunicationChangeEffects =
+  Object.freeze({
+    activeObjective: false,
+    factualRecord: false,
+    supportConfiguration: false,
+    realization: false,
+  })
+
+function normalizeCommunicationEvidence(values: readonly string[]) {
+  return Object.freeze(
+    Array.from(
+      new Set(
+        values
+          .map((value) => String(value || '').replace(/\s+/g, ' ').trim())
+          .filter(Boolean)
+      )
+    ).slice(0, 8)
+  )
+}
+
+function normalizeSpeechCompositionValues(
+  values: SpeechCompositionValues
+): SpeechCompositionValues {
+  return Object.freeze(
+    Object.fromEntries(
+      SPEECH_COMPOSITION_DIMENSIONS.map((dimension) => {
+        const value = String(values?.[dimension] || '')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .slice(0, 240)
+
+        return [dimension, value || null]
+      })
+    ) as Record<SpeechCompositionDimension, string | null>
+  )
+}
+
+const SPEECH_COMPOSITION_FACTORS = new Set<SpeechCompositionDecisionFactor>([
+  'desired_outcome',
+  'user_role',
+  'demonstrated_user_fit',
+  'counterpart_evidence',
+  'current_moment',
+  'delivery_constraints',
+])
+
+/**
+ * Canonical speech-composition acceptance boundary.
+ *
+ * GEORGE may automatically compose language from qualified evidence, but only
+ * Operational Judgment may authorize the plan or its scope. Expression cannot
+ * alter the objective, facts, commitments, or boundaries. Acceptance never
+ * authorizes durable persistence.
+ */
+export function resolveSpeechCompositionJudgment(input: {
+  proposal: ProviderSpeechCompositionProposal | null
+}): OperationalSpeechCompositionJudgment | null {
+  const proposal = input.proposal
+  if (!proposal) return null
+
+  const confidence = clamp01(Number(proposal.confidence) || 0)
+  const evidence = normalizeCommunicationEvidence(proposal.evidence || [])
+  const dimensions = normalizeSpeechCompositionValues(proposal.dimensions)
+  const populatedDimensionCount = SPEECH_COMPOSITION_DIMENSIONS.filter(
+    (dimension) => Boolean(dimensions[dimension])
+  ).length
+  const decisionFactors = Object.freeze(
+    Array.from(
+      new Set(
+        (proposal.decisionFactors || []).filter((factor) =>
+          SPEECH_COMPOSITION_FACTORS.has(factor)
+        )
+      )
+    )
+  )
+  const protectedMeaning = Object.freeze({
+    objective: proposal.protectedMeaning?.objective === true,
+    facts: proposal.protectedMeaning?.facts === true,
+    commitments: proposal.protectedMeaning?.commitments === true,
+    boundaries: proposal.protectedMeaning?.boundaries === true,
+  })
+  const meaningProtected = Object.values(protectedMeaning).every(Boolean)
+  const explicitDirection =
+    proposal.signalSource === 'explicit_user_instruction'
+  const repeatedQualified =
+    proposal.signalSource === 'repeated_behavior' &&
+    evidence.length >= 2 &&
+    confidence >= 0.68
+  const automaticInference =
+    proposal.signalSource === 'runtime_inference'
+  const automaticFactorsQualified =
+    decisionFactors.includes('desired_outcome') &&
+    decisionFactors.some((factor) => factor !== 'desired_outcome')
+  const automaticEvidenceQualified =
+    automaticInference &&
+    automaticFactorsQualified &&
+    evidence.length >= 2 &&
+    confidence >= 0.68
+  const directUserEdit = proposal.signalSource === 'user_edit'
+
+  let acceptedScope = proposal.requestedScope
+
+  if (automaticInference || directUserEdit) {
+    acceptedScope =
+      proposal.requestedScope === 'line' ? 'line' : 'turn'
+  }
+
+  if (
+    proposal.requestedScope === 'durable_candidate' &&
+    !explicitDirection &&
+    !repeatedQualified
+  ) {
+    acceptedScope = 'turn'
+  }
+
+  const evidenceSufficient =
+    populatedDimensionCount > 0 &&
+    evidence.length > 0 &&
+    (explicitDirection ||
+      repeatedQualified ||
+      automaticEvidenceQualified ||
+      directUserEdit)
+
+  const clarificationRequired =
+    populatedDimensionCount > 0 && !meaningProtected
+
+  const accepted =
+    evidenceSufficient &&
+    meaningProtected &&
+    !clarificationRequired
+
+  const clarificationQuestion = clarificationRequired
+    ? 'Should I preserve the objective, facts, commitments, and boundaries and change only how this is expressed?'
+    : null
+
+  const reason = clarificationRequired
+    ? 'The proposal may alter protected meaning and cannot be treated as expression alone.'
+    : !evidenceSufficient
+      ? 'The expression proposal lacks sufficient qualified evidence, outcome grounding, or a usable composition dimension.'
+      : acceptedScope !== proposal.requestedScope
+        ? 'Operational Judgment accepted only a bounded line/turn plan because an isolated edit or inference cannot establish broader behavior.'
+        : proposal.requestedScope === 'durable_candidate'
+          ? 'The plan may identify a durable candidate, but persistence remains unauthorized and belongs to the existing memory boundary.'
+          : 'Operational Judgment accepted a bounded expression plan while preserving the user’s meaning.'
+
+  return Object.freeze({
+    accepted,
+    dimensions,
+    requestedScope: proposal.requestedScope,
+    acceptedScope,
+    signalSource: proposal.signalSource,
+    confidence,
+    evidence,
+    decisionFactors,
+    clarificationRequired,
+    clarificationQuestion,
+    protectedMeaning,
+    durablePersistenceAuthorized: false,
+    reason,
+    authority: 'operational_judgment' as const,
+  })
+}
+
+function sanitizeCommunicationChangeEffects(
+  proposal: ProviderCommunicationChangeProposal,
+  authoritativeSignal: boolean
+): CommunicationChangeEffects {
+  if (proposal.kind === 'wording') {
+    return Object.freeze({
+      ...EMPTY_COMMUNICATION_CHANGE_EFFECTS,
+      realization: true,
+    })
+  }
+
+  if (proposal.kind === 'tone' || proposal.kind === 'timing') {
+    return Object.freeze({
+      ...EMPTY_COMMUNICATION_CHANGE_EFFECTS,
+      realization: true,
+    })
+  }
+
+  if (proposal.kind === 'fact') {
+    return Object.freeze({
+      ...EMPTY_COMMUNICATION_CHANGE_EFFECTS,
+      factualRecord: true,
+    })
+  }
+
+  if (proposal.kind === 'support_method') {
+    return Object.freeze({
+      ...EMPTY_COMMUNICATION_CHANGE_EFFECTS,
+      supportConfiguration: true,
+      realization: true,
+    })
+  }
+
+  if (proposal.kind === 'substance') {
+    return Object.freeze({
+      activeObjective:
+        authoritativeSignal && proposal.effects.activeObjective === true,
+      factualRecord: proposal.effects.factualRecord === true,
+      supportConfiguration: false,
+      realization: proposal.effects.realization === true,
+    })
+  }
+
+  if (proposal.kind === 'mixed' && authoritativeSignal) {
+    return Object.freeze({
+      activeObjective: proposal.effects.activeObjective === true,
+      factualRecord: proposal.effects.factualRecord === true,
+      supportConfiguration:
+        proposal.effects.supportConfiguration === true,
+      realization: proposal.effects.realization === true,
+    })
+  }
+
+  return EMPTY_COMMUNICATION_CHANGE_EFFECTS
+}
+
+/**
+ * Canonical communication-change acceptance boundary.
+ *
+ * Provider output proposes meaning. Only this Operational Judgment owner may
+ * accept the change, narrow its scope, or require clarification. Acceptance
+ * never authorizes durable persistence.
+ */
+export function resolveCommunicationChangeJudgment(input: {
+  proposal: ProviderCommunicationChangeProposal | null
+}): OperationalCommunicationChangeJudgment | null {
+  const proposal = input.proposal
+  if (!proposal) return null
+
+  const confidence = clamp01(Number(proposal.confidence) || 0)
+  const evidence = normalizeCommunicationEvidence(proposal.evidence || [])
+  const independentEvidenceCount = evidence.length
+  const explicitDirection =
+    proposal.signalSource === 'explicit_user_instruction'
+  const directUserEdit = proposal.signalSource === 'user_edit'
+  const repeatedQualified =
+    proposal.signalSource === 'repeated_behavior' &&
+    independentEvidenceCount >= 2 &&
+    confidence >= 0.68
+  const isolatedInference =
+    proposal.signalSource === 'runtime_inference' ||
+    (directUserEdit && independentEvidenceCount < 2)
+  const authoritativeSignal =
+    explicitDirection || directUserEdit || repeatedQualified
+
+  let acceptedScope = proposal.requestedScope
+  if (isolatedInference && !explicitDirection) {
+    acceptedScope =
+      proposal.requestedScope === 'line' ? 'line' : 'turn'
+  }
+
+  if (
+    proposal.requestedScope === 'durable_candidate' &&
+    !explicitDirection &&
+    !repeatedQualified
+  ) {
+    acceptedScope = 'turn'
+  }
+
+  const effects = sanitizeCommunicationChangeEffects(
+    proposal,
+    authoritativeSignal
+  )
+  const materiallyChangesMeaning = Boolean(
+    proposal.effects.activeObjective ||
+      proposal.effects.factualRecord ||
+      proposal.effects.supportConfiguration
+  )
+  const ambiguousMaterialChange =
+    (proposal.kind === 'unclear' || proposal.kind === 'mixed') &&
+    materiallyChangesMeaning &&
+    !authoritativeSignal
+  const clarificationRequired = Boolean(
+    proposal.clarificationRequired ||
+      ambiguousMaterialChange ||
+      (confidence < 0.55 && materiallyChangesMeaning)
+  )
+  const evidenceSufficient = Boolean(
+    evidence.length > 0 &&
+      (explicitDirection ||
+        directUserEdit ||
+        repeatedQualified ||
+        (proposal.signalSource === 'runtime_inference' && confidence >= 0.6))
+  )
+  const accepted = Boolean(
+    evidenceSufficient &&
+      !clarificationRequired &&
+      proposal.kind !== 'unclear'
+  )
+
+  const reason = clarificationRequired
+    ? 'The proposed change could alter meaning or future behavior, and its intended effect is not sufficiently clear.'
+    : !evidenceSufficient
+      ? 'The proposal lacks qualified evidence for an accepted communication change.'
+      : acceptedScope !== proposal.requestedScope
+        ? 'Operational Judgment accepted only a bounded line/turn interpretation because isolated inferred behavior cannot establish a broader preference.'
+        : proposal.requestedScope === 'durable_candidate'
+          ? 'The evidence may identify a durable candidate, but persistence remains unauthorized and belongs to the existing continuity/profile boundary.'
+          : 'Operational Judgment accepted the change within the supported scope while preserving unrelated meaning.'
+  const clarificationQuestion = !clarificationRequired
+    ? null
+    : proposal.kind === 'mixed' || proposal.kind === 'unclear'
+      ? 'Should I treat that as a factual or substantive change, or only change how it is expressed?'
+      : 'Should this change apply only here, or more broadly?'
+
+  return Object.freeze({
+    accepted,
+    kind: proposal.kind,
+    requestedScope: proposal.requestedScope,
+    acceptedScope,
+    signalSource: proposal.signalSource,
+    confidence,
+    evidence,
+    clarificationRequired,
+    clarificationQuestion,
+    effects: accepted ? effects : EMPTY_COMMUNICATION_CHANGE_EFFECTS,
+    durablePersistenceAuthorized: false,
+    reason,
+    authority: 'operational_judgment' as const,
+  })
+}
 
 function classifySignalValue(value: number): SignalAcquisitionJudgment['operationalValue'] {
   if (value >= 0.75) return 'high'
@@ -318,6 +1023,19 @@ export function resolveOperationalJudgment(
         ? signalAcquisition.requestedSignal
         : undefined,
     liveSupport: resolveLiveSupportJudgment(input.liveRecommendationEvidence),
+    preparationTurnClassification: null,
+    preparationTurnRealizationAuthorization: null,
+    preparationReadiness: Object.freeze({
+      level: 'insufficient' as const,
+      minimumLiveSupportEstablished: false,
+      furtherBriefingCouldSharpen: false,
+      sharpeningSignal: null,
+      reason:
+        'Canonical preparation readiness has not yet been established.',
+      source: 'operational_judgment' as const,
+    }),
+    communicationChange: null,
+    speechComposition: null,
     operationalDisposition: unresolvedOperationalDisposition(),
     realization: Object.freeze({
       executionGenerationRequired: false,
@@ -334,6 +1052,256 @@ export function resolveOperationalJudgment(
 function cleanOptionalText(value: unknown) {
   const normalized = typeof value === 'string' ? value.trim() : ''
   return normalized || null
+}
+
+function conciseClassificationText(value: unknown, limit: number) {
+  const normalized = cleanOptionalText(value)?.replace(/\s+/g, ' ') || null
+  return normalized ? normalized.slice(0, limit) : null
+}
+
+export function normalizePreparationTurnClassificationRequest(
+  value: unknown
+): PreparationTurnClassificationRequest {
+  const input =
+    value && typeof value === 'object' && !Array.isArray(value)
+      ? (value as Record<string, unknown>)
+      : null
+  const currentSelection = input?.currentClassification
+  const currentClassification =
+    currentSelection === 'preparation' ||
+    currentSelection === 'live_briefing'
+      ? currentSelection
+      : 'live_briefing'
+  const explicitSelectionFieldPresent = Boolean(
+    input &&
+      Object.prototype.hasOwnProperty.call(input, 'explicitSelection')
+  )
+  const explicitSelectionProvided = Boolean(
+    explicitSelectionFieldPresent && input?.explicitSelection !== null
+  )
+  const explicitSelection =
+    input?.explicitSelection === 'live_briefing' ||
+    input?.explicitSelection === 'preparation'
+      ? input.explicitSelection
+      : null
+  const malformed = Boolean(
+    !input ||
+      (Object.prototype.hasOwnProperty.call(
+        input,
+        'currentClassification'
+      ) &&
+        currentSelection !== 'live_briefing' &&
+        currentSelection !== 'preparation') ||
+      (explicitSelectionFieldPresent &&
+        input?.explicitSelection !== null &&
+        !explicitSelection)
+  )
+
+  return Object.freeze({
+    currentClassification,
+    explicitSelection,
+    explicitSelectionProvided,
+    malformed,
+  })
+}
+
+function rejectedPreparationTurnClassification(input: {
+  classificationSource: PreparationTurnClassificationSource
+  reason: string
+}): OperationalPreparationTurnClassification {
+  return Object.freeze({
+    classification: 'clarification_required' as const,
+    classificationSource: input.classificationSource,
+    clarificationRequired: true,
+    mayAffectLivePreparation: false,
+    preservePendingQuestion: true,
+    inferredModeTransition:
+      input.classificationSource === 'inferred'
+        ? ('clarification_required' as const)
+        : ('not_applicable' as const),
+    reason: input.reason,
+    acknowledgment: null,
+    providerProposalAccepted: false,
+    authority: 'operational_judgment' as const,
+  })
+}
+
+function providerPreparationTurnProposalIsConsistent(
+  proposal: ProviderPreparationTurnClassificationProposal | null,
+  requiredClassification?: 'live_briefing' | 'preparation'
+) {
+  const classification = proposal?.classification
+  const reason = conciseClassificationText(proposal?.reason, 240)
+  if (!classification || !reason) return false
+  if (requiredClassification && classification !== requiredClassification) {
+    return false
+  }
+
+  if (classification === 'live_briefing') {
+    return (
+      proposal?.clarificationRequired === false &&
+      proposal.mayAffectLivePreparation === true &&
+      typeof proposal.preservePendingQuestion === 'boolean'
+    )
+  }
+
+  if (classification === 'preparation') {
+    return (
+      proposal?.clarificationRequired === false &&
+      proposal.mayAffectLivePreparation === false &&
+      proposal.preservePendingQuestion === true
+    )
+  }
+
+  return (
+    proposal?.clarificationRequired === true &&
+    proposal.mayAffectLivePreparation === false &&
+    proposal.preservePendingQuestion === true
+  )
+}
+
+/**
+ * Accepts or rejects the provider's non-authoritative preparation-turn
+ * proposal. Explicit user selection establishes intended use; inferred turns
+ * fail closed unless the complete proposal is internally consistent.
+ */
+export function resolvePreparationTurnClassification(input: {
+  request: PreparationTurnClassificationRequest
+  providerProposal: ProviderPreparationTurnClassificationProposal | null
+}): OperationalPreparationTurnClassification {
+  const request = input.request
+
+  if (request.malformed) {
+    return rejectedPreparationTurnClassification({
+      classificationSource: request.explicitSelectionProvided
+        ? 'explicit'
+        : 'inferred',
+      reason:
+        'The preparation-turn intent selection was malformed and cannot safely affect LIVE preparation.',
+    })
+  }
+
+  if (request.explicitSelection) {
+    const classification = request.explicitSelection
+    const proposalAccepted = providerPreparationTurnProposalIsConsistent(
+      input.providerProposal,
+      classification
+    )
+    const preservePendingQuestion =
+      classification === 'preparation'
+        ? true
+        : proposalAccepted
+          ? input.providerProposal!.preservePendingQuestion === true
+          : true
+
+    return Object.freeze({
+      classification,
+      classificationSource: 'explicit' as const,
+      clarificationRequired: false,
+      mayAffectLivePreparation: classification === 'live_briefing',
+      preservePendingQuestion,
+      inferredModeTransition: 'not_applicable' as const,
+      reason:
+        classification === 'live_briefing'
+          ? 'The user explicitly selected LIVE briefing for this turn.'
+          : 'The user explicitly selected Preparation for this turn.',
+      acknowledgment: null,
+      providerProposalAccepted: proposalAccepted,
+      authority: 'operational_judgment' as const,
+    })
+  }
+
+  if (
+    !providerPreparationTurnProposalIsConsistent(input.providerProposal)
+  ) {
+    return rejectedPreparationTurnClassification({
+      classificationSource: 'inferred',
+      reason:
+        'The provider proposal was missing, malformed, or contradictory, so the turn remains uncommitted.',
+    })
+  }
+
+  const proposal = input.providerProposal!
+  const classification = proposal.classification!
+  if (classification === 'clarification_required') {
+    return Object.freeze({
+      classification,
+      classificationSource: 'inferred' as const,
+      clarificationRequired: true,
+      mayAffectLivePreparation: false,
+      preservePendingQuestion: true,
+      inferredModeTransition: 'clarification_required' as const,
+      reason: conciseClassificationText(proposal.reason, 240)!,
+      acknowledgment: null,
+      providerProposalAccepted: true,
+      authority: 'operational_judgment' as const,
+    })
+  }
+
+  const inferredModeTransition =
+    classification === request.currentClassification
+      ? ('retained' as const)
+      : ('switched' as const)
+
+  return Object.freeze({
+    classification,
+    classificationSource: 'inferred' as const,
+    clarificationRequired: false,
+    mayAffectLivePreparation: classification === 'live_briefing',
+    preservePendingQuestion:
+      classification === 'preparation' ||
+      proposal.preservePendingQuestion === true,
+    inferredModeTransition,
+    reason: conciseClassificationText(proposal.reason, 240)!,
+    acknowledgment:
+      inferredModeTransition === 'switched'
+        ? classification === 'preparation'
+          ? 'I’ll keep this in Preparation.'
+          : 'I’ll use that to shape your LIVE briefing.'
+        : null,
+    providerProposalAccepted: true,
+    authority: 'operational_judgment' as const,
+  })
+}
+
+function resolvePreparationTurnRealizationAuthorization(
+  classification: OperationalPreparationTurnClassification | null
+): OperationalPreparationTurnRealizationAuthorization | null {
+  if (!classification) return null
+
+  if (classification.classification === 'preparation') {
+    return Object.freeze({
+      action: 'respond_to_preparation' as const,
+      providerExecutionAuthorized: true as const,
+      directCanonicalPresentationAuthorized: false as const,
+      assessLiveBriefing: false as const,
+      mayAffectLivePreparation: false as const,
+      preservePendingQuestion: true as const,
+      source: 'operational_judgment' as const,
+    })
+  }
+
+  if (classification.classification === 'clarification_required') {
+    return Object.freeze({
+      action: 'direct_canonical_clarification' as const,
+      providerExecutionAuthorized: false as const,
+      directCanonicalPresentationAuthorized: true as const,
+      assessLiveBriefing: false as const,
+      mayAffectLivePreparation: false as const,
+      preservePendingQuestion: true as const,
+      source: 'operational_judgment' as const,
+    })
+  }
+
+  return Object.freeze({
+    action: 'assess_live_briefing' as const,
+    providerExecutionAuthorized: false as const,
+    directCanonicalPresentationAuthorized: false as const,
+    assessLiveBriefing: true as const,
+    mayAffectLivePreparation: true as const,
+    preservePendingQuestion: classification.preservePendingQuestion,
+    source: 'operational_judgment' as const,
+  })
 }
 
 function cleanTextList(value: unknown): readonly string[] {
@@ -370,13 +1338,7 @@ function buildCanonicalDispositionPresentation(input: {
   georgeResolvableWork: readonly string[]
 }) {
   if (input.disposition === 'unresolved') {
-    return cleanOptionalText(
-      input.consequentialUncertainty
-        ? `The consequential uncertainty is ${input.consequentialUncertainty}. The current evidence does not yet support a responsible strongest action or a material use for LIVE.`
-        : input.operationalObjective
-          ? `The current evidence does not yet establish a responsible strongest action or a material use for LIVE toward ${input.operationalObjective}.`
-          : 'The current evidence does not yet establish a responsible strongest action or a material use for LIVE.'
-    )
+    return null
   }
 
   const userFacingReason = /\b(provider|canonical|operational judgment)\b/i.test(
@@ -443,6 +1405,10 @@ function unresolvedOperationalDisposition(): OperationalDispositionJudgment {
 export function resolveProviderOperationalJudgment(input: {
   judgment: OperationalJudgment
   providerReasoning: ProviderOperationalReasoning | null
+  providerCommunicationChange?: ProviderCommunicationChangeProposal | null
+  providerSpeechComposition?: ProviderSpeechCompositionProposal | null
+  providerPreparationTurnClassification?: ProviderPreparationTurnClassificationProposal | null
+  preparationTurnClassificationRequest?: PreparationTurnClassificationRequest | null
   providerCapability: 'normal' | 'live' | null
   capabilityExplicitlyRequested: boolean
   capabilityRecommendationMaterial: boolean
@@ -450,8 +1416,92 @@ export function resolveProviderOperationalJudgment(input: {
   signalAcquisitionAllowed?: boolean
   operationalJudgmentRequest?: boolean
   ordinaryNormalRequest?: boolean
+  liveScopeGroundingRequired?: boolean
 }): OperationalJudgment {
   const reasoning = input.providerReasoning
+  const communicationChange = resolveCommunicationChangeJudgment({
+    proposal: input.providerCommunicationChange || null,
+  })
+  const speechComposition = resolveSpeechCompositionJudgment({
+    proposal: input.providerSpeechComposition || null,
+  })
+  const preparationTurnClassification =
+    input.preparationTurnClassificationRequest
+      ? resolvePreparationTurnClassification({
+          request: input.preparationTurnClassificationRequest,
+          providerProposal:
+            input.providerPreparationTurnClassification || null,
+        })
+      : null
+  const preparationTurnRealizationAuthorization =
+    resolvePreparationTurnRealizationAuthorization(
+      preparationTurnClassification
+    )
+
+  if (
+    preparationTurnClassification &&
+    !preparationTurnClassification.mayAffectLivePreparation
+  ) {
+    const clarificationRequired =
+      preparationTurnClassification.clarificationRequired
+    const signalAcquisition = Object.freeze({
+      ...input.judgment.signalAcquisition,
+      shouldAcquire: false,
+      requestedSignal: undefined,
+      purpose: undefined,
+      reason: clarificationRequired
+        ? 'Classification must be clarified before this turn can affect LIVE preparation.'
+        : 'Preparation discussion is conversational and excluded from LIVE preparation evidence.',
+    })
+
+    return Object.freeze({
+      ...input.judgment,
+      action: clarificationRequired
+        ? ('clarify_direction' as const)
+        : input.judgment.action,
+      signalAcquisition,
+      smallestSignal: undefined,
+      preparationTurnClassification,
+      preparationTurnRealizationAuthorization,
+      communicationChange,
+      speechComposition,
+      realization: Object.freeze(
+        clarificationRequired
+          ? {
+              executionGenerationRequired: false,
+              directPresentationAllowed: true,
+              reason:
+                'The canonical classification gate requires immediate clarification before any preparation assessment.',
+              source: 'operational_judgment' as const,
+            }
+          : {
+              executionGenerationRequired: true,
+              directPresentationAllowed: false,
+              reason:
+                'Canonical Operational Judgment authorized one post-classification conversational realization for the current Preparation turn.',
+              source: 'operational_judgment' as const,
+            }
+      ),
+      operationalDisposition: clarificationRequired
+        ? Object.freeze({
+            ...unresolvedOperationalDisposition(),
+            consequentialUncertainty:
+              'Whether the user intends this turn to shape LIVE support.',
+            reason: preparationTurnClassification.reason,
+            presentation: PREPARATION_TURN_CLARIFICATION,
+          })
+        : Object.freeze({
+            ...unresolvedOperationalDisposition(),
+            reason:
+              'The accepted Preparation turn is authorized for conversational realization only and cannot become operational evidence or judgment.',
+          }),
+      rationale: Object.freeze([
+        ...input.judgment.rationale,
+        `preparation turn classification: ${preparationTurnClassification.classification}`,
+      ]),
+    })
+  }
+
   const operationalJudgmentRequest = Boolean(
     input.operationalJudgmentRequest === true ||
       (
@@ -487,6 +1537,42 @@ export function resolveProviderOperationalJudgment(input: {
   const providerPresentation = cleanOptionalText(reasoning?.presentation)
   const requestedSignal = cleanOptionalText(
     reasoning?.signalAcquisition?.requestedSignal
+  )
+  const signalAcquisitionPurpose =
+    reasoning?.signalAcquisition?.purpose === 'live_scope_grounding' ||
+    reasoning?.signalAcquisition?.purpose === 'qualification'
+      ? reasoning.signalAcquisition.purpose
+      : null
+  const signalAcquisitionSemanticValidation = reasoning
+    ? providerSignalAcquisitionSemanticValidations.get(reasoning) || null
+    : null
+  const validatedScopeEvidenceNeed = normalizeEvidenceNeed(
+    signalAcquisitionSemanticValidation?.evidenceNeed
+  )
+  const validatedScopeHypothesisSpan = normalizeEvidenceNeed(
+    signalAcquisitionSemanticValidation?.liveScopeEvidenceIdentity
+      ?.provisionalHypothesisSpan
+  )
+  const validatedAlternativeScopeSpan = normalizeEvidenceNeed(
+    signalAcquisitionSemanticValidation?.liveScopeEvidenceIdentity
+      ?.alternativeScopeSpan
+  )
+  const validatedScopeHypothesisStart = validatedScopeHypothesisSpan
+    ? validatedScopeEvidenceNeed.indexOf(validatedScopeHypothesisSpan)
+    : -1
+  const validatedAlternativeScopeStart = validatedAlternativeScopeSpan
+    ? validatedScopeEvidenceNeed.indexOf(validatedAlternativeScopeSpan)
+    : -1
+  const validatedScopeSpansSatisfied = Boolean(
+    validatedScopeHypothesisStart >= 0 &&
+      validatedAlternativeScopeStart >= 0 &&
+      validatedScopeHypothesisSpan !== validatedAlternativeScopeSpan &&
+      (
+        validatedScopeHypothesisStart + validatedScopeHypothesisSpan.length <=
+          validatedAlternativeScopeStart ||
+        validatedAlternativeScopeStart + validatedAlternativeScopeSpan.length <=
+          validatedScopeHypothesisStart
+      )
   )
 
   const decisionComparison = reasoning?.decisionComparison
@@ -587,19 +1673,29 @@ export function resolveProviderOperationalJudgment(input: {
       desiredResult &&
       strongestNextStep
   )
-  const liveExecutionSupported = Boolean(
+  const activeLivePreparation = input.operationalJudgmentRequest === true
+  const liveExecutionReadinessSupported = Boolean(
     operationalObjective &&
       input.providerCapability === 'live' &&
-      input.capabilityRecommendationMaterial &&
-      interactionUseful &&
       interaction &&
       purpose &&
       desiredResult &&
-      liveMateriallyImprovesExecution &&
-      materialLiveBenefit &&
       georgeResolvableWork.length > 0 &&
       georgeCanAdvanceWithoutUserSignal &&
       strongestNextStep
+  )
+  const proactiveLiveRecommendationSupported = Boolean(
+    input.capabilityRecommendationMaterial &&
+      interactionUseful &&
+      liveMateriallyImprovesExecution &&
+      materialLiveBenefit
+  )
+  const liveExecutionSupported = Boolean(
+    liveExecutionReadinessSupported &&
+      (
+        activeLivePreparation ||
+        proactiveLiveRecommendationSupported
+      )
   )
 
   let disposition: GeorgeOperationalDisposition = 'unresolved'
@@ -620,9 +1716,12 @@ export function resolveProviderOperationalJudgment(input: {
     providerProposalAccepted = true
     reason =
       providerRationale ||
-      'Provider reasoning established a material execution use for LIVE.'
+      (activeLivePreparation
+        ? 'Provider reasoning established that the user-selected LIVE interaction is ready to advance.'
+        : 'Provider reasoning established a material execution use for LIVE.')
   } else if (
     proposedDisposition === 'continue_normal' &&
+    !activeLivePreparation &&
     normalActionSupported
   ) {
     disposition = 'continue_normal'
@@ -639,7 +1738,7 @@ export function resolveProviderOperationalJudgment(input: {
     reason =
       providerRationale ||
       'Provider reasoning established a stronger operational action than entering LIVE.'
-  } else if (normalActionSupported) {
+  } else if (!activeLivePreparation && normalActionSupported) {
     disposition = 'continue_normal'
     reason =
       proposedDisposition === 'execution_ready' ||
@@ -651,8 +1750,56 @@ export function resolveProviderOperationalJudgment(input: {
     proposedDisposition === 'execution_opportunity'
   ) {
     reason =
-      'Canonical Operational Judgment did not accept LIVE because the interaction, desired result, or material execution benefit was not established.'
+      activeLivePreparation
+        ? 'Canonical Operational Judgment did not yet establish the interaction, desired result, or preparation readiness required to advance the user-selected LIVE interaction.'
+        : 'Canonical Operational Judgment did not accept LIVE because the interaction, desired result, or material execution benefit was not established.'
   }
+
+  /*
+   * When Normal context has been carried into a newly requested LIVE
+   * briefing but LIVE scope has not yet been established by definitive
+   * LIVE-scoped user evidence, that relationship is itself the governing
+   * uncertainty.
+   *
+   * Do not validate it by vocabulary. The provider owns semantic inference
+   * and question selection; canonical Operational Judgment owns whether
+   * downstream acquisition may become authoritative.
+   *
+   * A scope-grounding turn may acquire one user-owned consequential signal,
+   * but it may not simultaneously convert a provisional Normal inference
+   * into an established LIVE fact.
+   */
+  const liveScopeGroundingSatisfied = Boolean(
+    !input.liveScopeGroundingRequired ||
+      (
+        operationalJudgmentRequest &&
+        signalAcquisitionPurpose === 'live_scope_grounding' &&
+        signalAcquisitionSemanticValidation?.purpose ===
+          'live_scope_grounding' &&
+        signalAcquisitionSemanticValidation.satisfiesPurpose === true &&
+        signalAcquisitionSemanticValidation.liveScopeEvidenceIdentity
+          ?.anticipatedLiveInteractionAddressed === true &&
+        signalAcquisitionSemanticValidation.liveScopeEvidenceIdentity
+          .normalContextRelationshipAddressed === true &&
+        signalAcquisitionSemanticValidation.liveScopeEvidenceIdentity
+          .correctionPathPreserved === true &&
+        signalAcquisitionSemanticValidation.liveScopeEvidenceIdentity
+          .answerCouldLeaveLiveInteractionUnstated === false &&
+        signalAcquisitionSemanticValidation.liveScopeEvidenceIdentity
+          .answerCouldBeNormalTaskOrSubjectDetailOnly === false &&
+        validatedScopeSpansSatisfied &&
+        consequentialUncertainty &&
+        requestedSignal &&
+        normalizeEvidenceNeed(
+          signalAcquisitionSemanticValidation.evidenceNeed
+        ) === normalizeEvidenceNeed(requestedSignal) &&
+        reasoning?.signalAcquisition?.shouldAcquire === true &&
+        reasoning?.signalAcquisition?.evidenceIsUserOwned === true &&
+        reasoning?.signalAcquisition?.consequentialToNextAction === true &&
+        requestedSignalMatchesUncertainty &&
+        comparisonSupportsSignalFirst
+      )
+  )
 
   const providerAuthorizesSignalAcquisition = Boolean(
     input.canonicalSignalAcquisition &&
@@ -664,7 +1811,8 @@ export function resolveProviderOperationalJudgment(input: {
       reasoning?.signalAcquisition?.consequentialToNextAction === true &&
       !georgeCanAdvanceWithoutUserSignal &&
       requestedSignalMatchesUncertainty &&
-      comparisonSupportsSignalFirst
+      comparisonSupportsSignalFirst &&
+      liveScopeGroundingSatisfied
   )
   const signalAcquisition: SignalAcquisitionJudgment =
     input.canonicalSignalAcquisition
@@ -675,6 +1823,9 @@ export function resolveProviderOperationalJudgment(input: {
             conversationalCost:
               input.judgment.signalAcquisition.conversationalCost,
             requestedSignal: requestedSignal || undefined,
+            ...(signalAcquisitionPurpose
+              ? { purpose: signalAcquisitionPurpose }
+              : {}),
             reason:
               cleanOptionalText(reasoning?.signalAcquisition?.reason) ||
               providerRationale ||
@@ -821,20 +1972,61 @@ export function resolveProviderOperationalJudgment(input: {
       })
     : input.judgment.outcomeState
   const executionGenerationRequired = Boolean(input.ordinaryNormalRequest)
+  const directPresentationAllowed = Boolean(
+    !executionGenerationRequired &&
+      disposition !== 'unresolved' &&
+      acceptedPresentation
+  )
+  const preparationReadiness: OperationalPreparationReadinessJudgment =
+    !operationalJudgmentRequest
+      ? input.judgment.preparationReadiness
+      : disposition === 'execution_ready' && providerProposalAccepted
+        ? Object.freeze({
+            level: comparisonCandidateSignal
+              ? ('supportable' as const)
+              : ('sharp' as const),
+            minimumLiveSupportEstablished: true,
+            furtherBriefingCouldSharpen: Boolean(
+              comparisonCandidateSignal
+            ),
+            sharpeningSignal: comparisonCandidateSignal,
+            reason: comparisonCandidateSignal
+              ? 'Canonical Operational Judgment established enough evidence for useful LIVE support while preserving one additional user-owned signal that could sharpen execution.'
+              : 'Canonical Operational Judgment established useful LIVE support and identified no additional user-owned signal that would materially sharpen execution.',
+            source: 'operational_judgment' as const,
+          })
+        : Object.freeze({
+            level:
+              providerAuthorizesSignalAcquisition ||
+              Boolean(operationalObjective) ||
+              knownEvidence.length > 0
+                ? ('developing' as const)
+                : ('insufficient' as const),
+            minimumLiveSupportEstablished: false,
+            furtherBriefingCouldSharpen: false,
+            sharpeningSignal: null,
+            reason: providerAuthorizesSignalAcquisition
+              ? 'One consequential user-owned signal is still required before minimum LIVE support can be established.'
+              : 'Canonical Operational Judgment has not established enough evidence for useful LIVE support.',
+            source: 'operational_judgment' as const,
+          })
+
   const realization: OperationalRealizationJudgment =
     providerDecisionAuthoritative
       ? Object.freeze({
           executionGenerationRequired,
-          directPresentationAllowed: !executionGenerationRequired,
+          directPresentationAllowed,
           reason: executionGenerationRequired
             ? providerAuthorizesSignalAcquisition
               ? 'The accepted consequential evidence need requires one execution-generated user question.'
               : disposition === 'unresolved'
                 ? 'The accepted unresolved judgment requires provider execution to present its current boundary without inventing an action or evidence need.'
                 : 'The accepted operational action requires provider execution to perform or realize the work.'
-            : operationalJudgmentRequest
-              ? 'The Normal LIVE control-plane judgment is presented directly from the accepted canonical disposition.'
-              : 'The accepted judgment itself completes the available response without additional provider execution.',
+            : disposition === 'unresolved'
+              ? 'The unresolved judgment remains internal until canonical realization produces an authorized user-facing move.'
+              : operationalJudgmentRequest
+                ? 'The Normal LIVE control-plane judgment is presented directly from the accepted canonical disposition.'
+                : 'The accepted judgment itself completes the available response without additional provider execution.',
           source: 'operational_judgment' as const,
         })
       : input.judgment.realization
@@ -848,6 +2040,11 @@ export function resolveProviderOperationalJudgment(input: {
       ? signalAcquisition.requestedSignal
       : undefined,
     liveSupport,
+    preparationTurnClassification,
+    preparationTurnRealizationAuthorization,
+    preparationReadiness,
+    communicationChange,
+    speechComposition,
     realization,
     operationalDisposition: Object.freeze({
       disposition,
@@ -886,15 +2083,24 @@ export function buildNormalOperationalResponseResult(input: {
   const canonicalPresentation = cleanOptionalText(
     input.operationalJudgment.operationalDisposition.presentation
   )
+  const preparationRealization =
+    input.operationalJudgment.preparationTurnRealizationAuthorization
+  const preparationConversationAuthorized = Boolean(
+    preparationRealization?.action === 'respond_to_preparation' &&
+      preparationRealization.providerExecutionAuthorized
+  )
   const executionRequired =
+    preparationConversationAuthorized ||
     input.operationalJudgment.realization.executionGenerationRequired
   const executionAccepted = executionRequired
-    ? executionTextConformsToOperationalJudgment(
-        executionText,
-        input.operationalJudgment,
-        Boolean(input.authorizedSignalQuestion),
-        Boolean(input.governedProviderExecution)
-      )
+    ? preparationConversationAuthorized
+      ? Boolean(executionText && input.governedProviderExecution)
+      : executionTextConformsToOperationalJudgment(
+          executionText,
+          input.operationalJudgment,
+          Boolean(input.authorizedSignalQuestion),
+          Boolean(input.governedProviderExecution)
+        )
     : false
   const message = executionRequired
     ? executionAccepted
@@ -980,8 +2186,7 @@ function executionTextConformsToOperationalJudgment(
 
   if (
     !signalAcquisition.shouldAcquire &&
-    questions.length > 0 &&
-    !governedProviderExecution
+    questions.length > 0
   ) {
     const acceptedWork = [
       ...disposition.georgeResolvableWork,
@@ -991,6 +2196,15 @@ function executionTextConformsToOperationalJudgment(
     if (!QUESTION_ARTIFACT_PATTERN.test(acceptedWork)) {
       return false
     }
+  }
+
+  if (
+    governedProviderExecution &&
+    disposition.disposition === 'unresolved' &&
+    !signalAcquisition.shouldAcquire &&
+    !disposition.consequentialUncertainty
+  ) {
+    return false
   }
 
   if (signalAcquisition.shouldAcquire) {
@@ -1041,19 +2255,367 @@ function executionTextConformsToOperationalJudgment(
 
 export function buildNormalLiveOperationalJudgmentResult(input: {
   operationalJudgment: OperationalJudgment
+  executionText?: string | null
+  governedProviderExecution?: boolean
+  authorizedSignalQuestion?: NormalLiveOperationalJudgmentResult['authorizedSignalQuestion']
 }): NormalLiveOperationalJudgmentResult {
-  const message =
-    !input.operationalJudgment.signalAcquisition.shouldAcquire
-      ? cleanOptionalText(
-          input.operationalJudgment.operationalDisposition.presentation
-        )
+  const classification =
+    input.operationalJudgment.preparationTurnClassification
+  const preparationRealization =
+    input.operationalJudgment.preparationTurnRealizationAuthorization
+  const preparationResponse =
+    preparationRealization?.action === 'respond_to_preparation' &&
+    preparationRealization.providerExecutionAuthorized
+      ? buildNormalOperationalResponseResult({
+          operationalJudgment: input.operationalJudgment,
+          executionText: input.executionText,
+          governedProviderExecution: input.governedProviderExecution,
+        })
       : null
+  const message = classification?.clarificationRequired
+    ? PREPARATION_TURN_CLARIFICATION
+    : preparationResponse?.message
+      ? preparationResponse.message
+      : !input.operationalJudgment.signalAcquisition.shouldAcquire &&
+          input.operationalJudgment.realization.directPresentationAllowed
+        ? cleanOptionalText(
+            input.operationalJudgment.operationalDisposition.presentation
+          )
+        : null
 
   return Object.freeze({
     request: NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST,
     operationalJudgment: input.operationalJudgment,
     message,
+    authorizedSignalQuestion: input.authorizedSignalQuestion || null,
     source: 'operational_judgment' as const,
+  })
+}
+
+function runtimePreparationEvidenceValue(value: unknown) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null
+
+  const evidence = value as Record<string, unknown>
+  const normalizedValue = cleanOptionalText(evidence.value)
+  const source = cleanOptionalText(evidence.source)
+  if (!normalizedValue || !source) return null
+
+  return { value: normalizedValue, source }
+}
+
+function normalizeHomepageOperationalPreparationContext(
+  transport: Record<string, unknown>
+): OperationalPreparationContext | null {
+  const input =
+    transport.preparationEvidenceProjection &&
+    typeof transport.preparationEvidenceProjection === 'object' &&
+    !Array.isArray(transport.preparationEvidenceProjection)
+      ? (transport.preparationEvidenceProjection as Record<string, unknown>)
+      : transport
+  const provenance =
+    input.provenance &&
+    typeof input.provenance === 'object' &&
+    !Array.isArray(input.provenance)
+      ? (input.provenance as Record<string, unknown>)
+      : null
+
+  if (!provenance) return null
+  if (provenance.entrySource !== 'homepage') return null
+
+  const preparationSessionId = cleanOptionalText(input.preparationSessionId)
+  const createdAt = Number(input.createdAt)
+  const preparationUpdatedAt = Number(input.updatedAt)
+  const relations =
+    input.relations &&
+    typeof input.relations === 'object' &&
+    !Array.isArray(input.relations)
+      ? (input.relations as Record<string, unknown>)
+      : null
+  const restoredFrom =
+    provenance.restoredFrom &&
+    typeof provenance.restoredFrom === 'object' &&
+    !Array.isArray(provenance.restoredFrom)
+      ? (provenance.restoredFrom as Record<string, unknown>)
+      : null
+  const restoredFromKind = cleanOptionalText(restoredFrom?.kind)
+  const restoredFromId = cleanOptionalText(restoredFrom?.id)
+  const relatedLiveSessionId = cleanOptionalText(relations?.liveSessionId)
+  const restoredFromValid = Boolean(
+    !restoredFrom ||
+      (
+        (restoredFromKind === 'preparation' ||
+          restoredFromKind === 'live_session') &&
+        restoredFromId &&
+        (restoredFromKind !== 'preparation' ||
+          restoredFromId === preparationSessionId) &&
+        (restoredFromKind !== 'live_session' ||
+          !relatedLiveSessionId ||
+          restoredFromId === relatedLiveSessionId)
+      )
+  )
+  const evidenceSufficiency =
+    transport.evidenceSufficiency === 'unresolved' ||
+    transport.evidenceSufficiency === 'sufficient'
+      ? transport.evidenceSufficiency
+      : null
+
+  if (
+    !/^preparation_[A-Za-z0-9-]+$/.test(preparationSessionId || '') ||
+    !Number.isFinite(createdAt) ||
+    !Number.isFinite(preparationUpdatedAt) ||
+    preparationUpdatedAt < createdAt ||
+    !evidenceSufficiency ||
+    !restoredFromValid ||
+    cleanOptionalText(relations?.normalSessionId)
+  ) {
+    return null
+  }
+
+  const knowledge =
+    input.knowledge &&
+    typeof input.knowledge === 'object' &&
+    !Array.isArray(input.knowledge)
+      ? (input.knowledge as Record<string, unknown>)
+      : null
+  const briefing =
+    input.briefing &&
+    typeof input.briefing === 'object' &&
+    !Array.isArray(input.briefing)
+      ? (input.briefing as Record<string, unknown>)
+      : null
+  if (!knowledge || !briefing) return null
+
+  const evidenceValue = (value: unknown) =>
+    runtimePreparationEvidenceValue(value)
+  const objective = evidenceValue(knowledge.objective)?.value
+  const acceptableOutcome = evidenceValue(knowledge.acceptableOutcome)?.value
+  const role = evidenceValue(knowledge.role)?.value
+  const audience = evidenceValue(knowledge.audience)?.value
+  const conversation =
+    knowledge.conversation &&
+    typeof knowledge.conversation === 'object' &&
+    !Array.isArray(knowledge.conversation)
+      ? (knowledge.conversation as Record<string, unknown>)
+      : null
+  const room = evidenceValue(conversation?.title)?.value
+  const additionalSignals =
+    knowledge.additionalSignals &&
+    typeof knowledge.additionalSignals === 'object' &&
+    !Array.isArray(knowledge.additionalSignals)
+      ? Object.values(knowledge.additionalSignals as Record<string, unknown>)
+      : []
+  const structuredEvidence = [
+    knowledge.objective,
+    knowledge.name,
+    knowledge.role,
+    ...(Array.isArray(knowledge.participants) ? knowledge.participants : []),
+    knowledge.audience,
+    ...(Array.isArray(knowledge.perspectives) ? knowledge.perspectives : []),
+    conversation?.title,
+    conversation?.group,
+    knowledge.knownContext,
+    knowledge.communicationMedium,
+    knowledge.receiverEvidence,
+    knowledge.acceptableOutcome,
+    knowledge.secondaryOutcome,
+    knowledge.roomObjective,
+    ...additionalSignals,
+  ]
+    .map(evidenceValue)
+    .filter(
+      (value): value is NonNullable<ReturnType<typeof evidenceValue>> =>
+        Boolean(value)
+    )
+  const provisionalPreparationEvidence = Array.from(
+    new Set(
+      structuredEvidence
+        .filter((evidence) => evidence.source === 'persisted_preparation')
+        .map((evidence) => evidence.value)
+    )
+  )
+  const inferenceEvidence = Array.from(
+    new Set(
+      [
+        ...(Array.isArray(knowledge.baselineAssumptions)
+          ? knowledge.baselineAssumptions
+          : []),
+        ...additionalSignals,
+      ]
+        .map(evidenceValue)
+        .filter(
+          (value): value is NonNullable<ReturnType<typeof evidenceValue>> =>
+            Boolean(value && value.source === 'inference')
+        )
+        .map((evidence) => evidence.value)
+    )
+  )
+  const documents = Array.isArray(knowledge.documents)
+    ? knowledge.documents
+    : []
+  const qualifiedDocumentEvidence = documents
+    .map((document) => {
+      if (!document || typeof document !== 'object' || Array.isArray(document)) {
+        return null
+      }
+      return evidenceValue((document as Record<string, unknown>).evidence)
+    })
+    .filter(
+      (value): value is NonNullable<ReturnType<typeof evidenceValue>> =>
+        Boolean(value && value.source === 'qualified_document')
+    )
+    .map((evidence) => evidence.value)
+  const priorInteractions = Array.isArray(briefing.priorInteractions)
+    ? briefing.priorInteractions
+        .map((candidate) => {
+          if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) {
+            return null
+          }
+          const interaction = candidate as Record<string, unknown>
+          const key = cleanOptionalText(interaction.key)
+          const question = cleanOptionalText(interaction.question)
+          const answer = cleanOptionalText(interaction.answer) || ''
+          const status =
+            interaction.status === 'answered' ||
+            interaction.status === 'skipped' ||
+            interaction.status === 'unknown'
+              ? interaction.status
+              : null
+          if (!key || !question || !status) return null
+
+          const presentation =
+            interaction.presentation &&
+            typeof interaction.presentation === 'object' &&
+            !Array.isArray(interaction.presentation)
+              ? (interaction.presentation as Record<string, unknown>)
+              : null
+
+          return {
+            key,
+            question,
+            ...(cleanOptionalText(presentation?.example)
+              ? {
+                  example:
+                    cleanOptionalText(presentation?.example) || undefined,
+                }
+              : {}),
+            answer,
+            status,
+            ...(cleanOptionalText(interaction.evidenceNeed)
+              ? {
+                  evidenceNeed:
+                    cleanOptionalText(interaction.evidenceNeed) || undefined,
+                }
+              : {}),
+            ...(interaction.purpose === 'live_scope_grounding' ||
+            interaction.purpose === 'qualification'
+              ? { purpose: interaction.purpose }
+              : {}),
+          }
+        })
+        .filter(
+          (
+            interaction
+          ): interaction is OperationalPreparationContext['priorInteractions'][number] =>
+            interaction !== null
+        )
+        .slice(-24)
+    : []
+  const confirmedPreparationEvidence = priorInteractions
+    .filter(
+      (interaction) =>
+        interaction.status === 'answered' && Boolean(interaction.answer)
+    )
+    .map(
+      (interaction) =>
+        `${interaction.evidenceNeed || interaction.question}: ${interaction.answer}`
+    )
+  const skippedEvidenceNeeds = priorInteractions
+    .filter((interaction) => interaction.status !== 'answered')
+    .map(
+      (interaction) => interaction.evidenceNeed || interaction.question
+    )
+  const currentQuestionInput =
+    briefing.currentQuestion &&
+    typeof briefing.currentQuestion === 'object' &&
+    !Array.isArray(briefing.currentQuestion)
+      ? (briefing.currentQuestion as Record<string, unknown>)
+      : null
+  const currentQuestionPresentation =
+    currentQuestionInput?.presentation &&
+    typeof currentQuestionInput.presentation === 'object' &&
+    !Array.isArray(currentQuestionInput.presentation)
+      ? (currentQuestionInput.presentation as Record<string, unknown>)
+      : null
+  const currentQuestionKey = cleanOptionalText(currentQuestionInput?.key)
+  const currentQuestionText = cleanOptionalText(currentQuestionInput?.question)
+
+  return Object.freeze({
+    preparationSessionId: preparationSessionId!,
+    entrySource: 'homepage' as const,
+    preparationEvidenceProjection:
+      input as unknown as PreparationRuntimeEvidenceProjection,
+    preparationProvenance: Object.freeze({
+      entrySource: 'homepage' as const,
+      ...(restoredFrom && restoredFromKind && restoredFromId
+        ? {
+            restoredFrom: Object.freeze({
+              kind: restoredFromKind as 'preparation' | 'live_session',
+              id: restoredFromId,
+            }),
+          }
+        : {}),
+    }),
+    preparationUpdatedAt,
+    ...(objective ? { objective } : {}),
+    ...(acceptableOutcome ? { acceptableOutcome } : {}),
+    ...(role ? { role } : {}),
+    ...(audience ? { audience } : {}),
+    ...(room ? { room } : {}),
+    knownEvidence: Object.freeze([
+      ...confirmedPreparationEvidence,
+      ...qualifiedDocumentEvidence,
+    ]),
+    currentUserEvidence: Object.freeze([]),
+    confirmedPreparationEvidence: Object.freeze(
+      confirmedPreparationEvidence
+    ),
+    qualifiedDocumentEvidence: Object.freeze(qualifiedDocumentEvidence),
+    provisionalPreparationEvidence: Object.freeze(
+      provisionalPreparationEvidence
+    ),
+    inferenceEvidence: Object.freeze(inferenceEvidence),
+    skippedEvidenceNeeds: Object.freeze(skippedEvidenceNeeds),
+    ...(currentQuestionKey && currentQuestionText
+      ? {
+          pendingQuestion: Object.freeze({
+            key: currentQuestionKey,
+            question: currentQuestionText,
+            ...(cleanOptionalText(currentQuestionPresentation?.example)
+              ? {
+                  example:
+                    cleanOptionalText(currentQuestionPresentation?.example) ||
+                    undefined,
+                }
+              : {}),
+            ...(cleanOptionalText(currentQuestionInput?.evidenceNeed)
+              ? {
+                  evidenceNeed:
+                    cleanOptionalText(currentQuestionInput?.evidenceNeed) ||
+                    undefined,
+                }
+              : {}),
+          }),
+        }
+      : {}),
+    priorInteractions: Object.freeze(priorInteractions),
+    sourcePrecedence: Object.freeze(
+      NORMAL_PREPARATION_EVIDENCE_PRECEDENCE.filter(
+        (precedence) =>
+          precedence.source !== 'active_normal_session_metadata'
+      )
+    ),
+    evidenceSufficiency,
+    signalAcquisitionAllowed: transport.signalAcquisitionAllowed !== false,
   })
 }
 
@@ -1063,6 +2625,9 @@ export function normalizeOperationalPreparationContext(
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null
 
   const input = value as Record<string, unknown>
+  if (input.provenance || input.preparationEvidenceProjection) {
+    return normalizeHomepageOperationalPreparationContext(input)
+  }
   const preparationSessionId = cleanOptionalText(input.preparationSessionId)
   const normalSessionId = cleanOptionalText(input.normalSessionId)
   const objective = cleanOptionalText(input.objective)
@@ -1141,6 +2706,12 @@ export function normalizeOperationalPreparationContext(
           return {
             key,
             question,
+            ...(cleanOptionalText(interaction.example)
+              ? {
+                  example:
+                    cleanOptionalText(interaction.example) || undefined,
+                }
+              : {}),
             answer: cleanOptionalText(interaction.answer) || '',
             status,
             ...(cleanOptionalText(interaction.evidenceNeed)
@@ -1148,6 +2719,10 @@ export function normalizeOperationalPreparationContext(
                   evidenceNeed:
                     cleanOptionalText(interaction.evidenceNeed) || undefined,
                 }
+              : {}),
+            ...(interaction.purpose === 'live_scope_grounding' ||
+            interaction.purpose === 'qualification'
+              ? { purpose: interaction.purpose }
               : {}),
           }
         })
@@ -1176,6 +2751,13 @@ export function normalizeOperationalPreparationContext(
     preparationSessionId,
     normalSessionId,
     entrySource: 'normal' as const,
+    preparationProvenance: Object.freeze({
+      entrySource: 'normal' as const,
+      restoredFrom: Object.freeze({
+        kind: 'normal_session' as const,
+        id: normalSessionId,
+      }),
+    }),
     preparationUpdatedAt,
     ...(objective ? { objective } : {}),
     ...(cleanOptionalText(input.acceptableOutcome)
@@ -1206,6 +2788,13 @@ export function normalizeOperationalPreparationContext(
           pendingQuestion: Object.freeze({
             key: pendingQuestionKey,
             question: pendingQuestionText,
+            ...(cleanOptionalText(pendingQuestionInput?.example)
+              ? {
+                  example:
+                    cleanOptionalText(pendingQuestionInput?.example) ||
+                    undefined,
+                }
+              : {}),
             ...(cleanOptionalText(pendingQuestionInput?.evidenceNeed)
               ? {
                   evidenceNeed:
@@ -1261,20 +2850,37 @@ export function buildOperationalPreparationContextNote(
     .map((item) => `- ${item}`)
     .join('\n')
   const interactions = context.priorInteractions
-    .map(
-      (interaction) =>
-        `- ${interaction.evidenceNeed || interaction.question}: ${
+    .map((interaction) =>
+      [
+        `- Question shown: ${interaction.question}`,
+        interaction.example
+          ? `  Illustrative example shown (presentation guidance only; not evidence): ${interaction.example}`
+          : '',
+        `  Authorized evidence need: ${interaction.evidenceNeed || interaction.question}`,
+        `  User answer: ${
           interaction.status === 'answered'
             ? interaction.answer
             : `${interaction.status} (unknown; no negative fact established)`
-        }`
+        }`,
+      ]
+        .filter(Boolean)
+        .join('\n')
     )
     .join('\n')
+  const sourceIdentity =
+    context.entrySource === 'normal'
+      ? `- Entry source: normal\n- Parent Normal session: ${context.normalSessionId}`
+      : '- Entry source: homepage\n- Homepage Preparation Session is the source identity; no Normal-session relationship is present.'
+  const sourceSpecificProvenanceDuty =
+    context.entrySource === 'normal'
+      ? `- The user chose THIS CONVERSATION as the starting context. That choice establishes provenance only. It does not establish the desired outcome of the anticipated external LIVE interaction.
+- Do not spend the first acquisition reconfirming whether the anticipated interaction is "about" the carried Normal subject. Topic adjacency is subordinate to the result the user needs that interaction to produce.`
+      : ''
 
   return `
-CURRENT NORMAL PREPARATION EVIDENCE
+CURRENT OPERATIONAL PREPARATION EVIDENCE
 - Preparation session: ${context.preparationSessionId}
-- Parent Normal session: ${context.normalSessionId}
+${sourceIdentity}
 - Evidence-acquisition state: ${context.evidenceSufficiency}
 - Signal acquisition available this pass: ${context.signalAcquisitionAllowed ? 'yes' : 'no'}
 ${context.formula ? '- A selected Formula is identified in canonical preparation and, when access-valid, appears in Operational Memory Evidence as strategic context.' : '- No Formula is selected in canonical preparation. Do not invent one.'}
@@ -1284,7 +2890,7 @@ ${precedence}
 - Within current explicit user evidence, later statements supersede older conflicting statements.
 - Assistant prose remains conversation context only and is never user-owned evidence.
 
-Current explicit Normal-session user evidence (highest authority, oldest to newest):
+Current explicit user evidence (highest authority, oldest to newest):
 ${currentUserEvidence || '- none'}
 
 Confirmed user answers from preparation:
@@ -1306,21 +2912,23 @@ Adaptive preparation history:
 ${interactions || '- none'}
 
 Pending unanswered preparation question:
-${context.pendingQuestion ? `- ${context.pendingQuestion.evidenceNeed || context.pendingQuestion.question} (pending only; not evidence and not continuing authorization)` : '- none'}
+${context.pendingQuestion ? `- Question shown: ${context.pendingQuestion.question}\n${context.pendingQuestion.example ? `  Illustrative example shown (presentation guidance only; not evidence): ${context.pendingQuestion.example}\n` : ''}  Authorized evidence need: ${context.pendingQuestion.evidenceNeed || context.pendingQuestion.question} (pending only; not evidence and not continuing authorization)` : '- none'}
 
 OPERATIONAL REASONING DUTY
-- Determine the strongest next step toward the objective from this evidence and the full conversation.
+- This is active, user-selected LIVE preparation. Selection authorizes preparation, but it does not establish the desired outcome, missing facts, strategy, or readiness.
+${sourceSpecificProvenanceDuty}
+- Determine the strongest next preparation move toward the user's desired outcome from this evidence and the full conversation.
 - Resolve conflicts using the source precedence above. Newer explicit user evidence outranks richer or older persisted preparation, and user-owned evidence outranks inference.
 - Treat the structured objective, role, audience, context, and other persisted preparation fields as provisional unless confirmed by current explicit user evidence or an answered preparation interaction.
-- Decide whether LIVE materially improves execution, whether Normal work is stronger, or whether another concrete operational action should come first.
-- The user invoking LIVE is a request for this judgment, not proof that LIVE preparation is the strongest move.
+- Do not re-evaluate whether LIVE deserves to be offered or recommended. That pre-selection decision ended when the user deliberately selected LIVE.
+- Interaction usefulness and material LIVE benefit may still inform how GEORGE prepares, but they are not prerequisites for continuing this selected preparation flow.
 - When evidence is unresolved, authorize signal acquisition only if one specific user-owned fact is genuinely necessary to determine or materially improve the strongest operational action.
 - When signal acquisition is unavailable this pass, do not preserve or repeat an earlier acquisition decision. Reassess the strongest supported action from current evidence and remain unresolved only if no responsible action is supported.
 - When another user interruption is not necessary, choose the supported operational disposition immediately even if preferred preparation fields remain empty.
 - Do not formulate a preparation question here. When signal acquisition is authorized, the existing question-formulation owner will acquire exactly the requested signal.
 - When evidence is sufficient, do not reopen preparation merely to complete fields.
 - Perform professional inference GEORGE can responsibly perform. Do not manufacture user-owned facts.
-- If LIVE is useful, explain its interaction-specific execution value naturally. Do not advertise it or force activation.
+- Selection does not make the interaction automatically ready. Advance readiness only when the objective, interaction, and supported preparation move are established.
 - Formula evidence informs the strategy; it is not a script, response template, or independent authority.
 `.trim()
 }
@@ -1490,6 +3098,10 @@ ${judgment.smallestSignal ? `- Smallest useful signal: ${judgment.smallestSignal
 - Interaction useful: ${judgment.operationalDisposition.interactionUseful ? 'yes' : 'no'}
 - Material LIVE benefit: ${judgment.operationalDisposition.materialLiveBenefit || 'none established'}
 - Strongest next step: ${judgment.operationalDisposition.strongestNextStep || 'unresolved'}
+- Communication change: ${judgment.communicationChange?.accepted ? `${judgment.communicationChange.kind} accepted for ${judgment.communicationChange.acceptedScope}` : judgment.communicationChange?.clarificationRequired ? 'clarification required' : 'none accepted'}
+- Communication effects: objective=${judgment.communicationChange?.effects.activeObjective ? 'change' : 'preserve'}; facts=${judgment.communicationChange?.effects.factualRecord ? 'change' : 'preserve'}; support=${judgment.communicationChange?.effects.supportConfiguration ? 'change' : 'preserve'}; realization=${judgment.communicationChange?.effects.realization ? 'change' : 'preserve'}
+${judgment.communicationChange?.clarificationQuestion ? `- Communication clarification: ${judgment.communicationChange.clarificationQuestion}` : ''}
+- Durable communication persistence: not authorized
 - Rationale: ${judgment.rationale.join(' | ')}
 `.trim()
 }

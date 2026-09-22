@@ -1,3 +1,5 @@
+import type { PreparationTurnClassificationRequest } from '@/lib/george/runtime/operational-judgment'
+
 export type GovernedRuntimeContextInput = {
   liveRuntimeContext?: string | null
   shelvedCampaignRuntimeNote?: string | null
@@ -154,6 +156,8 @@ ${realizationAuthority}
 - Obey the current user utterance and this operational conclusion over broader or older prompt guidance when realization instructions compete.
 - The selected conversational move defines the maximum allowable scope of this response, except that it must not erase or deny a direct capability request.
 - Advancement means completing the smallest move that improves the operational state, not completing the entire likely project.
+- Response length is subordinate to that selected move: provide all substance materially required to execute it well, but do not enlarge the move merely because additional information, analysis, or advice could also be useful.
+- When the user's intended outcome is not sufficiently established to justify a broader move, infer responsibly where possible and otherwise resolve only the consequential ambiguity needed to choose the strongest next move.
 - Do not replace the selected move with a generic consultant package, checklist, briefing framework, objection bundle, script, or multi-part plan unless the user explicitly asks for that form or the execution type requires it.
 ${signalRealizationRule}
 - When signal acquisition is not warranted, do not ask merely to complete fields.
@@ -163,22 +167,70 @@ ${signalRealizationRule}
 `.trim()
 }
 
-export function buildNormalLiveOperationalJudgmentRequestNote() {
+function buildOperationalPreparationJudgmentRequestNoteWithClassification(
+  classificationRequest?: PreparationTurnClassificationRequest | null
+) {
+  const classificationDuty = !classificationRequest
+    ? ''
+    : classificationRequest.malformed
+      ? `
+PREPARATION TURN CLASSIFICATION REQUIRED
+- The supplied explicit/inferred classification transport is malformed.
+- Do not repair it, infer around it, or allow this turn into LIVE preparation. Operational Judgment will fail closed.`
+      : classificationRequest.explicitSelection
+        ? `
+PREPARATION TURN CLASSIFICATION REQUIRED
+- The user explicitly selected ${classificationRequest.explicitSelection} for this turn. That intended use is authoritative and must not be silently reversed.
+- Return a structurally complete preparationTurnClassification proposal consistent with that explicit selection so Operational Judgment can assess pending-question disposition without becoming a second classification owner.`
+        : `
+PREPARATION TURN CLASSIFICATION REQUIRED
+- Infer whether this user turn is live_briefing, preparation, or clarification_required from its full semantic meaning and the active preparation context. Do not use keyword matching.
+- The current inferred classification is ${classificationRequest.currentClassification}. Your proposal must let Operational Judgment determine whether the inferred mode was retained, switched, or requires immediate clarification.
+- A question may shape LIVE preparation, but it is not automatically accepted evidence or an answer to the pending question.
+- Use clarification_required only when intended use cannot be determined responsibly.`
+
   return `
-NORMAL LIVE OPERATIONAL JUDGMENT REQUEST
-- This request was caused by the user invoking the Normal LIVE control. It is a control-plane reasoning request, not a new conversational user turn.
+OPERATIONAL PREPARATION JUDGMENT REQUEST
+- It is a control-plane reasoning request, not a new conversational user turn.
+- It applies only to the validated Preparation Session and its retained entry provenance.
 - Do not answer the last user message again, continue the prior ordinary Normal response, or replay prior assistant prose.
-- Treat the LIVE invocation as user interest in the capability, not evidence that the capability is operationally useful.
-- Reason in this order: operational objective; known evidence; work GEORGE can resolve or perform; consequential uncertainty; strongest next action; interaction usefulness; material LIVE execution benefit; disposition; and only then any exact user-owned evidence need.
+- Treat preparation entry as user interest in the capability, not evidence that the capability is operationally useful.
+- If definitive user evidence does not establish the concrete desired result of the anticipated LIVE interaction, preserve that missing result as the governing consequential uncertainty. Its acquisition has priority over scope or topic confirmation, participant identity, role, mechanics, constraints, leverage, risks, and other preparation details.
+- Do not infer, suggest, or promote a plausible LIVE outcome from assistant prose, provisional preparation, or an illustrative example. Certainty about the user's objective outranks a strategically attractive guess.
+- Once the user establishes the LIVE desired outcome, freshly reassess the complete evidence and compare the strongest operational candidates. No scope, participant, role, constraint, or other field is automatically next.
+- Do not acquire target market, product details, business-plan details, role, title, audience, objections, or other downstream preparation facts merely because they may eventually be useful. Ask only when uncertainty about that fact materially impairs the next LIVE judgment.
+- Reason in this order: desired outcome of the anticipated conversation; known evidence; work GEORGE can resolve or perform; consequential uncertainty; strongest next action; interaction usefulness; material LIVE execution benefit; disposition; and only then any exact user-owned evidence need.
 - Use validated user evidence, conversation context, Operational Memory Evidence, preparation evidence, and current capabilities. Prior GEORGE advice is conversation context, not independent user-owned evidence.
-- Determine whether an interaction supported by LIVE materially helps now, whether continued Normal work is stronger, or whether another concrete action should come first.
+- Determine whether an interaction supported by LIVE materially helps now, whether continued work outside LIVE is stronger, or whether another concrete action should come first.
 - Return the proposed semantic result in semanticJudgment.operationalReasoning. Do not generate a separate top-level answer during this semantic phase.
 - For execution_ready or execution_opportunity, make the interaction, GEORGE's situation-derived execution functions, desired result, strongest next step, and material LIVE execution benefit concrete.
 - For continue_normal, state why Normal is stronger now and identify the actual Normal action GEORGE should perform next.
 - For other_action, state the identified stronger action and why it outranks LIVE or another preparation question.
 - For unresolved, propose signal acquisition only when the same exact consequential uncertainty is user-owned, required for the next operational decision, and cannot be displaced by useful work GEORGE can perform now. Do not formulate the question.
 - Do not expose internal disposition labels, request metadata, or authority terminology.
+${classificationDuty}
 `.trim()
+}
+
+export function buildOperationalPreparationJudgmentRequestNote() {
+  return buildOperationalPreparationJudgmentRequestNoteWithClassification()
+}
+
+/**
+ * Compatibility name retained for the frozen runtime-pipeline caller. The
+ * returned contract is source-neutral and remains the single preparation
+ * judgment request note.
+ */
+export function buildNormalLiveOperationalJudgmentRequestNote(
+  classificationRequest?: PreparationTurnClassificationRequest | null
+) {
+  if (!classificationRequest) {
+    return buildOperationalPreparationJudgmentRequestNote()
+  }
+
+  return buildOperationalPreparationJudgmentRequestNoteWithClassification(
+    classificationRequest
+  )
 }
 
 export function buildNormalProviderRuntimeContext(input: {

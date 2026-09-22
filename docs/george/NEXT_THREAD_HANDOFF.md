@@ -2,7 +2,7 @@
 
 ## Authority
 
-`GEORGE_DOCUMENTATION_SYNC: 2026-08-15-formula-script-refinement`
+`GEORGE_DOCUMENTATION_SYNC: 2026-09-17-lh3a3e-governed-communication`
 
 `IMPLEMENTATION_AUTHORITY: Implementation is authoritative; these documents are authoritative only while synchronized with the validated local implementation.`
 
@@ -40,7 +40,7 @@ The production runtime, portability boundary, canonical ownership model, Prepara
 - `lib/george/live-runtime/live-preparation-storage.ts` owns portable canonical session persistence and legacy preparation-key compatibility.
 - `lib/george/live-browser/live-preparation-browser-storage.ts` owns browser storage access.
 - Fresh Traditional preparation creates and persists a canonical session without implicitly restoring stale prior preparation.
-- Quick LIVE creates and persists the same session with its narrow desired-outcome gate and current-session support recommendation.
+- Quick LIVE is retired. Its dedicated preparation, UI, runtime setup, and handoff path have been removed and must not be restored.
 - Homepage creates and preserves the same stable session through briefing, LIVE Entry handoff, Continue Briefing, Popup 3 / Ready Room, Library or Marketplace return, and LIVE entry.
 - Canonical `priorInteractions` preserve question text and answered, skipped, or unknown status without duplicate synthesis.
 - GEORGE recommendations and user overrides remain distinct.
@@ -58,7 +58,7 @@ Canonical route adapters:
 | Route | Status | Current experience |
 | --- | --- | --- |
 | Traditional | Complete | Questions → Popup 1 → Popup 2 → Popup 3 → LIVE |
-| Quick LIVE | Complete | Minimum outcome-first setup → LIVE |
+| Quick LIVE | Retired | Dedicated production route removed; do not restore |
 | Homepage | Complete | Adaptive briefing → Popup 3 / Ready Room → LIVE |
 | Normal GEORGE | Linked / pending full migration | Parent GEORGE session identity is preserved; full route migration remains pending |
 | Resume | Pending | Meaningful eligibility and canonical restoration are not implemented |
@@ -123,7 +123,7 @@ Current product refinement remains centered on recommendation quality, Formula/S
 - Inspect implementation before editing.
 - Keep one Preparation Runtime and one versioned Preparation Session contract.
 - Routes seed or restore preparation; they do not own preparation state.
-- Preserve the distinct Traditional, Quick LIVE, Homepage, Normal, and eventual Resume experiences.
+- Preserve the distinct Traditional, Homepage, Normal, and eventual Resume experiences. Quick LIVE is retired and must not be reintroduced as a separate route.
 - Keep explicit objective authority; never replace it silently with inferred direction.
 - Keep recommendations and user overrides distinct.
 - Recompute readiness and uncertainty; do not persist them as canonical session truth.
@@ -429,3 +429,776 @@ Before launch, demonstrate at minimum:
 The objective of the Codex phase is not another architecture.
 
 The objective is to finish GEORGE as a launch-grade, maintainable, portable product while preserving the operational intelligence already built.
+
+<!-- GEORGE_CONTINUATION_2026_08_19_NORMAL_LIVE_DESIGN_AND_PARTNERSHIP -->
+# GEORGE CONTINUATION — NORMAL / LIVE PARTNERSHIP + SITE DESIGN
+
+## FIRST
+
+This project remains in Production Completion & Product Design.
+
+Do not redesign GEORGE.
+
+Do not create another runtime.
+
+Do not create another reasoning authority.
+
+Do not flatten legitimate LIVE entry routes.
+
+Do not move runtime intelligence into presentation.
+
+Inspect implementation before changing anything.
+
+Patch canonical owners only.
+
+Small commits.
+
+Build before commit.
+
+Never commit a failed build.
+
+The current working tree contains intentional uncommitted work from the latest Normal GEORGE / LIVE partnership pass. Inspect it before changing or reverting anything.
+
+---
+
+## READ FIRST
+
+Read completely and in order:
+
+1. docs/george/PRODUCTION_TRACKER.md
+2. docs/george/RUNTIME_ARCHITECTURE.md
+3. docs/george/OPERATIONAL_PROFILE.md
+4. docs/george/NEXT_THREAD_HANDOFF.md
+
+Then inspect:
+
+- git status -sb
+- current HEAD / upstream
+- complete working-tree diff
+- affected canonical owners
+- current qualification/build state
+
+Do not assume this handoff is newer than implementation.
+
+Implementation wins when documentation and code differ.
+
+---
+
+## CURRENT BRANCH / LAST CLEAN DESIGN CHECKPOINT
+
+Branch:
+
+conversation-summary-runtime
+
+Last committed/pushed major design checkpoint:
+
+73a83fc9 — Unify GEORGE route and strategy design
+
+Recovery tag:
+
+george-route-strategy-design-20260818-231838
+
+That checkpoint unified:
+
+- homepage route design;
+- Library working-set design;
+- Marketplace recommendation/strategy design;
+- mobile-first density;
+- shared strategy/evidence presentation.
+
+The repository later received additional uncommitted Normal GEORGE and LIVE work described below.
+
+---
+
+## LOCKED DESIGN RULE
+
+Mobile first.
+
+Do not waste space.
+
+Desktop may use width to expose more information.
+
+Desktop must not create artificial vertical bulk simply because more space is available.
+
+Space communicates priority.
+
+If a surface consumes substantial screen space, it must materially help the user:
+
+- understand;
+- decide;
+- prepare;
+- execute;
+- verify;
+- learn;
+- or move closer to the desired outcome.
+
+Avoid decorative cards, redundant explanations, persistent controls with low operational value, and large empty regions.
+
+---
+
+# SITE DESIGN DIRECTION
+
+## Homepage
+
+Homepage is primarily a route map.
+
+It should explain:
+
+- what each GEORGE route is for;
+- when that route is useful;
+- what benefit the route provides.
+
+Current route distinctions remain legitimate.
+
+Do not merge the routes.
+
+Traditional LIVE should retain stronger desktop proportion than other routes where appropriate.
+
+Rendered intelligent headline/copy should feel visually superior to surrounding page content while it is in frame.
+
+The homepage should not become a wall of colored cards.
+
+Color should primarily communicate meaningful actions/states.
+
+---
+
+## Library
+
+Library = user's operational working set.
+
+It is not another Marketplace recommendation surface.
+
+Primary purpose:
+
+- see owned/current formulas and scripts;
+- understand operational state;
+- inspect execution learning;
+- adapt existing operational work;
+- manage only when necessary.
+
+Administrative controls should not dominate the initial Library view.
+
+Strategy/evidence state should travel with the formula instead of consuming separate oversized regions.
+
+---
+
+## Marketplace
+
+Marketplace = operational strategy decision surface.
+
+Recommendation remains primary.
+
+Alternatives are secondary and should explain how/when they differ.
+
+Marketplace should not feel like:
+
+- an app store;
+- social discovery;
+- a generic content catalog.
+
+Evidence/status belongs with the strategy.
+
+Do not recreate standalone Emerging/Proven catalog sections unless implementation proves they materially help decision quality.
+
+---
+
+# NORMAL GEORGE DESIGN WORK
+
+The latest Normal design pass intentionally moved toward:
+
+GEORGE speaks.
+Controls recede.
+
+Changes made during the current working-tree phase include or may include:
+
+- quieter user-message presentation;
+- preserved blue briefing treatment;
+- reduced persistent assistant action clutter;
+- permanent DECK action removed from every response;
+- Copy / Share visually quieted;
+- Remember interaction reduced from a miniature folder manager to a fast save decision;
+- Moment Marker redesigned as a visible milestone at the beginning of qualifying GEORGE responses;
+- Moment Marker retains recognition glyphs:
+  - 🔥 Momentum
+  - 🎯 Alignment
+  - 🏃 Movement
+  - 🙌 Interaction
+  - 🏁 Outcome
+  - BX Deft execution
+- Moment assessment expands inline rather than taking over the screen with a modal;
+- ordinary Normal composer was visually quieted while preserving:
+  - blue Normal briefing state;
+  - LIVE composer behavior;
+  - shared canonical composer ownership.
+
+Do not remove the blue briefing treatment.
+
+Blue communicates active briefing / context acquisition.
+
+Do not flatten Normal, briefing, and LIVE composer states into one visual treatment.
+
+---
+
+# MOMENT MARKER
+
+Moment Marker was originally conceived as recognition of significant milestones.
+
+Its semantics have expanded toward operationally significant moments.
+
+Do not exhaustively redesign or reclassify it during unrelated work.
+
+Current product intent:
+
+- important milestone/significant moment is acknowledged at the beginning of the GEORGE response;
+- recognition should feel meaningful;
+- flame/target/etc. are intentional, not accidental decoration;
+- deeper assessment may expose:
+  - observed;
+  - evidence;
+  - why it matters;
+  - focus.
+
+A future bounded pass should clarify whether Moment Marker represents:
+
+1. milestones only;
+2. broader consequential operational moments;
+3. a hierarchy containing both.
+
+Do not block remaining production/design work on exhaustive Moment Marker testing.
+
+---
+
+# NORMAL → LIVE PARTNERSHIP
+
+This behavior is now product doctrine.
+
+## First LIVE tap
+
+First tap does NOT begin briefing immediately.
+
+It explains LIVE and asks the user which context should become the basis for LIVE.
+
+Core framing:
+
+LIVE lets me support you while another conversation is happening.
+
+We can continue with what we're discussing, or you can use LIVE for something else.
+
+Preferred active execution language:
+
+While LIVE, you use your voice as I analyze the conversation for openings, behavior tells, risk, leverage, and changes in direction.
+
+I discreetly send high-impact lines and cues to your screen or audio device — earbuds, phone, laptop, or compatible glasses.
+
+Tap LIVE again to continue with this conversation.
+
+Or choose Something else.
+
+Avoid passive language such as:
+
+"I can listen with you."
+
+LIVE is execution support, not passive observation.
+
+---
+
+## Second LIVE tap
+
+Second tap means:
+
+Use the current Normal conversation as the starting context for evaluating and preparing LIVE.
+
+It does NOT mean:
+
+LIVE has already been judged appropriate.
+
+It does NOT mean:
+
+GEORGE must immediately reject LIVE if current evidence is incomplete.
+
+After the second tap:
+
+- current Normal objective/context/evidence carry forward;
+- blue adaptive briefing begins;
+- GEORGE acquires only consequential missing signal;
+- the existing Normal response must remain visually stable;
+- no already-delivered GEORGE response should replay/re-render.
+
+The briefing determines whether LIVE is ultimately useful.
+
+---
+
+## End-of-briefing judgment
+
+Only after sufficient briefing evidence exists should GEORGE judge whether:
+
+1. LIVE materially improves execution;
+2. Normal work is the stronger next move;
+3. another interaction would create more value;
+4. a verification conversation with a related party would resolve consequential uncertainty.
+
+Do not make the final "LIVE is not materially useful" judgment at the beginning of briefing merely because evidence is incomplete.
+
+---
+
+# GEORGE-INITIATED VERIFICATION CALL
+
+This is a major product / marketing behavior.
+
+GEORGE may identify that advice, strategy, or user assumptions depend on consequential information held by another real person.
+
+GEORGE may then recommend a legitimate verification interaction.
+
+GEORGE must not manufacture a call merely to demonstrate LIVE.
+
+The interaction must independently advance the user's desired outcome.
+
+GEORGE may test:
+
+- the user's assumptions;
+- stale facts;
+- another party's current position;
+- an interpretation;
+- GEORGE's own prior recommendation.
+
+Representative framing:
+
+"I suggest we verify this."
+
+"I'll set up a call with you and help determine whether those assumptions still hold."
+
+"Pay attention to your screen or audio device as I deliberately determine whether [X] is still [Y]."
+
+"If what we learn changes the strategy, we'll adjust."
+
+Locked partnership line:
+
+**Intelligent communication doesn't work without your voice.**
+
+Do not replace this with language implying competition between the user's voice and GEORGE's advice.
+
+---
+
+# GEORGE-PREPARED VERIFICATION LIVE ENTRY
+
+When GEORGE already knows:
+
+- objective;
+- participant / related party;
+- current evidence;
+- consequential uncertainty;
+- verification target;
+- intended result;
+
+the user should not be forced through redundant Traditional briefing.
+
+GEORGE may prepare the interaction and enter at Popup 3 / Ready Room.
+
+For this GEORGE-prepared verification route, the user's primary remaining setup decision is receiver:
+
+VISUAL
+
+Best when the user can glance discreetly and may need to compare details as they emerge.
+
+Guidance remains visible.
+
+AUDIO
+
+Best when eye contact, rapport, or attention to the other person matters most.
+
+Guidance must remain short, sequential, repeatable, and low-cognitive-load.
+
+GEORGE may recommend the receiver based on the interaction.
+
+Traditional LIVE remains its own full route.
+
+Homepage preparation begins with the user's exact desired outcome. Role and conversation type are optional evidence rather than entry gates.
+
+Do not flatten these routes.
+
+---
+
+# LIVE ENTRY ROUTES — PRESERVE
+
+GEORGE has multiple legitimate LIVE entry routes with different choreography over one shared LIVE runtime.
+
+Preserve:
+
+Normal GEORGE
+→ LIVE orientation
+→ current conversation or something else
+→ adaptive briefing
+→ readiness
+→ LIVE
+
+Traditional LIVE
+→ Popups 1 → 2 → 3
+
+Homepage preparation / GEORGE-prepared context
+→ may enter later in choreography when preceding information is already established
+
+Homepage outcome-led preparation
+→ exact desired outcome → same-surface adaptive question → editable confirmed understanding
+
+LH-3A1 generalizes the existing Operational Preparation Judgment ingress to accept validated `normal` or `homepage` provenance through the same semantic-proposal and Operational Judgment path. Homepage retains its canonical Preparation Session identity without a manufactured Normal-session relationship. The Homepage surface does not invoke that ingress yet; that connection remains the next controlled dependency.
+
+`/george/live-home` no longer inserts a role-selection or briefing-launch surface after outcome capture. Its active question remains primary; compact authorized S / I / B controls and editable Current Understanding remain beneath it. Role and conversation type are optional evidence, and an understanding revision is preserved in the same Preparation Session before the unresolved question returns.
+
+These are presentation/entry differences.
+
+They do not create separate intelligences or runtimes.
+
+---
+
+# FEEDBACK / THUMBS — LATEST REQUEST
+
+Latest requested behavior:
+
+- add 👍 / 👎 under user messages as well as GEORGE messages;
+- both start neutral;
+- tap 👍 selects;
+- tap selected 👍 again returns to neutral;
+- tap 👎 switches;
+- tap selected 👎 again returns to neutral;
+- no thumb should arrive pre-checked;
+- user-message feedback should remain visually quiet.
+
+Important:
+
+The final patch for neutral/toggleable feedback, user-message thumbs, Normal brevity, and updated LIVE orientation/second-tap doctrine was provided at the end of the previous thread.
+
+Its validation result was NOT shown before handoff.
+
+NEXT THREAD MUST INSPECT WHETHER THAT PATCH EXISTS IN THE WORKING TREE BEFORE REAPPLYING IT.
+
+Do not blindly rerun it.
+
+---
+
+# NORMAL RESPONSE LENGTH — LATEST DIRECTION
+
+GEORGE has become somewhat too long-winded in low-pressure, narrow-intent Normal conversations.
+
+Desired behavior:
+
+When the user's intent is narrow and pressure is low, answer in one compact useful thought.
+
+Add another sentence or paragraph only when it materially changes:
+
+- understanding;
+- decision;
+- next action;
+- or probability of reaching the desired outcome.
+
+Do not append generic consequences, summaries, restatements, or closing abstractions after the useful operational point has already been established.
+
+Example preferred response:
+
+"It's essential to assess the specifics of this re-issuance, such as the number of shares to be issued and the purpose behind the move. These details will influence the strategic decision and help predict both immediate and long-term effects on shareholder value and company performance."
+
+Do not add another generic paragraph unless it changes what the user should understand or do.
+
+---
+
+# CORRECTNESS BUGS DISCOVERED DURING NORMAL/LIVE TESTING
+
+## Startup greeting
+
+Observed bug:
+
+after the user's first Normal message, the startup greeting appeared above the user's message.
+
+Desired behavior:
+
+startup greeting is orientation, not transcript history.
+
+It should not suddenly become visible above the first user message once Normal conversation starts.
+
+Inspect current working tree to verify whether the greeting filtering correction is present.
+
+---
+
+## Existing response replay on LIVE transition
+
+Observed bug:
+
+after tapping LIVE, the already-rendered GEORGE response replayed/re-rendered before new blue briefing context appeared.
+
+Desired behavior:
+
+existing delivered messages are immutable presentation history.
+
+LIVE/preparation state changes must not replay an existing assistant response.
+
+Only a genuinely new assistant delivery should animate/type.
+
+Inspect current typewriter/message-delivery logic before changing it.
+
+---
+
+# QUALIFICATION DOCTRINE CHANGE
+
+Historical adaptive sequencing qualification previously enforced:
+
+first Normal LIVE click immediately enters adaptive preparation.
+
+That doctrine is obsolete.
+
+New doctrine:
+
+Tap 1
+→ LIVE orientation / context choice
+
+Tap 2
+→ authorize current Normal context as starting point for adaptive LIVE briefing
+
+Then adaptive sequencing continues.
+
+The adaptive sequencing qualification was being updated accordingly during the previous thread.
+
+Inspect:
+
+scripts/george-adaptive-sequencing-qualification.mjs
+
+Also inspect:
+
+scripts/george-normal-live-partnership-qualification.mjs
+
+Do not restore obsolete one-tap behavior merely to satisfy a stale qualification.
+
+---
+
+# RECENT BUILD / COMPILER STATUS
+
+During the Normal/LIVE partnership implementation, several compiler/qualification issues were corrected one at a time:
+
+- stale one-tap adaptive sequencing qualification;
+- receiver-profile ternary syntax;
+- verification Ready Room back-owner declaration ordering.
+
+After those corrections, a full production build completed successfully.
+
+Then a final requested patch was supplied for:
+
+- neutral/toggleable thumbs;
+- thumbs under user messages;
+- tighter Normal brevity;
+- stronger active LIVE orientation language;
+- second-tap briefing authority.
+
+No subsequent build output for that final patch was shown before handoff.
+
+Therefore:
+
+**Do not assume the current working tree is green.**
+
+First inspect.
+
+Then run focused qualifications and production build.
+
+---
+
+# IMMEDIATE NEXT THREAD PROCEDURE
+
+1. cd ~/ai-clarity
+
+2. Inspect:
+
+git status -sb
+git diff --check
+git diff --stat
+
+3. Inspect complete diffs for all modified files.
+
+4. Determine whether the final feedback/brevity/LIVE correction patch is already present.
+
+5. Do NOT reapply any patch that is already present.
+
+6. Run focused qualifications:
+
+node scripts/george-adaptive-sequencing-qualification.mjs
+node scripts/george-normal-live-partnership-qualification.mjs
+
+7. Run:
+
+npm run build
+
+8. Resolve failures one at a time.
+
+9. Perform the shortest behavior test:
+
+- fresh Normal conversation;
+- startup greeting does not enter transcript;
+- user thumbs neutral/toggleable;
+- GEORGE thumbs neutral/toggleable;
+- narrow Normal response is concise;
+- LIVE first tap explains active support;
+- existing response remains static;
+- second tap begins blue adaptive briefing;
+- no premature final "LIVE not useful" judgment;
+- Something else preserves Traditional LIVE route;
+- verification route reaches Popup 3 when legitimately prepared;
+- Popup 3 receiver choice explains Visual vs Audio;
+- "Intelligent communication doesn't work without your voice." remains present.
+
+10. Only after behavior and build are green:
+
+- remove current temporary `.pre-*` backups associated with this phase;
+- inspect final diff;
+- synchronize production documentation if behavior/doctrine changed;
+- commit in a bounded production checkpoint;
+- push;
+- create a recovery tag if appropriate.
+
+---
+
+# DO NOT DRIFT
+
+Do not:
+
+- redesign the runtime;
+- introduce a new LIVE recommendation engine;
+- create a verification-call runtime;
+- create a second Normal intelligence;
+- move Operational Judgment into presentation;
+- turn LIVE into passive listening;
+- make GEORGE promote LIVE merely to demonstrate the feature;
+- require full Traditional briefing when GEORGE already possesses the necessary preparation evidence;
+- flatten legitimate LIVE routes;
+- remove blue briefing-state meaning;
+- remove milestone recognition from Moment Marker;
+- waste mobile space;
+- restore persistent low-value response controls;
+- commit a failed build.
+
+The product objective remains:
+
+**One operational intelligence that reasons, prepares, executes with the user, tests reality when necessary, learns from execution, and moves the user toward the desired outcome.**
+
+--------------------------------------------------
+LH-3A2 — AUTHORIZED HOMEPAGE QUESTION TRANSPORT
+--------------------------------------------------
+
+Homepage preparation now preserves the user’s exact answer or Current
+Understanding revision before submitting the same canonical Homepage
+Preparation Session to the shared Operational Preparation Judgment ingress.
+
+Operational Judgment remains the sole authority that determines whether another
+material signal should be acquired. When acquisition is authorized, the exact
+requested signal and authorization provenance are passed unchanged to the
+signal-question formulation owner. Homepage requests without that authorization
+cannot enter independent evidence selection.
+
+The absence of an authorized question does not establish LIVE readiness.
+ENTER LIVE remains inactive until the later canonical minimum-viable-support
+judgment is implemented. Normal preparation behavior, shared runtime ownership,
+and Patch 4 preparation-evidence transport remain unchanged.
+
+--------------------------------------------------
+LH-3A3d1 — CLASSIFICATION CONTRACT CHECKPOINT
+--------------------------------------------------
+
+The canonical preparation-turn classification gate is now implemented in
+Operational Judgment and transported through the existing `/api/chat` runtime
+response. The Normal provider remains a non-authoritative semantic proposal
+source. Explicit `live_briefing` or `preparation` intent is authoritative;
+inferred proposals are validated, and missing, malformed, or contradictory data
+fails closed to `clarification_required` without mutating prior accepted state or
+resolving the pending question.
+
+Do not reimplement this classification in the homepage, controller, or
+signal-question route. Do not remove `ask_george` as part of this checkpoint.
+The next smallest patch is the bounded homepage consumer/UI conversion to the
+visible `LIVE briefing | Preparation` control using the accepted metadata
+already returned by `/api/chat`.
+
+--------------------------------------------------
+LH-3A3d2a — REALIZATION PREREQUISITE
+--------------------------------------------------
+
+The canonical post-classification conversational-realization boundary is now
+implemented. Operational Judgment distinguishes Preparation response,
+clarification, and LIVE-briefing assessment; `/api/chat` invokes the existing
+Normal provider execution path only after a Preparation classification is
+accepted and returns the response through the existing Operational Judgment
+result message.
+
+Preparation remains unable to mutate accepted evidence, Current Understanding,
+readiness, outcome potential, pending-question satisfaction, Formula, story,
+mechanics, or LIVE behavior. Clarification invokes no substantive provider
+execution. The homepage has not yet consumed this boundary. Its UI migration is
+the next smallest patch. The Homepage and LIVE Entry `ask_george` callers and the
+signal-question response branch remain intact pending a separately authorized
+dead-code milestone.
+
+--------------------------------------------------
+LH-3A3d2b — HOMEPAGE CONSUMER CHECKPOINT
+--------------------------------------------------
+
+The homepage now consumes the d1 classification gate and d2a realization
+boundary through `/api/chat`. It presents `LIVE briefing | Preparation`, sends
+null explicit intent for inferred turns, scopes manual intent to one
+submission, and updates the visible mode only from the accepted Operational
+Judgment classification.
+
+Preparation leaves the Preparation Session and pending operational question
+unchanged. Clarification holds and automatically resubmits the original turn
+without retyping or an extra submit action. The homepage no longer calls the
+signal-question `ask_george` branch. Traditional/LIVE Entry still does, so the
+branch is reachable and must remain until a later separately authorized
+dead-code milestone proves otherwise. Do not begin review, mechanics, final
+story, or LIVE-room redesign from this checkpoint.
+
+--------------------------------------------------
+LH-3A3e — GOVERNED COMMUNICATION CHECKPOINT
+--------------------------------------------------
+
+Implemented ownership:
+
+- the existing provider semantic pass proposes communication-change meaning;
+- Operational Judgment alone accepts, rejects, narrows, or requests
+  clarification and records affected state;
+- Execution Policy realizes accepted effects without reopening scope;
+- recent conversation context produces a bounded Adaptive User Profile with
+  repetition, recency, and contradiction handling;
+- Durable Behavioral Memory identifies candidates but does not persist them;
+- confirmed speaking style reaches the existing LIVE runtime context;
+- LIVE role etiquette requires repeated weighted role evidence;
+- Receiver Policy and presentation retain shaping/display-only authority.
+
+No ordinary-turn provider call, tone engine, memory system, style picker,
+reasoning lane, or LIVE intelligence was added. Room- and session-scoped
+changes remain non-durable. The existing authorized persistence boundary was
+not modified.
+
+Remaining dependency: `transcriptBuffer.getDominantRole()` is consumed by the
+LIVE orchestrator, but no production `transcriptBuffer.add()` caller was found.
+The evidence threshold is qualified, while production role ingestion remains
+unconnected and must not be replaced by a new role system.
+
+The dead-code ledger records unused posture definitions, uncalled governed cue
+memory, unused preferred-support-tag retrieval, and disconnected duplicate
+communication-baseline paths. Removal is not authorized in LH-3A3e.
+
+--------------------------------------------------
+LH-3A3k2 — OUTCOME INTELLIGENCE HANDOFF
+--------------------------------------------------
+
+Desired-outcome sufficiency and adaptive candidate discovery remain in
+`lib/george/runtime/provider/normal-provider.ts`. Clear user-stated preferred
+outcomes now anchor preparation without a redundant request for the outcome or
+for a reliably implied conversation type. Reasonable interaction inference is
+carried separately from confirmed evidence.
+
+After each answer, the provider reassesses the complete record, compares the
+strongest supported action with the single highest-value unresolved user-owned
+fact, and supplies a plain-language consequence for that fact. Operational
+Judgment alone authorizes acquisition; the signal-question layer only realizes
+the authorized wording.
+
+The fixed direct-outcome question in
+`lib/george/live-runtime/authorized-signal-question.ts` remains reachable for a
+genuinely ambiguous missing outcome. It is not a duplicate selection owner and
+was not changed. No suspected new dead code was found. Run
+`npm run george:outcome-intelligence:qualify`, `npx tsc --noEmit`, and
+`npm run build` before any commit. Do not commit without explicit approval.

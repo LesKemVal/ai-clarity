@@ -1,4 +1,7 @@
-import type { AdaptiveUserProfile } from '@/lib/george/runtime/adaptive-user-profile'
+import type {
+  AdaptiveSessionEvidenceSummary,
+  AdaptiveUserProfile,
+} from '@/lib/george/runtime/adaptive-user-profile'
 
 export type DurableBehavioralMemoryKind =
   | 'temporary_state'
@@ -13,6 +16,8 @@ export type DurableBehavioralMemoryCandidate = {
   kind: DurableBehavioralMemoryKind
   confidence: number
   shouldPersist: boolean
+  durableCandidateQualified?: boolean
+  qualifiedEvidenceCount?: number
   reason: string
 }
 
@@ -23,19 +28,31 @@ export function evaluateDurableBehavioralMemory(input: {
   adaptiveProfile: AdaptiveUserProfile
   pressureHigh?: boolean
   earbudActive?: boolean
+  sessionEvidence?: AdaptiveSessionEvidenceSummary
 }) {
   const text = input.latestUserText.toLowerCase()
+  const conciseEvidence = input.sessionEvidence
+  const conciseCandidateConfidence = conciseEvidence
+    ?.durableConciseCandidateQualified
+    ? Math.max(input.adaptiveProfile.conciseDeliveryPreference, 0.78)
+    : conciseEvidence?.conciseSessionTendencyQualified
+      ? Math.min(0.67, input.adaptiveProfile.conciseDeliveryPreference + 0.08)
+      : Math.min(0.55, input.adaptiveProfile.conciseDeliveryPreference)
 
   const candidates: DurableBehavioralMemoryCandidate[] = [
     {
       kind: 'operational_preference',
-      confidence: clamp01(
-        input.adaptiveProfile.conciseDeliveryPreference +
-          (input.earbudActive ? 0.18 : 0) +
-          (/\b(shorter|concise|quick|brief|less words|earbud|in my ear)\b/.test(text) ? 0.22 : 0)
-      ),
+      confidence: clamp01(conciseCandidateConfidence),
       shouldPersist: false,
-      reason: 'User may perform better with concise tactical delivery, but persistence requires repeated signal.',
+      durableCandidateQualified: Boolean(
+        conciseEvidence?.durableConciseCandidateQualified
+      ),
+      qualifiedEvidenceCount:
+        conciseEvidence?.independentConciseSignals || 0,
+      reason:
+        conciseEvidence?.durableConciseCandidateQualified
+          ? 'Repeated independent session evidence identifies concise delivery as a durable candidate; authorized continuity/profile persistence is still required.'
+          : 'Concise delivery remains current-session evidence only; persistence requires repeated qualified signal.',
     },
     {
       kind: 'operational_preference',
@@ -94,8 +111,9 @@ OPERATIONAL MEMORY CANDIDATE EVIDENCE
 - Temporary pressure does not equal permanent limitation.
 - Persistence belongs only to authorized continuity systems, Conversation Packages, and Operational Profile doctrine.
 - Recalibrate when future behavior contradicts the pattern.
+- A durable candidate requires repeated qualified evidence and is still not a persistence authorization.
 - Current likely memory candidates:
-${selected.map((item) => `  - ${item.kind} (${item.confidence.toFixed(2)}): ${item.reason}`).join('\n')}
+${selected.map((item) => `  - ${item.kind} (${item.confidence.toFixed(2)}; qualified evidence=${item.qualifiedEvidenceCount ?? 'not tracked'}; durable candidate=${item.durableCandidateQualified ? 'yes' : 'no'}): ${item.reason}`).join('\n')}
 - Use this to shape response behavior now only when it materially improves the present objective.
 `.trim()
 }

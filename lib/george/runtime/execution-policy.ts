@@ -50,6 +50,16 @@ export type GeorgeResourceUsage =
 
 export type GeorgeExecutionAudience = 'user' | 'room_through_user'
 
+export type GeorgeCommunicationRealization = Readonly<{
+  kind: NonNullable<OperationalJudgment['communicationChange']>['kind']
+  scope: NonNullable<OperationalJudgment['communicationChange']>['acceptedScope']
+  preserveObjective: boolean
+  preserveFacts: boolean
+  preserveSupportConfiguration: boolean
+  directive: string
+  source: 'execution_policy'
+}>
+
 export type GeorgeNormalExecutionPosture =
   | 'planning'
   | 'preparing'
@@ -67,6 +77,7 @@ export type GeorgeExecutionPolicy = {
   assumptionHandling: GeorgeAssumptionHandling
   repetitionPolicy: GeorgeRepetitionPolicy
   resourceUsage: GeorgeResourceUsage
+  communicationRealization: GeorgeCommunicationRealization | null
   strategyMove: GeorgeConversationStrategy['move']
   purpose: string
   source: 'execution_policy'
@@ -112,6 +123,9 @@ export function resolveGeorgeExecutionPolicy(
       : input.operationalResourceMonitor.resources[0]?.actionableNow
         ? 'surface_highest_value'
         : 'support_selected_move'
+  const communicationRealization = resolveCommunicationRealization(
+    input.operationalJudgment
+  )
 
   return {
     executionType,
@@ -123,10 +137,41 @@ export function resolveGeorgeExecutionPolicy(
     assumptionHandling,
     repetitionPolicy,
     resourceUsage,
+    communicationRealization,
     strategyMove: input.strategy.move,
     purpose: input.strategy.purpose,
     source: 'execution_policy',
   }
+}
+
+function resolveCommunicationRealization(
+  judgment: OperationalJudgment
+): GeorgeCommunicationRealization | null {
+  const change = judgment.communicationChange
+  if (!change?.accepted) return null
+
+  const directive =
+    change.kind === 'wording'
+      ? 'Revise wording only; preserve facts, objective, substantive position, and broader style.'
+      : change.kind === 'fact'
+        ? 'Update the accepted factual record without inventing a style preference.'
+        : change.kind === 'tone'
+          ? 'Apply the accepted tone adjustment only within its accepted scope.'
+          : change.kind === 'timing'
+            ? 'Apply the accepted timing or delivery adjustment only within its accepted scope.'
+            : change.kind === 'support_method'
+              ? 'Apply the accepted support-method change without altering the objective or factual record.'
+              : 'Realize only the effects accepted by Operational Judgment and preserve every unaffected field.'
+
+  return Object.freeze({
+    kind: change.kind,
+    scope: change.acceptedScope,
+    preserveObjective: !change.effects.activeObjective,
+    preserveFacts: !change.effects.factualRecord,
+    preserveSupportConfiguration: !change.effects.supportConfiguration,
+    directive,
+    source: 'execution_policy' as const,
+  })
 }
 
 export function resolveNormalExecutionPosture(
@@ -241,6 +286,7 @@ EXECUTION POLICY
 - Assumption handling: ${policy.assumptionHandling}
 - Repetition policy: ${policy.repetitionPolicy}
 - Operational resource usage: ${policy.resourceUsage}
+- Communication realization: ${policy.communicationRealization ? `${policy.communicationRealization.kind}/${policy.communicationRealization.scope} — ${policy.communicationRealization.directive}` : 'no accepted communication change'}
 - Realize the selected move supplied by Conversation Strategy; do not replace it with a different strategy.
 - When audience is user, speak directly with the user in a natural Normal GEORGE conversation. Ask direct questions when the move is ask, clarify, or probe; do not turn them into room scripts.
 - Normal execution posture changes preparation for the user only. It never changes LIVE response shaping, room behavior, receiver realization, timing, or delivery.

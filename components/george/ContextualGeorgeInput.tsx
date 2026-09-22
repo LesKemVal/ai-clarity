@@ -22,10 +22,10 @@ export function ContextualGeorgeInput({
   onCancel,
 }: ContextualGeorgeInputProps) {
   return (
-    <div className="mt-4 rounded-[12px] border border-[#7EA1FF]/28 bg-[#11182A]/70 p-3">
+    <div className="mt-3 rounded-[11px] border border-[#7EA1FF]/24 bg-[#11182A]/62 px-3 py-2.5">
       <label
         htmlFor={id}
-        className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white/48"
+        className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[#AFC0FF]/62"
       >
         {label}
       </label>
@@ -34,23 +34,23 @@ export function ContextualGeorgeInput({
         autoFocus
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        rows={3}
+        rows={2}
         placeholder={placeholder}
-        className="mt-2 min-h-[84px] w-full resize-none rounded-[9px] border border-white/[0.09] bg-black/30 px-3 py-2 text-[13px] leading-5 text-white outline-none placeholder:text-white/24 focus:border-[#7EA1FF]/55"
+        className="mt-1.5 min-h-[58px] w-full resize-none border-0 border-b border-[#7EA1FF]/16 bg-transparent px-0 py-1.5 text-[13px] leading-5 text-white/84 outline-none placeholder:text-white/24 focus:border-[#7EA1FF]/46"
       />
-      <div className="mt-2 flex gap-2">
+      <div className="mt-2 flex items-center gap-4">
         <button
           type="button"
           onClick={onSubmit}
           disabled={!value.trim()}
-          className="rounded-[9px] border border-[#7EA1FF]/45 bg-[#172347] px-3 py-2 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-white disabled:opacity-35"
+          className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-[#9CB3FF]/78 transition hover:text-[#C3D0FF] disabled:opacity-30"
         >
           {submitLabel}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-[9px] border border-white/[0.12] px-3 py-2 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-white/54"
+          className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-white/34 transition hover:text-white/62"
         >
           Cancel
         </button>

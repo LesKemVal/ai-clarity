@@ -4,7 +4,7 @@
 
 This document is the primary production authority for the current GEORGE implementation.
 
-`GEORGE_DOCUMENTATION_SYNC: 2026-08-15-formula-script-refinement`
+`GEORGE_DOCUMENTATION_SYNC: 2026-09-17-lh3a3e-governed-communication`
 
 `IMPLEMENTATION_AUTHORITY: Implementation is authoritative; these documents are authoritative only while synchronized with the validated local implementation.`
 
@@ -32,7 +32,7 @@ The local implementation has one GEORGE intelligence, one runtime, and one reaso
 - the Preparation Runtime is the canonical lifecycle authority, and the versioned `PreparationSessionV1` is the canonical state for one preparation;
 - `lib/george/live-runtime/live-preparation-controller.ts` owns session construction, normalization, interaction normalization, semantic workflow checkpoints, and derived preparation resolution;
 - `lib/george/live-runtime/live-preparation-storage.ts` owns the portable `GEORGE_PREPARATION_SESSION_V1` persistence contract, and `lib/george/live-browser/live-preparation-browser-storage.ts` owns browser storage access;
-- fresh Traditional, Quick LIVE, and Homepage entry paths now seed and persist the same Preparation Session while preserving their distinct user experiences;
+- fresh Traditional and Homepage entry paths seed and persist the shared Preparation Session while preserving their distinct user experiences; Quick LIVE is retired and is no longer an active LIVE entry route;
 - Homepage preserves one stable preparation identity through briefing, LIVE Entry handoff, Continue Briefing, Popup 3 / Ready Room, Library or Marketplace return, and LIVE entry;
 - preparation recommendations and explicit user overrides remain distinct; Formula, Script, customized Script, documents, confirmations, workflow checkpoints, and valid related-session identities may travel with the session;
 - preparation readiness, missing evidence, confidence, and recommended next step are recomputed controller results rather than persisted canonical truth;
@@ -63,7 +63,7 @@ Current synchronized implementation checkpoint: `0deaca7e` (`Expose optional For
 | Entry path | Canonical session status | Preserved experience |
 | --- | --- | --- |
 | Traditional | Migrated | Full questions → Popup 1 → Popup 2 → Popup 3 → LIVE |
-| Quick LIVE | Migrated | Minimum outcome-first setup → LIVE |
+| Quick LIVE | Retired | Obsolete entry path removed from production; do not restore or qualify as an active route |
 | Homepage | Migrated | Adaptive briefing → Popup 3 / Ready Room → LIVE |
 | Normal GEORGE | Linked / pending full migration | Existing GEORGE session identity is preserved through deliberate preparation/LIVE handoff; full route migration remains pending |
 | Resume | Pending | Must restore meaningful preparation, not infer eligibility from a storage key |
@@ -1362,14 +1362,16 @@ The four production authorities are synchronized together. No document-specific 
 <!-- GEORGE_HOMEPAGE_BRIEFING_VALIDATED_START -->
 ## Homepage LIVE Briefing — Validated
 
-The homepage now owns homepage-origin LIVE briefing from conversation selection through approved brief review.
+The homepage now owns homepage-origin LIVE briefing from exact desired-outcome capture through approved brief review.
 
 Current validated flow:
 
 ```text
-Homepage conversation selection
+Exact desired outcome
 ↓
-fresh mandatory briefing
+same-surface adaptive preparation question
+↓
+compact authorized intelligence tier + editable Current Understanding remain beneath the active question
 ↓
 core briefing complete
 ↓
@@ -1391,14 +1393,14 @@ user decision: START LIVE or NEXT QUESTION
 
 Validated production behavior:
 
-- selecting a new conversation starts a fresh homepage briefing;
+- submitting a new desired outcome starts one fresh homepage Preparation Session and preserves that session identity through presentation changes;
 - stale answers from another conversation do not silently satisfy readiness;
-- mandatory briefing is sufficient to continue toward LIVE;
+- role and conversation type are optional evidence and do not gate outcome capture or a valid outcome-led handoff;
 - optional OpenAI questioning begins only after explicit user choice;
 - optional questioning remains on the homepage, requests exactly one interaction, and reuses the canonical `/api/george/live/signal-question` authority;
 - answers, skips, original question text, and canonical `priorInteractions` persist through the Homepage handoff and LIVE Entry hydration;
 - **Start Live** preserves review-first routing;
-- homepage-origin preparation does not enter Quick LIVE, Traditional briefing, Popup 1, or Mechanics;
+- homepage-origin preparation does not enter the now-retired Quick LIVE path, Traditional briefing, Popup 1, or Mechanics;
 - Popup 3 Back restores the exact homepage brief-review state, including selected conversation and optional briefing answers.
 
 Historical checkpoint that established the Homepage owner (retained for production history):
@@ -1431,7 +1433,7 @@ Current direction:
 
 Outcome
 ↓
-Role
+Role when materially useful
 ↓
 Adaptive Briefing
 ↓
@@ -1443,7 +1445,7 @@ LIVE
 
 Outcome remains the governing objective.
 
-Role supplies operational context.
+An explicitly selected role supplies confirmed operational context. No role or conversation type is manufactured when the user has not supplied one.
 
 OpenAI owns adaptive briefing after the initial homepage selections.
 
@@ -1536,7 +1538,7 @@ Some operational work consists of one conversation.
 
 Some operational work consists of many conversations.
 
-After Role → Goal briefing, OpenAI determines whether the user is entering:
+After outcome-led briefing, GEORGE may determine whether the user is entering:
 
 • Single Conversation
 • Repeated Conversation Session
@@ -1866,6 +1868,8 @@ Operational Judgment owns consequential evidence-acquisition authorization.
 
 Signal-question machinery does not independently decide whether GEORGE should ask another question. It may ask only an evidence question authorized by Operational Judgment.
 
+The canonical Operational Preparation Judgment ingress now accepts strictly validated `normal` and `homepage` preparation provenance. Both sources use the existing semantic-proposal and Operational Judgment authority; Homepage retains its canonical Preparation Session identity and no Normal-session relationship is manufactured. The Homepage surface is not connected to this ingress in LH-3A1.
+
 Adaptive sequencing is judgment-first:
 
 - zero useful evidence questions returns to judgment;
@@ -2115,7 +2119,7 @@ Primary audit areas:
    Inspect app/george/page.tsx and other large hosts responsibility by responsibility. Extract only behavior or presentation whose canonical ownership demonstrably belongs elsewhere. Do not reduce a host merely to reduce line count.
 
 6. Route and state integrity.
-   Preserve Traditional, Quick LIVE, Homepage, Normal, and eventual Resume choreography. Do not flatten legitimate entry routes.
+   Preserve Traditional, Homepage, Normal, and eventual Resume choreography. Quick LIVE is retired and must not be restored as a legitimate entry route. Do not flatten the remaining legitimate entry routes.
 
 7. Receiver/device portability.
    Prove desktop/mobile, audio, visual, audio-visual, and supported smart-glasses realization through the existing receiver contract. Hardware integration belongs in adapters, not reasoning.
@@ -2200,3 +2204,147 @@ Analysis, explanation, research, planning, advice, writing, and reflection remai
 Execution on the user's behalf requires the user's expressed permission for the action or delegated scope.
 
 Current implementation behavior was audited before this documentation reinforcement. No runtime patch was warranted.
+
+--------------------------------------------------
+LH-3A2 — AUTHORIZED HOMEPAGE QUESTION TRANSPORT
+--------------------------------------------------
+
+Homepage preparation now preserves the user’s exact answer or Current
+Understanding revision before submitting the same canonical Homepage
+Preparation Session to the shared Operational Preparation Judgment ingress.
+
+Operational Judgment remains the sole authority that determines whether another
+material signal should be acquired. When acquisition is authorized, the exact
+requested signal and authorization provenance are passed unchanged to the
+signal-question formulation owner. Homepage requests without that authorization
+cannot enter independent evidence selection.
+
+The absence of an authorized question does not establish LIVE readiness.
+ENTER LIVE remains inactive until the later canonical minimum-viable-support
+judgment is implemented. Normal preparation behavior, shared runtime ownership,
+and Patch 4 preparation-evidence transport remain unchanged.
+
+--------------------------------------------------
+LH-3A3d1 — CANONICAL PREPARATION-TURN CLASSIFICATION GATE
+--------------------------------------------------
+
+The shared Operational Judgment owner now accepts the canonical classification
+for every validated preparation turn before the turn can affect preparation or
+LIVE behavior. The accepted result is exactly `live_briefing`, `preparation`, or
+`clarification_required`, records whether the source was explicit or inferred,
+and exposes the governing impact, pending-question, reason, transition, and
+optional acknowledgment metadata through the existing `/api/chat` runtime
+response authority.
+
+The provider supplies only a semantic proposal. Operational Judgment validates
+and normalizes that proposal, honors valid explicit user selection, and fails
+closed to immediate clarification when inferred proposal data is missing,
+malformed, or contradictory. Preparation and clarification turns cannot mutate
+accepted evidence, Current Understanding, readiness, outcome potential, pending
+evidence satisfaction, later questions, formulas, the final story, mechanics,
+or LIVE execution behavior. The unresolved pending question is preserved.
+
+This milestone does not convert the homepage UI, remove the current
+`ask_george` branch, or move classification into the signal-question wording
+route. The next smallest patch is the homepage consumer/UI migration onto this
+qualified contract.
+
+--------------------------------------------------
+LH-3A3d2a — POST-CLASSIFICATION CONVERSATIONAL REALIZATION
+--------------------------------------------------
+
+Canonical Operational Judgment now issues a typed preparation-turn realization
+authorization after accepting classification. The authorization distinguishes
+one provider-realized response to the current Preparation turn, direct canonical
+clarification, and continued LIVE-briefing assessment.
+
+A Preparation response is generated only after acceptance and is transported as
+the existing Operational Judgment result message. It cannot authorize signal
+acquisition or change accepted evidence, Current Understanding, readiness,
+outcome potential, pending-question satisfaction, Formula, story, mechanics, or
+LIVE behavior. Clarification remains direct canonical presentation without
+substantive provider execution. The homepage consumer migration and all
+`ask_george` dead-code decisions remain later milestones.
+
+--------------------------------------------------
+LH-3A3d2b — HOMEPAGE CONVERSATIONAL CONSUMER
+--------------------------------------------------
+
+The homepage now consumes the accepted preparation-turn classification and
+realization from the existing `/api/chat` Operational Judgment result. Its one
+composer presents `LIVE briefing | Preparation`, initially LIVE briefing.
+Ordinary submissions send a null explicit selection for canonical inference;
+a manual selection is explicit for one submission only.
+
+Preparation responses use the accepted result message without changing the
+Preparation Session. Clarification holds the exact original submission outside
+the evidence record, preserves the pending operational question, and
+automatically resubmits the held turn when the user selects a mode. Only
+canonically accepted LIVE-briefing evidence can update Current Understanding or
+readiness. The homepage `ask_george` request was removed; Traditional/LIVE Entry
+remains an active consumer of the signal-question branch. Shared dead-code
+removal remains a separate milestone.
+
+--------------------------------------------------
+LH-3A3e — GOVERNED COMMUNICATION ADAPTATION
+--------------------------------------------------
+
+The existing Normal-provider semantic result now carries an optional typed
+communication-change proposal. It distinguishes fact, substance, wording,
+tone, timing, support method, mixed, and unclear changes; requested scope;
+signal source; confidence; evidence; clarification need; and proposed effects.
+The proposal is not authority. `operational-judgment.ts` is the only owner that
+accepts or narrows scope and records which of objective, factual record,
+support configuration, or realization may change.
+
+Explicit direction is authoritative within its accepted scope. Wording-only
+edits preserve facts, objective, substantive position, support configuration,
+and broader style. Factual edits update the factual record without creating a
+style preference. Isolated inference is limited to line or turn. Repeated
+independent evidence can qualify a session tendency; contradiction weakens it.
+A durable candidate never authorizes persistence, which remains at the existing
+continuity/profile boundary.
+
+`/api/chat` now derives the Adaptive User Profile deterministically from the
+bounded recent user-turn window already carried by the request. It creates no
+new store and adds no provider call. Pressure and receiver constraints shape
+the current realization but are not learned as identity. Durable Behavioral
+Memory receives the qualified evidence summary and continues to identify
+candidates without persisting them.
+
+Confirmed Preparation speaking style now travels in `LivePrepSetup` to the
+canonical LIVE runtime context consumed by shared reasoning. It remains a
+realization preference below current explicit direction, objective, room
+evidence, safety, user agency, and receiver constraints. Receiver Policy remains
+shaping-only. Dominant-role etiquette requires repeated sufficiently weighted
+room evidence; a weak single role signal is neutral.
+
+Known limitation: no production caller was found that inserts classified role
+events into `transcriptBuffer`, so the guarded dominant-role branch remains
+neutral in the inspected production path until that existing ingestion
+dependency is connected. No replacement ingestion system was introduced.
+Dead-code candidates are recorded in `DEAD_CODE_LEDGER.md`; none were removed.
+
+--------------------------------------------------
+LH-3A3k2 — OUTCOME INTELLIGENCE CHECKPOINT
+--------------------------------------------------
+
+Implemented in the existing Normal-provider semantic proposal boundary:
+
+- clear natural-language outcomes are sufficient without redundant outcome or
+  conversation-type acquisition;
+- confirmed preferred outcome and reasonable anticipated-interaction inference
+  remain separate;
+- candidate discovery reassesses the full record and ranks one highest-value
+  unresolved user-owned fact;
+- the signal rationale states what the answer changes and why it matters;
+- unsupported deadlines, stages, people, objections, commitments, and minimum
+  results remain unknown;
+- realistic LIVE support may advance without exhaustive preparation.
+
+Operational Judgment remains the sole acquisition authorization owner. The
+authorized signal-question runtime remains a reachable wording-only consumer;
+its fixed direct-outcome wording is not dead and was deliberately not changed.
+No UI, route, tier, upgrade, device, or style owner changed.
+
+Focused coverage: `scripts/george-outcome-intelligence-qualification.mjs`.

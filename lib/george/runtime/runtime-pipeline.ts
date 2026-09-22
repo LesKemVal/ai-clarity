@@ -43,7 +43,11 @@ import {
   resolveOperationalJudgment,
   type OperationalJudgment,
   type OperationalPreparationContext,
+  type PreparationTurnClassificationRequest,
+  type ProviderCommunicationChangeProposal,
+  type ProviderPreparationTurnClassificationProposal,
   type ProviderOperationalReasoning,
+  type ProviderSpeechCompositionProposal,
 } from '@/lib/george/runtime/operational-judgment'
 import {
   resolveOperationalResourceMonitor,
@@ -154,6 +158,7 @@ export type GeorgeRuntimePipelineInput = {
   operationalSignals: OperationalSignal[]
   operationalMemoryEvidence?: OperationalMemoryRuntimeEvidence | null
   preparationContext?: OperationalPreparationContext | null
+  preparationTurnClassificationRequest?: PreparationTurnClassificationRequest | null
   providerPrompt: GeorgeProviderPromptInput
   onStageTiming?: (timing: GeorgeRuntimePipelineStageTiming) => void
   governedContextNotes: Readonly<{
@@ -238,6 +243,10 @@ export function selectProviderResolvedGeorgeRuntimeAuthoritySnapshot(input: {
   operationalSignals?: OperationalSignal[]
   judgmentSurface: JudgmentSurfaceState
   providerReasoning: ProviderOperationalReasoning | null
+  providerCommunicationChange?: ProviderCommunicationChangeProposal | null
+  providerSpeechComposition?: ProviderSpeechCompositionProposal | null
+  providerPreparationTurnClassification?: ProviderPreparationTurnClassificationProposal | null
+  preparationTurnClassificationRequest?: PreparationTurnClassificationRequest | null
   providerCapability: 'normal' | 'live' | null
   capabilityExplicitlyRequested: boolean
   capabilityRecommendationMaterial: boolean
@@ -245,11 +254,18 @@ export function selectProviderResolvedGeorgeRuntimeAuthoritySnapshot(input: {
   signalAcquisitionAllowed?: boolean
   operationalJudgmentRequest?: boolean
   ordinaryNormalRequest?: boolean
+  liveScopeGroundingRequired?: boolean
 }): GeorgeRuntimeAuthoritySnapshot {
   const authority = selectGeorgeRuntimeAuthoritySnapshot(input.snapshot)
   const providerResolvedJudgment = resolveProviderOperationalJudgment({
     judgment: authority.operationalJudgment,
     providerReasoning: input.providerReasoning,
+    providerCommunicationChange: input.providerCommunicationChange,
+    providerSpeechComposition: input.providerSpeechComposition,
+    providerPreparationTurnClassification:
+      input.providerPreparationTurnClassification,
+    preparationTurnClassificationRequest:
+      input.preparationTurnClassificationRequest,
     providerCapability: input.providerCapability,
     capabilityExplicitlyRequested:
       input.capabilityExplicitlyRequested,
@@ -260,6 +276,7 @@ export function selectProviderResolvedGeorgeRuntimeAuthoritySnapshot(input: {
     signalAcquisitionAllowed: input.signalAcquisitionAllowed,
     operationalJudgmentRequest: input.operationalJudgmentRequest,
     ordinaryNormalRequest: input.ordinaryNormalRequest,
+    liveScopeGroundingRequired: input.liveScopeGroundingRequired,
   })
 
   const providerDecisionAuthoritative = Boolean(
@@ -273,8 +290,32 @@ export function selectProviderResolvedGeorgeRuntimeAuthoritySnapshot(input: {
   )
 
   if (
+    input.currentRuntime === 'live_george' &&
+    providerResolvedJudgment.communicationChange
+  ) {
+    const executionPolicy = resolveGeorgeExecutionPolicy({
+      runtime: input.currentRuntime,
+      voiceMode: input.voiceMode,
+      strategy: authority.conversationStrategy,
+      moveDefinition: authority.conversationMoveDefinition,
+      operationalJudgment: providerResolvedJudgment,
+      outcomeEvolution: input.snapshot.outcomeEvolution,
+      operationalResourceMonitor: authority.operationalResourceMonitor,
+      latestUserText: input.latestUserText,
+    })
+
+    return Object.freeze({
+      ...authority,
+      operationalJudgment: providerResolvedJudgment,
+      executionPolicy,
+    })
+  }
+
+  if (
     input.currentRuntime !== 'normal_george' ||
-    !providerDecisionAuthoritative
+    !providerDecisionAuthoritative ||
+    providerResolvedJudgment.preparationTurnClassification
+      ?.mayAffectLivePreparation === false
   ) {
     return Object.freeze({
       ...authority,
@@ -526,7 +567,9 @@ export function resolveGeorgeRuntimePipeline(
         : '',
       operationalJudgmentRequestNote:
         input.providerPrompt.operationalJudgmentRequest
-          ? buildNormalLiveOperationalJudgmentRequestNote()
+          ? buildNormalLiveOperationalJudgmentRequestNote(
+              input.preparationTurnClassificationRequest
+            )
           : '',
       preparationContextNote: input.preparationContext
         ? buildOperationalPreparationContextNote(input.preparationContext)
