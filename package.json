@@ -73,7 +73,7 @@
     "@vercel/kv": "^3.0.0",
     "driver.js": "^1.8.0",
     "mammoth": "^1.12.0",
-    "next": "16.2.1",
+    "next": "16.3.5",
     "openai": "^6.33.0",
     "pdf-parse": "^2.4.5",
     "react": "19.2.4",
@@ -90,7 +90,7 @@
     "@types/react-dom": "^19",
     "@types/ws": "^8.18.1",
     "eslint": "^9",
-    "eslint-config-next": "16.2.1",
+    "eslint-config-next": "16.3.5",
     "tailwindcss": "^4",
     "tsx": "4.23.15",
     "typescript": "^5"
