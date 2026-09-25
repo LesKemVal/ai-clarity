@@ -81,7 +81,7 @@
     "redis": "^5.12.1",
     "resend": "^6.12.2",
     "stripe": "^22.0.1",
-    "ws": "^8.20.1"
+    "ws": "^8.21.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
