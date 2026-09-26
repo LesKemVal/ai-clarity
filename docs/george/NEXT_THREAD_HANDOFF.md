@@ -1202,3 +1202,33 @@ genuinely ambiguous missing outcome. It is not a duplicate selection owner and
 was not changed. No suspected new dead code was found. Run
 `npm run george:outcome-intelligence:qualify`, `npx tsc --noEmit`, and
 `npm run build` before any commit. Do not commit without explicit approval.
+
+--------------------------------------------------
+LH-3A3k3 — HOMEPAGE INTELLIGENCE TIER INTERFACE HANDOFF
+--------------------------------------------------
+
+The compact S / I / B tier interface on `/george/live-home` is implemented and
+qualified.
+
+Preserve these boundaries:
+
+- Smart, Intelligent, and Brilliant are the three Homepage intelligence-tier
+  choices.
+- entitlement comes from canonical session/subscriber authority;
+- available-tier selection persists locally without clearing the briefing;
+- an intentional locked-tier selection routes to `/activate`;
+- no persistent Keep Smart / Upgrade panel is part of the approved surface;
+- hover, keyboard focus, and temporary mobile-tap disclosure remain supported;
+- semantic pressed state, focus treatment, touch targets, and mobile overflow
+  protection remain qualified;
+- the tier controls remain in the existing action row with the single
+  SKIP / SUBMIT control;
+- `/george/live-home` continues to use `HomeConversationTypeSurface`;
+- no new route, reasoning authority, preparation owner, or LIVE runtime was
+  introduced.
+
+Focused qualification:
+`npm run george:live-home-tier-interface:qualify`.
+
+Do not invent LH-3A3k4 from this checkpoint. Determine the next product
+milestone from current implementation evidence and owner direction.

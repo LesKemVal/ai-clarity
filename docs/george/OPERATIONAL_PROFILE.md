@@ -1847,3 +1847,23 @@ needed, GEORGE selects exactly one highest-value unresolved fact and explains in
 plain language why it matters to the preferred outcome. When GEORGE can already
 provide realistic LIVE support, additional detail that would merely sharpen the
 help does not prevent readiness.
+
+--------------------------------------------------
+LH-3A3k3 — INTELLIGENCE TIER INTERFACE BEHAVIOR
+--------------------------------------------------
+
+The Homepage presents Smart, Intelligent, and Brilliant as compact S / I / B
+choices without interrupting preparation. The selected available tier receives
+clear emphasis while unavailable tiers remain visibly recessed.
+
+A user may change among tiers already available to them without losing the
+current briefing or Current Understanding. Selecting a tier that is not
+available is an intentional request to review access and routes to activation;
+GEORGE does not repeatedly promote an upgrade or place a persistent upgrade
+panel in the preparation conversation.
+
+Tier explanations are available through desktop hover, keyboard focus, and a
+temporary mobile-tap disclosure. Tier selection remains subordinate to the
+user's actual entitlement and does not change GEORGE's objective, accepted
+evidence, preparation authority, Operational Judgment authority, or legitimate
+LIVE entry choreography.

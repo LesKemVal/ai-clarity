@@ -2348,3 +2348,27 @@ its fixed direct-outcome wording is not dead and was deliberately not changed.
 No UI, route, tier, upgrade, device, or style owner changed.
 
 Focused coverage: `scripts/george-outcome-intelligence-qualification.mjs`.
+
+--------------------------------------------------
+LH-3A3k3 — HOMEPAGE INTELLIGENCE TIER INTERFACE CHECKPOINT
+--------------------------------------------------
+
+The existing `/george/live-home` preparation surface now presents the compact
+S / I / B intelligence-tier controls within the approved action row. Smart,
+Intelligent, and Brilliant are presentation and access selections over the
+existing GEORGE runtime; they do not create a new reasoning authority,
+preparation owner, route, or LIVE runtime.
+
+Tier entitlement is consumed from canonical session/subscriber authority.
+The homepage does not fabricate access. An entitled tier may be selected
+locally and persisted without clearing or rebuilding the current briefing.
+Selecting a locked tier intentionally routes to `/activate` for access review;
+no persistent upgrade panel or competing access surface was introduced.
+
+Desktop hover, keyboard focus, and temporary mobile-tap disclosure explain the
+tiers. The controls preserve semantic pressed state, focus treatment, practical
+touch targets, and mobile overflow protection. The existing single
+SKIP / SUBMIT control and preparation choreography remain intact.
+
+Focused coverage:
+`scripts/george-live-home-tier-interface-qualification.mjs`.

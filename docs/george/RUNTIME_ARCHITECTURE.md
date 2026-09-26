@@ -2399,3 +2399,31 @@ Judgment authorizes genuinely missing outcome evidence. It is not a duplicate
 sufficiency or next-question owner and must not be reached when a clear outcome
 already exists. No scenario questionnaire or scenario-specific sequence was
 introduced.
+
+--------------------------------------------------
+LH-3A3k3 — HOMEPAGE INTELLIGENCE TIER INTERFACE
+--------------------------------------------------
+
+The Homepage intelligence-tier interface is downstream of canonical
+session/subscriber entitlement authority. `HomeConversationTypeSurface` may
+display and persist an authorized Smart, Intelligent, or Brilliant selection,
+but it does not determine entitlement and does not create a reasoning,
+preparation, execution, or LIVE authority.
+
+Canonical access flow:
+
+session/subscriber authority
+→ `/api/session`
+→ entitled Homepage tier
+→ user selection within entitlement
+→ existing preparation/runtime behavior
+
+A deliberate selection above the user's entitlement routes to `/activate`.
+Available-tier selection remains local to the Homepage and preserves the active
+briefing. No `TierAccessPanel`, persistent upgrade surface, new route, or
+parallel tier owner is introduced.
+
+The S / I / B controls remain presentation controls inside the existing
+`/george/live-home` surface. Accessibility, keyboard, pointer, mobile
+disclosure, and touch-target behavior are presentation responsibilities and do
+not alter runtime authority.
