@@ -199,13 +199,30 @@ LIVE owns
 No duplicate ownership.
 
 ======================================================================
-NEXT IMPLEMENTATION
+CURRENT IMPLEMENTATION STATUS
 ======================================================================
 
-Current milestone:
+Milestones 1–5 are implemented as the current Homepage conversation
+experience.
 
-Milestone 2
+Homepage owns outcome-led preparation through approved brief review.
 
-Next engineering task:
+The Homepage preserves one canonical Preparation Session identity through
+briefing, Current Understanding revision, review, LIVE Entry handoff, and
+return-state continuity.
 
-Inspect the homepage implementation and determine the canonical owners required to implement the conversation preparation sequence without duplicating LIVE preparation.
+Approved Homepage preparation enters the existing shared Popup 3 / Ready Room
+experience. It does not enter Traditional Popup 1, Traditional Mechanics, or a
+duplicate preparation route.
+
+LIVE Entry owns the shared Ready Room / readiness surface. For Homepage-origin
+preparation, Popup 3 reviews the current-session support recommendation before
+LIVE entry.
+
+The compact S / I / B intelligence-tier interface is implemented within the
+Homepage question action row. Entitlement remains subordinate to canonical
+session/subscriber authority.
+
+Do not infer a new numbered implementation milestone from this document.
+Current production priorities and qualification status are governed by
+PRODUCTION_TRACKER.md and NEXT_THREAD_HANDOFF.md.
