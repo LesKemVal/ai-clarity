@@ -175,6 +175,10 @@ import { LiveOutcomeReviewPanel } from "@/components/george/live/LiveOutcomeRevi
 import { LiveRoomStatusPanel } from "@/components/george/live/LiveRoomStatusPanel";
 import { LiveHubShadowBridge } from "@/components/george/live/LiveHubShadowBridge";
 import { LiveHubVisualCueBridge } from "@/components/george/live/LiveHubVisualCueBridge";
+import {
+  buildGeorgeCurrentTurnOperationalActionCue,
+  getGeorgeLiveHubRuntimeAdapter,
+} from "@/lib/george/live-hub/live-runtime-adapter";
 import { useLiveAudioRuntime } from "@/hooks/useLiveAudioRuntime";
 import { useLiveReflexListener } from "@/hooks/useLiveReflexListener";
 import {
@@ -183,9 +187,14 @@ import {
   type LastLiveFinalTranscript,
 } from "@/lib/george/live-runtime/transcript-routing";
 import {
+  CURRENT_TURN_LIVE_OPERATIONAL_JUDGMENT_REQUEST,
   applyLiveFinalTranscriptExecution,
   resolveLiveFinalTranscriptAction,
 } from "@/lib/george/live-runtime/live-final-transcript-adapter";
+import {
+  UNCLEAR_GEORGE_LIVE_SPEAKER_EVIDENCE,
+  type GeorgeLiveSpeakerEvidence,
+} from "@/lib/george/core/live-execution";
 import { resolveLiveTranscriptDecision } from "@/lib/george/live-runtime/live-transcript-controller";
 import { rememberLiveSpokenLine } from "@/lib/george/live-runtime/spoken-memory";
 import { type LiveAwarenessFragment } from "@/lib/george/live-runtime/live-awareness-buffer";
@@ -904,6 +913,10 @@ export default function Page({
 
   const [interimTranscript, setInterimTranscript] = useState("");
   const [liveHubShadowTranscript, setLiveHubShadowTranscript] = useState("");
+  const [liveHubShadowSpeakerEvidence, setLiveHubShadowSpeakerEvidence] =
+    useState<GeorgeLiveSpeakerEvidence>(
+      UNCLEAR_GEORGE_LIVE_SPEAKER_EVIDENCE,
+    );
   const [interactionMode, setInteractionMode] = useState<"text" | "speech">(
     "text",
   );
@@ -2456,6 +2469,13 @@ export default function Page({
   const speakingRef = useRef(false);
   const audioRef = useRef<ReturnType<typeof createAudioPlayback> | null>(null);
   const liveTranscriptSubmitRef = useRef<(text: string) => void>(() => {});
+  const liveCurrentTurnOperationalJudgmentRef = useRef<
+    (input: {
+      transcript: string;
+      turnId: string;
+      speakerEvidence: GeorgeLiveSpeakerEvidence;
+    }) => void
+  >(() => {});
   const lastLiveFinalTranscriptRef = useRef<LastLiveFinalTranscript>(null);
   const liveBuyTimeUntilRef = useRef<number>(0);
   const liveLastSpokenUtteranceRef = useRef<string>("");
@@ -2472,6 +2492,7 @@ export default function Page({
     (clean: string) => {
       const execution = resolveLiveFinalTranscriptAction({
         transcript: clean,
+        speakerEvidence: UNCLEAR_GEORGE_LIVE_SPEAKER_EVIDENCE,
         lastFinalTranscript: lastLiveFinalTranscriptRef.current,
         isThinking,
         isSpeaking: isSpeakingRef.current,
@@ -2548,6 +2569,7 @@ export default function Page({
       const execution = resolveLiveFinalTranscriptExecution(clean);
 
       if (execution?.routing?.shouldForwardToHub) {
+        setLiveHubShadowSpeakerEvidence(execution.speakerEvidence);
         setLiveHubShadowTranscript(execution.routing.hubTranscript);
       } else {
         console.info("[GEORGE LIVE HUB ROUTE]", {
@@ -4788,6 +4810,17 @@ export default function Page({
 
   // DEV: ACTIVATE FULL MODE (2 HOURS)
 
+  const buildCurrentLiveRuntimePrefix = useCallback(
+    (setup: unknown, currentLiveMode = liveMode) =>
+      buildLiveRuntimeContext({
+        liveMode: currentLiveMode,
+        runtimeSupport: liveRuntimeSupport || null,
+        setup: setup || null,
+        steeringLabels: getLiveRuntimeSteeringLabels(liveRuntimeSupport?.room),
+      }),
+    [liveMode, liveRuntimeSupport],
+  );
+
   const handleSend = useCallback(
     async (
       overrideText?: string,
@@ -5034,12 +5067,9 @@ export default function Page({
         return;
       }
 
-      const liveRuntimePrefix = buildLiveRuntimeContext({
-        liveMode,
-        runtimeSupport: liveRuntimeSupport || null,
-        setup: liveRuntimeSetup || null,
-        steeringLabels: getLiveRuntimeSteeringLabels(liveRuntimeSupport?.room),
-      });
+      const liveRuntimePrefix = buildCurrentLiveRuntimePrefix(
+        liveRuntimeSetup,
+      );
 
       const updatedMessages = [
         ...messagesRef.current,
@@ -5369,8 +5399,127 @@ export default function Page({
       startListening,
       pendingImage,
       activePromptContext,
+      buildCurrentLiveRuntimePrefix,
     ],
   );
+
+  liveCurrentTurnOperationalJudgmentRef.current = async ({
+    transcript,
+    turnId,
+    speakerEvidence,
+  }) => {
+    const clean = String(transcript || "").trim();
+    if (!clean || !turnId || !liveMode) return;
+
+    const storedGeorgeName =
+      typeof window !== "undefined"
+        ? window.localStorage.getItem("george_name") || ""
+        : "";
+
+    if (
+      isLiveSteeringPhrase(clean) ||
+      isDirectGeorgeAddress(clean, storedGeorgeName)
+    ) {
+      return;
+    }
+
+    const liveRuntimeSetup = (() => {
+      if (typeof window === "undefined") return null;
+
+      try {
+        const raw = window.localStorage.getItem("george_live_setup_active");
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    })();
+    const liveRuntimePrefix = buildCurrentLiveRuntimePrefix(
+      liveRuntimeSetup,
+      true,
+    );
+    const currentTurnMessage: Message = {
+      role: "user",
+      content: clean,
+      source: "live_transcript",
+    };
+    const requestMessages = [
+      ...messagesRef.current.slice(-10),
+      ...(liveRuntimePrefix
+        ? [
+            {
+              role: "system",
+              content: liveRuntimePrefix,
+              source: "system_override",
+            } as Message,
+          ]
+        : []),
+      currentTurnMessage,
+    ];
+    const activeOperationalSession = getActiveSessionForMode("live");
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: requestMessages,
+          mode: "conversation",
+          voiceMode: voiceOn,
+          liveRuntimeContext: liveRuntimePrefix || null,
+          isFirstSession: false,
+          promptContext: activePromptContext || "manual_live",
+          promptLabel: activePromptLabel,
+          contextTurnCount,
+          tier: currentTier,
+          language,
+          liveSpeakerEvidence: speakerEvidence,
+          requestPurpose: CURRENT_TURN_LIVE_OPERATIONAL_JUDGMENT_REQUEST,
+          operationalMemoryContext: {
+            roomType:
+              liveRuntimeSupport?.room || liveRuntimeSetup?.room || "LIVE",
+            objectiveType:
+              liveRuntimeSetup?.objective ||
+              activeOperationalSession?.userGoal ||
+              activeOperationalSession?.metadata?.desiredOutcome ||
+              activePromptContext ||
+              undefined,
+            observedSignalTypes: [],
+          },
+        }),
+      });
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error ||
+            `Current-turn Operational Judgment failed (${response.status})`,
+        );
+      }
+
+      const runtimeAuthoritySnapshot = data?.runtimeAuthoritySnapshot
+        ? (data.runtimeAuthoritySnapshot as GeorgeRuntimeAuthoritySnapshot)
+        : null;
+      const actionCue = buildGeorgeCurrentTurnOperationalActionCue({
+        turnId,
+        transcript: clean,
+        cue: String(data?.message || ""),
+        generatedAt: Date.now(),
+        deliveryStyle: liveDeliveryStyle,
+        runtimeSnapshot: runtimeAuthoritySnapshot,
+        responseAuthority: data?.responseAuthority || null,
+      });
+
+      if (!runtimeAuthoritySnapshot || !actionCue) return;
+
+      setCanonicalRuntimeAuthority(runtimeAuthoritySnapshot);
+      getGeorgeLiveHubRuntimeAdapter().publishActionCue(actionCue);
+    } catch (error) {
+      console.warn(
+        "[GEORGE LIVE][current-turn-operational-judgment] unavailable",
+        error instanceof Error ? error.message : error,
+      );
+    }
+  };
 
   normalOperationalJudgmentRequestRef.current = async (
     preparationSession,
@@ -6023,6 +6172,10 @@ export default function Page({
           }}
           transcript={liveHubShadowTranscript}
           transcriptFinal={true}
+          speakerEvidence={liveHubShadowSpeakerEvidence}
+          onFinalTranscriptForwarded={(currentTurn) => {
+            liveCurrentTurnOperationalJudgmentRef.current(currentTurn);
+          }}
         />
 
         <LiveHubVisualCueBridge

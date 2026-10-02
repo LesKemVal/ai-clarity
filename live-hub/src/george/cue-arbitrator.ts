@@ -66,6 +66,24 @@ function enforceModeContract(cue: string, deliveryStyle: GeorgeRuntimePacket['de
   return clean
 }
 
+function normalizeExecutionCue(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+}
+
+export function isFastCueExecutionEquivalent(input: {
+  localCue: string
+  fastCue: string
+}) {
+  const localCue = normalizeExecutionCue(input.localCue)
+  const fastCue = normalizeExecutionCue(input.fastCue)
+
+  return Boolean(localCue) && localCue === fastCue
+}
+
 export function arbitrateCue(input: {
   packet: GeorgeRuntimePacket
   fastCue?: string | null
@@ -87,7 +105,14 @@ export function arbitrateCue(input: {
   const isGenericLocalCue =
     input.packet.cue.trim().toLowerCase() === 'give a useful response.'
 
-  if (fastCue && fastCue.length <= maxFastCueLength) {
+  if (
+    fastCue &&
+    fastCue.length <= maxFastCueLength &&
+    isFastCueExecutionEquivalent({
+      localCue: input.packet.cue,
+      fastCue,
+    })
+  ) {
     return {
       cue: enforceModeContract(fastCue, input.packet.deliveryStyle),
       reason: `Fast cue refined local cue: ${input.packet.cue}`,

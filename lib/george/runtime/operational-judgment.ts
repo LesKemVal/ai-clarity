@@ -1414,6 +1414,7 @@ export function resolveProviderOperationalJudgment(input: {
   capabilityRecommendationMaterial: boolean
   canonicalSignalAcquisition?: boolean
   signalAcquisitionAllowed?: boolean
+  preparationContext?: OperationalPreparationContext | null
   operationalJudgmentRequest?: boolean
   ordinaryNormalRequest?: boolean
   liveScopeGroundingRequired?: boolean
@@ -1801,9 +1802,69 @@ export function resolveProviderOperationalJudgment(input: {
       )
   )
 
+  /*
+   * Canonical preparation evidence is not reacquired.
+   *
+   * Provider reasoning may propose a consequential user-owned signal, but a
+   * proposal cannot become acquisition authority when that same evidence need
+   * has already been answered in the current PreparationSession.
+   *
+   * This does not declare preparation sufficient and does not prevent a
+   * different consequential evidence need from being acquired.
+   */
+  const normalizedRequestedSignal = normalizeEvidenceNeed(requestedSignal)
+
+  const requestedSignalAlreadyAnswered = Boolean(
+    normalizedRequestedSignal &&
+      input.preparationContext?.priorInteractions.some((interaction) => {
+        if (
+          interaction.status !== 'answered' ||
+          !cleanOptionalText(interaction.answer)
+        ) {
+          return false
+        }
+
+        const establishedEvidenceNeed = normalizeEvidenceNeed(
+          interaction.evidenceNeed || interaction.question
+        )
+
+        return (
+          establishedEvidenceNeed &&
+          establishedEvidenceNeed === normalizedRequestedSignal
+        )
+      })
+  )
+
+  const establishedPreparationObjective = cleanOptionalText(
+    input.preparationContext?.objective
+  )
+
+  const requestedSignalReacquiresEstablishedObjective = Boolean(
+    normalizedRequestedSignal &&
+      establishedPreparationObjective &&
+      (
+        normalizedRequestedSignal ===
+          normalizeEvidenceNeed('desired outcome') ||
+        normalizedRequestedSignal ===
+          normalizeEvidenceNeed('the desired outcome') ||
+        normalizedRequestedSignal ===
+          normalizeEvidenceNeed('the exact desired outcome') ||
+        normalizedRequestedSignal ===
+          normalizeEvidenceNeed('the result the user wants from this conversation') ||
+        normalizedRequestedSignal ===
+          normalizeEvidenceNeed('the result the user wants from the interaction')
+      )
+  )
+
+  const requestedSignalAlreadyEstablished = Boolean(
+    requestedSignalAlreadyAnswered ||
+      requestedSignalReacquiresEstablishedObjective
+  )
+
   const providerAuthorizesSignalAcquisition = Boolean(
     input.canonicalSignalAcquisition &&
       input.signalAcquisitionAllowed !== false &&
+      !requestedSignalAlreadyEstablished &&
       !higherPriorityAction &&
       disposition === 'unresolved' &&
       reasoning?.signalAcquisition?.shouldAcquire === true &&

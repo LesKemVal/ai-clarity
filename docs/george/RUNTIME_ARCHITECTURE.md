@@ -730,6 +730,43 @@ Provider realization
 
 The provider realizes approved runtime authority. The provider does not replace GEORGE's judgment or create another runtime owner.
 
+### Governed Invocation Contract V1
+
+The website enters the shared runtime through one versioned, normalized input
+contract:
+
+```text
+app/api/chat/route.ts website adapter
+↓
+GovernedInvocationContractV1
+↓
+runtime-context-composer.ts normalization
+↓
+runtime-pipeline.ts coordination
+↓
+Operational Judgment
+↓
+existing governed realization
+```
+
+`runtime-context-composer.ts` owns the contract version, current individual
+runtime input shape, source classification, and structural normalization.
+`app/api/chat/route.ts` remains the website adapter. `runtime-pipeline.ts`
+consumes the normalized input and preserves its provenance without deciding
+what the evidence means. Operational Judgment remains the sole judgment owner.
+
+V1 distinguishes the current user conversation, validated preparation
+projection, authenticated-user Operational Memory evidence, bounded runtime
+inference, and session-authority source. Provider semantic proposals are
+explicitly excluded from invocation authority and continue through their
+existing proposal → transport → Operational Judgment → governed-realization
+sequence.
+
+V1 does not introduce organization identity, membership, organizational role
+or permissions, shared briefing identity, organizational policy or authority,
+new persistence, a second context composer, or another runtime pipeline.
+Unsupported versions and structurally malformed invocations fail closed.
+
 ## Operational Signal Boundary
 
 Canonical producer:
@@ -1118,6 +1155,56 @@ Delivery Router does not render.
 Delivery Router does not select support behavior.
 
 Delivery Router does not own browser execution.
+
+### LIVE Audio Delivery Semantics and Usefulness Contract V1
+
+Canonical portable owner:
+
+```text
+lib/george/live-delivery/audio-semantics.ts
+```
+
+The contract distinguishes two delivery perspectives:
+
+- `to_user` — GEORGE is advising or cueing the user;
+- `as_user` — GEORGE is supplying language the user can say directly.
+
+Repeatable speech transitions are `enter`, `maintain`, `exit`, or `none`.
+The first AS_USER delivery after advice or ambiguity uses the minimum audible
+`Say:` marker. Confirmed user uptake permits an immediate AS_USER chain to
+continue without repeating that marker. Advice returns to TO_USER with the
+minimum audible `My advice?` marker and exits repeatable speech. A continuation
+is already identified by the user's unfinished thought, so it remains direct
+AS_USER language rather than coaching about what to say.
+
+Current transcript transport does not provide reliable speaker attribution or
+proof that the user delivered an approved line. The production bridge therefore
+marks uptake unconfirmed and preserves explicit transition framing. It does not
+guess from punctuation, text similarity, or the fact that a cue was sent.
+
+Audio delivery state is current-LIVE-session state. The active delivery bridge
+resets it when LIVE ends, unmounts, or loses its transport connection. It is not
+a durable communication preference and is not owned by localStorage.
+
+Receiver limits remain safety ceilings. Audio realization preserves the minimum
+sufficient approved action and supporting reason whenever they fit; it may add
+or remove only perspective markers and may not invent operational meaning.
+
+Usefulness lifetime remains owned by the existing delivery deadline and
+commitment contracts. Generation time and receiver modes derive a usefulness
+deadline; expired uncommitted delivery may be suppressed, while started or
+committed delivery remains protected. Duplicate suppression remains active.
+Latency may simplify or suppress execution, but it may never create authority.
+
+The LIVE Hub local/fast path remains execution-only. A fast cue may replace an
+execution-safe local cue only when it is execution-equivalent to that cue. It
+may not independently create concessions, commitments, factual claims,
+objectives, strategic reversals, disclosure decisions, or high-leverage moves.
+
+`lib/george/live-voice/runtime/silence-intelligence.ts` remains dormant behind
+the legacy orchestrator and is not reconnected. Canonical silence continues to
+come from the active Support Behavior Composer when the user naturally owns the
+floor.
 
 ## Delivery Behavior Resolver
 
@@ -2427,3 +2514,177 @@ The S / I / B controls remain presentation controls inside the existing
 `/george/live-home` surface. Accessibility, keyboard, pointer, mobile
 disclosure, and touch-target behavior are presentation responsibilities and do
 not alter runtime authority.
+
+<!-- GEORGE_HOMEPAGE_DIRECT_LIVE_CONVERGENCE_2026_09_30 -->
+## Homepage Preparation → LIVE Convergence — 2026-09-30
+
+This section supersedes earlier Homepage-specific descriptions that require
+Popup 3 / Ready Room before LIVE. Historical descriptions remain in this
+document as implementation history; they are not the current Homepage
+choreography.
+
+### Preparation is a state, not a place
+
+Preparation is part of GEORGE's continuing operational relationship with the
+user. It is not a destination the user must navigate through merely because
+preparation state exists.
+
+For Homepage-origin preparation, Ask GEORGE is the persistent intelligent
+surface. Its content reorganizes as the user's relationship with the current
+work progresses:
+
+foundational LIVE intent:
+  1. desired outcome — “What should LIVE support help you accomplish, obtain, or clarify?”
+  2. LIVE setting — “Ready to use me in a room, over the phone, or somewhere else?”
+→ Operational Judgment / adaptive conversational understanding
+→ Current Understanding
+→ Final Review
+→ Formula / operational strategy
+→ explicit support and delivery confirmation
+→ LIVE
+
+The surface may change emphasis and content without creating another
+preparation runtime, reasoning owner, or navigation layer.
+
+
+### Two foundational LIVE signals before adaptive questioning
+
+Homepage preparation begins with two user-owned signals that are required before
+adaptive Operational Judgment questioning begins.
+
+The first establishes the user's desired outcome:
+
+`What should LIVE support help you accomplish, obtain, or clarify?`
+
+The answer remains canonical outcome authority. It is preserved as the
+PreparationSession objective / desired-outcome evidence. “Accomplish, obtain, or
+clarify” broadens the natural expression of the outcome without creating three
+different outcome types.
+
+The second establishes the anticipated LIVE communication environment:
+
+`Ready to use me in a room, over the phone, or somewhere else?`
+
+Its answer is preserved canonically as `knowledge.communicationMedium` and as an
+answered preparation interaction with LIVE-scope-grounding purpose.
+
+These are foundational inputs to reasoning, not a fixed questionnaire owned by
+Operational Judgment. Q1 must not invoke adaptive Operational Judgment before Q2
+has been answered. After Q2 is incorporated into the same PreparationSession,
+Operational Judgment / OpenAI reasons from both established signals and the rest
+of the available evidence.
+
+Only then may GEORGE acquire another user-owned signal. Any subsequent question
+must be consequential to the next operational decision and authorized through
+the existing Operational Judgment / signal-acquisition boundary. The
+signal-question machinery remains the wording/execution owner for such an
+authorized adaptive question; it does not become a second sufficiency or
+question-selection authority.
+
+The two foundational signals do not declare preparation sufficient. They give
+GEORGE enough initial grounding to reason intelligently about what, if anything,
+is worth asking next.
+
+Previously answered preparation evidence must not be reacquired merely because
+provider reasoning proposes the same evidence need again. A genuinely different
+consequential unknown remains eligible for acquisition.
+
+Current Understanding remains editable and evolves from accepted preparation
+evidence. It is not a third mandatory questionnaire step. User corrections are
+preserved in the same PreparationSession and return to governed reasoning.
+
+
+### Homepage does not require Ready Room
+
+Homepage Final Review now converges directly on the existing canonical LIVE
+launch owner.
+
+When canonical minimum-viable support, required LIVE signal, user
+confirmations, and existing LIVE access authority are satisfied, Homepage
+delegates to the established `startLive()` path.
+
+Homepage does not require Popup 3 / Ready Room as an intermediate prerequisite.
+
+The canonical Homepage handoff records the existing `strategy` Preparation
+checkpoint rather than manufacturing a Homepage `ready_room` checkpoint.
+
+This change is Homepage-specific. Traditional LIVE and Normal LIVE retain
+their legitimate route-specific choreography, including Ready Room behavior
+where that route requires it. Distinct entry choreography must not be flattened
+merely because all routes converge on the same LIVE runtime.
+
+### One LIVE launch and execution authority
+
+`startLive()` remains the sole LIVE launch owner for this convergence.
+
+Homepage does not create a second launch path, LIVE runtime, delivery owner,
+reasoning authority, Formula owner, Preparation owner, or receiver-policy
+owner.
+
+The execution chain remains:
+
+canonical PreparationSession
+→ `startLive()`
+→ prepared LIVE setup / runtime support
+→ GEORGE LIVE host
+→ LIVE Hub
+→ governed ACTION_CUE
+→ canonical delivery behavior and receiver policy
+→ user
+
+Formula identity, support behavior, confirmed speaking style, receiver choice,
+relevant preparation evidence, and other authorized runtime context travel
+through the existing canonical preparation and LIVE contracts.
+
+### Final Review is convergence, not another application surface
+
+Final Review remains part of the same Ask GEORGE experience.
+
+It presents the consequential understanding and execution choices the user
+needs before LIVE. Formula/strategy is visible there when relevant. Brilliant
+may expose alternative Formula choices inline. Deeper Formula viewing or
+editing may use the established asset UI, but returning preserves the same
+PreparationSession and selected strategy.
+
+Final Review must not become a dashboard, wizard, collection of giant cards,
+or another primary navigation layer.
+
+### Execution philosophy
+
+GEORGE is always moving from information to understanding to judgment to
+execution.
+
+GEORGE should not make the user operate GEORGE when GEORGE already has enough
+intelligence to prepare the user to operate in the world.
+
+Accordingly, preparation UI exists only where it improves understanding,
+corrects consequential uncertainty, captures user authority, or makes LIVE
+support usable. Completed internal mechanics do not justify additional user
+steps.
+
+Current Understanding remains a working operational picture rather than a
+completion checklist. Formula remains the operational strategy. Cue / Lines
+remain user-selectable starting support preferences. Delivery mechanism remains
+a user choice. Operational Judgment remains the sole decision authority.
+
+### Qualified implementation state
+
+The current repository qualification establishes that:
+
+- Homepage no longer requires Ready Room before LIVE.
+- Homepage handoff uses the canonical `strategy` Preparation checkpoint.
+- `startLive()` remains the launch owner.
+- existing LIVE access authority remains enforced.
+- the required LIVE signal gate remains enforced.
+- confirmed receiver and speaking-style state travel into LIVE.
+- Traditional and Normal route choreography remains intact.
+- canonical PreparationSession evidence is projected into LIVE runtime support.
+- LIVE delivery continues through the existing LIVE Hub and canonical receiver
+  policy.
+- duplicate canonical ownership remains zero.
+- the production build passes.
+
+The next release activity is runtime E2E proof of the qualified Homepage
+Final Review → LIVE transition. Runtime proof must verify the behavior in the
+running product; it must not create another architecture merely to test the
+existing one.

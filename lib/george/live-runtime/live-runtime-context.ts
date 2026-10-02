@@ -76,24 +76,55 @@ function appendPreparationEvidenceValues(
   lines: string[],
   label: string,
   values: readonly PreparationRuntimeEvidenceValue[],
+  limit: number,
 ) {
-  values.forEach((value, index) => {
+  values.slice(0, limit).forEach((value, index) => {
     appendPreparationEvidenceValue(lines, `${label} ${index + 1}`, value)
   })
 }
 
-function formatPreparationEvidence(
+const LIVE_PREPARATION_ATTENTION_LIMITS = Object.freeze({
+  confirmedAnswers: 6,
+  unresolvedNeeds: 3,
+  assumptions: 4,
+  participants: 4,
+  perspectives: 4,
+  additionalSignals: 6,
+  documents: 3,
+})
+
+/**
+ * Produces the bounded per-turn attention view of the canonical preparation
+ * projection. PreparationSession remains the memory owner; this formatter
+ * neither changes evidence authority nor selects an operational move.
+ */
+function formatBoundedPreparationEvidence(
   projection: PreparationRuntimeEvidenceProjection | null,
 ) {
   if (!projection) return 'No preparation evidence was established for this LIVE entry.'
 
+  const answeredInteractions = projection.briefing.priorInteractions.filter(
+    (interaction) =>
+      interaction.status === 'answered' &&
+      Boolean(interaction.answer) &&
+      Boolean(interaction.answerAuthority),
+  )
+  const attendedAnswers = answeredInteractions.slice(
+    -LIVE_PREPARATION_ATTENTION_LIMITS.confirmedAnswers,
+  )
+  const unresolvedInteractions = projection.briefing.priorInteractions
+    .filter((interaction) => interaction.status !== 'answered')
+    .slice(-LIVE_PREPARATION_ATTENTION_LIMITS.unresolvedNeeds)
+
   const lines = [
     `Preparation session: ${projection.preparationSessionId}`,
     `Preparation provenance: entrySource=${projection.provenance.entrySource}; relations=${JSON.stringify(projection.relations)}`,
+    'Preparation attention boundary: bounded current working context; the canonical PreparationSession remains broader memory.',
+    'Evidence authority: user_owned and qualified evidence may be treated as established; provisional and inference evidence must remain uncertain.',
     'Confirmed preparation answers:',
   ]
 
-  projection.briefing.priorInteractions.forEach((interaction) => {
+  attendedAnswers.forEach((interaction) => {
     lines.push(`- Status: ${interaction.status}; Question: ${interaction.question}`)
     if (interaction.answer) lines.push(`  Answer: ${interaction.answer}`)
     if (interaction.evidenceNeed) {
@@ -105,6 +136,12 @@ function formatPreparationEvidence(
       )
     }
   })
+  if (attendedAnswers.length === 0) lines.push('- none')
+  if (answeredInteractions.length > attendedAnswers.length) {
+    lines.push(
+      `- ${answeredInteractions.length - attendedAnswers.length} older confirmed answer(s) remain in PreparationSession memory outside this per-turn attention view.`,
+    )
+  }
 
   lines.push('Preparation knowledge with preserved classification:')
   const knowledge = projection.knowledge
@@ -113,12 +150,23 @@ function formatPreparationEvidence(
     lines,
     'Baseline assumption',
     knowledge.baselineAssumptions,
+    LIVE_PREPARATION_ATTENTION_LIMITS.assumptions,
   )
   appendPreparationEvidenceValue(lines, 'Name', knowledge.name)
   appendPreparationEvidenceValue(lines, 'Role', knowledge.role)
-  appendPreparationEvidenceValues(lines, 'Participant', knowledge.participants)
+  appendPreparationEvidenceValues(
+    lines,
+    'Participant',
+    knowledge.participants,
+    LIVE_PREPARATION_ATTENTION_LIMITS.participants,
+  )
   appendPreparationEvidenceValue(lines, 'Audience', knowledge.audience)
-  appendPreparationEvidenceValues(lines, 'Perspective', knowledge.perspectives)
+  appendPreparationEvidenceValues(
+    lines,
+    'Perspective',
+    knowledge.perspectives,
+    LIVE_PREPARATION_ATTENTION_LIMITS.perspectives,
+  )
   appendPreparationEvidenceValue(
     lines,
     'Conversation title',
@@ -152,30 +200,41 @@ function formatPreparationEvidence(
   )
   appendPreparationEvidenceValue(lines, 'Room objective', knowledge.roomObjective)
 
-  Object.entries(knowledge.additionalSignals).forEach(([key, value]) => {
-    appendPreparationEvidenceValue(lines, `Additional signal ${key}`, value)
-  })
+  Object.entries(knowledge.additionalSignals)
+    .slice(0, LIVE_PREPARATION_ATTENTION_LIMITS.additionalSignals)
+    .forEach(([key, value]) => {
+      appendPreparationEvidenceValue(lines, `Additional signal ${key}`, value)
+    })
 
-  knowledge.documents.forEach((evidenceAsset) => {
-    appendPreparationEvidenceValue(
-      lines,
-      `Qualified document ${evidenceAsset.name} (${evidenceAsset.kind})`,
-      evidenceAsset.evidence,
-    )
-  })
+  knowledge.documents
+    .slice(0, LIVE_PREPARATION_ATTENTION_LIMITS.documents)
+    .forEach((evidenceAsset) => {
+      appendPreparationEvidenceValue(
+        lines,
+        `Qualified document ${evidenceAsset.name} (${evidenceAsset.kind})`,
+        evidenceAsset.evidence,
+      )
+    })
 
-  lines.push('Preparation readiness and workflow:')
-  lines.push(`- Confirmations: ${JSON.stringify(projection.readiness.confirmations)}`)
-  lines.push(`- Workflow: ${JSON.stringify(projection.readiness.workflow)}`)
-
+  lines.push(
+    'Unresolved preparation evidence (not facts; carry quietly unless operationally material):',
+  )
   if (projection.briefing.currentQuestion) {
     lines.push(
-      `Current preparation question (not an answer): ${projection.briefing.currentQuestion.question}`,
+      `- Current preparation question (not an answer): ${projection.briefing.currentQuestion.question}`,
     )
+  }
+  unresolvedInteractions.forEach((interaction) => {
+    lines.push(
+      `- Status: ${interaction.status}; unresolved=${interaction.evidenceNeed || interaction.question}`,
+    )
+  })
+  if (!projection.briefing.currentQuestion && unresolvedInteractions.length === 0) {
+    lines.push('- none')
   }
 
   lines.push('Presentation-only preparation metadata (not evidence):')
-  projection.briefing.priorInteractions.forEach((interaction) => {
+  attendedAnswers.forEach((interaction) => {
     if (interaction.presentation?.example) {
       lines.push(`- ${interaction.key} example: ${interaction.presentation.example}`)
     }
@@ -242,9 +301,11 @@ export function buildLiveRuntimeContext(params: {
 
   return `LIVE RUNTIME AUTHORITY
 
-The following information has already been established.
+The active LIVE setup and a bounded, source-classified preparation view follow.
 
-Do not ask the user to restate, redefine, rediscover, or clarify these items unless the user explicitly says they have changed.
+Do not ask the user to restate items marked user_owned or qualified unless the user says they changed.
+Do not promote provisional, inferred, missing, skipped, or unanswered information into fact.
+Carry unresolved preparation evidence quietly unless resolving it becomes operationally material.
 
 Room: ${room}
 Chair: ${chair}
@@ -258,7 +319,7 @@ Speaking style realization: ${communicationStyle} (${communicationStyleAuthority
 Support style: ${supportStyle}
 ${selectedFormula || ""}
 
-Treat these as current operational reality.
+Treat explicit runtime setup as current operational direction. Evidence classifications remain controlling.
 
 Speaking style is a realization preference, not a persona or reasoning authority.
 Explicit current-turn direction, the objective, room evidence, safety, user agency, and receiver constraints outrank it.
@@ -330,7 +391,7 @@ Runtime behavior bias:
 ${runtimeBias}
 
 Canonical preparation evidence:
-${formatPreparationEvidence(preparationEvidence)}
+${formatBoundedPreparationEvidence(preparationEvidence)}
 
 LIVE separation doctrine:
 - This is LIVE, not normal GEORGE.

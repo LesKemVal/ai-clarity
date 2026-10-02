@@ -9,9 +9,7 @@ import {
 } from '@/lib/george/live-voice/runtime/active-outcome'
 import {
   buildOperationalMemoryEvidenceNote,
-  type OperationalMemoryRuntimeEvidence,
 } from '@/lib/george/operational-memory/runtime-evidence'
-import type { AdaptiveUserProfile } from '@/lib/george/runtime/adaptive-user-profile'
 import {
   buildConversationMoveDefinitionNote,
   type GeorgeConversationMoveDefinition,
@@ -22,19 +20,16 @@ import {
   type GeorgeConversationStrategy,
 } from '@/lib/george/runtime/conversation-strategy'
 import { resolveContextFraming, type ContextFraming } from '@/lib/george/runtime/context-framing'
-import type { ContinuityRestorationState } from '@/lib/george/runtime/continuity-restoration'
 import {
   buildExecutionPolicyNote,
   resolveGeorgeExecutionPolicy,
   type GeorgeExecutionPolicy,
 } from '@/lib/george/runtime/execution-policy'
-import type { GeorgeIntentState } from '@/lib/george/runtime/intent-state'
 import type { JudgmentSurfaceState } from '@/lib/george/runtime/judgment-surface'
 import {
   resolveNormalGeorgeReasoning,
   type NormalGeorgeReasoningDecision,
 } from '@/lib/george/runtime/normal-reasoning-governor'
-import type { LiveRecommendationEvidence } from '@/lib/george/runtime/live-recommendation-governor'
 import {
   buildOperationalPreparationContextNote,
   buildOperationalJudgmentNote,
@@ -58,13 +53,18 @@ import {
   evolveGeorgeOutcomeState,
   type OutcomeEvolution,
 } from '@/lib/george/runtime/outcome-evolution'
-import type { RuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-learning'
-import type { RuntimeSignalArbitration } from '@/lib/george/runtime/runtime-signal-arbitrator'
 import {
   buildGovernedRuntimeContext,
   buildNormalLiveOperationalJudgmentRequestNote,
   buildNormalProviderRuntimeContext,
   buildProviderExecutionAuthority,
+  normalizeGovernedInvocationContractV1,
+  selectGovernedInvocationMetadataV1,
+  type GovernedInvocationContractV1,
+  type GovernedInvocationMetadataV1,
+  type GovernedInvocationProviderMessageV1,
+  type GovernedInvocationProviderPromptV1,
+  type GovernedInvocationRuntimeInputV1,
 } from '@/lib/george/runtime/runtime-context-composer'
 import {
   assessTrajectory,
@@ -100,11 +100,7 @@ export const GEORGE_RUNTIME_PIPELINE = {
 
 export type GeorgeRuntimePipeline = typeof GEORGE_RUNTIME_PIPELINE
 
-export type GeorgeProviderMessage = Readonly<{
-  role: 'user' | 'assistant'
-  content: string
-  imageDataUrls?: readonly string[]
-}>
+export type GeorgeProviderMessage = GovernedInvocationProviderMessageV1
 
 export type GeorgeProviderRequest = Readonly<{
   systemContent: string
@@ -121,67 +117,12 @@ export type GeorgeRuntimePipelineTiming = Readonly<{
   stages: readonly GeorgeRuntimePipelineStageTiming[]
 }>
 
-export type GeorgeProviderPromptInput = Readonly<{
-  languageRule: string
-  modeBlock: string
-  baseSystemPrompt: string
-  messageSourceBlock: string
-  controlStateBlock: string
-  runtimeScoresBlock: string
-  scoreAwareSteeringBlock: string
-  conversationEngineRulesBlock: string
-  universalLiveOpeningBlock: string
-  liveDisciplineBlock: string
-  dynamicRuntimeBlocks: string
-  includeLiveDiscipline: boolean
-  operationalJudgmentRequest?: boolean
-  recentMessages: readonly GeorgeProviderMessage[]
-}>
+export type GeorgeProviderPromptInput = GovernedInvocationProviderPromptV1
 
-export type GeorgeRuntimePipelineInput = {
-  currentRuntime: CurrentGeorgeRuntime
-  latestUserText: string
-  previousUserText?: string
-  voiceMode: boolean
-  objectiveKnown: boolean
-  signalUsable: boolean
-  executionImminent: boolean
-  tier: string
-  hasImageInput: boolean
-  intentState: GeorgeIntentState
-  runtimeArbitration: RuntimeSignalArbitration
-  judgmentSurface: JudgmentSurfaceState
-  continuityRestoration: ContinuityRestorationState
-  outcomeSignals: RuntimeOutcomeSignals
-  adaptiveProfile: AdaptiveUserProfile
-  liveRecommendationEvidence: LiveRecommendationEvidence
-  operationalSignals: OperationalSignal[]
-  operationalMemoryEvidence?: OperationalMemoryRuntimeEvidence | null
-  preparationContext?: OperationalPreparationContext | null
-  preparationTurnClassificationRequest?: PreparationTurnClassificationRequest | null
-  providerPrompt: GeorgeProviderPromptInput
-  onStageTiming?: (timing: GeorgeRuntimePipelineStageTiming) => void
-  governedContextNotes: Readonly<{
-    liveRuntimeContext?: string | null
-    shelvedCampaignRuntimeNote?: string | null
-    individualLiveContextNote?: string | null
-    runtimeAdapterNote?: string | null
-    earbudRuntimeNote?: string | null
-    runtimeSignalArbitrationNote?: string | null
-    arbitrationResponseShapeNote?: string | null
-    adaptiveUserProfileNote?: string | null
-    durableBehavioralMemoryNote?: string | null
-    runtimeOutcomeLearningNote?: string | null
-    continuityRestorationNote?: string | null
-    judgmentSurfaceNote?: string | null
-    responseShapeNote?: string | null
-    continuityGovernanceNote?: string | null
-    outputGovernanceNote?: string | null
-    presentationAuthorityNote?: string | null
-  }>
-}
+export type GeorgeRuntimePipelineInput = GovernedInvocationRuntimeInputV1
 
 export type GeorgeRuntimePipelineSnapshot = Readonly<{
+  invocation: GovernedInvocationMetadataV1
   inferredOutcomeState: GeorgeOutcomeState
   outcomeEvolution: OutcomeEvolution
   outcomeState: GeorgeOutcomeState
@@ -252,6 +193,7 @@ export function selectProviderResolvedGeorgeRuntimeAuthoritySnapshot(input: {
   capabilityRecommendationMaterial: boolean
   canonicalSignalAcquisition?: boolean
   signalAcquisitionAllowed?: boolean
+  preparationContext?: OperationalPreparationContext | null
   operationalJudgmentRequest?: boolean
   ordinaryNormalRequest?: boolean
   liveScopeGroundingRequired?: boolean
@@ -274,6 +216,7 @@ export function selectProviderResolvedGeorgeRuntimeAuthoritySnapshot(input: {
     canonicalSignalAcquisition:
       input.canonicalSignalAcquisition,
     signalAcquisitionAllowed: input.signalAcquisitionAllowed,
+    preparationContext: input.preparationContext,
     operationalJudgmentRequest: input.operationalJudgmentRequest,
     ordinaryNormalRequest: input.ordinaryNormalRequest,
     liveScopeGroundingRequired: input.liveScopeGroundingRequired,
@@ -435,8 +378,15 @@ export function resolveGeorgeRuntimeProvider(input: {
 }
 
 export function resolveGeorgeRuntimePipeline(
-  input: GeorgeRuntimePipelineInput
+  invocationValue: GovernedInvocationContractV1
 ): GeorgeRuntimePipelineSnapshot {
+  const invocation = normalizeGovernedInvocationContractV1(invocationValue)
+
+  if (!invocation) {
+    throw new Error('Unsupported or malformed governed invocation contract.')
+  }
+
+  const input = invocation.input
   const pipelineStartedAt = performance.now()
   const stageTimings: GeorgeRuntimePipelineStageTiming[] = []
 
@@ -449,8 +399,6 @@ export function resolveGeorgeRuntimePipeline(
     })
 
     stageTimings.push(timing)
-    input.onStageTiming?.(timing)
-
     return result
   }
 
@@ -488,6 +436,8 @@ export function resolveGeorgeRuntimePipeline(
       inferredState: inferredOutcomeState,
       latestUserText: input.latestUserText,
       previousUserText: input.previousUserText,
+      primaryOutcomeReplacementAuthorized:
+        invocation.provenance.inputSpeaker === 'user',
     })
   )
   const outcomeState = outcomeEvolution.state
@@ -678,6 +628,7 @@ export function resolveGeorgeRuntimePipeline(
   console.info('[GEORGE][runtime][latency]', timing)
 
   return Object.freeze({
+    invocation: selectGovernedInvocationMetadataV1(invocation),
     inferredOutcomeState,
     outcomeEvolution,
     outcomeState,

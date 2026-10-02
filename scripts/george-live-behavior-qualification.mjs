@@ -46,6 +46,52 @@ const {
 } = loadTypeScriptModule(
   `${root}/lib/george/live-runtime/support-behavior-composer.ts`
 )
+const { LIVE_SUPPORT_PANELS } = loadTypeScriptModule(
+  `${root}/lib/george/capabilities/live-support-panels.ts`
+)
+
+const liveEntrySource = readFileSync(
+  `${root}/app/george/live-entry/LiveEntryClient.tsx`,
+  'utf8'
+)
+
+assert(
+  JSON.stringify(LIVE_SUPPORT_PANELS.map(({ id, label }) => ({ id, label }))) ===
+    JSON.stringify([
+      { id: 'advice', label: 'Cue' },
+      { id: 'response', label: 'Lines' },
+    ]),
+  'The user-facing LIVE support model must contain only Cue and Lines'
+)
+
+const cuePanel = LIVE_SUPPORT_PANELS.find((panel) => panel.id === 'advice')
+const linesPanel = LIVE_SUPPORT_PANELS.find((panel) => panel.id === 'response')
+
+assert(
+  cuePanel?.line === 'Concise advice about what to do or say next.',
+  'Cue must remain advice-oriented'
+)
+assert(
+  linesPanel?.line === 'Directly usable speech in your voice.',
+  'Lines must remain directly usable user speech'
+)
+assert(
+  liveEntrySource.includes('if (style === "response") return "response";') &&
+    liveEntrySource.includes('return "advice";'),
+  'Cue and Lines must map to the existing advice/response runtime semantics'
+)
+assert(
+  liveEntrySource.includes(
+    'const supportLabel = activeAdaptiveSupportPanel.label;'
+  ),
+  'Ready Room must present the canonical Cue/Lines label'
+)
+assert(
+  liveEntrySource.includes(
+    '...(selectedBehavior ? { behavior: selectedBehavior } : {}),'
+  ),
+  'The user choice must remain a real PreparationSession override'
+)
 
 function decide(input) {
   return composeGeorgeSupportBehavior(input)
@@ -216,6 +262,85 @@ expectResource(
     hasSafeResponse: true,
   },
   'cue'
+)
+
+/*
+ * Receiver recommendation and receiver confirmation are separate authorities.
+ * GEORGE may recommend a delivery receiver, but only explicit user selection
+ * may satisfy preparation readiness.
+ */
+const receiverConfirmationSource = readFileSync(
+  `${root}/app/george/live-entry/LiveEntryClient.tsx`,
+  'utf8'
+)
+
+assert(
+  /setSelectedReceiverProfile\(homepageReceiverProfile\);\s*setReceiverProfileConfirmed\(\s*Boolean\(\s*recommendedHomepageSession\?\.support\.confirmations\.receiverConfirmed\s*\?\?\s*homepagePreparationSeed\?\.support\.confirmations\.receiverConfirmed,?\s*\),?\s*\);/.test(
+    receiverConfirmationSource
+  ),
+  'Homepage receiver confirmation must restore only canonical PreparationSession confirmation'
+)
+
+assert(
+  /const hasCompletedSupportConfiguration = Boolean\([\s\S]*?selectedReceiverProfile &&\s*receiverProfileConfirmed &&\s*String\(communicationStyle/.test(
+    receiverConfirmationSource
+  ),
+  'Support readiness must require explicit receiver confirmation'
+)
+
+assert(
+  /const mechanicsSelectionsComplete = Boolean\([\s\S]*?selectedReceiverProfile &&\s*receiverProfileConfirmed &&\s*String\(communicationStyle/.test(
+    receiverConfirmationSource
+  ),
+  'Mechanics completion must require explicit receiver confirmation'
+)
+
+/*
+ * Homepage Final Review already owns preparation and delivery confirmation.
+ * LIVE Entry must not add Ready Room as another homepage stop. Once canonical
+ * homepage preparation is complete, it delegates exactly once to startLive(),
+ * which remains the LIVE launch authority.
+ */
+assert(
+  /homepageWorkflowAction === "review_brief"[\s\S]*?setShowLiveBriefingRoom\(false\);/.test(
+    receiverConfirmationSource
+  ),
+  'Homepage handoff must not present the redundant Ready Room'
+)
+
+assert(
+  /savePreparationSession\(restoredPreparationSession\);\s*setShowLiveBriefingRoom\(source !== "homepage"\);\s*setLiveBriefingStep\(3\);/.test(
+    receiverConfirmationSource
+  ),
+  'Homepage live-prep return must not reopen Ready Room while preserving shared restoration for other routes'
+)
+
+assert(
+  receiverConfirmationSource.includes(
+    'const homepageDirectLiveStartedRef = useRef(false);'
+  ),
+  'Homepage direct LIVE handoff must have a one-shot launch guard'
+)
+
+assert(
+  /useEffect\(\(\) => \{\s*if \(liveEntryRoute !== "homepage"\) return;\s*if \(!homepagePreparationSession\) return;\s*if \(!hasRequiredLiveSignal\) return;\s*if \(homepageDirectLiveStartedRef\.current\) return;/.test(
+    receiverConfirmationSource
+  ),
+  'Homepage direct LIVE handoff must require canonical preparation and existing LIVE signal readiness'
+)
+
+assert(
+  /const homepageReadyForDirectLive = Boolean\([\s\S]*?homepageSupport\.receiver[\s\S]*?homepageConfirmations\.receiverConfirmed &&\s*homepageConfirmations\.speakingStyleConfirmed/.test(
+    receiverConfirmationSource
+  ),
+  'Homepage direct LIVE handoff must require canonical delivery configuration and confirmations'
+)
+
+assert(
+  /if \(!homepageReadyForDirectLive\) return;\s*const hasLiveAccess =\s*Boolean\(sessionEmail\.trim\(\)\) \|\|\s*preLivePreviewReady \|\|\s*window\.localStorage\.getItem\("george_founder_access"\) ===\s*"server-verified";\s*if \(!hasLiveAccess\) return;\s*homepageDirectLiveStartedRef\.current = true;\s*startLive\(false, editableResources, true\);/.test(
+    receiverConfirmationSource
+  ),
+  'Homepage direct LIVE handoff must wait for existing LIVE access authority, then delegate once to canonical startLive'
 )
 
 /*

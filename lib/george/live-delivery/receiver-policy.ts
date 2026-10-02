@@ -173,11 +173,17 @@ function resolveDeliveryModes(input: {
 
 function shapeForDeliverySurface(input: {
   text: string
+  audioText?: string
   mode: GeorgeDeliveryMode
   deliveryStyle: GeorgeLiveDeliveryStyle
   receiverProfile: GeorgeLiveReceiverProfile
 }) {
-  if (input.mode === 'voice') return shapeAudioText(input.text, input.deliveryStyle)
+  if (input.mode === 'voice') {
+    return shapeAudioText(
+      input.audioText === undefined ? input.text : input.audioText,
+      input.deliveryStyle
+    )
+  }
 
   if (input.mode === 'visual') {
     return input.receiverProfile === 'visual_only'
@@ -196,6 +202,7 @@ export type GeorgeReceiverDeliveryPolicyResult = {
 
 export function resolveGeorgeReceiverDeliveryPolicy(input: {
   text: string
+  audioText?: string
   voiceEnabled: boolean
   deliveryStyle: GeorgeLiveDeliveryStyle
   receiverProfile?: GeorgeLiveReceiverProfile
@@ -209,6 +216,7 @@ export function resolveGeorgeReceiverDeliveryPolicy(input: {
   }).map((mode) => {
     const text = shapeForDeliverySurface({
       text: input.text,
+      audioText: input.audioText,
       mode,
       deliveryStyle: input.deliveryStyle,
       receiverProfile,

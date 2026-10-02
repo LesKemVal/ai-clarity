@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: 'GEORGE by BRANESx',
     short_name: 'GEORGE',
     description: 'Operational guidance and LIVE runtime support from GEORGE.',
-    start_url: '/george',
+    start_url: '/',
     display: 'standalone',
     background_color: '#05060A',
     theme_color: '#0B0D12',

@@ -36,7 +36,7 @@ export type GeorgeActionCue = {
   cue: string
   reason: string
   operationalAssessment?: GeorgeOperationalAssessment
-  source: 'local' | 'groq'
+  source: 'local' | 'groq' | 'operational_judgment'
   localCue: string
   fastCue?: string
   evidence?: GeorgeActionCueEvidence

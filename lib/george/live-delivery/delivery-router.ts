@@ -11,6 +11,10 @@ import {
   composeGeorgeOperationalCueText,
   resolveGeorgeReceiverDeliveryPolicy,
 } from './receiver-policy'
+import {
+  realizeGeorgeAudioDelivery,
+  type GeorgeAudioDeliverySemantics,
+} from './audio-semantics'
 
 function composeBaseDeliveryText(input: {
   actionCue: GeorgeActionCue
@@ -60,6 +64,7 @@ function buildDeliveryCue(input: {
   mode: GeorgeDeliveryMode
   text: string
   reason: string
+  audioSemantics?: GeorgeAudioDeliverySemantics
 }): GeorgeDeliveryCue {
   return {
     turnId: input.actionCue.turnId,
@@ -73,6 +78,9 @@ function buildDeliveryCue(input: {
     confidence: input.actionCue.confidence,
     priority: input.actionCue.priority,
     at: Date.now(),
+    ...(input.audioSemantics
+      ? { audioSemantics: input.audioSemantics }
+      : {}),
   }
 }
 
@@ -104,8 +112,16 @@ export function routeGeorgeDeliveryCues(input: {
     ]
   }
 
+  const audioRealization = realizeGeorgeAudioDelivery({
+    text: explanatoryText,
+    deliveryStyle,
+    previousState: input.context?.audioDeliveryState,
+    repeatableSpeechUptake: input.context?.repeatableSpeechUptake,
+  })
+
   return resolveGeorgeReceiverDeliveryPolicy({
     text: explanatoryText,
+    audioText: audioRealization.text,
     voiceEnabled,
     deliveryStyle,
     receiverProfile: input.context?.receiverProfile,
@@ -119,6 +135,10 @@ export function routeGeorgeDeliveryCues(input: {
       mode: delivery.mode,
       text: delivery.text,
       reason: delivery.reason,
+      audioSemantics:
+        delivery.mode === 'voice'
+          ? audioRealization.semantics
+          : undefined,
     })
   )
 }

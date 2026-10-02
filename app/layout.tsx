@@ -33,6 +33,9 @@ export const metadata: Metadata = {
   },
   description: 'GEORGE helps you prepare, respond, and keep momentum when timing, pressure, and words matter.',
   applicationName: 'GEORGE',
+  alternates: {
+    canonical: '/',
+  },
   icons: {
     icon: [{ url: '/logofav.png', type: 'image/png' }],
     shortcut: '/logofav.png',
@@ -47,7 +50,7 @@ export const metadata: Metadata = {
     title: 'GEORGE by BRANESx',
     description: 'Prepare. Respond. Keep momentum when timing, pressure, and words matter.',
     siteName: 'BRANESx',
-    url: 'https://www.branesx.com/george',
+    url: 'https://www.branesx.com/',
     type: 'website',
     images: [
       {

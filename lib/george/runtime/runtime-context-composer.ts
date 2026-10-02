@@ -1,4 +1,472 @@
-import type { PreparationTurnClassificationRequest } from '@/lib/george/runtime/operational-judgment'
+import type { CurrentGeorgeRuntime } from '@/lib/george/chat/current-runtime-policy'
+import {
+  normalizeGeorgeLiveSpeakerEvidence,
+  type GeorgeLiveTranscriptSpeaker,
+} from '@/lib/george/core/live-execution'
+import type { OperationalMemoryRuntimeEvidence } from '@/lib/george/operational-memory/runtime-evidence'
+import type { AdaptiveUserProfile } from '@/lib/george/runtime/adaptive-user-profile'
+import type { ContinuityRestorationState } from '@/lib/george/runtime/continuity-restoration'
+import type { GeorgeIntentState } from '@/lib/george/runtime/intent-state'
+import type { JudgmentSurfaceState } from '@/lib/george/runtime/judgment-surface'
+import type { LiveRecommendationEvidence } from '@/lib/george/runtime/live-recommendation-governor'
+import {
+  type OperationalPreparationContext,
+  type PreparationTurnClassificationRequest,
+} from '@/lib/george/runtime/operational-judgment'
+import type { OperationalSignal } from '@/lib/george/runtime/operational-signals'
+import type { RuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-learning'
+import type { RuntimeSignalArbitration } from '@/lib/george/runtime/runtime-signal-arbitrator'
+
+export const GOVERNED_INVOCATION_CONTRACT_VERSION = 1 as const
+
+export type GovernedInvocationProviderMessageV1 = Readonly<{
+  role: 'user' | 'assistant'
+  content: string
+  imageDataUrls?: readonly string[]
+}>
+
+export type GovernedInvocationProviderPromptV1 = Readonly<{
+  languageRule: string
+  modeBlock: string
+  baseSystemPrompt: string
+  messageSourceBlock: string
+  controlStateBlock: string
+  runtimeScoresBlock: string
+  scoreAwareSteeringBlock: string
+  conversationEngineRulesBlock: string
+  universalLiveOpeningBlock: string
+  liveDisciplineBlock: string
+  dynamicRuntimeBlocks: string
+  includeLiveDiscipline: boolean
+  operationalJudgmentRequest?: boolean
+  recentMessages: readonly GovernedInvocationProviderMessageV1[]
+}>
+
+export type GovernedInvocationContextNotesV1 = Readonly<{
+  liveRuntimeContext?: string | null
+  shelvedCampaignRuntimeNote?: string | null
+  individualLiveContextNote?: string | null
+  runtimeAdapterNote?: string | null
+  earbudRuntimeNote?: string | null
+  runtimeSignalArbitrationNote?: string | null
+  arbitrationResponseShapeNote?: string | null
+  adaptiveUserProfileNote?: string | null
+  durableBehavioralMemoryNote?: string | null
+  runtimeOutcomeLearningNote?: string | null
+  continuityRestorationNote?: string | null
+  judgmentSurfaceNote?: string | null
+  responseShapeNote?: string | null
+  continuityGovernanceNote?: string | null
+  outputGovernanceNote?: string | null
+  presentationAuthorityNote?: string | null
+}>
+
+export type GovernedInvocationRuntimeInputV1 = Readonly<{
+  currentRuntime: CurrentGeorgeRuntime
+  latestUserText: string
+  previousUserText?: string
+  voiceMode: boolean
+  objectiveKnown: boolean
+  signalUsable: boolean
+  executionImminent: boolean
+  tier: string
+  hasImageInput: boolean
+  intentState: GeorgeIntentState
+  runtimeArbitration: RuntimeSignalArbitration
+  judgmentSurface: JudgmentSurfaceState
+  continuityRestoration: ContinuityRestorationState
+  outcomeSignals: RuntimeOutcomeSignals
+  adaptiveProfile: AdaptiveUserProfile
+  liveRecommendationEvidence: LiveRecommendationEvidence
+  operationalSignals: OperationalSignal[]
+  operationalMemoryEvidence?: OperationalMemoryRuntimeEvidence | null
+  preparationContext?: OperationalPreparationContext | null
+  preparationTurnClassificationRequest?: PreparationTurnClassificationRequest | null
+  providerPrompt: GovernedInvocationProviderPromptV1
+  governedContextNotes: GovernedInvocationContextNotesV1
+}>
+
+export type GovernedInvocationProvenanceV1 = Readonly<{
+  adapter: 'app_api_chat'
+  userInput: 'current_conversation'
+  inputSpeaker?: GeorgeLiveTranscriptSpeaker
+  sessionAuthority:
+    | 'authenticated_session'
+    | 'legacy_request_compatibility'
+  preparationEvidence:
+    | 'validated_preparation_projection'
+    | 'none'
+  operationalMemoryEvidence:
+    | 'authenticated_user_scope'
+    | 'none'
+  runtimeInference: 'bounded_runtime_evidence'
+  providerProposal: 'excluded_from_invocation_authority'
+}>
+
+export type GovernedInvocationContractV1 = Readonly<{
+  version: typeof GOVERNED_INVOCATION_CONTRACT_VERSION
+  source: 'website_adapter'
+  provenance: GovernedInvocationProvenanceV1
+  input: GovernedInvocationRuntimeInputV1
+}>
+
+export type GovernedInvocationMetadataV1 = Readonly<{
+  version: typeof GOVERNED_INVOCATION_CONTRACT_VERSION
+  source: GovernedInvocationContractV1['source']
+  provenance: GovernedInvocationProvenanceV1
+}>
+
+const INVOCATION_CONTEXT_NOTE_KEYS = [
+  'liveRuntimeContext',
+  'shelvedCampaignRuntimeNote',
+  'individualLiveContextNote',
+  'runtimeAdapterNote',
+  'earbudRuntimeNote',
+  'runtimeSignalArbitrationNote',
+  'arbitrationResponseShapeNote',
+  'adaptiveUserProfileNote',
+  'durableBehavioralMemoryNote',
+  'runtimeOutcomeLearningNote',
+  'continuityRestorationNote',
+  'judgmentSurfaceNote',
+  'responseShapeNote',
+  'continuityGovernanceNote',
+  'outputGovernanceNote',
+  'presentationAuthorityNote',
+] as const satisfies readonly (keyof GovernedInvocationContextNotesV1)[]
+
+const FORBIDDEN_INVOCATION_AUTHORITY_KEYS = new Set([
+  'organizationId',
+  'membershipId',
+  'organizationRole',
+  'organizationPermissions',
+  'sharedBriefingId',
+  'organizationalPolicy',
+  'organizationalAuthority',
+  'providerSemanticIntent',
+  'providerSemanticJudgment',
+  'providerSpeechComposition',
+  'providerReasoning',
+  'providerCommunicationChange',
+])
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
+}
+
+function containsForbiddenInvocationAuthority(
+  value: Record<string, unknown>
+) {
+  return Object.keys(value).some((key) =>
+    FORBIDDEN_INVOCATION_AUTHORITY_KEYS.has(key)
+  )
+}
+
+function normalizeInvocationProviderPrompt(
+  value: unknown
+): GovernedInvocationProviderPromptV1 | null {
+  if (!isRecord(value) || containsForbiddenInvocationAuthority(value)) {
+    return null
+  }
+
+  const stringKeys = [
+    'languageRule',
+    'modeBlock',
+    'baseSystemPrompt',
+    'messageSourceBlock',
+    'controlStateBlock',
+    'runtimeScoresBlock',
+    'scoreAwareSteeringBlock',
+    'conversationEngineRulesBlock',
+    'universalLiveOpeningBlock',
+    'liveDisciplineBlock',
+    'dynamicRuntimeBlocks',
+  ] as const
+
+  if (
+    stringKeys.some((key) => typeof value[key] !== 'string') ||
+    typeof value.includeLiveDiscipline !== 'boolean' ||
+    (
+      value.operationalJudgmentRequest !== undefined &&
+      typeof value.operationalJudgmentRequest !== 'boolean'
+    ) ||
+    !Array.isArray(value.recentMessages)
+  ) {
+    return null
+  }
+
+  const recentMessages: GovernedInvocationProviderMessageV1[] = []
+
+  for (const candidate of value.recentMessages) {
+    if (
+      !isRecord(candidate) ||
+      (candidate.role !== 'user' && candidate.role !== 'assistant') ||
+      typeof candidate.content !== 'string' ||
+      (
+        candidate.imageDataUrls !== undefined &&
+        (
+          !Array.isArray(candidate.imageDataUrls) ||
+          candidate.imageDataUrls.some((url) => typeof url !== 'string')
+        )
+      )
+    ) {
+      return null
+    }
+
+    recentMessages.push(
+      Object.freeze({
+        role: candidate.role,
+        content: candidate.content,
+        ...(candidate.imageDataUrls
+          ? { imageDataUrls: Object.freeze([...candidate.imageDataUrls]) }
+          : {}),
+      })
+    )
+  }
+
+  return Object.freeze({
+    languageRule: value.languageRule as string,
+    modeBlock: value.modeBlock as string,
+    baseSystemPrompt: value.baseSystemPrompt as string,
+    messageSourceBlock: value.messageSourceBlock as string,
+    controlStateBlock: value.controlStateBlock as string,
+    runtimeScoresBlock: value.runtimeScoresBlock as string,
+    scoreAwareSteeringBlock: value.scoreAwareSteeringBlock as string,
+    conversationEngineRulesBlock: value.conversationEngineRulesBlock as string,
+    universalLiveOpeningBlock: value.universalLiveOpeningBlock as string,
+    liveDisciplineBlock: value.liveDisciplineBlock as string,
+    dynamicRuntimeBlocks: value.dynamicRuntimeBlocks as string,
+    includeLiveDiscipline: value.includeLiveDiscipline as boolean,
+    ...(typeof value.operationalJudgmentRequest === 'boolean'
+      ? { operationalJudgmentRequest: value.operationalJudgmentRequest }
+      : {}),
+    recentMessages: Object.freeze(recentMessages),
+  })
+}
+
+function normalizeInvocationContextNotes(
+  value: unknown
+): GovernedInvocationContextNotesV1 | null {
+  if (!isRecord(value) || containsForbiddenInvocationAuthority(value)) {
+    return null
+  }
+
+  const normalized: Record<string, string | null> = {}
+
+  for (const key of INVOCATION_CONTEXT_NOTE_KEYS) {
+    const note = value[key]
+
+    if (note !== undefined && note !== null && typeof note !== 'string') {
+      return null
+    }
+
+    if (note !== undefined) {
+      normalized[key] = note
+    }
+  }
+
+  return Object.freeze(normalized) as GovernedInvocationContextNotesV1
+}
+
+function normalizeInvocationProvenance(
+  value: unknown
+): GovernedInvocationProvenanceV1 | null {
+  if (!isRecord(value) || containsForbiddenInvocationAuthority(value)) {
+    return null
+  }
+
+  if (
+    value.adapter !== 'app_api_chat' ||
+    value.userInput !== 'current_conversation' ||
+    (
+      value.sessionAuthority !== 'authenticated_session' &&
+      value.sessionAuthority !== 'legacy_request_compatibility'
+    ) ||
+    (
+      value.preparationEvidence !== 'validated_preparation_projection' &&
+      value.preparationEvidence !== 'none'
+    ) ||
+    (
+      value.operationalMemoryEvidence !== 'authenticated_user_scope' &&
+      value.operationalMemoryEvidence !== 'none'
+    ) ||
+    value.runtimeInference !== 'bounded_runtime_evidence' ||
+    value.providerProposal !== 'excluded_from_invocation_authority'
+  ) {
+    return null
+  }
+
+  const inputSpeaker = normalizeGeorgeLiveSpeakerEvidence({
+    speaker: value.inputSpeaker,
+  }).speaker
+
+  return Object.freeze({
+    adapter: value.adapter,
+    userInput: value.userInput,
+    inputSpeaker,
+    sessionAuthority: value.sessionAuthority,
+    preparationEvidence: value.preparationEvidence,
+    operationalMemoryEvidence: value.operationalMemoryEvidence,
+    runtimeInference: value.runtimeInference,
+    providerProposal: value.providerProposal,
+  })
+}
+
+function normalizeInvocationRuntimeInput(
+  value: unknown
+): GovernedInvocationRuntimeInputV1 | null {
+  if (!isRecord(value) || containsForbiddenInvocationAuthority(value)) {
+    return null
+  }
+
+  if (
+    (value.currentRuntime !== 'normal_george' &&
+      value.currentRuntime !== 'live_george') ||
+    typeof value.latestUserText !== 'string' ||
+    (
+      value.previousUserText !== undefined &&
+      typeof value.previousUserText !== 'string'
+    ) ||
+    typeof value.voiceMode !== 'boolean' ||
+    typeof value.objectiveKnown !== 'boolean' ||
+    typeof value.signalUsable !== 'boolean' ||
+    typeof value.executionImminent !== 'boolean' ||
+    typeof value.tier !== 'string' ||
+    typeof value.hasImageInput !== 'boolean' ||
+    !isRecord(value.intentState) ||
+    !isRecord(value.runtimeArbitration) ||
+    !isRecord(value.judgmentSurface) ||
+    !isRecord(value.continuityRestoration) ||
+    !isRecord(value.outcomeSignals) ||
+    !isRecord(value.adaptiveProfile) ||
+    !isRecord(value.liveRecommendationEvidence) ||
+    !Array.isArray(value.operationalSignals) ||
+    (
+      value.operationalMemoryEvidence !== undefined &&
+      value.operationalMemoryEvidence !== null &&
+      !isRecord(value.operationalMemoryEvidence)
+    ) ||
+    (
+      value.preparationContext !== undefined &&
+      value.preparationContext !== null &&
+      !isRecord(value.preparationContext)
+    ) ||
+    (
+      value.preparationTurnClassificationRequest !== undefined &&
+      value.preparationTurnClassificationRequest !== null &&
+      !isRecord(value.preparationTurnClassificationRequest)
+    )
+  ) {
+    return null
+  }
+
+  const providerPrompt = normalizeInvocationProviderPrompt(
+    value.providerPrompt
+  )
+  const governedContextNotes = normalizeInvocationContextNotes(
+    value.governedContextNotes
+  )
+
+  if (!providerPrompt || !governedContextNotes) return null
+
+  return Object.freeze({
+    currentRuntime: value.currentRuntime,
+    latestUserText: value.latestUserText,
+    ...(typeof value.previousUserText === 'string'
+      ? { previousUserText: value.previousUserText }
+      : {}),
+    voiceMode: value.voiceMode,
+    objectiveKnown: value.objectiveKnown,
+    signalUsable: value.signalUsable,
+    executionImminent: value.executionImminent,
+    tier: value.tier,
+    hasImageInput: value.hasImageInput,
+    intentState: value.intentState as GeorgeIntentState,
+    runtimeArbitration:
+      value.runtimeArbitration as RuntimeSignalArbitration,
+    judgmentSurface: value.judgmentSurface as JudgmentSurfaceState,
+    continuityRestoration:
+      value.continuityRestoration as ContinuityRestorationState,
+    outcomeSignals: value.outcomeSignals as RuntimeOutcomeSignals,
+    adaptiveProfile: value.adaptiveProfile as AdaptiveUserProfile,
+    liveRecommendationEvidence:
+      value.liveRecommendationEvidence as LiveRecommendationEvidence,
+    operationalSignals: [
+      ...(value.operationalSignals as OperationalSignal[]),
+    ],
+    ...(value.operationalMemoryEvidence
+      ? {
+          operationalMemoryEvidence:
+            value.operationalMemoryEvidence as OperationalMemoryRuntimeEvidence,
+        }
+      : {}),
+    ...(value.preparationContext
+      ? {
+          preparationContext:
+            value.preparationContext as OperationalPreparationContext,
+        }
+      : {}),
+    ...(value.preparationTurnClassificationRequest
+      ? {
+          preparationTurnClassificationRequest:
+            value.preparationTurnClassificationRequest as PreparationTurnClassificationRequest,
+        }
+      : {}),
+    providerPrompt,
+    governedContextNotes,
+  })
+}
+
+/**
+ * Normalizes the portable invocation envelope without deciding what its
+ * evidence means. Operational Judgment remains the sole decision authority.
+ */
+export function normalizeGovernedInvocationContractV1(
+  value: unknown
+): GovernedInvocationContractV1 | null {
+  if (
+    !isRecord(value) ||
+    containsForbiddenInvocationAuthority(value) ||
+    value.version !== GOVERNED_INVOCATION_CONTRACT_VERSION ||
+    value.source !== 'website_adapter'
+  ) {
+    return null
+  }
+
+  const provenance = normalizeInvocationProvenance(value.provenance)
+  const input = normalizeInvocationRuntimeInput(value.input)
+
+  if (!provenance || !input) return null
+
+  return Object.freeze({
+    version: GOVERNED_INVOCATION_CONTRACT_VERSION,
+    source: 'website_adapter' as const,
+    provenance,
+    input,
+  })
+}
+
+export function createGovernedInvocationContractV1(
+  value: GovernedInvocationContractV1
+): GovernedInvocationContractV1 {
+  const normalized = normalizeGovernedInvocationContractV1(value)
+
+  if (!normalized) {
+    throw new Error('Governed Invocation Contract V1 is malformed.')
+  }
+
+  return normalized
+}
+
+export function selectGovernedInvocationMetadataV1(
+  invocation: GovernedInvocationContractV1
+): GovernedInvocationMetadataV1 {
+  return Object.freeze({
+    version: invocation.version,
+    source: invocation.source,
+    provenance: invocation.provenance,
+  })
+}
 
 export type GovernedRuntimeContextInput = {
   liveRuntimeContext?: string | null

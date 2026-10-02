@@ -15,6 +15,7 @@ const section = (source, start, end) => {
 }
 
 const homepage = read('components/home/HomeConversationTypeSurface.tsx')
+const rootPage = read('app/page.tsx')
 const liveHomeRoute = read('app/george/live-home/page.tsx')
 const sessionRoute = read('app/api/session/route.ts')
 const sessionAuthority = read('lib/security/george-session.ts')
@@ -33,7 +34,7 @@ const hydration = section(
 const selection = section(
   homepage,
   '  function selectHomepageMissionTier(',
-  '  const activeFormula = useMemo(() => {',
+  '  async function openFormulaReview()',
 )
 const renderedSurface = section(homepage, '  return (\n    <section', '\n  );\n}')
 const actionRow = section(
@@ -139,14 +140,18 @@ assert(
   actionRow.indexOf('HOMEPAGE_INTELLIGENCE_TIERS.map') >= 0 &&
     actionRow.indexOf('optionalAnswer.trim()') >
       actionRow.indexOf('HOMEPAGE_INTELLIGENCE_TIERS.map') &&
-    actionRow.includes('{optionalAnswer.trim() ? "Submit" : "Skip"}') &&
+    actionRow.includes('optionalQuestion?.key === "communicationMedium"') &&
+    actionRow.includes('? "Continue"') &&
+    actionRow.includes('? "Submit"') &&
+    actionRow.includes(': "Skip"') &&
     actionRow.includes('flex min-w-0 items-center justify-between gap-3') &&
     actionRow.includes('relative flex shrink-0 items-center gap-1') &&
     actionRow.includes('w-[min(18rem,calc(100vw-3rem))]'),
   'the single SKIP/SUBMIT control, tier controls, or mobile overflow protections left the approved action row',
 )
 assert(
-  liveHomeRoute.includes('<HomeConversationTypeSurface />') &&
+  rootPage.includes('<HomeConversationTypeSurface />') &&
+    liveHomeRoute.trim() === 'export { default } from "../../page";' &&
     !liveHomeRoute.includes('TierAccessPanel') &&
     !liveHomeRoute.includes('Upgrade') &&
     (homepage.match(/\/activate\?tier=/g) || []).length === 1,

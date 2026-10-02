@@ -11,7 +11,11 @@ import {
 } from '@/lib/george/live-metrics/runtime-metrics'
 import { resolveGeorgeLiveDeliveryDeadline } from '@/lib/george/live-metrics/latency-budgets.mjs'
 import { resolveGeorgeDeliveryBehavior } from '@/lib/george/live-delivery/delivery-behavior-resolver'
-import { commitGeorgeApprovedLiveDelivery } from '@/lib/george/live-runtime/approved-delivery-history'
+import {
+  clearGeorgeApprovedLiveDelivery,
+  commitGeorgeApprovedLiveDelivery,
+} from '@/lib/george/live-runtime/approved-delivery-history'
+import { INITIAL_GEORGE_AUDIO_DELIVERY_STATE } from '@/lib/george/live-delivery/audio-semantics'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
 import type {
   GeorgeDeliveryCue,
@@ -41,6 +45,24 @@ export function LiveHubDeliveryBridge({
   onSilentCue,
 }: LiveHubDeliveryBridgeProps) {
   const deliveredCueByTurnRef = useRef<Record<string, { text: string; armedAt: number; committed?: boolean; deliveryStarted?: boolean; confidence?: number; priority?: number }>>({})
+  const audioDeliveryStateRef = useRef(INITIAL_GEORGE_AUDIO_DELIVERY_STATE)
+
+  useEffect(() => {
+    if (active) return
+
+    audioDeliveryStateRef.current = INITIAL_GEORGE_AUDIO_DELIVERY_STATE
+    deliveredCueByTurnRef.current = {}
+    clearGeorgeApprovedLiveDelivery()
+  }, [active])
+
+  useEffect(
+    () => () => {
+      audioDeliveryStateRef.current = INITIAL_GEORGE_AUDIO_DELIVERY_STATE
+      deliveredCueByTurnRef.current = {}
+      clearGeorgeApprovedLiveDelivery()
+    },
+    []
+  )
 
   useEffect(() => {
     if (!active) return
@@ -49,6 +71,14 @@ export function LiveHubDeliveryBridge({
     const adapter = getGeorgeLiveHubRuntimeAdapter()
 
     const unsubscribe = adapter.subscribe((event) => {
+      if (event.type === 'STATUS') {
+        if (event.status !== 'connected') {
+          audioDeliveryStateRef.current =
+            INITIAL_GEORGE_AUDIO_DELIVERY_STATE
+        }
+        return
+      }
+
       if (event.type !== 'ACTION_CUE') return
 
       const behaviorResolution = resolveGeorgeDeliveryBehavior({
@@ -73,6 +103,8 @@ export function LiveHubDeliveryBridge({
           room: context.room,
           objective: context.objective,
           knownContext: context.knownContext,
+          audioDeliveryState: audioDeliveryStateRef.current,
+          repeatableSpeechUptake: 'unconfirmed',
         },
       }).map((deliveryCue) => ({
         ...deliveryCue,
@@ -168,6 +200,15 @@ export function LiveHubDeliveryBridge({
       }
 
       commitGeorgeApprovedLiveDelivery(resolvedDeliveryCue)
+
+      const deliveredVoiceCue = deadlineApprovedCues.find(
+        (cue) => cue.mode === 'voice'
+      )
+
+      if (deliveredVoiceCue?.audioSemantics) {
+        audioDeliveryStateRef.current =
+          deliveredVoiceCue.audioSemantics.nextState
+      }
 
       for (const routedCue of deadlineApprovedCues) {
         console.info('[LIVE][hub][delivery] DELIVERY_CUE', routedCue)

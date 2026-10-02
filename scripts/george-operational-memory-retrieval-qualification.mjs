@@ -26,7 +26,10 @@ const personalFormula = {
   objectiveTypes: ['secure_pilot'],
   prerequisites: ['proof_requested'],
   confidence: 0.9,
-  sampleCount: 4,
+  sampleCount: 12,
+  successCount: 9,
+  contradictionCount: 1,
+  unknownCount: 2,
   steps: [
     {
       signalType: 'proof_requested',
@@ -44,7 +47,10 @@ const generalFormula = {
   objectiveTypes: [],
   prerequisites: [],
   confidence: 0.8,
-  sampleCount: 7,
+  sampleCount: 10,
+  successCount: 5,
+  contradictionCount: 2,
+  unknownCount: 3,
   steps: [
     {
       signalType: 'risk_unclear',
@@ -129,13 +135,107 @@ assert.equal(ranked.length, 2)
 assert.equal(
   ranked[0].formula.id,
   personalFormula.id,
-  'Contextually matched personal evidence should outrank general evidence.'
+  'Contextual fit and execution evidence should outrank weaker general evidence; personal scope alone must not determine success rank.'
+)
+
+const scopeNeutralPersonal = {
+  ...generalFormula,
+  id: 'scope-neutral-personal',
+  ownerId: 'user@example.com',
+  scope: 'personal',
+}
+
+const scopeNeutralGeneral = {
+  ...generalFormula,
+  id: 'scope-neutral-general',
+  scope: 'general',
+}
+
+const scopeNeutralRanked = rankOperationalFormulas(
+  [scopeNeutralPersonal, scopeNeutralGeneral],
+  context
+)
+
+assert.equal(
+  scopeNeutralRanked[0].score,
+  scopeNeutralRanked[1].score,
+  'Scope may govern access but must not independently increase contextual success rank.'
+)
+
+const tinyPerfectSample = {
+  ...generalFormula,
+  id: 'tiny-perfect-sample',
+  confidence: 0.7,
+  sampleCount: 1,
+  successCount: 1,
+  contradictionCount: 0,
+}
+
+const establishedStrongSample = {
+  ...generalFormula,
+  id: 'established-strong-sample',
+  confidence: 0.7,
+  sampleCount: 20,
+  successCount: 16,
+  contradictionCount: 0,
+}
+
+const evidenceRanked = rankOperationalFormulas(
+  [tinyPerfectSample, establishedStrongSample],
+  context
+)
+
+assert.equal(
+  evidenceRanked[0].formula.id,
+  establishedStrongSample.id,
+  'One successful execution must not automatically outrank a strong, substantially better-established execution record.'
+)
+
+const contradictionLight = {
+  ...generalFormula,
+  id: 'contradiction-light',
+  confidence: 0.8,
+  sampleCount: 12,
+  successCount: 8,
+  contradictionCount: 0,
+}
+
+const contradictionHeavy = {
+  ...contradictionLight,
+  id: 'contradiction-heavy',
+  contradictionCount: 6,
+}
+
+const contradictionRanked = rankOperationalFormulas(
+  [contradictionHeavy, contradictionLight],
+  context
+)
+
+assert.equal(
+  contradictionRanked[0].formula.id,
+  contradictionLight.id,
+  'Repeated contradictions should exert bounded downward pressure without invalidating the Formula.'
+)
+
+assert.ok(
+  contradictionRanked[1].score > 0,
+  'Contradictions must weaken contextual rank rather than automatically declare a Formula unusable.'
 )
 
 const selected = applyOperationalMemoryRetrievalPolicy(ranked)
 
-assert.equal(selected.length, 2)
+assert.equal(
+  selected.length,
+  1,
+  'Runtime evidence policy may narrow canonically ranked formulas using its independent evidence-injection threshold.'
+)
 assert.equal(selected[0].formula.id, personalFormula.id)
+
+assert.equal(
+  ranked.length,
+  2,
+  'Canonical contextual-success ranking must retain eligible alternatives independently of runtime evidence filtering.'
+)
 
 const evidence = createOperationalMemoryRuntimeEvidence(selected)
 const evidenceNote = buildOperationalMemoryEvidenceNote(evidence)
@@ -188,8 +288,14 @@ assert.match(
 
 assert.match(
   route,
-  /resolveGeorgeRuntimePipeline\(\{[\s\S]*?operationalMemoryEvidence,/,
-  'Governed operational-memory evidence must enter the canonical runtime pipeline.'
+  /createGovernedInvocationContractV1\(\{[\s\S]*?operationalMemoryEvidence,/,
+  'Governed operational-memory evidence must enter the canonical invocation contract.'
+)
+
+assert.match(
+  route,
+  /resolveGeorgeRuntimePipeline\(governedInvocation\)/,
+  'The canonical invocation contract must transport operational-memory evidence into the runtime pipeline.'
 )
 
 assert.match(

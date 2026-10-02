@@ -13,8 +13,40 @@ import type { LiveTranscriptControllerAction } from '@/lib/george/live-runtime/l
 import type { LiveTranscriptDecision } from '@/lib/george/live-runtime/transcript-routing'
 import { buildGeorgeOperationalUnderstanding } from '@/lib/george/core/operational-understanding'
 
+export type GeorgeLiveTranscriptSpeaker = 'user' | 'other_party' | 'unclear'
+
+export type GeorgeLiveSpeakerEvidence = Readonly<{
+  speaker: GeorgeLiveTranscriptSpeaker
+}>
+
+export const UNCLEAR_GEORGE_LIVE_SPEAKER_EVIDENCE: GeorgeLiveSpeakerEvidence =
+  Object.freeze({ speaker: 'unclear' })
+
+export function normalizeGeorgeLiveSpeakerEvidence(
+  value: unknown
+): GeorgeLiveSpeakerEvidence {
+  if (!value || typeof value !== 'object') {
+    return UNCLEAR_GEORGE_LIVE_SPEAKER_EVIDENCE
+  }
+
+  const speaker = (value as { speaker?: unknown }).speaker
+
+  if (speaker !== 'user' && speaker !== 'other_party' && speaker !== 'unclear') {
+    return UNCLEAR_GEORGE_LIVE_SPEAKER_EVIDENCE
+  }
+
+  return Object.freeze({ speaker })
+}
+
+export function isKnownUserSpeakingFromGeorgeLiveSpeakerEvidence(
+  evidence: GeorgeLiveSpeakerEvidence
+) {
+  return evidence.speaker === 'user'
+}
+
 export type GeorgeCoreLiveExecutionInput = {
   transcript: string
+  speakerEvidence?: unknown
   lastFinalTranscript: LastLiveFinalTranscript
   routingContext?: LiveTranscriptRoutingContext
   lastSpokenLine?: string
@@ -30,6 +62,7 @@ export type GeorgeCoreLiveExecutionInput = {
 export type GeorgeCoreLiveExecutionResult = {
   nextFinalTranscript: LastLiveFinalTranscript
   authority: LiveActionAuthorityResult
+  speakerEvidence: GeorgeLiveSpeakerEvidence
 }
 
 function makeIgnoredLiveAuthority(params: {
@@ -85,6 +118,9 @@ function isOutcomeRelevantTranscript(transcript: string, desiredOutcome?: string
 export function resolveGeorgeCoreLiveExecution(
   input: GeorgeCoreLiveExecutionInput
 ): GeorgeCoreLiveExecutionResult {
+  const speakerEvidence = normalizeGeorgeLiveSpeakerEvidence(
+    input.speakerEvidence
+  )
   const understanding = buildGeorgeOperationalUnderstanding({
     transcript: input.transcript,
     objective: input.desiredOutcome,
@@ -93,7 +129,8 @@ export function resolveGeorgeCoreLiveExecution(
 
   const speakerIntent = classifyLiveSpeakerIntent({
     transcript: input.transcript,
-    knownUserSpeaking: false,
+    knownUserSpeaking:
+      isKnownUserSpeakingFromGeorgeLiveSpeakerEvidence(speakerEvidence),
     objective: understanding.operationalObjective || null,
   })
 
@@ -113,6 +150,7 @@ export function resolveGeorgeCoreLiveExecution(
 
     return {
       nextFinalTranscript: input.lastFinalTranscript,
+      speakerEvidence,
       authority: makeIgnoredLiveAuthority({
         decision,
         action,
@@ -149,6 +187,7 @@ export function resolveGeorgeCoreLiveExecution(
 
   return {
     nextFinalTranscript: routed.nextFinalTranscript,
+    speakerEvidence,
     authority,
   }
 }

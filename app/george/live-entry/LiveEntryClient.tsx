@@ -1066,7 +1066,7 @@ export default function LiveEntryClient() {
 
         savePreparationSession(restoredPreparationSession);
 
-        setShowLiveBriefingRoom(true);
+        setShowLiveBriefingRoom(source !== "homepage");
         setLiveBriefingStep(3);
         setLivePrepOpenSection(snapshot.livePrepOpenSection || "formula");
         setLiveBriefingSupportAccepted(
@@ -1322,6 +1322,7 @@ export default function LiveEntryClient() {
       const hasCompletedSupportConfiguration = Boolean(
         (liveBriefingActiveSupportStyle || selectedSupportStyle) &&
           selectedReceiverProfile &&
+          receiverProfileConfirmed &&
           String(communicationStyle || "").trim() &&
           (liveEntryRoute === "homepage" || liveRecoveryAcknowledged),
       );
@@ -1331,15 +1332,11 @@ export default function LiveEntryClient() {
           return "support";
         }
 
-        if (liveEntryRoute !== "homepage") {
+        if (liveEntryRoute === "homepage") {
           return "ready";
         }
 
-        if (current === "ready") {
-          return "ready";
-        }
-
-        return "formula";
+        return "ready";
       });
 
       if (liveEntryRoute !== "homepage") {
@@ -3253,7 +3250,12 @@ export default function LiveEntryClient() {
           normalizeLiveSupportStyle(runtimeSupportStyle),
         );
         setSelectedReceiverProfile(homepageReceiverProfile);
-        setReceiverProfileConfirmed(true);
+        setReceiverProfileConfirmed(
+          Boolean(
+            recommendedHomepageSession?.support.confirmations.receiverConfirmed ??
+              homepagePreparationSeed?.support.confirmations.receiverConfirmed,
+          ),
+        );
         setCommunicationStyle(homepageCommunicationStyle);
         setLiveBriefingCommunicationConfirmed(true);
         setLiveBriefingSupportAccepted(
@@ -3448,7 +3450,7 @@ export default function LiveEntryClient() {
         setLiveRecoveryAcknowledged(false);
         setLiveReadyAccepted(false);
         setLiveReadinessComplete(false);
-        setShowLiveBriefingRoom(true);
+        setShowLiveBriefingRoom(false);
 
         window.localStorage.removeItem("GEORGE_HOMEPAGE_LIVE_HANDOFF");
       } else if (entryResolution.firstStep === "mechanics") {
@@ -4228,6 +4230,8 @@ export default function LiveEntryClient() {
     setShowLiveBriefingRoom(restoredHasOperationalSignal);
   };
 
+  const homepageDirectLiveStartedRef = useRef(false);
+
   const startLive = (
     skipPrep = false,
     resources = editableResources,
@@ -4621,6 +4625,49 @@ export default function LiveEntryClient() {
 
     window.location.href = "/george/live?ready=1";
   };
+
+  useEffect(() => {
+    if (liveEntryRoute !== "homepage") return;
+    if (!homepagePreparationSession) return;
+    if (!hasRequiredLiveSignal) return;
+    if (homepageDirectLiveStartedRef.current) return;
+
+    const resolvedHomepagePreparation = resolvePreparationSession(
+      homepagePreparationSession,
+    );
+    const homepageSupport =
+      resolvedHomepagePreparation.supportConfiguration;
+    const homepageConfirmations =
+      homepagePreparationSession.support.confirmations;
+
+    const homepageReadyForDirectLive = Boolean(
+      homepageSupport.behavior &&
+        homepageSupport.receiver &&
+        String(homepageSupport.speakingStyle || "").trim() &&
+        homepageConfirmations.receiverConfirmed &&
+        homepageConfirmations.speakingStyleConfirmed,
+    );
+
+    if (!homepageReadyForDirectLive) return;
+
+    const hasLiveAccess =
+      Boolean(sessionEmail.trim()) ||
+      preLivePreviewReady ||
+      window.localStorage.getItem("george_founder_access") ===
+        "server-verified";
+
+    if (!hasLiveAccess) return;
+
+    homepageDirectLiveStartedRef.current = true;
+    startLive(false, editableResources, true);
+  }, [
+    editableResources,
+    hasRequiredLiveSignal,
+    homepagePreparationSession,
+    liveEntryRoute,
+    preLivePreviewReady,
+    sessionEmail,
+  ]);
 
   const appendProofTranscript = (
     speaker: "george" | "user",
@@ -5572,6 +5619,7 @@ export default function LiveEntryClient() {
     const mechanicsSelectionsComplete = Boolean(
       activeSupportPanelId &&
         selectedReceiverProfile &&
+        receiverProfileConfirmed &&
         String(communicationStyle || "").trim(),
     );
 
@@ -6472,10 +6520,7 @@ export default function LiveEntryClient() {
       );
     }
 
-    const supportLabel =
-      activeSupportPanelId === "response"
-        ? "Adaptive response"
-        : "Adaptive cues";
+    const supportLabel = activeAdaptiveSupportPanel.label;
 
     const activeFormula =
       selectedFormula || operationalRecommendation?.recommendedFormula || null;

@@ -32,12 +32,12 @@ const judgmentRequestBody = section(
 const understanding = section(
   homepage,
   'function preserveCurrentUnderstanding()',
-  'async function submitHomepageOptionalAnswer(',
+  'async function submitHomepagePreparationTurn(',
 )
 const answer = section(
   homepage,
+  'async function submitHomepagePreparationTurn(',
   'async function submitHomepageOptionalAnswer(',
-  'function skipHomepageOptionalQuestion()',
 )
 const acceptedLiveTurn = section(
   homepage,
@@ -153,6 +153,16 @@ assert(
       answer.indexOf('classification?.authority !== "operational_judgment"') &&
     !answer.includes('interactionMode: "ask_george"'),
   'homepage conversational turns do not pass through accepted canonical classification',
+)
+assert(
+  answer.includes('const mandatoryEvidenceEstablished =') &&
+    answer.includes('classification.providerProposalAccepted === true') &&
+    answer.includes('classification.preservePendingQuestion === false') &&
+    answer.indexOf('if (!mandatoryEvidenceEstablished)') <
+      answer.indexOf('commitMandatoryDesiredOutcome(seed, exactSubmission)') &&
+    answer.indexOf('commitMandatoryLiveCommunicationMedium(seed, exactSubmission)') <
+      answer.indexOf('requestHomepageOperationalJudgment(nextSession)'),
+  'mandatory opening evidence can bypass canonical question satisfaction or post-Q2 reassessment',
 )
 assert(
   acceptedLiveTurn.includes(

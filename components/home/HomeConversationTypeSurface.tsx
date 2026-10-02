@@ -15,6 +15,11 @@ import {
   saveLivePreparationSignals,
 } from "@/lib/george/live-browser/live-preparation-browser-storage";
 import {
+  LIVE_RECEIVER_PROFILE_PANELS,
+  type LiveReceiverProfilePanelId,
+} from "@/lib/george/capabilities/live-support-panels";
+
+import {
   createPreparationSession,
   normalizePreparationInteractions,
   projectPreparationSessionForLiveRuntime,
@@ -61,6 +66,11 @@ type HomepagePriorInteraction = {
   evidenceNeed?: string;
   purpose?: "live_scope_grounding" | "qualification";
 };
+
+type CurrentUnderstandingSignal = Readonly<{
+  text: string;
+  authority: "user_owned" | "provisional";
+}>;
 
 function SelectionAcknowledgement({ label }: { label: string }) {
   return (
@@ -702,6 +712,37 @@ type HomepageHeldAmbiguousTurn = {
   currentClassification: HomepageConversationMode;
 };
 
+type HomepagePreparationTurnSubmission = {
+  explicitSelection?: HomepageConversationMode;
+  heldTurn?: HomepageHeldAmbiguousTurn;
+  pendingQuestion?: HomepageOptionalQuestion;
+  submission?: string;
+  seed?: PreparationSessionV1;
+};
+
+const MANDATORY_DESIRED_OUTCOME_QUESTION: HomepageOptionalQuestion = {
+  key: "desiredOutcome",
+  label: "Desired outcome",
+  question: "What would you like to accomplish today?",
+  example: "Describe the result you want from the anticipated conversation.",
+  why: "Your desired outcome organizes what GEORGE should prepare and support.",
+  evidenceNeed: "the user's desired outcome for the anticipated conversation",
+  purpose: "live_scope_grounding",
+};
+
+const HOMEPAGE_QUESTION_TYPEWRITER_SPEED_MS = 10;
+
+const MANDATORY_COMMUNICATION_MEDIUM_QUESTION: HomepageOptionalQuestion = {
+  key: "communicationMedium",
+  label: "LIVE setting",
+  question: "Ready to use me in a room, over the phone, or somewhere else?",
+  example:
+    "For example: in a meeting room, on a phone call, or another LIVE setting.",
+  why: "How you will use LIVE support affects what I should prepare for.",
+  evidenceNeed: "the communication environment for the anticipated LIVE conversation",
+  purpose: "live_scope_grounding",
+};
+
 type HomepageOperationalJudgmentAuthorization = {
   request: typeof NORMAL_LIVE_OPERATIONAL_JUDGMENT_REQUEST;
   source: "operational_judgment";
@@ -1011,7 +1052,15 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [formulaSurfaceMode, setFormulaSurfaceMode] =
     useState<FormulaSurfaceMode>("closed");
-  const [accessibleFormulas, setAccessibleFormulas] = useState<
+  const [activeFormula, setActiveFormula] =
+    useState<OperationalFormula | null>(null);
+  const [activeFormulaSource, setActiveFormulaSource] =
+    useState<"george" | "user" | null>(null);
+  const [homepageReceiverProfile, setHomepageReceiverProfile] =
+    useState<LiveReceiverProfilePanelId | null>(null);
+  const [homepageReceiverConfirmed, setHomepageReceiverConfirmed] =
+    useState(false);
+  const [alternativeFormulas, setAlternativeFormulas] = useState<
     OperationalFormula[]
   >([]);
   const [formulaLoading, setFormulaLoading] = useState(false);
@@ -1118,68 +1167,69 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     window.localStorage.setItem(selectedTierStorageKeyRef.current, tier);
   }
 
-  const activeFormula = useMemo(() => {
-    if (!selectedType || accessibleFormulas.length === 0) return null;
-
-    const conversationId = selectedType.id.trim().toLowerCase();
-    const conversationTitle = selectedType.title.trim().toLowerCase();
-
-    const ranked = accessibleFormulas
-      .filter((formula) => formula.status !== "retired")
-      .map((formula) => {
-        const roomTypes = (formula.roomTypes || []).map((value) =>
-          value.trim().toLowerCase(),
-        );
-        const bestUsedFor = (formula.bestUsedFor || []).map((value) =>
-          value.trim().toLowerCase(),
-        );
-        const formulaName = String(formula.name || "").trim().toLowerCase();
-
-        let score = formula.confidence || 0;
-
-        if (roomTypes.includes(conversationId)) score += 4;
-        if (roomTypes.includes(conversationTitle)) score += 3;
-        if (formulaName.includes(conversationTitle)) score += 2;
-        if (
-          bestUsedFor.some(
-            (value) =>
-              value.includes(conversationTitle) ||
-              conversationTitle.includes(value),
-          )
-        ) {
-          score += 1;
-        }
-
-        if (formula.status === "validated") score += 0.5;
-        if (formula.status === "candidate") score -= 0.15;
-
-        return { formula, score };
-      })
-      .sort((left, right) => right.score - left.score);
-
-    return ranked[0]?.formula || null;
-  }, [accessibleFormulas, selectedType]);
-
   async function openFormulaReview() {
     setFormulaSurfaceMode("review");
     setFormulaError("");
 
-    if (accessibleFormulas.length > 0 || formulaLoading) return;
+    if (formulaLoading) return;
 
     setFormulaLoading(true);
 
     try {
-      const response = await fetch(
-        "/api/george/operational-memory/formulas",
-        { cache: "no-store" },
-      );
-      const payload = (await response.json()) as FormulaResponse;
+      const preparationSession = homepagePreparationSeedRef.current;
+      const desiredOutcome = String(
+        preparationSession?.knowledge.objective ||
+          answers.desiredOutcome ||
+          selectedGoal ||
+          "",
+      ).trim();
+      const conversationContext = String(
+        preparationSession?.knowledge.knownContext ||
+          answers.conversationContext ||
+          "",
+      ).trim();
+      const knownFacts = preparationSession?.briefing.priorInteractions
+        .filter(
+          (interaction) =>
+            interaction.status === "answered" && interaction.answer.trim(),
+        )
+        .map((interaction) => interaction.answer.trim());
 
-      if (!response.ok || !payload.ok) {
-        throw new Error(payload.error || "Unable to load formula");
+      const response = await fetch(
+        "/api/george/operational-memory/recommend",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          cache: "no-store",
+          body: JSON.stringify({
+            roomType: selectedType?.id || undefined,
+            objectiveType: desiredOutcome || undefined,
+            observedSignalTypes: [],
+            formulaLimit: 6,
+            alternativeLimit: 5,
+            briefingComplete: briefingSufficient,
+            preparationContext: {
+              role: selectedRole?.label || answers.role || undefined,
+              desiredOutcome: desiredOutcome || undefined,
+              conversationContext: conversationContext || undefined,
+              knownFacts,
+            },
+          }),
+        },
+      );
+      const payload = await response.json();
+
+      if (!response.ok || !payload?.ok) {
+        throw new Error(payload?.error || "Unable to load formula");
       }
 
-      setAccessibleFormulas(payload.formulas || []);
+      const recommendedFormula =
+        payload.recommendation?.recommendedFormula || null;
+      setActiveFormula(recommendedFormula);
+      setActiveFormulaSource(recommendedFormula ? "george" : null);
+      setAlternativeFormulas(
+        payload.recommendation?.alternativeFormulas || [],
+      );
     } catch (error) {
       setFormulaError(
         error instanceof Error ? error.message : "Unable to load formula",
@@ -1300,6 +1350,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
     firstFrame = window.requestAnimationFrame(() => {
       setPhase("review");
+      void openFormulaReview();
 
       secondFrame = window.requestAnimationFrame(() => {
         surfaceRef.current?.scrollIntoView({
@@ -1350,7 +1401,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       Boolean(optionalQuestion) &&
       !editingCurrentUnderstanding &&
       homepageConversationSequence.stage === "question",
-    18,
+    HOMEPAGE_QUESTION_TYPEWRITER_SPEED_MS,
   );
   const optionalQuestionWhyText = useTypewriter(
     optionalQuestion?.why || "",
@@ -1368,6 +1419,11 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
         homepageConversationSequence.stage === "response" ||
         homepageConversationSequence.stage === "clarification"),
     18,
+  );
+  const openingQuestionText = useTypewriter(
+    MANDATORY_DESIRED_OUTCOME_QUESTION.question,
+    phase === "selection",
+    HOMEPAGE_QUESTION_TYPEWRITER_SPEED_MS,
   );
   const visibleConversationMode =
     pendingExplicitConversationMode || acceptedConversationMode;
@@ -1422,6 +1478,14 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       });
     }
   }
+
+  const baselineAssumptions = useMemo(
+    () =>
+      selectedType
+        ? getConversationTypeBaselineAssumptions(selectedType.id)
+        : [],
+    [selectedType],
+  );
 
   const supportedCurrentUnderstanding = useMemo(() => {
     const explicitRevision =
@@ -1485,19 +1549,38 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       return revision
         .split(/\n+/)
         .map(punctuate)
-        .filter(Boolean);
+        .filter(Boolean)
+        .map((text) => ({ text, authority: "user_owned" as const }));
     }
 
-    return [
-      outcome ? punctuate(describeOutcome(outcome)) : "",
-      answers.role ? punctuate(`Your role is ${answers.role}`) : "",
+    const signals: Array<CurrentUnderstandingSignal | null> = [
+      outcome
+        ? {
+            text: punctuate(describeOutcome(outcome)),
+            authority: "user_owned" as const,
+          }
+        : null,
+      answers.role
+        ? {
+            text: punctuate(`Your role is ${answers.role}`),
+            authority: "user_owned" as const,
+          }
+        : null,
       answers.conversationContext
-        ? punctuate(`Relevant context: ${answers.conversationContext}`)
-        : "",
-      ...Object.values(optionalAnswers).map((answer) =>
-        punctuate(String(answer || "")),
-      ),
-    ].filter(Boolean);
+        ? {
+            text: punctuate(`Relevant context: ${answers.conversationContext}`),
+            authority: "user_owned" as const,
+          }
+        : null,
+      ...Object.values(optionalAnswers).map((answer) => ({
+        text: punctuate(String(answer || "")),
+        authority: "user_owned" as const,
+      })),
+    ];
+
+    return signals.filter(
+      (signal): signal is CurrentUnderstandingSignal => Boolean(signal?.text),
+    );
   }, [
     answers.conversationContext,
     answers.currentUnderstandingRevision,
@@ -1514,12 +1597,6 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const currentOperationalUnderstanding = answers.conversationContext?.trim()
     ? `Based on what you've told me, ${answers.conversationContext.trim()}`
     : currentOperationalPromise;
-
-  const baselineAssumptions = useMemo(
-    () =>
-      getConversationTypeBaselineAssumptions(selectedType?.id),
-    [selectedType?.id],
-  );
 
   const preparationUnderstandingChecklist = useMemo(() => {
     const objective = String(
@@ -1729,19 +1806,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     const exactOutcome = outcomeDraft;
     if (!exactOutcome.trim()) return;
 
-    const nextSignals = {
-      desiredOutcome: exactOutcome,
-      broadGoal: exactOutcome,
-    };
     const existingSeed = homepagePreparationSeedRef.current;
-    const exactOutcomeInteraction = {
-      key: "desiredOutcome",
-      question: "What do you want this conversation to accomplish?",
-      answer: exactOutcome,
-      status: "answered" as const,
-      evidenceNeed: "the user's desired outcome for the anticipated conversation",
-    };
-
     if (!existingSeed) {
       clearPreparationSession();
     }
@@ -1751,22 +1816,11 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       provenance: existingSeed?.provenance || { entrySource: "homepage" },
       createdAt: existingSeed?.createdAt,
       updatedAt: Date.now(),
-      knowledge: {
-        ...(existingSeed?.knowledge || {}),
-        objective: exactOutcome,
-        additionalSignals: {
-          ...(existingSeed?.knowledge.additionalSignals || {}),
-          ...nextSignals,
-        },
-      },
+      knowledge: existingSeed?.knowledge,
       briefing: {
-        priorInteractions: normalizePreparationInteractions([
-          ...(existingSeed?.briefing.priorInteractions || []).filter(
-            (interaction) => interaction.key !== "desiredOutcome",
-          ),
-          exactOutcomeInteraction,
-        ]),
-        currentQuestion: existingSeed?.briefing.currentQuestion,
+        priorInteractions:
+          existingSeed?.briefing.priorInteractions || [],
+        currentQuestion: MANDATORY_DESIRED_OUTCOME_QUESTION,
       },
       assets: existingSeed?.assets,
       support: existingSeed?.support,
@@ -1776,20 +1830,161 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
     homepagePreparationSeedRef.current = seed;
     savePreparationSession(seed);
-    saveLivePreparationSignals(nextSignals);
-    setSelectedGoal(exactOutcome);
-    setSelectedMissions([exactOutcome]);
-    setAnswers(nextSignals);
     setBriefingSufficient(false);
-    setOptionalQuestion(null);
-    setOptionalAnswer("");
+    setOptionalQuestion(MANDATORY_DESIRED_OUTCOME_QUESTION);
+    setOptionalAnswer(exactOutcome);
     setAcceptedConversationMode("live_briefing");
     setPendingExplicitConversationMode(null);
     setHeldAmbiguousTurn(null);
     setHomepageConversationError("");
     setHomepageConversationSequence({ stage: "question", message: "" });
     setPhase("optional");
-    void requestHomepageOperationalJudgment(seed);
+
+    void submitHomepagePreparationTurn({
+      pendingQuestion: MANDATORY_DESIRED_OUTCOME_QUESTION,
+      submission: exactOutcome,
+      seed,
+    });
+  }
+
+  function submitMandatoryLiveCommunicationMedium() {
+    if (homepageAssessmentInFlightRef.current) return;
+    if (optionalQuestion?.key !== "communicationMedium") return;
+
+    const exactMedium = optionalAnswer.trim();
+    if (!exactMedium) return;
+
+    const seed = homepagePreparationSeedRef.current;
+    if (!seed || seed.provenance.entrySource !== "homepage") return;
+
+    void submitHomepagePreparationTurn({
+      pendingQuestion: MANDATORY_COMMUNICATION_MEDIUM_QUESTION,
+      submission: exactMedium,
+      seed,
+    });
+  }
+
+  function commitMandatoryDesiredOutcome(
+    seed: PreparationSessionV1,
+    exactOutcome: string,
+  ) {
+    const nextSignals = {
+      desiredOutcome: exactOutcome,
+      broadGoal: exactOutcome,
+    };
+    const exactOutcomeInteraction = {
+      key: MANDATORY_DESIRED_OUTCOME_QUESTION.key,
+      question: MANDATORY_DESIRED_OUTCOME_QUESTION.question,
+      answer: exactOutcome,
+      status: "answered" as const,
+      evidenceNeed: MANDATORY_DESIRED_OUTCOME_QUESTION.evidenceNeed,
+      purpose: MANDATORY_DESIRED_OUTCOME_QUESTION.purpose,
+    };
+
+    const nextSession = createPreparationSession({
+      preparationSessionId: seed.preparationSessionId,
+      provenance: seed.provenance,
+      createdAt: seed.createdAt,
+      updatedAt: Date.now(),
+      knowledge: {
+        ...seed.knowledge,
+        objective: exactOutcome,
+        additionalSignals: {
+          ...seed.knowledge.additionalSignals,
+          ...nextSignals,
+        },
+      },
+      briefing: {
+        priorInteractions: normalizePreparationInteractions([
+          ...seed.briefing.priorInteractions.filter(
+            (interaction) => interaction.key !== "desiredOutcome",
+          ),
+          exactOutcomeInteraction,
+        ]),
+        currentQuestion: MANDATORY_COMMUNICATION_MEDIUM_QUESTION,
+      },
+      assets: seed.assets,
+      support: seed.support,
+      workflow: seed.workflow,
+      relations: seed.relations,
+    });
+
+    homepagePreparationSeedRef.current = nextSession;
+    savePreparationSession(nextSession);
+    saveLivePreparationSignals(nextSignals);
+    setSelectedGoal(exactOutcome);
+    setSelectedMissions([exactOutcome]);
+    setAnswers(nextSignals);
+    setBriefingSufficient(false);
+    setOptionalQuestion(MANDATORY_COMMUNICATION_MEDIUM_QUESTION);
+    setOptionalAnswer("");
+    setPhase("optional");
+
+    return nextSession;
+  }
+
+  function commitMandatoryLiveCommunicationMedium(
+    seed: PreparationSessionV1,
+    exactMedium: string,
+  ) {
+    const mediumInteraction = {
+      key: MANDATORY_COMMUNICATION_MEDIUM_QUESTION.key,
+      question: MANDATORY_COMMUNICATION_MEDIUM_QUESTION.question,
+      answer: exactMedium,
+      status: "answered" as const,
+      evidenceNeed: MANDATORY_COMMUNICATION_MEDIUM_QUESTION.evidenceNeed,
+      purpose: MANDATORY_COMMUNICATION_MEDIUM_QUESTION.purpose,
+    };
+
+    const nextSession = createPreparationSession({
+      preparationSessionId: seed.preparationSessionId,
+      provenance: seed.provenance,
+      createdAt: seed.createdAt,
+      updatedAt: Date.now(),
+      knowledge: {
+        ...seed.knowledge,
+        communicationMedium: exactMedium,
+        additionalSignals: {
+          ...seed.knowledge.additionalSignals,
+          communicationMedium: exactMedium,
+        },
+      },
+      briefing: {
+        priorInteractions: normalizePreparationInteractions([
+          ...seed.briefing.priorInteractions.filter(
+            (interaction) => interaction.key !== "communicationMedium",
+          ),
+          mediumInteraction,
+        ]),
+        currentQuestion: null,
+      },
+      assets: seed.assets,
+      support: seed.support,
+      workflow: seed.workflow,
+      relations: seed.relations,
+    });
+
+    const nextAnswers = {
+      ...answers,
+      communicationMedium: exactMedium,
+    };
+
+    homepagePreparationSeedRef.current = nextSession;
+    savePreparationSession(nextSession);
+    saveLivePreparationSignals(nextAnswers);
+
+    setAnswers(nextAnswers);
+    setOptionalAnswer("");
+    setOptionalQuestion(null);
+    setBriefingSufficient(false);
+    setAcceptedConversationMode("live_briefing");
+    setPendingExplicitConversationMode(null);
+    setHeldAmbiguousTurn(null);
+    setHomepageConversationError("");
+    setHomepageConversationSequence({ stage: "question", message: "" });
+    setPhase("optional");
+
+    return nextSession;
   }
 
   function resetSelection() {
@@ -1975,6 +2170,11 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     if (phase === "review") {
       setPhase("decision");
     }
+  }
+
+  function enterFinalReview() {
+    setPhase("review");
+    void openFormulaReview();
   }
 
   function beginQuestions() {
@@ -2489,18 +2689,19 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     );
   }
 
-  async function submitHomepageOptionalAnswer(options?: {
-    explicitSelection?: HomepageConversationMode;
-    heldTurn?: HomepageHeldAmbiguousTurn;
-  }) {
+  async function submitHomepagePreparationTurn(
+    options: HomepagePreparationTurnSubmission = {},
+  ) {
     if (homepageAssessmentInFlightRef.current) return;
 
     const heldTurn = options?.heldTurn;
-    const pendingQuestion = heldTurn?.pendingQuestion || optionalQuestion;
-    const exactSubmission = heldTurn?.submission ?? optionalAnswer;
+    const pendingQuestion =
+      heldTurn?.pendingQuestion || options.pendingQuestion || optionalQuestion;
+    const exactSubmission =
+      heldTurn?.submission ?? options.submission ?? optionalAnswer;
     if (!pendingQuestion || !exactSubmission.trim()) return;
 
-    const seed = homepagePreparationSeedRef.current;
+    const seed = options.seed || homepagePreparationSeedRef.current;
     if (!seed || seed.provenance.entrySource !== "homepage") return;
 
     const projectedPreparation =
@@ -2667,13 +2868,74 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       setPendingExplicitConversationMode(null);
       setHeldAmbiguousTurn(null);
       setEditingOptionalQuestionKey(null);
+      const canonicalResponse = String(judgmentResult.message || "").trim();
+      const mandatoryQuestion =
+        pendingQuestion.key === MANDATORY_DESIRED_OUTCOME_QUESTION.key ||
+        pendingQuestion.key === MANDATORY_COMMUNICATION_MEDIUM_QUESTION.key;
+
+      if (mandatoryQuestion) {
+        const mandatoryEvidenceEstablished =
+          classification.providerProposalAccepted === true &&
+          classification.preservePendingQuestion === false;
+
+        if (!mandatoryEvidenceEstablished) {
+          preserveHomepagePendingQuestion(seed, pendingQuestion);
+          setOptionalQuestion(pendingQuestion);
+          setOptionalAnswer("");
+          setBriefingSufficient(false);
+          setPhase("optional");
+
+          await presentHomepageConversationSequence([
+            ...(canonicalAcknowledgment
+              ? [
+                  {
+                    stage: "acknowledgment" as const,
+                    message: canonicalAcknowledgment,
+                  },
+                ]
+              : []),
+            ...(canonicalResponse
+              ? [{ stage: "response" as const, message: canonicalResponse }]
+              : []),
+          ]);
+          return;
+        }
+
+        const nextSession =
+          pendingQuestion.key === MANDATORY_DESIRED_OUTCOME_QUESTION.key
+            ? commitMandatoryDesiredOutcome(seed, exactSubmission)
+            : commitMandatoryLiveCommunicationMedium(seed, exactSubmission);
+
+        await presentHomepageConversationSequence([
+          ...(canonicalAcknowledgment
+            ? [
+                {
+                  stage: "acknowledgment" as const,
+                  message: canonicalAcknowledgment,
+                },
+              ]
+            : []),
+          ...(canonicalResponse
+            ? [{ stage: "response" as const, message: canonicalResponse }]
+            : []),
+        ]);
+
+        if (
+          pendingQuestion.key ===
+          MANDATORY_COMMUNICATION_MEDIUM_QUESTION.key
+        ) {
+          await requestHomepageOperationalJudgment(nextSession);
+          setHomepageConversationSequence({ stage: "question", message: "" });
+        }
+        return;
+      }
+
       const nextSession = applyAcceptedLiveBriefingTurn(
         seed,
         pendingQuestion,
         classification,
         judgmentResult,
       );
-      const canonicalResponse = String(judgmentResult.message || "").trim();
       setOptionalAnswer("");
       setBriefingSufficient(false);
       setPhase("optional");
@@ -2718,6 +2980,13 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
         setOptionalQuestionLoading(false);
       }
     }
+  }
+
+  async function submitHomepageOptionalAnswer(options?: {
+    explicitSelection?: HomepageConversationMode;
+    heldTurn?: HomepageHeldAmbiguousTurn;
+  }) {
+    return submitHomepagePreparationTurn(options);
   }
 
   function selectHomepageConversationMode(mode: HomepageConversationMode) {
@@ -2930,8 +3199,31 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
         ]),
         currentQuestion: optionalQuestion,
       },
-      assets: seed.assets,
-      support: seed.support,
+      assets: {
+        ...seed.assets,
+        ...(activeFormula && activeFormulaSource
+          ? {
+              formula: {
+                id: activeFormula.id,
+                version: activeFormula.version,
+                source: activeFormulaSource,
+              },
+            }
+          : {}),
+      },
+      support: {
+        ...seed.support,
+        overrides: {
+          ...seed.support.overrides,
+          ...(homepageReceiverConfirmed && homepageReceiverProfile
+            ? { receiver: homepageReceiverProfile }
+            : {}),
+        },
+        confirmations: {
+          ...seed.support.confirmations,
+          receiverConfirmed: homepageReceiverConfirmed,
+        },
+      },
       workflow: {
         current: checkpoint,
         history: seed.workflow.history,
@@ -2939,6 +3231,10 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       relations: seed.relations,
     });
   }, [
+    activeFormula,
+    activeFormulaSource,
+    homepageReceiverConfirmed,
+    homepageReceiverProfile,
     answers,
     optionalAnswers,
     optionalQuestion,
@@ -2995,11 +3291,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
         assets: homepagePreparationSession.assets,
         support: homepagePreparationSession.support,
         workflow: {
-          current: {
-            surface: "ready_room",
-            phase: "readiness",
-            section: "support",
-          },
+          current: { surface: "strategy" },
           history: [homepagePreparationSession.workflow.current],
         },
         relations: homepagePreparationSession.relations,
@@ -3062,14 +3354,13 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       );
     } catch {}
 
-    window.location.href =
-      "/george/live-entry?source=homepage&stage=formula";
+    window.location.href = "/george/live-entry?source=homepage";
   }
 
   return (
     <section
       ref={surfaceRef}
-      className={`relative min-h-[100dvh] scroll-mt-4 border-t border-white/[0.08] px-6 pb-16 pt-8 transition-colors duration-700 sm:px-8 sm:pb-20 sm:pt-10 ${
+      className={`relative min-h-[100dvh] scroll-mt-4 border-t border-white/[0.08] px-6 pb-16 pt-4 transition-colors duration-700 sm:px-8 sm:pb-20 sm:pt-10 ${
         isMissionTransition
           ? "bg-[#020304] max-sm:px-3 max-sm:py-3"
           : "bg-black"
@@ -3077,7 +3368,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     >
       <div className="mx-auto w-full max-w-5xl">
         {phase === "selection" ? (
-          <div className="mx-auto flex min-h-[62dvh] w-full max-w-3xl items-center animate-[fadeIn_420ms_ease-out]">
+          <div className="mx-auto flex min-h-[62dvh] w-full max-w-3xl items-start sm:items-center animate-[fadeIn_420ms_ease-out]">
             <form
               className="w-full min-w-0 py-8 sm:py-12"
               onSubmit={(event) => {
@@ -3085,18 +3376,12 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                 captureDesiredOutcome();
               }}
             >
-              <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-[#AEB6FF]/62">
-                Desired outcome
-              </div>
               <label
                 htmlFor="homepage-desired-outcome"
-                className="mt-4 block max-w-2xl font-mono text-[24px] font-semibold leading-[1.22] tracking-[-0.04em] text-white sm:text-[34px]"
+                className="block max-w-2xl font-mono text-[18px] font-normal leading-7 tracking-[-0.025em] text-white/70 sm:text-[22px] sm:leading-8"
               >
-                What do you want this conversation to accomplish?
+                {openingQuestionText}
               </label>
-              <p className="mt-4 max-w-xl text-[13px] leading-6 text-white/44 sm:text-[14px]">
-                Start with the result in your own words. GEORGE can determine the next best question to materially improve the likelihood of a successful conclusion.
-              </p>
               <textarea
                 id="homepage-desired-outcome"
                 autoFocus
@@ -3114,8 +3399,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                   }
                 }}
                 rows={3}
-                placeholder="Describe the outcome you want"
-                className="mt-8 min-h-[118px] w-full min-w-0 resize-none border-x-0 border-b border-t-0 border-white/[0.16] bg-transparent px-0 py-3 text-[17px] leading-7 text-white outline-none transition placeholder:text-white/24 focus:border-[#7EA1FF]/65 focus:ring-0 sm:text-[19px]"
+                className="mt-6 min-h-[118px] w-full min-w-0 resize-none border-x-0 border-b border-t-0 border-white/[0.16] bg-transparent px-0 py-3 text-[17px] leading-7 text-white outline-none transition focus:border-[#7EA1FF]/65 focus:ring-0 sm:text-[19px]"
               />
               <div className="mt-6 flex justify-end">
                 <button
@@ -3190,9 +3474,12 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                   {homepageConversationSequence.stage === "transitioning" ? (
                     <div
                       aria-live="polite"
-                      className="min-h-[172px] opacity-0 transition-opacity duration-200 motion-reduce:transition-none"
+                      aria-busy={optionalQuestionLoading}
+                      className="min-h-[172px] animate-[fadeIn_160ms_ease-out] motion-reduce:animate-none"
                     >
-                      {optionalQuestion?.question || "GEORGE"}
+                      <h3 className="mt-3 min-h-[88px] max-w-4xl font-mono text-[20px] leading-8 tracking-[-0.025em] text-white/42 sm:text-[24px]">
+                        {optionalQuestion?.question || "GEORGE"}
+                      </h3>
                     </div>
                   ) : homepageConversationSequence.stage === "acknowledgment" ||
                     homepageConversationSequence.stage === "response" ? (
@@ -3250,7 +3537,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                     </p>
                   ) : optionalQuestion ? (
                     <>
-                      <h3 className="mt-3 min-h-[58px] max-w-4xl font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px]">
+                      <h3 className="mt-3 min-h-[58px] max-w-4xl font-mono text-[20px] leading-8 tracking-[-0.025em] text-white/70 sm:text-[24px]">
                         {optionalQuestionText}
                       </h3>
                       <p className="mt-2 min-h-5 max-w-3xl text-[12px] leading-5 text-white/42">
@@ -3290,7 +3577,11 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                         onKeyDown={(event) => {
                           if (event.key === "Enter" && !event.shiftKey) {
                             event.preventDefault();
-                            submitHomepageOptionalAnswer();
+                            if (optionalQuestion?.key === "communicationMedium") {
+                              submitMandatoryLiveCommunicationMedium();
+                            } else {
+                              submitHomepageOptionalAnswer();
+                            }
                           }
                         }}
                         rows={3}
@@ -3388,11 +3679,20 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                         </div>
                         <button
                           type="button"
-                          onClick={() =>
-                            optionalAnswer.trim()
-                              ? void submitHomepageOptionalAnswer()
-                              : skipHomepageOptionalQuestion()
-                          }
+                          onClick={() => {
+                            if (optionalQuestion?.key === "communicationMedium") {
+                              if (optionalAnswer.trim()) {
+                                submitMandatoryLiveCommunicationMedium();
+                              }
+                              return;
+                            }
+
+                            if (optionalAnswer.trim()) {
+                              void submitHomepageOptionalAnswer();
+                            } else {
+                              skipHomepageOptionalQuestion();
+                            }
+                          }}
                           disabled={optionalQuestionLoading}
                           className={`min-w-[92px] rounded-[10px] border px-5 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.17em] transition disabled:cursor-not-allowed disabled:opacity-30 ${
                             optionalAnswer.trim()
@@ -3400,7 +3700,11 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                               : "border-white/[0.12] text-white/52 hover:border-white/25 hover:text-white"
                           }`}
                         >
-                          {optionalAnswer.trim() ? "Submit" : "Skip"}
+                          {optionalQuestion?.key === "communicationMedium"
+                            ? "Continue"
+                            : optionalAnswer.trim()
+                              ? "Submit"
+                              : "Skip"}
                         </button>
                       </div>
                     </>
@@ -3427,11 +3731,11 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                   <div className="mt-6 flex justify-start">
                     <button
                       type="button"
-                      onClick={() => setPhase("review")}
+                      onClick={enterFinalReview}
                       disabled={!briefingSufficient}
                       className="min-w-[190px] rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
                     >
-                      ENTER LIVE
+                      REVIEW AND PREPARE LIVE
                     </button>
                   </div>
                 </div>
@@ -3439,36 +3743,90 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
               {phase === "review" && (
                 <div className="pt-7 animate-[fadeIn_420ms_ease-out]">
-                  <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/56">
-                    Review answers
-                  </div>
-                  <div className="mt-5 space-y-3">
-                    {[
-                      {
-                        key: "role",
-                        label: "Role",
-                        value: answers.role || selectedRole?.label || "",
-                      },
-                      {
-                        key: "broadGoal",
-                        label: "Objectives",
-                        value: answers.broadGoal || selectedGoal || "",
-                      },
-                    ]
-                      .filter((item) => String(item.value || "").trim())
-                      .map((item) => (
-                        <div
-                          key={item.key}
-                          className="rounded-[16px] border border-white/[0.08] bg-white/[0.02] p-4"
-                        >
-                          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/38">
-                            {item.label}
+                  <div className="mt-6 border-t border-white/[0.08] pt-6">
+                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-[#AEB6FF]/46">
+                      Recommended strategy
+                    </div>
+
+                    {formulaLoading ? (
+                      <p className="mt-3 text-[13px] leading-6 text-white/48">
+                        GEORGE is selecting the strongest strategy for this conversation.
+                      </p>
+                    ) : activeFormula ? (
+                      <div className="mt-3 rounded-[16px] border border-[#7EA1FF]/24 bg-[#7EA1FF]/[0.04] p-4">
+                        <p className="text-[15px] font-medium leading-6 text-white/86">
+                          {activeFormula.name}
+                        </p>
+
+                        {activeFormula.bestUsedFor ? (
+                          <p className="mt-2 text-[13px] leading-6 text-white/58">
+                            {activeFormula.bestUsedFor}
                           </p>
-                          <p className="mt-2 text-[14px] leading-6 text-white/76">
-                            {item.value}
-                          </p>
-                        </div>
-                      ))}
+                        ) : null}
+
+                        {activeFormula.steps?.length ? (
+                          <div className="mt-4 space-y-2">
+                            {activeFormula.steps.map((step, index) => (
+                              <div
+                                key={`${activeFormula.id}-step-${index}`}
+                                className="flex items-start gap-3 text-[13px] leading-6 text-white/68"
+                              >
+                                <span className="shrink-0 font-mono text-[9px] text-[#AEB6FF]/58">
+                                  {String(index + 1).padStart(2, "0")}
+                                </span>
+                                <span>
+                                  {[
+                                    step.signalType &&
+                                      `When ${step.signalType.replace(/_/g, " ")}`,
+                                    step.actionType &&
+                                      step.actionType.replace(/_/g, " "),
+                                    step.expectedTransition &&
+                                      `until ${step.expectedTransition.replace(/_/g, " ")}`,
+                                  ]
+                                    .filter(Boolean)
+                                    .join(", ")}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : null}
+
+                        {missionTier === "brilliant" &&
+                        alternativeFormulas.length > 0 ? (
+                          <details className="mt-5 border-t border-white/[0.08] pt-4">
+                            <summary className="cursor-pointer font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#AEB6FF]/68">
+                              Other strategies
+                            </summary>
+                            <div className="mt-3 space-y-2">
+                              {alternativeFormulas.map((formula) => (
+                                <button
+                                  key={formula.id}
+                                  type="button"
+                                  onClick={() => {
+                                    setActiveFormula(formula);
+                                    setActiveFormulaSource("user");
+                                  }}
+                                  className="block w-full rounded-[12px] border border-white/[0.08] px-3 py-3 text-left transition hover:border-[#7EA1FF]/32"
+                                >
+                                  <span className="block text-[13px] leading-5 text-white/72">
+                                    {formula.name}
+                                  </span>
+                                  {formula.bestUsedFor ? (
+                                    <span className="mt-1 block text-[11px] leading-5 text-white/42">
+                                      {formula.bestUsedFor}
+                                    </span>
+                                  ) : null}
+                                </button>
+                              ))}
+                            </div>
+                          </details>
+                        ) : null}
+                      </div>
+                    ) : formulaError ? (
+                      <p className="mt-3 text-[12px] leading-5 text-white/42">
+                        Strategy recommendation is unavailable right now.
+                      </p>
+                    ) : null}
                   </div>
 
                   {Object.keys(optionalAnswers).length > 0 && (
@@ -3505,11 +3863,53 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                     </div>
                   )}
 
+                  <div className="mt-7 border-t border-white/[0.08] pt-6">
+                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-[#AEB6FF]/46">
+                      How should I reach you?
+                    </div>
+                    <p className="mt-2 max-w-2xl text-[12px] leading-5 text-white/42">
+                      Choose how you want GEORGE to deliver support during LIVE.
+                    </p>
+
+                    <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                      {LIVE_RECEIVER_PROFILE_PANELS.map((panel) => {
+                        const selected =
+                          homepageReceiverConfirmed &&
+                          homepageReceiverProfile === panel.id;
+
+                        return (
+                          <button
+                            key={panel.id}
+                            type="button"
+                            onClick={() => {
+                              setHomepageReceiverProfile(panel.id);
+                              setHomepageReceiverConfirmed(true);
+                            }}
+                            className={`text-left transition ${
+                              selected
+                                ? "border-l border-[#AFC0FF]/54 pl-3"
+                                : "border-l border-white/[0.08] pl-3 hover:border-white/[0.18]"
+                            }`}
+                          >
+                            <span className="block font-mono text-[10px] font-semibold uppercase tracking-[0.17em] text-white/72">
+                              {panel.label}
+                            </span>
+                            <span className="mt-1.5 block text-[11px] leading-5 text-white/40">
+                              {panel.line}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   <div className="mt-7 flex justify-center gap-3">
                     <button
                       type="button"
                       onClick={approveAndContinueToLive}
-                      disabled={!briefingSufficient}
+                      disabled={
+                        !briefingSufficient || !homepageReceiverConfirmed
+                      }
                       className="min-w-[190px] rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
                     >
                       Approve and continue
@@ -3540,18 +3940,25 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                 <span className="mt-3 block space-y-2 text-[13px] leading-6 text-white/64">
                   {currentUnderstandingSignals.map((signal, index) => (
                     <span
-                      key={`${signal}-${index}`}
+                      key={`${signal.text}-${index}`}
                       className="flex items-start gap-2"
                     >
-                      <span aria-hidden="true" className="text-[#AEB6FF]/78">
-                        ✓
+                      <span
+                        aria-hidden="true"
+                        className={
+                          signal.authority === "provisional"
+                            ? "text-white/34"
+                            : "text-[#AEB6FF]/78"
+                        }
+                      >
+                        {signal.authority === "provisional" ? "~" : "✓"}
                       </span>
-                      <span className="min-w-0 break-words">{signal}</span>
+                      <span className="min-w-0 break-words">{signal.text}</span>
                     </span>
                   ))}
                 </span>
                 <span className="mt-3 block text-[11px] leading-5 text-white/34">
-                  Edit anything I have misunderstood, or add what I should know.
+                  This is what GEORGE understands so far. Edit anything that isn't right. My understanding may change as you answer and I determine how best to use Communication Intelligence to help you achieve your goal.
                 </span>
                 {currentUnderstandingStatus === "preserved" ? (
                   <span className="mt-3 block font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-[#AEB6FF]/64">

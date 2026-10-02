@@ -22,8 +22,6 @@ export function tryLiveFastPath(params: {
   const input = String(params.input || '').trim()
   const lower = input.toLowerCase()
   const objective = String(params.objective || '').trim()
-  const room = String(params.room || '').trim()
-  const chair = String(params.chair || '').trim()
 
   if (!input) return { handled: false }
 
@@ -58,39 +56,6 @@ export function tryLiveFastPath(params: {
       handled: true,
       content: recent,
       serving: serve(['Continuation']),
-      source: 'live_fast_path',
-    }
-  }
-
-  if (/\b(shorter|keep this tight|tighten it)\b/i.test(lower)) {
-    return {
-      handled: true,
-      content: objective
-        ? `Keep it tight: bring this back to ${objective}, then ask for the next clear step.`
-        : "Keep it tight: make one point, ask one question, and stop.",
-      serving: serve(['Cues', 'Advise']),
-      source: 'live_fast_path',
-    }
-  }
-
-  if (/\b(what should i say first|how should i start|open with)\b/i.test(lower)) {
-    const target = objective || 'the outcome'
-    const context = [chair, room].filter(Boolean).join(' in ')
-    return {
-      handled: true,
-      content: context
-        ? `Start here: “I want to frame this clearly from my position as ${context}. The outcome I’m trying to move toward is ${target}.”`
-        : `Start here: “I want to frame this clearly. The outcome I’m trying to move toward is ${target}.”`,
-      serving: serve(['Continuation', 'Advise']),
-      source: 'live_fast_path',
-    }
-  }
-
-  if (/\b(close with|close this|wrap this)\b/i.test(lower)) {
-    return {
-      handled: true,
-      content: "Close with the next step, who owns it, and when it happens.",
-      serving: serve(['Close', 'Cues']),
       source: 'live_fast_path',
     }
   }

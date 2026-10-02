@@ -1,5 +1,10 @@
 import type { GeorgeActionCue } from '@/lib/george/live-hub/types'
 import type { GeorgeLiveDeliveryStyle } from '@/lib/george/live-contracts'
+import type {
+  GeorgeAudioDeliverySemantics,
+  GeorgeAudioDeliveryState,
+  GeorgeRepeatableSpeechUptake,
+} from './audio-semantics'
 export type { GeorgeLiveDeliveryStyle } from '@/lib/george/live-contracts'
 
 export type GeorgeDeliveryMode = 'voice' | 'visual' | 'silent'
@@ -24,6 +29,7 @@ export type GeorgeDeliveryCue = {
   confidence: number
   priority: number
   at: number
+  audioSemantics?: GeorgeAudioDeliverySemantics
 }
 
 export type GeorgeDeliveryContext = {
@@ -34,4 +40,6 @@ export type GeorgeDeliveryContext = {
   objective?: string
   knownContext?: string
   pressure?: string
+  audioDeliveryState?: GeorgeAudioDeliveryState
+  repeatableSpeechUptake?: GeorgeRepeatableSpeechUptake
 }

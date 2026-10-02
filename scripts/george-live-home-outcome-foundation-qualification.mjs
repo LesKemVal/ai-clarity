@@ -15,33 +15,129 @@ const section = (source, start, end) => {
 }
 
 const homepage = read('components/home/HomeConversationTypeSurface.tsx')
+const rootPage = read('app/page.tsx')
+const compatibilityRoute = read('app/george/live-home/page.tsx')
+const proxy = read('proxy.ts')
+const manifest = read('app/manifest.ts')
+const layout = read('app/layout.tsx')
 const liveEntry = read('app/george/live-entry/LiveEntryClient.tsx')
 const runtimeSupport = read('lib/george/live-runtime/prep-runtime.ts')
 
-const outcomeCapture = section(homepage, 'function captureDesiredOutcome()', 'function resetSelection()')
+const outcomeCapture = section(homepage, 'function captureDesiredOutcome()', 'function submitMandatoryLiveCommunicationMedium()')
+const outcomeCommit = section(homepage, 'function commitMandatoryDesiredOutcome(', 'function commitMandatoryLiveCommunicationMedium(')
+const mediumCommit = section(homepage, 'function commitMandatoryLiveCommunicationMedium(', 'function resetSelection()')
+const turnAssessment = section(homepage, 'async function submitHomepagePreparationTurn(', 'async function submitHomepageOptionalAnswer(')
 const roleSelection = section(homepage, 'function selectRole(role: HomepageRole)', 'function captureDesiredOutcome()')
 const questionRequest = section(homepage, 'async function requestHomepageOperationalJudgment(', 'function editCurrentUnderstanding()')
 const understandingProjection = section(homepage, 'const supportedCurrentUnderstanding = useMemo(() =>', 'const currentOperationalPromise =')
 const understandingEdit = section(homepage, 'function editCurrentUnderstanding()', 'function cancelCurrentUnderstandingEdit()')
-const understandingPreservation = section(homepage, 'function preserveCurrentUnderstanding()', 'async function submitHomepageOptionalAnswer(')
+const understandingPreservation = section(homepage, 'function preserveCurrentUnderstanding()', 'async function submitHomepagePreparationTurn(')
 const sessionProjection = section(homepage, 'const homepagePreparationSession = useMemo(() =>', 'useEffect(() => {\n    if (!homepagePreparationSession)')
 const handoff = section(homepage, 'function preserveHomepageHandoff(', 'function approveAndContinueToLive()')
 const renderedSurface = section(homepage, '  return (\n    <section', '\n  );\n}')
+const desiredOutcomeQuestion = section(
+  homepage,
+  'const MANDATORY_DESIRED_OUTCOME_QUESTION:',
+  'const HOMEPAGE_QUESTION_TYPEWRITER_SPEED_MS',
+)
+const questionTypewriters = section(
+  homepage,
+  'const optionalQuestionText = useTypewriter(',
+  'const visibleConversationMode =',
+)
 
 assert(
-  renderedSurface.includes('What do you want this conversation to accomplish?') &&
-    renderedSurface.indexOf('What do you want this conversation to accomplish?') < renderedSurface.indexOf('{optionalQuestionText}'),
-  '/george/live-home does not begin outcome-first before the preparation question',
+  rootPage.includes('COMMUNICATION INTELLIGENCE') &&
+    rootPage.includes('Answer in your own words. GEORGE can determine the next best question') &&
+    rootPage.includes('to materially improve the likelihood of a successful conclusion.') &&
+    !rootPage.includes('Start with the result.') &&
+    rootPage.includes('<HomeConversationTypeSurface />') &&
+    !rootPage.includes('useTypewriter') &&
+    !rootPage.includes('router.push') &&
+    !rootPage.includes('redirect('),
+  'the domain root is not the stable canonical GEORGE front door',
+)
+assert(
+  rootPage.indexOf('COMMUNICATION INTELLIGENCE') <
+      rootPage.indexOf('Answer in your own words. GEORGE can determine the next best question') &&
+    !homepage.includes('Describe the outcome you want') &&
+    !homepage.includes('placeholder="Describe the outcome you want"'),
+  'the opening still contains redundant hierarchy or outcome instructions',
+)
+assert(
+  compatibilityRoute.trim() === 'export { default } from "../../page";' &&
+    !compatibilityRoute.includes('HomeConversationTypeSurface'),
+  '/george/live-home still owns an independent homepage implementation',
+)
+assert(
+  proxy.includes("'/api/chat'") &&
+    proxy.includes("'/api/founder-code'") &&
+    proxy.includes("'/api/continuity/request-link'") &&
+    !proxy.includes("matcher: ['/:") &&
+    !rootPage.includes('/api/') &&
+    !rootPage.includes('/_next/') &&
+    !rootPage.includes('live-hub'),
+  'root routing can capture API, Next asset, or LIVE Hub/service traffic',
+)
+assert(
+  manifest.includes("start_url: '/'") &&
+    layout.includes("canonical: '/'") &&
+    layout.includes("url: 'https://www.branesx.com/'"),
+  'project-side application or canonical metadata still starts away from the domain root',
+)
+
+assert(
+  desiredOutcomeQuestion.includes('question: "What would you like to accomplish today?"') &&
+    renderedSurface.includes('{openingQuestionText}') &&
+    renderedSurface.includes('htmlFor="homepage-desired-outcome"') &&
+    renderedSurface.indexOf('{openingQuestionText}') < renderedSurface.indexOf('{optionalQuestionText}'),
+  'the root front door does not begin with the required conversational question',
+)
+assert(
+  homepage.includes('const HOMEPAGE_QUESTION_TYPEWRITER_SPEED_MS = 10;') &&
+    questionTypewriters.includes('HOMEPAGE_QUESTION_TYPEWRITER_SPEED_MS') &&
+    questionTypewriters.includes('phase === "selection"') &&
+    questionTypewriters.includes('MANDATORY_DESIRED_OUTCOME_QUESTION.question'),
+  'opening and subsequent canonical questions do not share the faster question-only typewriter',
+)
+assert(
+  renderedSurface.includes('aria-busy={optionalQuestionLoading}') &&
+    renderedSurface.includes('{optionalQuestion?.question || "GEORGE"}') &&
+    !renderedSurface.includes('min-h-[172px] opacity-0'),
+  'the active question disappears into a dead blank state while canonical reasoning is pending',
 )
 assert(
   outcomeCapture.includes('if (!exactOutcome.trim()) return;') &&
-    outcomeCapture.includes('objective: exactOutcome') &&
-    outcomeCapture.includes('desiredOutcome: exactOutcome') &&
-    outcomeCapture.includes('answer: exactOutcome') &&
-    outcomeCapture.includes('status: "answered" as const') &&
-    outcomeCapture.indexOf('savePreparationSession(seed)') < outcomeCapture.indexOf('requestHomepageOperationalJudgment(seed)') &&
+    outcomeCapture.includes('currentQuestion: MANDATORY_DESIRED_OUTCOME_QUESTION') &&
+    outcomeCapture.includes('submitHomepagePreparationTurn({') &&
+    !outcomeCapture.includes('objective: exactOutcome') &&
+    !outcomeCapture.includes('setSelectedGoal(exactOutcome)') &&
     outcomeCapture.includes('setPhase("optional")'),
-  'the exact outcome is not preserved before the existing question path begins',
+  'Q1 does not remain uncommitted while canonical turn assessment begins',
+)
+assert(
+  turnAssessment.includes('fetch("/api/chat"') &&
+    turnAssessment.includes('preparationTurnIntent: {') &&
+    turnAssessment.includes('classification.providerProposalAccepted === true') &&
+    turnAssessment.includes('classification.preservePendingQuestion === false') &&
+    turnAssessment.indexOf('if (!mandatoryEvidenceEstablished)') <
+      turnAssessment.indexOf('commitMandatoryDesiredOutcome(seed, exactSubmission)'),
+  'mandatory opening evidence is not gated by canonical provider and Operational Judgment authority',
+)
+assert(
+  outcomeCommit.includes('objective: exactOutcome') &&
+    outcomeCommit.includes('desiredOutcome: exactOutcome') &&
+    outcomeCommit.includes('answer: exactOutcome') &&
+    outcomeCommit.includes('status: "answered" as const') &&
+    outcomeCommit.includes('currentQuestion: MANDATORY_COMMUNICATION_MEDIUM_QUESTION'),
+  'accepted Q1 evidence does not establish the outcome before Q2 becomes pending',
+)
+assert(
+  mediumCommit.includes('communicationMedium: exactMedium') &&
+    mediumCommit.includes('currentQuestion: null') &&
+    turnAssessment.indexOf('commitMandatoryLiveCommunicationMedium(seed, exactSubmission)') <
+      turnAssessment.indexOf('requestHomepageOperationalJudgment(nextSession)'),
+  'accepted Q2 evidence does not commit before canonical Operational Judgment continues',
 )
 assert(
   !renderedSurface.includes('Start Briefing') &&
@@ -165,4 +261,4 @@ assert(
   'the conversational surface lost its narrow-width overflow protections',
 )
 
-console.log('GEORGE live-home LH-1/LH-1C qualification: PASS')
+console.log('GEORGE root front-door and live-home compatibility qualification: PASS')

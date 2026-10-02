@@ -88,7 +88,17 @@ assert(
   'Normal LIVE control must preserve two-tap orientation choreography',
 )
 assert(
-  homepageEntry.includes('requestHomepageOperationalJudgment(seed)') &&
+  homepageEntry.includes(
+    'currentQuestion: MANDATORY_DESIRED_OUTCOME_QUESTION',
+  ) &&
+    homepageEntry.includes('submitHomepagePreparationTurn({') &&
+    homepageEntry.includes(
+      'classification.providerProposalAccepted === true',
+    ) &&
+    homepageEntry.includes(
+      'classification.preservePendingQuestion === false',
+    ) &&
+    homepageEntry.includes('requestHomepageOperationalJudgment(nextSession)') &&
     !homepageEntry.includes('requestHomepageOptionalQuestion({}, [], nextSignals)') &&
     !homepageEntry.includes('Continue to preparation →') &&
     !homepageEntry.includes('Start Briefing →') &&

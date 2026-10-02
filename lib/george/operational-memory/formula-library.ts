@@ -120,33 +120,54 @@ export function scoreOperationalFormula(
     return null;
   }
 
-  let score = formula.confidence * 0.5;
+  /*
+   * Formula retrieval first establishes eligibility above. Ranking then asks a
+   * different question: among eligible strategies, which has the strongest
+   * contextual evidence of succeeding here?
+   *
+   * Scope controls access. It is not evidence that a strategy will succeed,
+   * so personal / organization / general ownership receives no ranking bonus.
+   *
+   * This is a contextual success score, not a calibrated probability.
+   */
+  const sampleCount = Math.max(0, formula.sampleCount || 0);
+  const successCount = Math.max(0, formula.successCount || 0);
+  const contradictionCount = Math.max(0, formula.contradictionCount || 0);
+
+  // Use a neutral prior equivalent to several unknown executions so that
+  // tiny samples remain informative without dominating established evidence.
+  // This is ranking evidence, not a calibrated probability of success.
+  const priorWeight = 6;
+  const priorSuccessRate = 0.5;
+  const contextualSuccessEvidence =
+    (successCount + priorWeight * priorSuccessRate) /
+    (sampleCount + priorWeight);
+  const evidenceReliability = sampleCount / (sampleCount + priorWeight);
+
+  let score =
+    formula.confidence * 0.30 +
+    contextualSuccessEvidence * 0.32;
+
   reasons.push(`confidence:${formula.confidence.toFixed(2)}`);
+  reasons.push(`execution_success:${successCount}/${sampleCount}`);
+  reasons.push(
+    `contextual_success_evidence:${contextualSuccessEvidence.toFixed(2)}`,
+  );
+  reasons.push(`evidence_reliability:${evidenceReliability.toFixed(2)}`);
 
   if (status === "validated") {
     score += 0.08;
     reasons.push("status:validated");
   } else if (status === "contested") {
-    score -= 0.2;
+    score -= 0.12;
     reasons.push("status:contested");
   } else if (status === "candidate") {
     score -= 0.04;
     reasons.push("status:candidate");
   }
 
-  if (formula.scope === "personal") {
-    score += 0.3;
-    reasons.push("personal");
-  } else if (formula.scope === "organization") {
-    score += 0.2;
-    reasons.push("organization");
-  } else {
-    score += 0.1;
-    reasons.push("general");
-  }
-
   if (context.roomType && formula.roomTypes.includes(context.roomType)) {
-    score += 0.08;
+    score += 0.10;
     reasons.push("room");
   }
 
@@ -154,7 +175,7 @@ export function scoreOperationalFormula(
     context.objectiveType &&
     formula.objectiveTypes.includes(context.objectiveType)
   ) {
-    score += 0.08;
+    score += 0.10;
     reasons.push("objective");
   }
 
@@ -165,10 +186,19 @@ export function scoreOperationalFormula(
 
   if (requiredSignals.length > 0) {
     const prerequisiteMatch = matchedSignals.length / requiredSignals.length;
-    score += prerequisiteMatch * 0.14;
+    score += prerequisiteMatch * 0.10;
     reasons.push(
       `prerequisites:${matchedSignals.length}/${requiredSignals.length}`,
     );
+  }
+
+  // Contradictions are relevant evidence, but they do not declare a Formula
+  // wrong. Their influence is bounded and becomes meaningful with repetition.
+  if (contradictionCount > 0) {
+    const contradictionPressure =
+      contradictionCount / (contradictionCount + 6);
+    score -= contradictionPressure * 0.08;
+    reasons.push(`contradictions:${contradictionCount}`);
   }
 
   return {

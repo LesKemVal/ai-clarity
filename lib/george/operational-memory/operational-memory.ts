@@ -188,9 +188,11 @@ export function createOperationalMemory(
         limit: formulaLimit,
       })
 
-      const rankedFormulas =
-        applyOperationalMemoryRetrievalPolicy(retrievedFormulas)
-          .slice(0, formulaLimit)
+      // Recommendation review consumes the canonical contextual-success order
+      // directly. The narrower retrieval policy is reserved for runtime evidence
+      // injection and must not silently remove otherwise eligible user-review
+      // alternatives.
+      const rankedFormulas = retrievedFormulas.slice(0, formulaLimit)
 
       let recommendedFormula = rankedFormulas[0] ?? null
       const alternativeFormulas = rankedFormulas

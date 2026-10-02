@@ -21,7 +21,7 @@ import { resolveGeorgeCoreLiveExecution } from '${process.cwd()}/lib/george/core
 import { resolveNormalGeorgeReasoning } from '${process.cwd()}/lib/george/runtime/normal-reasoning-governor'
 import { resolvePreProviderSend } from '${process.cwd()}/lib/george/runtime/pre-provider-send-resolution'
 import { resolveCoursesExpandResponse } from '${process.cwd()}/lib/george/runtime/training-runtime'
-import { buildGovernedRuntimeContext, buildNormalProviderRuntimeContext, buildProviderExecutionAuthority } from '${process.cwd()}/lib/george/runtime/runtime-context-composer'
+import { buildGovernedRuntimeContext, buildNormalProviderRuntimeContext, buildProviderExecutionAuthority, createGovernedInvocationContractV1, GOVERNED_INVOCATION_CONTRACT_VERSION } from '${process.cwd()}/lib/george/runtime/runtime-context-composer'
 import { buildOperationalJudgmentNote, resolveOperationalJudgment, resolveProviderOperationalJudgment, resolveSignalAcquisitionJudgment } from '${process.cwd()}/lib/george/runtime/operational-judgment'
 import { buildConversationStrategyNote, resolveGeorgeConversationStrategy } from '${process.cwd()}/lib/george/runtime/conversation-strategy'
 import { buildConversationMoveDefinitionNote, listConversationMoveDefinitions, resolveConversationMoveDefinition, resolveSignalAcquisitionMoveVariant } from '${process.cwd()}/lib/george/runtime/conversation-move-library'
@@ -1007,6 +1007,7 @@ const explicitReplacement = evolveGeorgeOutcomeState({
   previousState: constrainedEvolution.state,
   inferredState: replacementOutcome,
   latestUserText: 'My goal is now to preserve the relationship and secure a second meeting.',
+  primaryOutcomeReplacementAuthorized: true,
 })
 assert(explicitReplacement.kind === 'primary_replaced', 'explicit user direction should permit primary outcome replacement')
 assert(explicitReplacement.state.primaryOutcome === replacementOutcome.primaryOutcome, 'explicit replacement should adopt the new primary outcome')
@@ -1245,8 +1246,20 @@ assert(
 
 
 
-const qualifiedRuntimePipeline = resolveGeorgeRuntimePipeline({
-  currentRuntime: 'normal_george',
+const qualifiedRuntimeInvocation = createGovernedInvocationContractV1({
+  version: GOVERNED_INVOCATION_CONTRACT_VERSION,
+  source: 'website_adapter',
+  provenance: {
+    adapter: 'app_api_chat',
+    userInput: 'current_conversation',
+    sessionAuthority: 'authenticated_session',
+    preparationEvidence: 'none',
+    operationalMemoryEvidence: 'none',
+    runtimeInference: 'bounded_runtime_evidence',
+    providerProposal: 'excluded_from_invocation_authority',
+  },
+  input: {
+    currentRuntime: 'normal_george',
   latestUserText: 'I am walking into an investor meeting right now.',
   previousUserText: 'Help me prepare for an investor meeting while preserving founder control.',
   voiceMode: false,
@@ -1307,6 +1320,7 @@ const qualifiedRuntimePipeline = resolveGeorgeRuntimePipeline({
     layeredExplanationTolerance: 0.5,
   },
   liveRecommendationEvidence,
+  operationalSignals: [],
   providerPrompt: {
     languageRule: 'LANGUAGE',
     modeBlock: 'MODE',
@@ -1322,15 +1336,26 @@ const qualifiedRuntimePipeline = resolveGeorgeRuntimePipeline({
     includeLiveDiscipline: true,
     recentMessages: [{ role: 'user', content: 'Help me prepare.' }],
   },
-  governedContextNotes: {
-    liveRuntimeContext: 'LIVE CONTEXT',
-    runtimeAdapterNote: 'RUNTIME ADAPTER',
-    responseShapeNote: 'RESPONSE SHAPE',
-    outputGovernanceNote: 'OUTPUT GOVERNANCE',
+    governedContextNotes: {
+      liveRuntimeContext: 'LIVE CONTEXT',
+      runtimeAdapterNote: 'RUNTIME ADAPTER',
+      responseShapeNote: 'RESPONSE SHAPE',
+      outputGovernanceNote: 'OUTPUT GOVERNANCE',
+    },
   },
 })
 
+const qualifiedRuntimePipeline = resolveGeorgeRuntimePipeline(
+  qualifiedRuntimeInvocation,
+)
+
 assert(qualifiedRuntimePipeline.source === 'runtime_pipeline', 'full runtime qualification should use the canonical pipeline')
+assert(
+  qualifiedRuntimePipeline.invocation.version === GOVERNED_INVOCATION_CONTRACT_VERSION &&
+    qualifiedRuntimePipeline.invocation.provenance.providerProposal ===
+      'excluded_from_invocation_authority',
+  'runtime pipeline should preserve governed invocation version and provenance without promoting provider proposals',
+)
 assert(Object.isFrozen(qualifiedRuntimePipeline), 'runtime pipeline snapshot should be immutable')
 assert(
   qualifiedRuntimePipeline.operationalJudgment.outcomeState === qualifiedRuntimePipeline.outcomeState,

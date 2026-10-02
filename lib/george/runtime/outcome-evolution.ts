@@ -29,6 +29,7 @@ export type OutcomeEvolutionInput = {
   latestUserText: string
   previousUserText?: string
   conversationStrategy?: GeorgeConversationStrategy | null
+  primaryOutcomeReplacementAuthorized?: boolean
 }
 
 const clamp01 = (value: number) => Math.max(0, Math.min(1, value))
@@ -79,7 +80,10 @@ export function evolveGeorgeOutcomeState(input: OutcomeEvolutionInput): OutcomeE
     }
   }
 
-  const replacementAllowed = explicitPrimaryReplacement(latestText)
+  const replacementRequested = explicitPrimaryReplacement(latestText)
+  const replacementAllowed =
+    input.primaryOutcomeReplacementAuthorized === true &&
+    replacementRequested
   const primaryOutcome = replacementAllowed
     ? inferred.primaryOutcome
     : previous.primaryOutcome || inferred.primaryOutcome
@@ -87,8 +91,10 @@ export function evolveGeorgeOutcomeState(input: OutcomeEvolutionInput): OutcomeE
   const newSupporting = inferred.supportingOutcomes.filter(
     (item) => !previous.supportingOutcomes.includes(item)
   )
-  const contradiction = contradictionSignal(latestText)
-    ? 'The latest user signal may conflict with an established outcome, constraint, or preference.'
+  const contradiction =
+    contradictionSignal(latestText) ||
+    (replacementRequested && !replacementAllowed)
+    ? 'The latest signal may conflict with an established outcome, constraint, or preference.'
     : undefined
 
   const supportingOutcomes = unique([
@@ -126,7 +132,9 @@ export function evolveGeorgeOutcomeState(input: OutcomeEvolutionInput): OutcomeE
     reason = 'The user explicitly signaled a new governing objective.'
   } else if (contradiction) {
     kind = 'contradiction_detected'
-    reason = 'The latest signal may conflict with the active outcome or its constraints.'
+    reason = replacementRequested && !replacementAllowed
+      ? 'The latest signal lacks established user authority to replace the active primary outcome.'
+      : 'The latest signal may conflict with the active outcome or its constraints.'
   } else if (constraints.length > (previous.constraints || []).length) {
     kind = 'constraint_added'
     reason = 'A user-stated constraint was added without replacing the primary outcome.'

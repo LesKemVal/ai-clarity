@@ -1,8 +1,12 @@
 import { resolveGeorgeCoreLiveExecution } from '@/lib/george/core/live-execution'
 import type { LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
 
+export const CURRENT_TURN_LIVE_OPERATIONAL_JUDGMENT_REQUEST =
+  'current_turn_live_operational_judgment' as const
+
 export type LiveFinalTranscriptAdapterInput = {
   transcript: string
+  speakerEvidence?: unknown
   lastFinalTranscript: LastLiveFinalTranscript | null
   isThinking: boolean
   isSpeaking: boolean
@@ -22,6 +26,7 @@ export function resolveLiveFinalTranscriptAction(input: LiveFinalTranscriptAdapt
 
   const execution = resolveGeorgeCoreLiveExecution({
     transcript,
+    speakerEvidence: input.speakerEvidence,
     lastFinalTranscript: input.lastFinalTranscript,
     routingContext: {
       isThinking: input.isThinking,

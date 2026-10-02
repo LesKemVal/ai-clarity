@@ -6,12 +6,23 @@ import { getGeorgeLiveHubRuntimeAdapter } from '@/lib/george/live-hub/live-runti
 import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import { resolveLiveFinalTranscriptReleaseDelayMs } from '@/lib/george/live-runtime/final-transcript-release-policy'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
+import {
+  normalizeGeorgeLiveSpeakerEvidence,
+  UNCLEAR_GEORGE_LIVE_SPEAKER_EVIDENCE,
+  type GeorgeLiveSpeakerEvidence,
+} from '@/lib/george/core/live-execution'
 
 type LiveHubShadowBridgeProps = {
   active: boolean
   context: GeorgeLiveHubContext
   transcript?: string
   transcriptFinal?: boolean
+  speakerEvidence?: unknown
+  onFinalTranscriptForwarded?: (input: {
+    transcript: string
+    turnId: string
+    speakerEvidence: GeorgeLiveSpeakerEvidence
+  }) => void
 }
 
 export function LiveHubShadowBridge({
@@ -19,13 +30,19 @@ export function LiveHubShadowBridge({
   context,
   transcript,
   transcriptFinal = true,
+  speakerEvidence,
+  onFinalTranscriptForwarded,
 }: LiveHubShadowBridgeProps) {
   const lastForwardedTranscriptRef = useRef('')
   const lastTurnIdRef = useRef('')
   const pendingFinalTranscriptRef = useRef('')
   const pendingFinalTurnIdRef = useRef('')
+  const pendingFinalSpeakerEvidenceRef = useRef<GeorgeLiveSpeakerEvidence>(
+    UNCLEAR_GEORGE_LIVE_SPEAKER_EVIDENCE
+  )
   const finalTranscriptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const deliveryStyleRef = useRef(context.deliveryStyle)
+  const onFinalTranscriptForwardedRef = useRef(onFinalTranscriptForwarded)
 
   const clearFinalTranscriptTimer = () => {
     if (!finalTranscriptTimerRef.current) return
@@ -38,11 +55,17 @@ export function LiveHubShadowBridge({
     clearFinalTranscriptTimer()
     pendingFinalTranscriptRef.current = ''
     pendingFinalTurnIdRef.current = ''
+    pendingFinalSpeakerEvidenceRef.current =
+      UNCLEAR_GEORGE_LIVE_SPEAKER_EVIDENCE
   }
 
   useEffect(() => {
     deliveryStyleRef.current = context.deliveryStyle
   }, [context.deliveryStyle])
+
+  useEffect(() => {
+    onFinalTranscriptForwardedRef.current = onFinalTranscriptForwarded
+  }, [onFinalTranscriptForwarded])
 
   useEffect(() => {
     if (!active) return
@@ -108,7 +131,8 @@ export function LiveHubShadowBridge({
     const forwardTranscript = (
       text: string,
       isFinal: boolean,
-      existingTurnId?: string
+      existingTurnId?: string,
+      finalSpeakerEvidence?: GeorgeLiveSpeakerEvidence
     ) => {
       if (!text) return
       if (lastForwardedTranscriptRef.current === text) return
@@ -135,6 +159,16 @@ export function LiveHubShadowBridge({
         deliveryStyleRef.current
       )
       markRuntimeEvent(turnId, 'hub_transcript_sent')
+
+      if (isFinal) {
+        onFinalTranscriptForwardedRef.current?.({
+          transcript: text,
+          turnId,
+          speakerEvidence:
+            finalSpeakerEvidence ||
+            UNCLEAR_GEORGE_LIVE_SPEAKER_EVIDENCE,
+        })
+      }
     }
 
     if (!transcriptFinal) {
@@ -142,11 +176,25 @@ export function LiveHubShadowBridge({
       return
     }
 
+    const hadPendingFinalTranscript = Boolean(
+      pendingFinalTranscriptRef.current.trim()
+    )
+
     pendingFinalTranscriptRef.current = [pendingFinalTranscriptRef.current, clean]
       .filter(Boolean)
       .join(' ')
       .replace(/\s+/g, ' ')
       .trim()
+
+    const nextSpeakerEvidence = normalizeGeorgeLiveSpeakerEvidence(
+      speakerEvidence
+    )
+    const pendingSpeakerEvidence = pendingFinalSpeakerEvidenceRef.current
+    pendingFinalSpeakerEvidenceRef.current =
+      !hadPendingFinalTranscript ||
+      pendingSpeakerEvidence.speaker === nextSpeakerEvidence.speaker
+        ? nextSpeakerEvidence
+        : UNCLEAR_GEORGE_LIVE_SPEAKER_EVIDENCE
 
     if (!pendingFinalTurnIdRef.current) {
       pendingFinalTurnIdRef.current =
@@ -173,18 +221,26 @@ export function LiveHubShadowBridge({
     finalTranscriptTimerRef.current = setTimeout(() => {
       const finalText = pendingFinalTranscriptRef.current.trim()
       const finalTurnId = pendingFinalTurnIdRef.current
+      const finalSpeakerEvidence = pendingFinalSpeakerEvidenceRef.current
 
       pendingFinalTranscriptRef.current = ''
       pendingFinalTurnIdRef.current = ''
+      pendingFinalSpeakerEvidenceRef.current =
+        UNCLEAR_GEORGE_LIVE_SPEAKER_EVIDENCE
       finalTranscriptTimerRef.current = null
 
       if (!finalText || !finalTurnId) return
 
       markRuntimeEvent(finalTurnId, 'final_transcript_buffer_released')
-      forwardTranscript(finalText, true, finalTurnId)
+      forwardTranscript(
+        finalText,
+        true,
+        finalTurnId,
+        finalSpeakerEvidence
+      )
     }, finalTranscriptReleaseDelayMs)
 
-  }, [active, transcript, transcriptFinal])
+  }, [active, speakerEvidence, transcript, transcriptFinal])
 
   return null
 }

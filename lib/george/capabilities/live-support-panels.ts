@@ -27,17 +27,17 @@ export type LiveReceiverProfilePanel = {
 export const LIVE_SUPPORT_PANELS: LiveSupportPanel[] = [
   {
     id: 'advice',
-    label: 'Adaptive Cue',
-    line: 'Recommended. Begin with concise cues.',
+    label: 'Cue',
+    line: 'Concise advice about what to do or say next.',
     detail:
-      'GEORGE starts with the shortest useful guidance likely to help you reach your desired outcome. GEORGE adapts when a cue alone is not enough for successful execution.',
+      'GEORGE starts with the shortest useful cue. When current signals show that a cue is not enough, the governed runtime may provide more explicit help without changing the approved move.',
   },
   {
     id: 'response',
-    label: 'Adaptive Response',
-    line: 'Begin with concise, complete responses.',
+    label: 'Lines',
+    line: 'Directly usable speech in your voice.',
     detail:
-      'GEORGE starts with the shortest complete response you can use naturally. If complete lines are working, GEORGE leaves them alone. GEORGE may adapt to cues, continuation, recovery, or another operational resource when evidence suggests it would serve you better.',
+      'GEORGE starts with the shortest complete line that can accomplish the approved move. If lines are working, GEORGE keeps them concise. Existing governed runtime evidence may still select a cue, continuation, recovery, or another operational resource when it would serve you better.',
   },
 ]
 

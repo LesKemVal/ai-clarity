@@ -51,6 +51,7 @@ import { buildDeliveryAndForesightBlock } from '@/lib/george/chat/delivery-fores
 import { appendPostResponseNotices } from '@/lib/george/runtime/post-response-governance'
 import { buildPassiveIntentState } from '@/lib/george/runtime/intent-state'
 import { buildGeorgeCoreInterpretation } from '@/lib/george/core/build-interpretation'
+import { normalizeGeorgeLiveSpeakerEvidence } from '@/lib/george/core/live-execution'
 import { buildRuntimeInterpretation } from '@/lib/george/runtime/runtime-interpretation'
 import { buildRuntimeAdapter, buildRuntimeAdapterNote, type GeorgeRuntimeAdapter } from '@/lib/george/runtime/runtime-adapter'
 import { buildEarbudRuntimeNote, detectEarbudRuntime } from '@/lib/george/runtime/earbud-runtime'
@@ -70,7 +71,6 @@ import {
   runNormalExecutionCompletion,
   runNormalSemanticProposal,
   runNormalTextCompletion,
-  type NormalProviderSemanticIntent,
   type NormalProviderSemanticJudgment,
 } from '@/lib/george/runtime/provider/normal-provider'
 import {
@@ -79,6 +79,10 @@ import {
   resolveGeorgeRuntimePipeline,
   selectProviderResolvedGeorgeRuntimeAuthoritySnapshot,
 } from '@/lib/george/runtime/runtime-pipeline'
+import {
+  createGovernedInvocationContractV1,
+  GOVERNED_INVOCATION_CONTRACT_VERSION,
+} from '@/lib/george/runtime/runtime-context-composer'
 import {
   buildNormalLiveOperationalJudgmentResult,
   buildNormalOperationalResponseResult,
@@ -102,6 +106,7 @@ import {
   projectNormalPreparationEvidence,
   projectPreparationSessionForLiveRuntime,
 } from '@/lib/george/live-runtime/live-preparation-controller'
+import { CURRENT_TURN_LIVE_OPERATIONAL_JUDGMENT_REQUEST } from '@/lib/george/live-runtime/live-final-transcript-adapter'
 import { formulateAuthorizedSignalQuestion } from '@/lib/george/live-runtime/authorized-signal-question'
 import { readGeorgeSession } from '@/lib/security/george-session'
 
@@ -824,7 +829,15 @@ export async function POST(req: NextRequest) {
 
     const latestUserRaw = latestUserMessage?.content || ''
     const latestUserSource = latestUserMessage?.source || 'user_input'
-
+    const liveSpeakerEvidence =
+      latestUserSource === 'live_transcript'
+        ? normalizeGeorgeLiveSpeakerEvidence(body?.liveSpeakerEvidence)
+        : latestUserSource === 'third_party_speech'
+          ? normalizeGeorgeLiveSpeakerEvidence({ speaker: 'other_party' })
+          : latestUserSource === 'user_input' ||
+              latestUserSource === 'sidebar_prompt'
+            ? normalizeGeorgeLiveSpeakerEvidence({ speaker: 'user' })
+            : normalizeGeorgeLiveSpeakerEvidence(undefined)
     const control = classifyControlState(latestUserRaw)
     const scores = scoreRuntimeSignals(latestUserRaw)
     const bottleneck = detectLikelyBottleneck(latestUserRaw)
@@ -1221,51 +1234,73 @@ LANGUAGE MODE: SPANISH
       })),
     }
 
-    const runtimePipeline = resolveGeorgeRuntimePipeline({
-      currentRuntime,
-      latestUserText: latestUserRaw,
-      previousUserText,
-      voiceMode,
-      objectiveKnown:
-        Boolean(preparationContext?.objective) ||
-        passiveIntentState.objectiveState !== 'unclear',
-      signalUsable:
-        preparationContext?.evidenceSufficiency === 'sufficient' ||
-        judgmentSurface.signalSufficiency !== 'insufficient',
-      executionImminent: passiveIntentState.executionImminent,
-      tier,
-      hasImageInput,
-      intentState: passiveIntentState,
-      runtimeArbitration,
-      judgmentSurface,
-      continuityRestoration,
-      outcomeSignals: runtimeOutcomeSignals,
-      adaptiveProfile: adaptiveUserProfile,
-      liveRecommendationEvidence,
-      operationalSignals: coreInterpretation.operationalSignals || [],
-      operationalMemoryEvidence,
-      preparationContext,
-      preparationTurnClassificationRequest,
-      providerPrompt,
-      governedContextNotes: {
-        liveRuntimeContext,
-        shelvedCampaignRuntimeNote,
-        individualLiveContextNote,
-        runtimeAdapterNote,
-        earbudRuntimeNote,
-        runtimeSignalArbitrationNote,
-        arbitrationResponseShapeNote,
-        adaptiveUserProfileNote,
-        durableBehavioralMemoryNote,
-        runtimeOutcomeLearningNote,
-        continuityRestorationNote,
-        judgmentSurfaceNote,
-        responseShapeNote,
-        continuityGovernanceNote,
-        outputGovernanceNote,
-        presentationAuthorityNote,
+    const governedInvocation = createGovernedInvocationContractV1({
+      version: GOVERNED_INVOCATION_CONTRACT_VERSION,
+      source: 'website_adapter',
+      provenance: {
+        adapter: 'app_api_chat',
+        userInput: 'current_conversation',
+        inputSpeaker: liveSpeakerEvidence.speaker,
+        sessionAuthority: session
+          ? 'authenticated_session'
+          : 'legacy_request_compatibility',
+        preparationEvidence: preparationContext
+          ? 'validated_preparation_projection'
+          : 'none',
+        operationalMemoryEvidence: operationalMemoryEvidence
+          ? 'authenticated_user_scope'
+          : 'none',
+        runtimeInference: 'bounded_runtime_evidence',
+        providerProposal: 'excluded_from_invocation_authority',
+      },
+      input: {
+        currentRuntime,
+        latestUserText: latestUserRaw,
+        previousUserText,
+        voiceMode,
+        objectiveKnown:
+          Boolean(preparationContext?.objective) ||
+          passiveIntentState.objectiveState !== 'unclear',
+        signalUsable:
+          preparationContext?.evidenceSufficiency === 'sufficient' ||
+          judgmentSurface.signalSufficiency !== 'insufficient',
+        executionImminent: passiveIntentState.executionImminent,
+        tier,
+        hasImageInput,
+        intentState: passiveIntentState,
+        runtimeArbitration,
+        judgmentSurface,
+        continuityRestoration,
+        outcomeSignals: runtimeOutcomeSignals,
+        adaptiveProfile: adaptiveUserProfile,
+        liveRecommendationEvidence,
+        operationalSignals: coreInterpretation.operationalSignals || [],
+        operationalMemoryEvidence,
+        preparationContext,
+        preparationTurnClassificationRequest,
+        providerPrompt,
+        governedContextNotes: {
+          liveRuntimeContext,
+          shelvedCampaignRuntimeNote,
+          individualLiveContextNote,
+          runtimeAdapterNote,
+          earbudRuntimeNote,
+          runtimeSignalArbitrationNote,
+          arbitrationResponseShapeNote,
+          adaptiveUserProfileNote,
+          durableBehavioralMemoryNote,
+          runtimeOutcomeLearningNote,
+          continuityRestorationNote,
+          judgmentSurfaceNote,
+          responseShapeNote,
+          continuityGovernanceNote,
+          outputGovernanceNote,
+          presentationAuthorityNote,
+        },
       },
     })
+
+    const runtimePipeline = resolveGeorgeRuntimePipeline(governedInvocation)
 
     const { providerRequest, providerResolution } = runtimePipeline
 
@@ -1273,13 +1308,20 @@ LANGUAGE MODE: SPANISH
     const { systemContent, messages: providerMessages } = providerRequest
 
 
+    const currentTurnLiveOperationalJudgmentRequested =
+      body?.requestPurpose ===
+        CURRENT_TURN_LIVE_OPERATIONAL_JUDGMENT_REQUEST &&
+      currentRuntime === 'live_george' &&
+      latestUserSource === 'live_transcript'
     const normalSemanticPhase = currentRuntime === 'normal_george'
+    const canonicalSemanticPhase =
+      normalSemanticPhase || currentTurnLiveOperationalJudgmentRequested
     const ordinaryNormalTwoStage =
-      normalSemanticPhase && !operationalJudgmentRequest
+      (currentRuntime === 'normal_george' && !operationalJudgmentRequest) ||
+      currentTurnLiveOperationalJudgmentRequested
     const providerFallback = providerResolution.fallback
 
     let reply = ''
-    let providerSemanticIntent: NormalProviderSemanticIntent = null
     let providerSemanticJudgment: NormalProviderSemanticJudgment | null = null
     let resolvedSemanticProvider = providerResolution.provider
     let resolvedSemanticModel = model
@@ -1336,7 +1378,7 @@ LANGUAGE MODE: SPANISH
       })
 
       reply = response.output_text.trim()
-    } else if (normalSemanticPhase) {
+    } else if (canonicalSemanticPhase) {
       let semanticProposal = null
 
       if (providerFallback) {
@@ -1382,7 +1424,6 @@ LANGUAGE MODE: SPANISH
         )
       }
 
-      providerSemanticIntent = semanticProposal.semanticIntent
       providerSemanticJudgment = semanticProposal.semanticJudgment
     } else {
       if (providerFallback) {
@@ -1395,8 +1436,6 @@ LANGUAGE MODE: SPANISH
           })
 
           reply = providerResult?.text || ''
-          providerSemanticIntent =
-          providerResult?.semanticIntent ?? null
           providerSemanticJudgment =
             providerResult?.semanticJudgment ?? null
         } catch (error) {
@@ -1417,14 +1456,12 @@ LANGUAGE MODE: SPANISH
         })
 
         reply = providerResult?.text || ''
-        providerSemanticIntent =
-          providerResult?.semanticIntent ?? null
         providerSemanticJudgment =
           providerResult?.semanticJudgment ?? null
       }
     }
 
-    if (!normalSemanticPhase && !reply) {
+    if (!canonicalSemanticPhase && !reply) {
       return NextResponse.json(
         { error: 'No response generated.' },
         { status: 502 }
@@ -1455,13 +1492,14 @@ LANGUAGE MODE: SPANISH
           providerSemanticJudgment?.capabilityExplicitlyRequested === true,
         capabilityRecommendationMaterial:
           providerSemanticJudgment?.capabilityRecommendationMaterial === true,
-        canonicalSignalAcquisition: normalSemanticPhase,
+        canonicalSignalAcquisition: canonicalSemanticPhase,
         signalAcquisitionAllowed: operationalJudgmentRequest
           ? preparationContext?.evidenceSufficiency === 'unresolved' &&
             preparationContext.signalAcquisitionAllowed
           : ordinaryNormalTwoStage
             ? true
             : undefined,
+        preparationContext,
         operationalJudgmentRequest,
         ordinaryNormalRequest: ordinaryNormalTwoStage,
       })
@@ -1775,11 +1813,7 @@ LANGUAGE MODE: SPANISH
         : reply,
       operationalResourceMonitor:
         runtimeAuthoritySnapshot.operationalResourceMonitor,
-      runtimeAuthoritySnapshot: {
-        ...runtimeAuthoritySnapshot,
-        providerSemanticIntent,
-        providerSemanticJudgment,
-      },
+      runtimeAuthoritySnapshot,
       operationalJudgmentResult,
       normalOperationalResult,
       responseAuthority: ordinaryNormalTwoStage
