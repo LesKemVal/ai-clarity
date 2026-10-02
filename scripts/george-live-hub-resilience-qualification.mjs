@@ -9,6 +9,18 @@ const port = 18080 + Math.floor(Math.random() * 1000)
 const baseUrl = `http://127.0.0.1:${port}`
 const socketUrl = `ws://127.0.0.1:${port}`
 
+const install = spawnSync('npm', ['ci', '--prefix', 'live-hub'], {
+  cwd: root,
+  encoding: 'utf8',
+  stdio: 'pipe',
+})
+
+assert.equal(
+  install.status,
+  0,
+  `LIVE Hub dependency installation failed before resilience qualification\n${install.stdout}\n${install.stderr}`
+)
+
 const build = spawnSync('npm', ['run', 'build', '--prefix', 'live-hub'], {
   cwd: root,
   encoding: 'utf8',
